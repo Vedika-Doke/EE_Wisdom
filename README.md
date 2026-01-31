@@ -25,14 +25,12 @@ Documentation of technical learning and applied engineering work completed durin
 - Core electrical and embedded concepts
 - Research-based learning tasks
 
----
-
-### pcb-design-projects
-Contains two complete PCB design projects.
-- Schematic design and component selection
-- PCB layout and routing
-- Sensor interfacing and mixed-signal design
-- Hardware bring-up, debugging, and validation
+#### pcb-design-projects
+  Contains two complete PCB design projects.
+  - Schematic design and component selection
+  - PCB layout and routing
+  - Sensor interfacing and mixed-signal design
+  - Hardware bring-up, debugging, and validation
 
 ---
 
