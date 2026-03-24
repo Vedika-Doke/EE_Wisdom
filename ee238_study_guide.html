@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EE238 Power Engineering II - Ultimate Quiz Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root {
+    --bg: #0a0a10;
+    --surface: #13131f;
+    --surface2: #1c1c30;
+    --surface3: #252540;
+    --border: #2a2a4a;
+    --text: #e8e8f0;
+    --text-dim: #8888a8;
+    --accent: #7c6aef;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --pink: #f472b6;
+    --blue: #60a5fa;
+    --orange: #fb923c;
+    --red: #f87171;
+    --cyan: #22d3ee;
+    --teal: #2dd4bf;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    overflow-x: hidden;
+    font-size: 15px;
+  }
+
+  /* ===== PROGRESS BAR ===== */
+  .progress-bar {
+    position: fixed; top: 0; left: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--pink), var(--cyan));
+    z-index: 1000; transition: width 0.1s;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    position: relative; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; overflow: hidden;
+    background: radial-gradient(ellipse at 50% 0%, #1e1b4b 0%, var(--bg) 70%);
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: -50%;
+    background:
+      radial-gradient(circle at 20% 50%, rgba(124,106,239,0.07) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(244,114,182,0.05) 0%, transparent 50%),
+      radial-gradient(circle at 60% 80%, rgba(96,165,250,0.05) 0%, transparent 50%);
+    animation: drift 25s ease-in-out infinite;
+  }
+  @keyframes drift { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-2%,2%)} }
+
+  .hero-content { position: relative; z-index: 1; padding: 2rem; max-width: 900px; }
+  .hero h1 {
+    font-size: clamp(2.2rem, 5vw, 4rem); font-weight: 800;
+    background: linear-gradient(135deg, var(--accent2), var(--pink), var(--cyan));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem; letter-spacing: -1px;
+  }
+  .hero .subtitle { font-size: 1.2rem; color: var(--text-dim); font-weight: 300; margin-bottom: 1.5rem; }
+
+  /* Stats bar */
+  .stats-bar {
+    display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;
+    margin: 1.5rem 0;
+  }
+  .stat { text-align: center; }
+  .stat-num { font-size: 2rem; font-weight: 700; color: var(--accent2); }
+  .stat-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+  /* TOC */
+  .toc-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.8rem; margin-top: 2rem; text-align: left;
+  }
+  .toc-item {
+    padding: 1rem 1.2rem; border-radius: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    text-decoration: none; color: var(--text); transition: all 0.3s;
+  }
+  .toc-item:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(124,106,239,0.2); }
+  .toc-item .toc-num { font-size: 0.7rem; color: var(--accent2); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+  .toc-item .toc-title { font-weight: 600; font-size: 0.95rem; margin-top: 0.2rem; }
+  .toc-item .toc-desc { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.1rem; }
+
+  .scroll-hint { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); color: var(--text-dim); font-size: 0.85rem; animation: bounce 2s infinite; }
+  @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(8px)} }
+
+  /* ===== MAIN ===== */
+  main { max-width: 920px; margin: 0 auto; padding: 2rem 1.5rem 6rem; }
+
+  /* ===== SECTIONS ===== */
+  .topic { margin-bottom: 4rem; scroll-margin-top: 2rem; }
+  .topic-header {
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid var(--border);
+  }
+  .topic-number {
+    font-size: 2.5rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1;
+    min-width: 50px;
+  }
+  .topic-header h2 { font-size: 1.6rem; font-weight: 700; }
+  .topic-header .time {
+    margin-left: auto; background: var(--surface2);
+    padding: 0.3rem 0.8rem; border-radius: 999px;
+    font-size: 0.8rem; color: var(--yellow); font-weight: 500; white-space: nowrap;
+  }
+
+  h3 { font-size: 1.25rem; color: var(--accent2); margin: 2rem 0 0.8rem; font-weight: 600; }
+  h4 { font-size: 1rem; color: var(--cyan); margin: 1.5rem 0 0.5rem; font-weight: 600; }
+  p { margin-bottom: 0.7rem; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.3rem; margin: 1rem 0; transition: border-color 0.3s;
+  }
+  .card:hover { border-color: rgba(124,106,239,0.4); }
+  .card.highlight { border-left: 4px solid var(--accent); background: linear-gradient(135deg, rgba(124,106,239,0.04), var(--surface)); }
+  .card.warning { border-left: 4px solid var(--yellow); background: linear-gradient(135deg, rgba(251,191,36,0.04), var(--surface)); }
+  .card.important { border-left: 4px solid var(--pink); background: linear-gradient(135deg, rgba(244,114,182,0.04), var(--surface)); }
+  .card.green { border-left: 4px solid var(--green); background: linear-gradient(135deg, rgba(52,211,153,0.04), var(--surface)); }
+  .card.blue { border-left: 4px solid var(--blue); background: linear-gradient(135deg, rgba(96,165,250,0.04), var(--surface)); }
+  .card-title { font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+
+  /* ===== EQUATIONS ===== */
+  .eq {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1rem 1.3rem; margin: 0.8rem 0;
+    overflow-x: auto; font-size: 0.92rem; line-height: 2; color: var(--cyan);
+    white-space: pre-wrap; word-wrap: break-word;
+  }
+  .eq .label { color: var(--text-dim); font-size: 0.78rem; display: block; margin-bottom: 0.2rem; }
+  .eq .main { font-size: 1.05rem; color: var(--yellow); }
+  .eq .ans { color: var(--green); font-weight: 500; }
+
+  /* ===== LISTS ===== */
+  ul, ol { margin: 0.4rem 0 0.7rem 1.4rem; }
+  li { margin-bottom: 0.35rem; }
+  li strong { color: var(--green); }
+
+  /* ===== TABLES ===== */
+  .table-wrap { overflow-x: auto; margin: 1rem 0; border-radius: 10px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th { background: var(--surface2); color: var(--accent2); padding: 0.7rem 1rem; text-align: left; font-weight: 600; border-bottom: 2px solid var(--border); }
+  td { padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(124,106,239,0.04); }
+
+  /* ===== GRIDS ===== */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  /* ===== TAGS ===== */
+  .tag { display: inline-block; padding: 0.12rem 0.55rem; border-radius: 999px; font-size: 0.7rem; font-weight: 600; margin-right: 0.3rem; }
+  .tag.purple { background: rgba(124,106,239,0.2); color: var(--accent2); }
+  .tag.green { background: rgba(52,211,153,0.2); color: var(--green); }
+  .tag.yellow { background: rgba(251,191,36,0.2); color: var(--yellow); }
+  .tag.pink { background: rgba(244,114,182,0.2); color: var(--pink); }
+  .tag.blue { background: rgba(96,165,250,0.2); color: var(--blue); }
+  .tag.cyan { background: rgba(34,211,238,0.2); color: var(--cyan); }
+  .tag.orange { background: rgba(251,146,60,0.2); color: var(--orange); }
+  .tag.red { background: rgba(248,113,113,0.2); color: var(--red); }
+
+  /* ===== QUIZ QUESTION ===== */
+  .quiz-q {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.3rem; margin: 1rem 0;
+    cursor: pointer; position: relative;
+  }
+  .quiz-q .q-num {
+    position: absolute; top: -0.6rem; left: 1rem;
+    background: var(--accent); color: white; font-size: 0.7rem; font-weight: 700;
+    padding: 0.15rem 0.6rem; border-radius: 999px;
+  }
+  .quiz-q .q-text { font-weight: 500; margin-bottom: 0.6rem; padding-top: 0.3rem; }
+  .quiz-q .q-options { list-style: none; margin: 0; padding: 0; }
+  .quiz-q .q-options li { padding: 0.3rem 0.6rem; margin: 0.2rem 0; border-radius: 6px; font-size: 0.9rem; }
+  .quiz-q .q-options li.correct { background: rgba(52,211,153,0.15); border-left: 3px solid var(--green); color: var(--green); font-weight: 600; }
+  .quiz-q .q-explanation {
+    display: none; margin-top: 0.8rem; padding-top: 0.8rem;
+    border-top: 1px solid var(--border); font-size: 0.88rem; color: var(--text-dim);
+  }
+  .quiz-q.open .q-explanation { display: block; }
+  .quiz-q .q-toggle { font-size: 0.78rem; color: var(--accent2); margin-top: 0.5rem; }
+
+  /* ===== VS CONTAINER ===== */
+  .vs-container { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0; align-items: stretch; margin: 1rem 0; }
+  .vs-box { background: var(--surface); border: 1px solid var(--border); padding: 1.1rem; border-radius: 12px; }
+  .vs-divider { display: flex; align-items: center; padding: 0 0.8rem; font-weight: 700; color: var(--text-dim); font-size: 1.2rem; }
+  @media (max-width: 700px) { .vs-container { grid-template-columns: 1fr; } .vs-divider { justify-content: center; padding: 0.5rem 0; } }
+
+  /* ===== SVG ===== */
+  .svg-container { display: flex; justify-content: center; margin: 1.5rem 0; }
+  svg text { font-family: 'Inter', sans-serif; }
+
+  /* ===== SEPARATOR ===== */
+  .sep { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 3rem 0; }
+
+  /* ===== BACK TOP ===== */
+  .back-top {
+    position: fixed; bottom: 2rem; right: 2rem;
+    width: 46px; height: 46px; border-radius: 50%;
+    background: var(--accent); border: none; color: white; font-size: 1.2rem;
+    cursor: pointer; z-index: 100; opacity: 0; transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(124,106,239,0.4);
+  }
+  .back-top.visible { opacity: 1; }
+  .back-top:hover { transform: scale(1.1); }
+
+  /* ===== NAV SIDEBAR (desktop) ===== */
+  .side-nav {
+    position: fixed; left: 1rem; top: 50%; transform: translateY(-50%);
+    z-index: 50; display: flex; flex-direction: column; gap: 0.4rem;
+  }
+  .side-nav a {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--border); display: block;
+    transition: all 0.3s; position: relative;
+  }
+  .side-nav a:hover, .side-nav a.active { background: var(--accent); transform: scale(1.4); }
+  .side-nav a:hover::after {
+    content: attr(data-label); position: absolute; left: 1.2rem; top: -0.2rem;
+    background: var(--surface2); color: var(--text); font-size: 0.72rem;
+    padding: 0.2rem 0.6rem; border-radius: 4px; white-space: nowrap;
+    border: 1px solid var(--border);
+  }
+  @media (max-width: 1100px) { .side-nav { display: none; } }
+
+  /* ===== FORMULA SHEET BOX ===== */
+  .formula-sheet {
+    background: linear-gradient(135deg, rgba(124,106,239,0.08), rgba(244,114,182,0.05));
+    border: 2px solid var(--accent);
+    border-radius: 16px; padding: 2rem; margin: 2rem 0;
+  }
+  .formula-sheet h3 { color: var(--yellow); margin-top: 0; }
+
+  /* ===== WORKED EXAMPLE ===== */
+  .worked {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; margin: 1rem 0; overflow: hidden;
+  }
+  .worked-header {
+    padding: 0.8rem 1.3rem; background: var(--surface2);
+    border-bottom: 1px solid var(--border); font-weight: 600;
+    cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+  }
+  .worked-header .arrow { transition: transform 0.3s; color: var(--accent2); }
+  .worked-body { padding: 1.3rem; display: none; }
+  .worked.open .worked-body { display: block; }
+  .worked.open .worked-header .arrow { transform: rotate(180deg); }
+
+  /* Misc */
+  .flash { background: var(--surface2); border-radius: 6px; padding: 0.3rem 0.7rem; display: inline-block; margin: 0.15rem; font-size: 0.85rem; }
+  mark { background: rgba(251,191,36,0.2); color: var(--yellow); padding: 0 0.2rem; border-radius: 3px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 0.88em; background: var(--surface2); padding: 0.1rem 0.4rem; border-radius: 4px; }
+  .callout { display: flex; gap: 0.8rem; align-items: flex-start; padding: 1rem; background: var(--surface2); border-radius: 10px; margin: 0.8rem 0; }
+  .callout-icon { font-size: 1.3rem; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Side nav dots -->
+<nav class="side-nav" id="sideNav">
+  <a href="#t1" data-label="Power Grids"></a>
+  <a href="#t2" data-label="3-Phase & Per-Unit"></a>
+  <a href="#t3" data-label="Maxwell & TEM"></a>
+  <a href="#t4" data-label="Transmission Lines"></a>
+  <a href="#t5" data-label="Power (P & Q)"></a>
+  <a href="#t6" data-label="Power System Components"></a>
+  <a href="#t7" data-label="Review Q (Part B)"></a>
+  <a href="#t8" data-label="Review Q (5A)"></a>
+  <a href="#t9" data-label="Textbook Problems"></a>
+  <a href="#formulas" data-label="Formula Sheet"></a>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>EE238 Power Engineering II</h1>
+    <p class="subtitle">The Ultimate Quiz Prep Guide &mdash; IIT Bombay</p>
+
+    <div class="stats-bar">
+      <div class="stat"><div class="stat-num">10</div><div class="stat-label">Topics</div></div>
+      <div class="stat"><div class="stat-num">24+</div><div class="stat-label">Quiz Q's Solved</div></div>
+      <div class="stat"><div class="stat-num">10</div><div class="stat-label">Worked Examples</div></div>
+      <div class="stat"><div class="stat-num">50+</div><div class="stat-label">Key Formulas</div></div>
+    </div>
+
+    <div class="toc-grid">
+      <a href="#t1" class="toc-item">
+        <div class="toc-num">Topic 01</div>
+        <div class="toc-title">Power Grids Overview</div>
+        <div class="toc-desc">Grid structure, meshed vs radial, protection</div>
+      </a>
+      <a href="#t2" class="toc-item">
+        <div class="toc-num">Topic 02</div>
+        <div class="toc-title">3-Phase & Per-Unit</div>
+        <div class="toc-desc">Wye/delta, phasors, p.u. system, transformers</div>
+      </a>
+      <a href="#t3" class="toc-item">
+        <div class="toc-num">Topic 03</div>
+        <div class="toc-title">Maxwell & TEM Mode</div>
+        <div class="toc-desc">EM fields, static analysis, TEM propagation</div>
+      </a>
+      <a href="#t4" class="toc-item">
+        <div class="toc-num">Topic 04</div>
+        <div class="toc-title">Transmission Lines</div>
+        <div class="toc-desc">Wave eq, ABCD, Pi model, cables vs OTL</div>
+      </a>
+      <a href="#t5" class="toc-item">
+        <div class="toc-num">Topic 05</div>
+        <div class="toc-title">Power (P & Q)</div>
+        <div class="toc-desc">Complex power, sign conventions, power flow</div>
+      </a>
+      <a href="#t6" class="toc-item">
+        <div class="toc-num">Topic 06</div>
+        <div class="toc-title">System Components</div>
+        <div class="toc-desc">Generators, sync machines, voltage regulation</div>
+      </a>
+      <a href="#t7" class="toc-item">
+        <div class="toc-num">Quiz Prep</div>
+        <div class="toc-title">Review Q (Part B)</div>
+        <div class="toc-desc">18 MCQs with solutions</div>
+      </a>
+      <a href="#t8" class="toc-item">
+        <div class="toc-num">Quiz Prep</div>
+        <div class="toc-title">Review Q (5A)</div>
+        <div class="toc-desc">6 long problems with strategy</div>
+      </a>
+      <a href="#t9" class="toc-item">
+        <div class="toc-num" style="color:var(--orange);">Practice</div>
+        <div class="toc-title">Textbook Problems</div>
+        <div class="toc-desc">Weedy Ex 2.5, 2.6, 3.2, 3.3 + practice Qs</div>
+      </a>
+      <a href="#formulas" class="toc-item">
+        <div class="toc-num" style="color:var(--yellow);">Reference</div>
+        <div class="toc-title">Master Formula Sheet</div>
+        <div class="toc-desc">Every formula you need, on one page</div>
+      </a>
+    </div>
+  </div>
+  <div class="scroll-hint">Scroll to begin studying</div>
+</section>
+
+<main>
+
+<!-- ========== TOPIC 1: POWER GRIDS ========== -->
+<section class="topic" id="t1">
+  <div class="topic-header">
+    <div class="topic-number">01</div>
+    <div><h2>Power Grids Overview</h2></div>
+    <div class="time">~8 min</div>
+  </div>
+
+  <div class="card highlight">
+    <div class="card-title"><span class="tag purple">KEY</span> The Big Picture</div>
+    <ul>
+      <li><strong>3-phase AC, 50 Hz</strong> (India / most of world) with a few HVDC links</li>
+      <li>High voltage minimizes I&sup2;R losses for long distance bulk power transfer</li>
+      <li>Frequency: 50 Hz (India/Europe), 60 Hz (USA). Japan has both!</li>
+      <li><strong>SIL (Surge Impedance Loading)</strong> = V&sup2;/Z<sub>c</sub> determines practical line capacity</li>
+    </ul>
+  </div>
+
+  <!-- SVG: Grid hierarchy -->
+  <div class="svg-container">
+    <svg width="720" height="200" viewBox="0 0 720 200">
+      <rect x="20" y="30" width="130" height="55" rx="10" fill="#1e1b4b" stroke="#7c6aef" stroke-width="2"/>
+      <text x="85" y="52" fill="#a78bfa" text-anchor="middle" font-size="12" font-weight="600">Generation</text>
+      <text x="85" y="72" fill="#9393a8" text-anchor="middle" font-size="10">11-25 kV</text>
+      <rect x="210" y="30" width="150" height="55" rx="10" fill="#1a1a24" stroke="#f472b6" stroke-width="2"/>
+      <text x="285" y="52" fill="#f472b6" text-anchor="middle" font-size="12" font-weight="600">Transmission</text>
+      <text x="285" y="72" fill="#9393a8" text-anchor="middle" font-size="10">132-765 kV (Meshed)</text>
+      <rect x="420" y="30" width="150" height="55" rx="10" fill="#1a1a24" stroke="#34d399" stroke-width="2"/>
+      <text x="495" y="52" fill="#34d399" text-anchor="middle" font-size="12" font-weight="600">Distribution</text>
+      <text x="495" y="72" fill="#9393a8" text-anchor="middle" font-size="10">415V-33 kV (Radial)</text>
+      <rect x="620" y="35" width="80" height="45" rx="8" fill="#22223a" stroke="#60a5fa" stroke-width="1.5"/>
+      <text x="660" y="62" fill="#60a5fa" text-anchor="middle" font-size="11">Loads</text>
+      <line x1="150" y1="57" x2="208" y2="57" stroke="#7c6aef" stroke-width="2" marker-end="url(#arr1)"/>
+      <line x1="360" y1="57" x2="418" y2="57" stroke="#f472b6" stroke-width="2" marker-end="url(#arr2)"/>
+      <line x1="570" y1="57" x2="618" y2="57" stroke="#34d399" stroke-width="2" marker-end="url(#arr3)"/>
+      <text x="180" y="48" fill="#fbbf24" text-anchor="middle" font-size="9">Step-up</text>
+      <text x="390" y="48" fill="#fbbf24" text-anchor="middle" font-size="9">Step-down</text>
+      <!-- SIL info -->
+      <rect x="180" y="110" width="360" height="70" rx="10" fill="rgba(251,191,36,0.06)" stroke="#fbbf24" stroke-width="1"/>
+      <text x="360" y="132" fill="#fbbf24" text-anchor="middle" font-size="11" font-weight="600">Practical Loading Rules</text>
+      <text x="360" y="150" fill="#e4e4ef" text-anchor="middle" font-size="10">Short lines (&lt;80 km): loaded ABOVE SIL</text>
+      <text x="360" y="166" fill="#e4e4ef" text-anchor="middle" font-size="10">Long lines (&gt;300 km): loaded BELOW SIL for stability (&delta; &lt; 30&deg;)</text>
+      <defs>
+        <marker id="arr1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#7c6aef"/></marker>
+        <marker id="arr2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#f472b6"/></marker>
+        <marker id="arr3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#34d399"/></marker>
+      </defs>
+    </svg>
+  </div>
+
+  <h3>Meshed vs Radial</h3>
+  <div class="vs-container">
+    <div class="vs-box">
+      <h4 style="color:var(--pink);margin-top:0;">Radial (Distribution)</h4>
+      <ul>
+        <li>Single path source&rarr;load</li>
+        <li>Easy protection (overcurrent)</li>
+        <li>Less reliable; one break = outage</li>
+        <li>Lower fault currents</li>
+      </ul>
+    </div>
+    <div class="vs-divider">vs</div>
+    <div class="vs-box">
+      <h4 style="color:var(--blue);margin-top:0;">Meshed (Transmission)</h4>
+      <ul>
+        <li>Multiple parallel paths</li>
+        <li>Harder protection (distance/differential)</li>
+        <li>More reliable (redundancy)</li>
+        <li>Higher fault currents</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card warning">
+    <div class="card-title"><span class="tag yellow">IMPORTANT</span> Power Flow Control</div>
+    <p>In meshed AC grids, power flow depends on <strong>impedances</strong> and cannot be controlled locally. To change flow:</p>
+    <ol>
+      <li>Change generation dispatch</li>
+      <li>Change network topology (open/close breakers)</li>
+      <li>Use <strong>Phase Shifting Transformer</strong> or <strong>FACTS</strong> devices</li>
+    </ol>
+    <p style="margin-top:0.5rem;">This is a major motivation for <strong>HVDC</strong> &mdash; DC power flow is fully controllable.</p>
+  </div>
+
+  <h3>Protection in Meshed AC Systems</h3>
+  <div class="card">
+    <ul>
+      <li><strong>Detect faults</strong> reliably</li>
+      <li><strong>Trip quickly</strong> before equipment/personnel affected (~100 ms CB opening)</li>
+      <li><strong>Selectivity</strong>: trip only the affected zone</li>
+      <li><strong>Backup</strong>: if primary protection fails, backup trips</li>
+      <li>Single-pole or three-phase tripping</li>
+      <li>In AC systems, arc interrupts at <strong>current zero crossing</strong></li>
+    </ul>
+  </div>
+
+  <h3>Transformers in the Grid</h3>
+  <div class="card">
+    <ul>
+      <li><strong>Auto-transformers</strong> for close voltage ratios (220/400, 132/220 kV) &mdash; no electrical isolation, but smaller/cheaper</li>
+      <li>Weight ratio vs 2-winding: (1 - N2/N1). Max advantage when voltages are close.</li>
+      <li>Paralleled transformers <strong>must have same phase shift</strong> (e.g., both Yd11)</li>
+      <li>Y&rarr;&Delta; transformer: secondary voltages are <strong>-30&deg;</strong> out of phase with primary</li>
+    </ul>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- ========== TOPIC 2: 3-PHASE & PER-UNIT ========== -->
+<section class="topic" id="t2">
+  <div class="topic-header">
+    <div class="topic-number">02</div>
+    <div><h2>3-Phase Systems & Per-Unit</h2></div>
+    <div class="time">~10 min</div>
+  </div>
+
+  <h3>Three-Phase Fundamentals</h3>
+  <div class="card green">
+    <div class="card-title"><span class="tag green">WHY 3-PHASE?</span></div>
+    <ul>
+      <li>3 windings displaced by 120&deg; &rarr; voltages: v<sub>a</sub>, v<sub>b</sub> (lag 120&deg;), v<sub>c</sub> (lag 240&deg;)</li>
+      <li>Algebraic sum of balanced 3-phase voltages/currents = <strong>0</strong> at every instant</li>
+      <li>Total instantaneous power = <strong>constant</strong> (no pulsation!)</li>
+      <li>Phase sequence a-b-c: determines motor rotation direction</li>
+    </ul>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="tag blue">Wye (Star) Y</span></div>
+      <ul>
+        <li>V<sub>LL</sub> = &radic;3 &middot; V<sub>phase</sub></li>
+        <li>I<sub>line</sub> = I<sub>phase</sub></li>
+        <li>Neutral point available</li>
+        <li>Used for transmission</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag pink">Delta (&Delta;) Mesh</span></div>
+      <ul>
+        <li>V<sub>LL</sub> = V<sub>phase</sub></li>
+        <li>I<sub>line</sub> = &radic;3 &middot; I<sub>phase</sub></li>
+        <li>No neutral wire</li>
+        <li>Triple harmonics circulate in loop</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card highlight">
+    <div class="card-title">3-Phase Power</div>
+    <div class="eq">
+      <span class="main">P = &radic;3 &middot; V<sub>LL</sub> &middot; I<sub>L</sub> &middot; cos(&phi;) = 3 &middot; V<sub>ph</sub> &middot; I<sub>ph</sub> &middot; cos(&phi;)</span>
+      <span class="main">Q = &radic;3 &middot; V<sub>LL</sub> &middot; I<sub>L</sub> &middot; sin(&phi;) = 3 &middot; V<sub>ph</sub> &middot; I<sub>ph</sub> &middot; sin(&phi;)</span>
+    </div>
+    <p>For balanced systems, analyze <strong>one phase</strong> and multiply power by 3.</p>
+  </div>
+
+  <h3>Per-Unit System</h3>
+  <div class="card important">
+    <div class="card-title"><span class="tag pink">EXAM ESSENTIAL</span> Per-Unit Basics</div>
+    <div class="eq">
+      <span class="label">Definition:</span>
+      <span class="main">quantity (p.u.) = actual value / base value</span>
+
+      <span class="label" style="margin-top:0.5rem;">Choose 2 base quantities: S<sub>base</sub> (VA) and V<sub>base</sub> (V)</span>
+      I<sub>base</sub> = S<sub>base</sub> / (&radic;3 &middot; V<sub>base</sub>)
+      <span class="main">Z<sub>base</sub> = V<sub>base</sub>&sup2; / S<sub>base</sub></span>
+      Z<sub>p.u.</sub> = Z(&Omega;) &middot; S<sub>base</sub> / V<sub>base</sub>&sup2;
+    </div>
+  </div>
+
+  <div class="card warning">
+    <div class="card-title"><span class="tag yellow">CHANGE OF BASE</span></div>
+    <div class="eq">
+      Z<sub>p.u.</sub>(new) = Z<sub>p.u.</sub>(old) &times; (S<sub>new</sub>/S<sub>old</sub>) &times; (V<sub>old</sub>/V<sub>new</sub>)&sup2;
+    </div>
+    <p>Transformer p.u. impedance is the <strong>same</strong> on both sides if voltage bases follow turns ratio. The winding disappears in p.u. equivalent circuits!</p>
+  </div>
+
+  <h3>Advantages of Per-Unit</h3>
+  <div class="card">
+    <ol>
+      <li>P.u. values are similar for apparatus of same type regardless of size</li>
+      <li>Eliminates &radic;3 factors in 3-phase calculations</li>
+      <li>Networks with multiple voltage levels solved easily (transformers vanish)</li>
+      <li>Convenient for digital computation</li>
+    </ol>
+  </div>
+
+  <h3>Harmonics in 3-Phase</h3>
+  <div class="card">
+    <ul>
+      <li><strong>Fundamental (n=1,7,13...)</strong>: positive sequence rotation</li>
+      <li><strong>2nd harmonic (n=2,5,8,11...)</strong>: negative (reverse) sequence rotation</li>
+      <li><strong>3rd harmonic (n=3,6,9...)</strong>: zero sequence &mdash; all in phase, circulate in &Delta; loops</li>
+      <li>Line-to-line voltages have <strong>no triple harmonics</strong> (they cancel)</li>
+    </ul>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- ========== TOPIC 3: MAXWELL & TEM ========== -->
+<section class="topic" id="t3">
+  <div class="topic-header">
+    <div class="topic-number">03</div>
+    <div><h2>Maxwell's Equations & TEM Mode</h2></div>
+    <div class="time">~10 min</div>
+  </div>
+
+  <h3>Maxwell's Equations</h3>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="tag purple">STATIC</span></div>
+      <div class="eq">
+        div E = &rho;/&epsilon;<sub>0</sub>
+        div B = 0
+        curl E = 0
+        (1/&mu;<sub>0</sub>) curl B = J
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag pink">DYNAMIC</span></div>
+      <div class="eq">
+        div E = &rho;/&epsilon;<sub>0</sub>
+        div B = 0
+        <span class="main">curl E = -&part;B/&part;t</span>
+        <span class="main">(1/&mu;<sub>0</sub>) curl B = J + &epsilon;<sub>0</sub> &part;E/&part;t</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card green">
+    <div class="card-title">What Changed? (Static &rarr; Dynamic)</div>
+    <ul>
+      <li><strong>Faraday</strong>: curl E &ne; 0. Changing B induces circulating E (voltage!)</li>
+      <li><strong>Displacement current</strong>: &epsilon;<sub>0</sub> &part;E/&part;t. Changing E creates B even without current.</li>
+      <li>Result: <strong>electromagnetic waves</strong> can propagate through space</li>
+    </ul>
+  </div>
+
+  <h3>Two-Wire Transmission Line (Static)</h3>
+  <div class="card">
+    <ul>
+      <li>Two parallel conductors: +&rho; and -&rho; line charge density</li>
+      <li>E between conductors (radial), B loops around conductors</li>
+      <li><strong>No E or B in z-direction</strong> &rarr; 2D Laplace equation</li>
+      <li>Equipotential surfaces are <strong>circles</strong> (not centered on conductors)</li>
+    </ul>
+    <div class="eq">
+      |E| = &rho; / (2&pi;&epsilon;<sub>0</sub>r)        |B| = &mu;<sub>0</sub>I / (2&pi;r)
+    </div>
+  </div>
+
+  <h3>TEM Mode</h3>
+  <div class="card important">
+    <div class="card-title"><span class="tag pink">KEY CONCEPT</span></div>
+    <ul>
+      <li>TEM = <strong>Transverse Electromagnetic</strong> &mdash; E<sub>z</sub> = B<sub>z</sub> = 0</li>
+      <li>Valid when <strong>&lambda; >> conductor spacing</strong> (50 Hz: &lambda; = 6000 km!)</li>
+      <li>Allows <strong>static formulas</strong> to be used for time-varying signals</li>
+      <li>Requires at least 2 conductors (cannot exist in a hollow waveguide)</li>
+    </ul>
+  </div>
+
+  <div class="card blue">
+    <div class="card-title"><span class="tag blue">TRICKY CONCEPT</span> Voltage gradient in z-direction without E<sub>z</sub>?</div>
+    <p><strong>Q: How is there a voltage drop V(z+&Delta;z) - V(z) in the z-direction when there's no E field in that direction (TEM)?</strong></p>
+    <p><strong>A:</strong> Use Faraday's law: &oint; E&middot;dl = -d/dt &int; B&middot;dS</p>
+    <ul>
+      <li>E field can be expressed as gradient of potential only if curl E = 0</li>
+      <li>In the x-y plane, curl E = 0 (no B passing through loops in x-y plane in TEM mode) &rarr; E = -&nabla;V works in x-y</li>
+      <li>But in any loop in the y-z plane, there IS changing B passing through it</li>
+      <li>So <strong>there CAN be a voltage drop [V(z+&Delta;z) - V(z)] in the z-direction without having E<sub>z</sub></strong></li>
+      <li>The voltage drop comes from <strong>Faraday's law</strong> (changing magnetic flux), not from an electric field in z</li>
+    </ul>
+  </div>
+
+  <h3>From Fields to Circuit Parameters</h3>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="tag yellow">Capacitive (E field)</span></div>
+      <div class="eq">
+        <span class="main">-&part;i/&part;z = C' &middot; &part;v/&part;t</span>
+        C' = &pi;&epsilon;<sub>0</sub> / ln(D/r)
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag blue">Inductive (B field)</span></div>
+      <div class="eq">
+        <span class="main">-&part;v/&part;z = L' &middot; &part;i/&part;t</span>
+        L' = (&mu;<sub>0</sub>/&pi;) ln(D/r)
+      </div>
+    </div>
+  </div>
+
+  <div class="card warning">
+    <div class="card-title"><span class="tag yellow">REMEMBER</span> Effect of spacing D</div>
+    <p>If spacing D is <strong>doubled</strong>:</p>
+    <ul>
+      <li>C' <strong>marginally decreases</strong> (C' &prop; 1/ln(D/r), logarithmic)</li>
+      <li>L' marginally increases</li>
+      <li>Z<sub>c</sub> = &radic;(L'/C') increases</li>
+    </ul>
+  </div>
+
+  <h3>Bundle Conductors & Corona</h3>
+  <div class="card">
+    <ul>
+      <li>EHV lines use <strong>bundled conductors</strong> (2, 3, or 4 sub-conductors per phase)</li>
+      <li>Purpose: <strong>reduce corona</strong> (main reason) by lowering surface E-field</li>
+      <li>Side effect: also reduces inductance, increases capacitance</li>
+      <li>Maximum E field in a triangular bundle is at the <strong>outer vertex</strong> (superposition of fields from all sub-conductors)</li>
+    </ul>
+  </div>
+
+  <div class="card warning">
+    <div class="card-title"><span class="tag yellow">CORONA DISCHARGE</span></div>
+    <p>When voltage on a line becomes very high &rarr; E field exceeds a critical value &rarr; air breaks down &rarr; air molecules become ionized &rarr; <strong>partial discharge around the conductor = corona</strong></p>
+    <ul>
+      <li>E field is stronger at <strong>sharp edges</strong> and points (field concentration)</li>
+      <li>Bundling creates a <strong>smoother, larger effective radius</strong> &rarr; less field concentration &rarr; less corona</li>
+      <li>Corona causes power loss, radio interference, and audible noise</li>
+    </ul>
+  </div>
+
+  <h3>Ground Wire (Shield Wire)</h3>
+  <div class="card">
+    <ul>
+      <li>Top wire on transmission tower = <strong>ground conductor</strong></li>
+      <li>Purpose: <strong>prevents phase conductors from direct lightning hit</strong></li>
+      <li>Wire has some potential w.r.t. ground (not exactly zero)</li>
+      <li>Any metallic object near HV lines acquires a potential due to capacitive coupling</li>
+    </ul>
+  </div>
+
+  <h3>E and B Field Patterns</h3>
+  <div class="card">
+    <ul>
+      <li><strong>B field around two-conductor line</strong> (opposite currents): individual loops around each conductor (like two concentric circles, one CW one CCW)</li>
+      <li><strong>E field around two-conductor bundle</strong> (same potential): radial outward from both conductors (divergent pattern)</li>
+      <li><strong>3-phase line at point P</strong>: both magnitude AND direction of E vary with time (superposition of 3 time-varying fields)</li>
+    </ul>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- ========== TOPIC 4: TRANSMISSION LINES ========== -->
+<section class="topic" id="t4">
+  <div class="topic-header">
+    <div class="topic-number">04</div>
+    <div><h2>Transmission Line Models</h2></div>
+    <div class="time">~15 min</div>
+  </div>
+
+  <h3>Telegrapher's Equations</h3>
+  <div class="eq">
+    <span class="label">Lossless:</span>
+    <span class="main">-&part;v/&part;z = L' &part;i/&part;t      -&part;i/&part;z = C' &part;v/&part;t</span>
+    <span class="label" style="margin-top:0.3rem;">Wave equation:</span>
+    <span class="main">&part;&sup2;v/&part;z&sup2; = L'C' &middot; &part;&sup2;v/&part;t&sup2;</span>
+  </div>
+
+  <div class="card highlight">
+    <div class="card-title">Travelling Wave Solution</div>
+    <div class="eq">
+      v(z,t) = f<sub>1</sub>(t - z/v<sub>p</sub>) + f<sub>2</sub>(t + z/v<sub>p</sub>)
+      i(z,t) = (1/Z<sub>c</sub>)[f<sub>1</sub>(t - z/v<sub>p</sub>) - f<sub>2</sub>(t + z/v<sub>p</sub>)]
+    </div>
+    <div class="grid-2" style="margin-top:0.8rem;">
+      <div style="text-align:center;">
+        <div style="font-size:1.3rem;color:var(--yellow);font-weight:700;">Z<sub>c</sub> = &radic;(L'/C')</div>
+        <div style="font-size:0.8rem;color:var(--text-dim);">Characteristic impedance</div>
+        <div style="font-size:0.8rem;color:var(--green);">Independent of line length!</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:1.3rem;color:var(--yellow);font-weight:700;">v<sub>p</sub> = 1/&radic;(L'C')</div>
+        <div style="font-size:0.8rem;color:var(--text-dim);">Propagation speed</div>
+        <div style="font-size:0.8rem;color:var(--green);">&asymp; 3&times;10<sup>8</sup> m/s for OTL</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Boundary Conditions</h3>
+  <div class="grid-3">
+    <div class="card green"><div class="card-title">Matched (R=Z<sub>c</sub>)</div><p>No reflection. f<sub>2</sub>=0.</p></div>
+    <div class="card"><div class="card-title">Open Circuit</div><p>Full reflection. V doubles.</p></div>
+    <div class="card"><div class="card-title">Short Circuit</div><p>Sign flip. I doubles.</p></div>
+  </div>
+
+  <h3>Lossy Line</h3>
+  <div class="eq">
+    -&part;v/&part;z = L' &part;i/&part;t + <span style="color:#fb923c">R'</span>i
+    -&part;i/&part;z = C' &part;v/&part;t + <span style="color:#34d399">G'</span>v
+    <span class="label">Skin effect adds to R' at AC (current concentrates near surface)</span>
+  </div>
+
+  <h3>Sinusoidal Steady State (SSS)</h3>
+  <div class="card important">
+    <div class="card-title"><span class="tag pink">EXAM CORE</span></div>
+    <div class="eq">
+      <span class="label">Per-unit-length:</span>
+      Z(j&omega;) = R' + j&omega;L'       Y(j&omega;) = G' + j&omega;C'
+
+      <span class="main">&gamma; = &radic;(Z &middot; Y) = &alpha; + j&beta;</span>
+      <span class="main">Z<sub>c</sub> = &radic;(Z / Y)</span>
+
+      <span class="label" style="margin-top:0.5rem;">LOSSLESS (R'=G'=0):</span>
+      <span class="ans">&gamma; = j&beta; = j&omega;&radic;(L'C')     Z<sub>c</sub> = &radic;(L'/C') [real!]</span>
+    </div>
+  </div>
+
+  <h3>ABCD Matrix</h3>
+  <div class="card highlight">
+    <div class="card-title"><span class="tag purple">MASTER EQUATION</span></div>
+    <div class="eq" style="font-size:1rem;">
+      <span class="label">Exact (long line):</span>
+      <span class="main">[V<sub>s</sub>]   [cosh(&gamma;l)       Z<sub>c</sub>sinh(&gamma;l)]   [V<sub>r</sub>]</span>
+      <span class="main">[I<sub>s</sub>] = [(1/Z<sub>c</sub>)sinh(&gamma;l)  cosh(&gamma;l)  ] &middot; [I<sub>r</sub>]</span>
+
+      <span class="label" style="margin-top:0.5rem;">LOSSLESS (cosh&rarr;cos, sinh&rarr;jsin):</span>
+      <span class="ans">[V<sub>s</sub>]   [cos(&beta;l)         jZ<sub>c</sub>sin(&beta;l)]   [V<sub>r</sub>]</span>
+      <span class="ans">[I<sub>s</sub>] = [j(1/Z<sub>c</sub>)sin(&beta;l)  cos(&beta;l)  ] &middot; [I<sub>r</sub>]</span>
+    </div>
+    <p style="margin-top:0.5rem;">Property: <strong>AD - BC = 1</strong>. For lossless: cos&sup2;(&beta;l) + sin&sup2;(&beta;l) = 1.</p>
+  </div>
+
+  <h3>Cascading ABCD Matrices</h3>
+  <div class="card">
+    <p>Two networks in series: <strong>[ABCD]<sub>total</sub> = [ABCD]<sub>1</sub> &times; [ABCD]<sub>2</sub></strong></p>
+    <p>For parallel networks: special formulas (A<sub>0</sub>=(A<sub>1</sub>B<sub>2</sub>+A<sub>2</sub>B<sub>1</sub>)/(B<sub>1</sub>+B<sub>2</sub>), etc.)</p>
+  </div>
+
+  <h3>Equivalent Pi Circuit</h3>
+  <div class="svg-container">
+    <svg width="420" height="150" viewBox="0 0 420 150">
+      <line x1="40" y1="45" x2="100" y2="45" stroke="#e4e4ef" stroke-width="2"/>
+      <rect x="100" y="30" width="120" height="30" rx="6" fill="none" stroke="#fb923c" stroke-width="2"/>
+      <text x="160" y="50" fill="#fb923c" text-anchor="middle" font-size="11">Z<tspan font-size="8" dy="3">c</tspan><tspan dy="-3">sinh(&gamma;l)</tspan></text>
+      <line x1="220" y1="45" x2="280" y2="45" stroke="#e4e4ef" stroke-width="2"/>
+      <line x1="85" y1="45" x2="85" y2="65" stroke="#e4e4ef" stroke-width="1.5"/>
+      <rect x="72" y="65" width="26" height="35" rx="4" fill="none" stroke="#60a5fa" stroke-width="2"/>
+      <text x="85" y="86" fill="#60a5fa" text-anchor="middle" font-size="8">Y<tspan font-size="6" dy="2">sh</tspan>/2</text>
+      <line x1="85" y1="100" x2="85" y2="115" stroke="#e4e4ef" stroke-width="1.5"/>
+      <line x1="235" y1="45" x2="235" y2="65" stroke="#e4e4ef" stroke-width="1.5"/>
+      <rect x="222" y="65" width="26" height="35" rx="4" fill="none" stroke="#60a5fa" stroke-width="2"/>
+      <text x="235" y="86" fill="#60a5fa" text-anchor="middle" font-size="8">Y<tspan font-size="6" dy="2">sh</tspan>/2</text>
+      <line x1="235" y1="100" x2="235" y2="115" stroke="#e4e4ef" stroke-width="1.5"/>
+      <line x1="40" y1="115" x2="280" y2="115" stroke="#e4e4ef" stroke-width="2"/>
+      <text x="38" y="38" fill="#fbbf24" font-size="10">V<sub>s</sub></text>
+      <text x="268" y="38" fill="#fbbf24" font-size="10">V<sub>r</sub></text>
+    </svg>
+  </div>
+  <div class="eq">
+    Z<sub>series</sub> = Z<sub>c</sub> sinh(&gamma;l)
+    Y<sub>shunt</sub>/2 = (1/Z<sub>c</sub>) tanh(&gamma;l/2)
+    <span class="label">Lossless: Z<sub>se</sub> = jZ<sub>c</sub>sin(&beta;l), Y<sub>sh</sub>/2 = j(1/Z<sub>c</sub>)tan(&beta;l/2)</span>
+  </div>
+
+  <h3>Line Length Approximations</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Type</th><th>Length</th><th>Model</th><th>ABCD</th></tr>
+      <tr><td><span class="tag green">Short</span></td><td>&lt;80 km</td><td>Series Z only</td><td>[[1, Z], [0, 1]]</td></tr>
+      <tr><td><span class="tag yellow">Medium</span></td><td>80-250 km</td><td>Nominal &Pi;</td><td>[[1+YZ/2, Z], [Y(1+YZ/4), 1+YZ/2]]</td></tr>
+      <tr><td><span class="tag pink">Long</span></td><td>&gt;250 km</td><td>Exact</td><td>cosh/sinh</td></tr>
+    </table>
+  </div>
+
+  <h3>OTL vs Cables</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Parameter</th><th>Overhead (230 kV)</th><th>Cable (230 kV)</th><th>Ratio</th></tr>
+      <tr><td>x<sub>l</sub> (&Omega;/km)</td><td>0.488</td><td>0.339</td><td>~1.4x</td></tr>
+      <tr><td>b<sub>c</sub> (&mu;S/km)</td><td>3.371</td><td>245.6</td><td><strong>~73x</strong></td></tr>
+      <tr><td>Z<sub>c</sub> (&Omega;)</td><td>380</td><td>37.1</td><td>~10x</td></tr>
+      <tr><td>SIL (MW)</td><td>140</td><td>1426</td><td>~10x</td></tr>
+    </table>
+  </div>
+
+  <div class="card warning">
+    <div class="card-title"><span class="tag yellow">WHY CABLES LIMITED TO 30-40 km AC?</span></div>
+    <p>Cables <strong>generate</strong> massive reactive power under typical loading (high b<sub>c</sub>). At 30-40 km, the charging current alone can approach the thermal limit. Need shunt reactors to compensate.</p>
+    <p style="margin-top:0.5rem;"><strong>Solution:</strong> Compensate with <strong>lumped shunt reactors</strong>. For long distances, use <strong>HVDC cables</strong> (no reactive power issue with DC).</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="tag cyan">FROM NOTES</span> OTL vs Cable Quick Facts</div>
+    <div class="table-wrap" style="margin:0;">
+      <table>
+        <tr><th>Property</th><th>Overhead Lines</th><th>Cables</th></tr>
+        <tr><td>Z<sub>c</sub></td><td>230-400 &Omega;</td><td>25-50 &Omega;</td></tr>
+        <tr><td>b<sub>c</sub></td><td>Baseline</td><td>50-100x more reactive power</td></tr>
+        <tr><td>SIL</td><td>Lower</td><td>Much higher (cable SIL >> OTL SIL)</td></tr>
+        <tr><td>X/R ratio</td><td>10-12</td><td>2-9</td></tr>
+        <tr><td>&alpha;, &beta;</td><td>Lower</td><td>Higher (more lossy/km, dielectric losses)</td></tr>
+        <tr><td>Structure</td><td>Open air</td><td>Coaxial: 2 conductors close together, dielectric between</td></tr>
+        <tr><td>Max AC length</td><td>Hundreds of km</td><td>30-40 km (charging current limit)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3>3-Phase Line: Mutual Coupling & Impedance Matrix</h3>
+  <div class="card">
+    <div class="card-title"><span class="tag cyan">FROM NOTES</span> Two-wire line with mutual inductance & capacitance</div>
+    <div class="eq">
+      <span class="label">For a 3-phase line (with mutual coupling L<sub>m</sub>', C<sub>m</sub>'):</span>
+      [-&part;V<sub>a</sub>/&part;z]   [Z<sub>s</sub>'  Z<sub>m</sub>'  Z<sub>m</sub>'] [I<sub>a</sub>]
+      [-&part;V<sub>b</sub>/&part;z] = [Z<sub>m</sub>'  Z<sub>s</sub>'  Z<sub>m</sub>'] [I<sub>b</sub>]
+      [-&part;V<sub>c</sub>/&part;z]   [Z<sub>m</sub>'  Z<sub>m</sub>'  Z<sub>s</sub>'] [I<sub>c</sub>]
+
+      <span class="label" style="margin-top:0.3rem;">Similarly for capacitance matrix (C<sub>s</sub>', C<sub>m</sub>')</span>
+    </div>
+    <p><strong>Key simplification</strong> (balanced system, I<sub>a</sub>+I<sub>b</sub>+I<sub>c</sub>=0):</p>
+    <div class="eq">
+      -&part;(V<sub>a</sub>)/&part;z = Z<sub>s</sub>'I<sub>a</sub> + Z<sub>m</sub>'(I<sub>b</sub>+I<sub>c</sub>)
+                  = (Z<sub>s</sub>' - Z<sub>m</sub>') I<sub>a</sub>     [since I<sub>b</sub>+I<sub>c</sub> = -I<sub>a</sub>]
+
+      <span class="ans">&rarr; Effective per-phase: Z' = Z<sub>s</sub>' - Z<sub>m</sub>'  and  C' = C<sub>s</sub>' - C<sub>m</sub>'</span>
+    </div>
+    <p>This is why we can treat a balanced 3-phase system as a <strong>single-phase equivalent</strong>!</p>
+  </div>
+
+  <h3>Matched Load (R = Z<sub>c</sub>): Equivalent Circuit View</h3>
+  <div class="card green">
+    <div class="card-title"><span class="tag green">FROM NOTES</span> What the line "looks like"</div>
+    <ul>
+      <li>When terminated with R = Z<sub>c</sub>: V<sub>k</sub> = V<sub>m</sub> e<sup>j&beta;l</sup> (just a phase shift, no magnitude change)</li>
+      <li>Sending and receiving voltages are <strong>equal in magnitude</strong></li>
+      <li>Split line at midpoint: V<sub>mid</sub> = V<sub>k</sub> e<sup>-j&beta;l/2</sup> = V<sub>m</sub> e<sup>j&beta;l/2</sup></li>
+      <li>Equivalent circuit seen from receiving end: source V<sub>k</sub>/cos(&beta;l) in series with <strong>jZ<sub>c</sub>tan(&beta;l)</strong></li>
+    </ul>
+    <div class="eq">
+      <span class="label">Equivalent series impedance from receiving end:</span>
+      <span class="main">V<sub>k</sub>/cos(&beta;l) &mdash;&mdash;[ jZ<sub>c</sub>tan(&beta;l) ]&mdash;&mdash; V<sub>m</sub></span>
+    </div>
+  </div>
+
+  <h3>Power Flow Through Lossless Line</h3>
+  <div class="card highlight">
+    <div class="card-title"><span class="tag purple">FROM NOTES</span> Direct derivation (P)</div>
+    <div class="eq">
+      <span class="label">Using the equivalent circuit (V<sub>k</sub>/cos&beta;l source with jZ<sub>c</sub>tan&beta;l series):</span>
+      P = V&middot;V sin&delta; / (cos&beta;l &middot; Z<sub>c</sub>tan&beta;l)
+        = <span class="main">V&sup2; sin&delta; / (Z<sub>c</sub> sin&beta;l)</span>
+
+      <span class="label" style="margin-top:0.3rem;">For lossless line: &beta; = &omega;&radic;(L'C'), Z<sub>c</sub>sin&beta;l = &omega;L'l = X<sub>total</sub></span>
+
+      <span class="ans">Longer line &rarr; larger sin(&beta;l) &rarr; LESS power can be transmitted!</span>
+    </div>
+  </div>
+
+  <div class="card important">
+    <div class="card-title"><span class="tag pink">WHY THIS WORKS FOR P BUT NOT Q</span></div>
+    <p>The equivalent circuit (V/cos&beta;l source + jZ<sub>c</sub>tan&beta;l) is a <strong>Thevenin equivalent from the receiving end</strong>. It lumps all the distributed shunt capacitance into the series element.</p>
+    <ul>
+      <li><strong>P:</strong> Works because P<sub>sending</sub> = P<sub>receiving</sub> (lossless line, active power is conserved)</li>
+      <li><strong>Q:</strong> Does NOT work because the line itself generates Q (capacitance) and absorbs Q (inductance), so <strong>Q<sub>s</sub> &ne; Q<sub>r</sub></strong></li>
+    </ul>
+    <p style="margin-top:0.5rem;"><strong>For Q, you MUST use the full ABCD matrix:</strong></p>
+    <div class="eq">
+      <span class="main">P = V&sup2; sin&delta; / (Z<sub>c</sub> sin&beta;l)</span>  &larr; same at both ends
+
+      <span class="main" style="color:var(--pink);">Q<sub>s</sub> = V&sup2;[cos&delta; - cos&beta;l] / (Z<sub>c</sub> sin&beta;l)</span>  &larr; sending end
+      <span class="main" style="color:var(--pink);">Q<sub>r</sub> = V&sup2;[cos&beta;l - cos&delta;] / (Z<sub>c</sub> sin&beta;l)</span>  &larr; receiving end
+    </div>
+    <p style="margin-top:0.5rem;">Notice: <strong>Q<sub>s</sub> = -Q<sub>r</sub></strong> only when &delta; = &beta;l (SIL loading). At any other loading, the line has a net Q exchange with the system.</p>
+    <ul>
+      <li>&delta; &lt; &beta;l (below SIL): cos&delta; > cos&beta;l &rarr; Q<sub>s</sub> > 0, Q<sub>r</sub> < 0 &rarr; <strong>line generates Q</strong> (capacitive dominates)</li>
+      <li>&delta; > &beta;l (above SIL): cos&delta; < cos&beta;l &rarr; Q<sub>s</sub> < 0, Q<sub>r</sub> > 0 &rarr; <strong>line absorbs Q</strong> (inductive dominates)</li>
+    </ul>
+  </div>
+
+  <h3>Voltage Profile Concepts</h3>
+  <div class="card">
+    <ul>
+      <li><strong>SIL loading</strong>: I&sup2;X<sub>L</sub> = V&sup2;B<sub>C</sub> &rarr; flat voltage profile</li>
+      <li><strong>Below SIL</strong> (light load): line capacitance dominates &rarr; <strong>voltage rises</strong> (Ferranti effect)</li>
+      <li><strong>Above SIL</strong> (heavy load): line inductance dominates &rarr; <strong>voltage drops</strong></li>
+      <li>At <strong>no-load</strong> with both ends at 1 p.u., midpoint voltage = 1/cos(&beta;l/2) > 1 p.u.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- ========== TOPIC 5: POWER ========== -->
+<section class="topic" id="t5">
+  <div class="topic-header">
+    <div class="topic-number">05</div>
+    <div><h2>Active & Reactive Power</h2></div>
+    <div class="time">~10 min</div>
+  </div>
+
+  <h3>Instantaneous Power (Single Phase)</h3>
+  <div class="eq">
+    v = &radic;2 E sin(&omega;t),  i = &radic;2 I sin(&omega;t + &phi;)
+    <span class="main">p = vi = [EI cos&phi; - EI cos(2&omega;t)cos&phi;] + [EI sin(2&omega;t) sin&phi;]</span>
+    <span class="label">       = instantaneous real power + instantaneous reactive power</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card green">
+      <div class="card-title">Real Power P</div>
+      <div class="eq"><span class="ans">P = EI cos&phi; [W]</span></div>
+      <p>Average power. Does real work.</p>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--pink)">Reactive Power Q</div>
+      <div class="eq"><span style="color:var(--pink)">Q = EI sin&phi; [VAr]</span></div>
+      <p>Peak of oscillating energy exchange. No net work.</p>
+    </div>
+  </div>
+
+  <h3>Complex Power</h3>
+  <div class="card highlight">
+    <div class="eq">
+      <span class="main">S = P + jQ = V &middot; I*</span>   (using S = EI* convention)
+      |S| = &radic;(P&sup2; + Q&sup2;) [VA]
+      <span class="ans">Power Factor = cos(&phi;) = P/|S|</span>
+    </div>
+    <p style="margin-top:0.5rem;">Convention (IEC): <strong>S = EI*</strong> &rarr; inductive load absorbs +Q, capacitive load absorbs -Q (generates +Q).</p>
+  </div>
+
+  <h3>Reactive Power Sources & Sinks</h3>
+  <div class="card">
+    <div class="table-wrap" style="margin:0;">
+      <table>
+        <tr><th>Component</th><th>Q Behavior</th></tr>
+        <tr><td>Inductor / Induction motor</td><td><strong>Absorbs</strong> Q (Q>0)</td></tr>
+        <tr><td>Capacitor</td><td><strong>Generates</strong> Q (absorbs Q<0)</td></tr>
+        <tr><td>Over-excited synchronous gen</td><td><strong>Generates</strong> Q</td></tr>
+        <tr><td>Under-excited synchronous gen</td><td><strong>Absorbs</strong> Q</td></tr>
+        <tr><td>Lightly loaded OTL</td><td><strong>Generates</strong> Q (capacitive)</td></tr>
+        <tr><td>Heavily loaded OTL</td><td><strong>Absorbs</strong> Q (inductive)</td></tr>
+        <tr><td>Cables (always)</td><td><strong>Generates</strong> Q (high capacitance)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3>Power Transfer Through a Line</h3>
+  <div class="svg-container">
+    <svg width="400" height="100" viewBox="0 0 400 100">
+      <circle cx="60" cy="50" r="25" fill="none" stroke="#a78bfa" stroke-width="2"/>
+      <text x="60" y="55" fill="#a78bfa" text-anchor="middle" font-size="14">~</text>
+      <text x="60" y="88" fill="#e4e4ef" text-anchor="middle" font-size="11">V<sub>G</sub>&ang;&delta;</text>
+      <line x1="85" y1="50" x2="140" y2="50" stroke="#e4e4ef" stroke-width="2"/>
+      <path d="M140,50 Q155,30 170,50 Q185,30 200,50 Q215,30 230,50 Q245,30 260,50" fill="none" stroke="#fbbf24" stroke-width="2"/>
+      <line x1="260" y1="50" x2="315" y2="50" stroke="#e4e4ef" stroke-width="2"/>
+      <text x="200" y="30" fill="#fbbf24" text-anchor="middle" font-size="11">R + jX</text>
+      <circle cx="340" cy="50" r="25" fill="none" stroke="#34d399" stroke-width="2"/>
+      <text x="340" y="55" fill="#34d399" text-anchor="middle" font-size="14">~</text>
+      <text x="340" y="88" fill="#e4e4ef" text-anchor="middle" font-size="11">V<sub>L</sub>&ang;0</text>
+    </svg>
+  </div>
+
+  <div class="card important">
+    <div class="card-title"><span class="tag pink">KEY EQUATIONS</span> (General Z = R + jX)</div>
+    <div class="eq">
+      <span class="label">At source end:</span>
+      P<sub>G</sub> = (V<sub>G</sub>&sup2;/Z) cos&theta; - (V<sub>G</sub>V<sub>L</sub>/Z) cos(&theta;+&delta;)
+
+      Q<sub>G</sub> = (V<sub>G</sub>&sup2;/Z) sin&theta; - (V<sub>G</sub>V<sub>L</sub>/Z) sin(&theta;+&delta;)
+
+      <span class="label">where &theta; = tan<sup>-1</sup>(X/R)</span>
+    </div>
+    <div class="eq" style="border-color:var(--green);">
+      <span class="label">For LOSSLESS line (R=0, &theta;=90&deg;):</span>
+      <span class="ans">P = (V<sub>G</sub>V<sub>L</sub> / X) sin(&delta;)</span>
+
+      <span class="ans">P<sub>max</sub> = V<sub>G</sub>V<sub>L</sub> / X</span>
+
+      Q<sub>G</sub> = (V<sub>G</sub>&sup2; - V<sub>G</sub>V<sub>L</sub> cos&delta;) / X
+
+      Q<sub>L</sub> = (V<sub>G</sub>V<sub>L</sub> cos&delta; - V<sub>L</sub>&sup2;) / X
+    </div>
+  </div>
+
+  <div class="card warning">
+    <div class="card-title"><span class="tag yellow">GOLDEN RULES</span></div>
+    <ul>
+      <li><strong>P</strong> controlled by <strong>angle difference &delta;</strong></li>
+      <li><strong>Q</strong> controlled by <strong>voltage magnitudes</strong></li>
+      <li>Voltage drop &Delta;V &asymp; (RP + XQ)/V<sub>L</sub> (approximate, for small &delta;)</li>
+      <li>For transmission (R&lt;&lt;X): <strong>&Delta;V &asymp; XQ/V</strong> &mdash; voltage depends mainly on Q!</li>
+    </ul>
+  </div>
+
+  <h3>Tellegen's Theorem</h3>
+  <div class="card">
+    <div class="eq">
+      <span class="main">&Sigma; V<sub>k</sub> I<sub>k</sub>* = 0</span>  &rarr; total complex power absorbed = total supplied
+    </div>
+    <p>Works for ANY circuit: linear, nonlinear, time-varying. At each node: &Sigma;P = 0, &Sigma;Q = 0.</p>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- ========== TOPIC 6: COMPONENTS ========== -->
+<section class="topic" id="t6">
+  <div class="topic-header">
+    <div class="topic-number">06</div>
+    <div><h2>Power System Components</h2></div>
+    <div class="time">~5 min</div>
+  </div>
+
+  <h3>Synchronous Machines</h3>
+  <div class="card">
+    <ul>
+      <li>f = np/60 (n=rpm, p=pole pairs). 50 Hz, 2-pole: 3000 rpm (turbo). 20-pole: 150 rpm (hydro).</li>
+      <li>Equivalent circuit: <strong>E = V<sub>t</sub> + I(R<sub>L</sub> + jX<sub>s</sub>)</strong></li>
+      <li>X<sub>s</sub> = synchronous reactance = X<sub>m</sub> + X<sub>L</sub> (magnetizing + leakage)</li>
+      <li><strong>Over-excited</strong>: E > V, generates Q (capacitive to system)</li>
+      <li><strong>Under-excited</strong>: E < V, absorbs Q (inductive to system)</li>
+    </ul>
+  </div>
+
+  <h3>Short-Circuit Ratio (SCR)</h3>
+  <div class="card">
+    <ul>
+      <li>SCR = (field current for rated V on OC) / (field current for rated I on SC)</li>
+      <li>SCR &asymp; 1/X<sub>s</sub>(p.u.) approximately</li>
+      <li>Low SCR (0.55) = high X<sub>s</sub> = cheaper but less stable</li>
+      <li>Design trade-off: economy vs stability</li>
+    </ul>
+  </div>
+
+  <h3>Four-Terminal (ABCD) Networks</h3>
+  <div class="card">
+    <div class="eq">
+      V<sub>S</sub> = AV<sub>R</sub> + BI<sub>R</sub>
+      I<sub>S</sub> = CV<sub>R</sub> + DI<sub>R</sub>
+      <span class="label">Property: AD - BC = 1</span>
+      <span class="label">Physical interpretation:</span>
+      <span class="label">B = V<sub>S</sub>/I<sub>R</sub> with V<sub>R</sub>=0  (short circuit impedance)</span>
+      <span class="label">A = V<sub>S</sub>/V<sub>R</sub> with I<sub>R</sub>=0  (open circuit voltage ratio)</span>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- ========== TOPIC 7: REVIEW QUESTIONS PART B ========== -->
+<section class="topic" id="t7">
+  <div class="topic-header">
+    <div class="topic-number">Q</div>
+    <div><h2>Review Questions (Part B) &mdash; MCQ Practice</h2></div>
+    <div class="time">Quiz prep</div>
+  </div>
+
+  <p style="color:var(--text-dim);margin-bottom:1.5rem;">Click any question to reveal the solution. These are from the Moodle quiz bank.</p>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q1</div>
+    <div class="q-text">For an OTL: L' = 1.11 &mu;H/m, C' = 0.01 nF/m. Characteristic impedance?</div>
+    <ul class="q-options">
+      <li>111 &Omega;</li>
+      <li class="correct">333 &Omega;</li>
+      <li>0.003 &Omega;</li>
+    </ul>
+    <div class="q-explanation">
+      <div class="eq">Z<sub>c</sub> = &radic;(L'/C') = &radic;(1.11&times;10<sup>-6</sup> / 0.01&times;10<sup>-9</sup>) = &radic;(111000) &asymp; <span class="ans">333 &Omega;</span></div>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q2</div>
+    <div class="q-text">L' = 1.11 &mu;H/m, v<sub>p</sub> = 3&times;10<sup>8</sup> m/s. Find C'.</div>
+    <ul class="q-options">
+      <li>10 nF/m</li><li>100 nF/m</li><li>1 nF/m</li>
+      <li class="correct">0.01 nF/m</li>
+    </ul>
+    <div class="q-explanation">
+      <div class="eq">v = 1/&radic;(L'C') &rarr; C' = 1/(v&sup2;L') = 1/((3&times;10<sup>8</sup>)&sup2; &times; 1.11&times;10<sup>-6</sup>) = <span class="ans">0.01 nF/m</span></div>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q3</div>
+    <div class="q-text">Bundled conductor (equilateral triangle, 3 sub-conductors at same potential). Maximum E field at?</div>
+    <ul class="q-options">
+      <li class="correct">Point Y (outer vertex where fields superpose constructively)</li>
+      <li>Point W</li><li>Point X</li><li>Point Z</li>
+    </ul>
+    <div class="q-explanation">At the outer vertex, electric fields from all 3 sub-conductors point roughly in the same direction (outward), so they superpose to give maximum intensity.</div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q4</div>
+    <div class="q-text">Bundle conductor purpose in EHV lines?</div>
+    <ul class="q-options">
+      <li>Increase inductance</li><li>Reduce phase imbalance</li><li>Decrease capacitance</li>
+      <li class="correct">Reduce corona</li>
+    </ul>
+    <div class="q-explanation">Bundling increases effective radius &rarr; reduces surface electric field &rarr; reduces corona discharge. Side effects: decreases L, increases C.</div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q5</div>
+    <div class="q-text">Series capacitors on long EHV lines are used to:</div>
+    <ul class="q-options">
+      <li>Control system frequency</li><li>Improve load PF</li>
+      <li class="correct">Increase power transfer capability</li>
+      <li>Prevent over-voltage</li>
+    </ul>
+    <div class="q-explanation">P<sub>max</sub> = V&sup2;/X<sub>eff</sub>. Series capacitor cancels part of line inductance, reducing X<sub>eff</sub> and increasing P<sub>max</sub>. (See Q5A Problem 5)</div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q6</div>
+    <div class="q-text">X/R ratio of 150 km, 400 kV overhead line?</div>
+    <ul class="q-options">
+      <li class="correct">10-15</li><li>60-100</li><li>0.1-0.5</li><li>1-2</li>
+    </ul>
+    <div class="q-explanation">For EHV OTL, R is very small compared to X. Typical X/R &asymp; 10-15. (At distribution level, X/R &asymp; 1-2.)</div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q7</div>
+    <div class="q-text">400 kV OTL, Z<sub>c</sub> &asymp; 300 &Omega;. Which line data (R, x<sub>l</sub>, b<sub>c</sub>) is correct?</div>
+    <ul class="q-options">
+      <li>20.8, 24, 256.375 &mu;S</li>
+      <li class="correct">6.4, 73.6, 800 &mu;S</li>
+    </ul>
+    <div class="q-explanation">
+      <div class="eq">Z<sub>c</sub> &asymp; &radic;(x<sub>l</sub>/b<sub>c</sub>) &rarr; x<sub>l</sub> = Z<sub>c</sub>&sup2; &middot; b<sub>c</sub>
+      If b<sub>c</sub> = 800 &mu;S: x<sub>l</sub> = 300&sup2; &times; 800&times;10<sup>-6</sup> = 72 &Omega; &asymp; <span class="ans">73.6 &Omega;</span></div>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q8</div>
+    <div class="q-text">Lossless line terminated by R = Z<sub>c</sub>. Which is TRUE?</div>
+    <ul class="q-options">
+      <li>Phase and magnitude same everywhere</li>
+      <li>Phase angle difference independent of length</li>
+      <li class="correct">Phase angle difference depends on line length</li>
+    </ul>
+    <div class="q-explanation">
+      <div class="eq">V<sub>s</sub> = cos(&beta;l)V<sub>r</sub> + jZ<sub>c</sub>sin(&beta;l)(V<sub>r</sub>/Z<sub>c</sub>) = e<sup>j&beta;l</sup> V<sub>r</sub></div>
+      <p>Magnitude is constant (|V<sub>s</sub>| = |V<sub>r</sub>|) but phase shift = &beta;l, which <strong>depends on length</strong>.</p>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q9</div>
+    <div class="q-text">Reactance of 100-mile EHV overhead line?</div>
+    <ul class="q-options">
+      <li>1-10 &Omega;</li><li class="correct">45-80 &Omega;</li><li>400-850 &Omega;</li><li>4500-7600 &Omega;</li>
+    </ul>
+    <div class="q-explanation">100 mile &asymp; 161 km. EHV line x &asymp; 0.29-0.49 &Omega;/km. X = 161 &times; 0.3 to 0.49 &asymp; <span class="ans">47-79 &Omega;</span></div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q10</div>
+    <div class="q-text">Surge impedance of EHV overhead lines?</div>
+    <ul class="q-options">
+      <li>10-15 &Omega;</li><li class="correct">230-400 &Omega;</li><li>800-1200 &Omega;</li><li>30-50 &Omega;</li>
+    </ul>
+    <div class="q-explanation">EHV OTL: Z<sub>c</sub> &asymp; 230-400 &Omega;. Cables: Z<sub>c</sub> &asymp; 30-50 &Omega;.</div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q11</div>
+    <div class="q-text">Why are cables not used for AC transmission > 30-40 km?</div>
+    <ul class="q-options">
+      <li>Absorb reactive power</li><li>Under-voltage problems</li>
+      <li class="correct">Generate substantial reactive power (high b<sub>c</sub>)</li>
+      <li>High characteristic impedance</li>
+    </ul>
+    <div class="q-explanation">Cables have very high capacitance &rarr; generate massive reactive power (Q = V&sup2;&omega;C per km). The charging current alone can fill the cable's thermal capacity.</div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q12</div>
+    <div class="q-text">3-phase OTL, balanced voltages, E field at point P near ground?</div>
+    <ul class="q-options">
+      <li>Constant magnitude, varying direction</li><li>E = 0</li>
+      <li class="correct">Both magnitude and direction vary with time</li>
+      <li>Varying magnitude, constant direction</li>
+    </ul>
+    <div class="q-explanation">E at P is superposition of fields from 3 phases. Since the phases have different magnitudes at different times AND different directions, the resultant E varies in both magnitude and direction (it traces an ellipse).</div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q13-14</div>
+    <div class="q-text">B field around two-conductor line (opposite currents)? E field around two-conductor bundle (same potential)?</div>
+    <ul class="q-options">
+      <li class="correct">B: Individual circles around each conductor (opposite rotation)</li>
+      <li class="correct">E: Radial outward from both conductors (diverging arrows)</li>
+    </ul>
+    <div class="q-explanation">B field: apply right-hand rule to each conductor separately. E field for bundle: both at same potential with +charge, so E radiates outward from both (like two positive charges).</div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q15</div>
+    <div class="q-text">Two-wire system: spacing D doubled. Capacitance?</div>
+    <ul class="q-options">
+      <li>Doubles</li><li>Marginally increases</li><li>Halves</li>
+      <li class="correct">Marginally decreases</li>
+    </ul>
+    <div class="q-explanation">
+      <div class="eq">C' = &pi;&epsilon;<sub>0</sub>/ln(D/r). When D doubles: ln(2D/r) = ln(D/r) + ln2</div>
+      <p>Logarithmic dependence &rarr; only a small (marginal) decrease.</p>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q16</div>
+    <div class="q-text">400 km lossless line, both ends at 1.0 p.u., &beta;=0.0013 rad/km. No-load voltage profile?</div>
+    <ul class="q-options">
+      <li class="correct">Voltage rises to ~1.035 p.u. at midpoint (bowl shape)</li>
+    </ul>
+    <div class="q-explanation">
+      <div class="eq">&theta; = &beta;l = 0.0013 &times; 400 = 0.52 rad &asymp; 30&deg;
+      V<sub>mid</sub> = |E<sub>s</sub>|/cos(&theta;/2) = 1.0/cos(15&deg;) = <span class="ans">1.035 p.u.</span></div>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q17</div>
+    <div class="q-text">Correct Pi model of transmission line in SSS?</div>
+    <ul class="q-options">
+      <li class="correct">Series: Z<sub>c</sub>sinh(&gamma;l), Shunt: (1/Z<sub>c</sub>)tanh(&gamma;l/2)</li>
+    </ul>
+    <div class="q-explanation">For lossless: sinh&rarr;jsin, tanh&rarr;jtan. The series element is impedance, shunt elements are admittances.</div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q18</div>
+    <div class="q-text">Two similar 50 km lines (Z<sub>o</sub>) in series = 100 km line. Z<sub>c</sub> of combined line?</div>
+    <ul class="q-options">
+      <li class="correct">Z<sub>o</sub> (unchanged)</li>
+      <li>0.5 Z<sub>o</sub></li><li>2 Z<sub>o</sub></li>
+    </ul>
+    <div class="q-explanation">Z<sub>c</sub> = &radic;(L'/C') depends on per-unit-length parameters only, NOT on total length. Series connection doesn't change L' or C', so Z<sub>c</sub> remains Z<sub>o</sub>.</div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- ========== TOPIC 8: REVIEW QUESTIONS 5A ========== -->
+<section class="topic" id="t8">
+  <div class="topic-header">
+    <div class="topic-number">5A</div>
+    <div><h2>Review Questions (5A) &mdash; Problem Strategies</h2></div>
+    <div class="time">Long problems</div>
+  </div>
+
+  <div class="worked" onclick="this.classList.toggle('open')">
+    <div class="worked-header">
+      <span><span class="tag purple">Q1</span> ABCD Matrix: Open circuit, terminated, shunt L/C compensation</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="worked-body">
+      <p><strong>Given:</strong> Lossless line with ABCD = [[cos&beta;l, jZ<sub>c</sub>sin&beta;l], [j(1/Z<sub>c</sub>)sin&beta;l, cos&beta;l]]</p>
+      <h4>Part (a): Inverse ABCD</h4>
+      <div class="eq">[V<sub>r</sub>, I<sub>r</sub>] = [D, -B; -C, A] [V<sub>s</sub>, I<sub>s</sub>] (swap A&harr;D, negate B,C)</div>
+      <h4>Part (b): Open circuit (I<sub>r</sub> = 0)</h4>
+      <div class="eq">V<sub>s</sub> = cos(&beta;l) &middot; V<sub>r</sub>  &rarr;  |V<sub>r</sub>| = |V<sub>s</sub>|/cos(&beta;l) &gt; |V<sub>s</sub>| (Ferranti effect!)</div>
+      <h4>Part (c): Terminated by R</h4>
+      <p>V<sub>r</sub> = R&middot;I<sub>r</sub>. Substitute into ABCD. |V<sub>r</sub>| depends on R/Z<sub>c</sub> ratio.</p>
+      <h4>Part (d,e): Shunt L or C for |V<sub>r</sub>| = |V<sub>s</sub>|</h4>
+      <p>Add shunt admittance Y<sub>comp</sub> at receiving end. Set |V<sub>r</sub>| = |V<sub>s</sub>| and solve for Y<sub>comp</sub>.</p>
+    </div>
+  </div>
+
+  <div class="worked" onclick="this.classList.toggle('open')">
+    <div class="worked-header">
+      <span><span class="tag purple">Q2</span> Both ends at voltage V, find P & Q along line</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="worked-body">
+      <p><strong>Setup:</strong> V<sub>s</sub> = V&ang;&delta;, V<sub>r</sub> = V&ang;0. Express V(d), I(d) using ABCD from receiving end.</p>
+      <div class="eq">
+        P = (V&sup2;/Z<sub>c</sub>) &middot; sin&delta;/sin(&beta;l)
+        <span class="ans">SIL condition: P = V&sup2;/Z<sub>c</sub> when &delta; = &beta;l (natural loading)</span>
+      </div>
+      <p>At SIL: voltage profile is flat. Below SIL: midpoint voltage > V (Ferranti).</p>
+    </div>
+  </div>
+
+  <div class="worked" onclick="this.classList.toggle('open')">
+    <div class="worked-header">
+      <span><span class="tag purple">Q3</span> Cable (40 km) + Overhead line (120 km) cascaded</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="worked-body">
+      <p><strong>Method:</strong> Cascade ABCD: [ABCD]<sub>total</sub> = [ABCD]<sub>cable</sub> &times; [ABCD]<sub>OTL</sub></p>
+      <p>OTL terminated at Z<sub>c,OTL</sub> &rarr; V<sub>r</sub> = Z<sub>c,OTL</sub>&middot;I<sub>r</sub>. Cable and OTL have <strong>very different</strong> Z<sub>c</sub> values (37 vs 380 &Omega;).</p>
+      <p>Key insight: there will be significant reactive power exchange at the cable-OTL junction due to impedance mismatch.</p>
+    </div>
+  </div>
+
+  <div class="worked" onclick="this.classList.toggle('open')">
+    <div class="worked-header">
+      <span><span class="tag purple">Q4</span> 600 km line: shunt B<sub>c</sub> at midpoint for voltage regulation</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="worked-body">
+      <p><strong>Setup:</strong> Both ends at 400 kV, &beta; = 0.0013 rad/km. &theta; = &beta;l = 0.78 rad &asymp; 45&deg;</p>
+      <p><strong>Method:</strong> Split into two 300 km halves. Each half has ABCD with &beta;l/2.</p>
+      <p>At midpoint: KCL with shunt susceptance B<sub>c</sub>. Set V<sub>mid</sub> = 400 kV.</p>
+      <div class="eq">B<sub>c</sub> compensates the reactive power surplus that causes V<sub>mid</sub> to rise above 400 kV at no-load.</div>
+    </div>
+  </div>
+
+  <div class="worked" onclick="this.classList.toggle('open')">
+    <div class="worked-header">
+      <span><span class="tag purple">Q5</span> Maximum power & series capacitor compensation</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="worked-body">
+      <div class="eq">
+        <span class="label">Maximum power for lossless line (both ends at V):</span>
+        <span class="main">P<sub>max</sub> = V&sup2; / (Z<sub>c</sub> sin(&beta;l))</span>
+        <span class="label">occurs when &delta; = &beta;l</span>
+      </div>
+      <p><strong>Series capacitor at midpoint:</strong> Cancels part of inductive reactance.</p>
+      <p>With 50% series compensation, X<sub>eff</sub> halves, so P<sub>max</sub> <strong>doubles</strong>.</p>
+      <div class="eq">
+        &beta; = &omega;&radic;(L'C')
+        With L'=1 mH/km, C'=11.1 nF/km: &beta; = 314&radic;(10<sup>-3</sup>&times;11.1&times;10<sup>-9</sup>) = 0.00105 rad/km
+      </div>
+    </div>
+  </div>
+
+  <div class="worked" onclick="this.classList.toggle('open')">
+    <div class="worked-header">
+      <span><span class="tag purple">Q6</span> Cable + OTL with reactive compensation at junction</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="worked-body">
+      <p>Similar to Q3, but with shunt reactive element Q<sub>c</sub> at cable-OTL junction to maintain V<sub>junction</sub> = 230 kV.</p>
+      <p><strong>Method:</strong></p>
+      <ol>
+        <li>Find V,I at junction from OTL side (ABCD with load condition)</li>
+        <li>Find V,I at junction from cable side (ABCD with source condition)</li>
+        <li>Apply KCL at junction: I<sub>cable</sub> = I<sub>OTL</sub> + I<sub>comp</sub></li>
+        <li>Determine if compensator is L or C based on sign of Q<sub>c</sub></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- ========== TOPIC 9: TEXTBOOK PROBLEMS ========== -->
+<section class="topic" id="t9">
+  <div class="topic-header">
+    <div class="topic-number" style="background:linear-gradient(135deg,var(--orange),var(--red));-webkit-background-clip:text;">TB</div>
+    <div><h2>Textbook Worked Examples & Practice</h2></div>
+    <div class="time">Weedy Ch 2-3</div>
+  </div>
+
+  <p style="color:var(--text-dim);margin-bottom:1.5rem;">These are directly relevant to the review questions. Click to expand solutions.</p>
+
+  <!-- Example 2.5: Per-unit system -->
+  <div class="worked" onclick="this.classList.toggle('open')">
+    <div class="worked-header">
+      <span><span class="tag orange">Ex 2.5</span> Per-Unit System: Radial Transmission with Transformers</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="worked-body">
+      <p><strong>Problem:</strong> 11 kV generator &rarr; 11/132 kV transformer (50 MVA, X=10%) &rarr; 132 kV line (j100 &Omega;) &rarr; 132/33 kV transformer (50 MVA, X=12%) &rarr; 50 MW load at 0.8 p.f. lag. V<sub>load</sub> = 30 kV. Find generator terminal voltage.</p>
+      <div class="eq">
+        <span class="label">Step 1: Choose base = 100 MVA. Voltage bases follow transformer ratios: 11, 132, 33 kV</span>
+
+        <span class="label" style="margin-top:0.3rem;">Step 2: Base impedance at 132 kV level:</span>
+        Z<sub>base</sub> = 132&sup2; &times; 10&sup3; / (100 &times; 10&sup6;) = <span class="ans">174 &Omega;</span>
+
+        <span class="label" style="margin-top:0.3rem;">Step 3: Line reactance in p.u.:</span>
+        X<sub>line</sub> = j100/174 = <span class="ans">j0.575 p.u.</span>
+
+        <span class="label" style="margin-top:0.3rem;">Step 4: Transformer reactances (change of base from 50 to 100 MVA):</span>
+        X<sub>T1</sub> = j0.1 &times; (100/50) = <span class="ans">j0.2 p.u.</span>
+        X<sub>T2</sub> = j0.12 &times; (100/50) = <span class="ans">j0.24 p.u.</span>
+
+        <span class="label" style="margin-top:0.3rem;">Step 5: Load voltage & current:</span>
+        V<sub>R</sub> = 30/33 = <span class="ans">0.91 p.u.</span>
+        I<sub>load</sub> = 50&times;10&sup6;/(&radic;3 &times; 30&times;10&sup3; &times; 0.8) = 1203 A
+        I<sub>base</sub> = 100&times;10&sup6;/(&radic;3 &times; 33&times;10&sup3;) = 1750 A
+        I<sub>p.u.</sub> = 1203/1750 = <span class="ans">0.687&ang;-36.87&deg; = 0.55 - j0.41 p.u.</span>
+
+        <span class="label" style="margin-top:0.3rem;">Step 6: Sending voltage:</span>
+        V<sub>s</sub> = 0.687(0.8-j0.6)(j0.2+j0.575+j0.24) + 0.91
+        V<sub>s</sub> = 1.328 + j0.558 p.u.
+        |V<sub>s</sub>| = <span class="ans">1.44 p.u. = 1.44 &times; 11 = 15.84 kV</span>
+      </div>
+      <div class="card warning" style="margin-top:0.8rem;">
+        <p><strong>Key takeaway:</strong> Transformers vanish in p.u. circuit! Just add all reactances in series. V<sub>base</sub> must follow turns ratio.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 2.6: Voltage drop approximation -->
+  <div class="worked" onclick="this.classList.toggle('open')">
+    <div class="worked-header">
+      <span><span class="tag orange">Ex 2.6</span> Voltage Drop: Accurate vs Approximate (275 kV, 160 km)</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="worked-body">
+      <p><strong>Problem:</strong> 275 kV line, 160 km, R=0.034 &Omega;/km, X=0.32 &Omega;/km. Load: 600 MW, 300 MVAr. Compare accurate and approximate methods.</p>
+      <div class="eq">
+        <span class="label">Base: 100 MVA, 275 kV</span>
+        Z<sub>base</sub> = 275&sup2;/100 = 756 &Omega;
+        X = 160 &times; 0.32 = 51.2 &Omega; &rarr; X<sub>pu</sub> = 51.2/756 = <span class="ans">0.0677 p.u.</span>
+
+        <span class="label" style="margin-top:0.3rem;">P = 6 p.u., Q = 3 p.u. (on 100 MVA base)</span>
+
+        <span class="label" style="margin-top:0.5rem;">Approximate (R&asymp;0):</span>
+        &Delta;V = XQ/V = 0.0677 &times; 3 / 1 = 0.203 p.u.
+        V<sub>G</sub> &asymp; 1 + 0.203 = <span class="ans">1.203 p.u.</span> (error: 5.6%)
+
+        <span class="label" style="margin-top:0.3rem;">Accurate:</span>
+        V<sub>G</sub>&sup2; = (1 + QX)&sup2; + (PX)&sup2; = (1.203)&sup2; + (0.406)&sup2;
+        V<sub>G</sub> = <span class="ans">1.27 p.u. = 349 kV</span>
+
+        <span class="label" style="margin-top:0.5rem;">For shorter line (80 km), same load:</span>
+        X<sub>pu</sub> = 0.0338; &Delta;V = 0.203 p.u.; &delta; = 10&deg;
+        V<sub>G</sub>(accurate) = 1.120; V<sub>G</sub>(approx) = <span class="ans">1.101 p.u.</span> (error: 1.7%)
+      </div>
+      <div class="card green" style="margin-top:0.8rem;">
+        <p><strong>Lesson:</strong> Approximate formula &Delta;V &asymp; XQ/V works well for <strong>short lines / small angles</strong>. For heavily loaded long lines (&delta; > 15&deg;), use the accurate formula.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 3.2: Short line parameters + voltage drop -->
+  <div class="worked" onclick="this.classList.toggle('open')">
+    <div class="worked-header">
+      <span><span class="tag orange">Ex 3.2</span> Short Line: L, C Calculation + Voltage Drop (3.3 kV, 1.6 km)</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="worked-body">
+      <p><strong>Problem:</strong> 3.3 kV OTL, 1.6 km, horizontal formation, conductor spacing 762 mm, diameter 3.5 mm, R=0.41 &Omega;/km. Find inductance. Then find V<sub>load</sub> for 1 MW at 0.8 p.f. lag.</p>
+      <div class="eq">
+        <span class="label">Equivalent spacing: d<sub>eq</sub> = &radic;3(762 &times; 762 &times; 1524) = 762&radic;2 = 960 mm</span>
+
+        <span class="label" style="margin-top:0.3rem;">Inductance per phase (line-to-neutral):</span>
+        L = (&mu;<sub>0</sub>/8&pi;)[1 + 4 ln(d/r)] = (4&pi;&times;10<sup>-7</sup>/8&pi;)[1 + 4 ln(960/1.75)]
+        L = 1.31 &times; 10<sup>-6</sup> H/m &rarr; L<sub>total</sub> = <span class="ans">2.11 mH</span>
+
+        X<sub>L</sub> = 2&pi; &times; 50 &times; 2.11 &times; 10<sup>-3</sup> = <span class="ans">0.66 &Omega;</span>
+        R<sub>total</sub> = 1.6 &times; 0.41 = 0.66 &Omega;
+        Z = 0.66 + j0.66 &Omega;
+
+        <span class="label" style="margin-top:0.5rem;">P.u. method (base: 1 MVA, 3.3 kV):</span>
+        Z<sub>base</sub> = 3.3&sup2; &times; 10&sup3; / 10&sup6; = 10.89 &Omega;
+        Z<sub>pu</sub> = (0.66+j0.66)/10.89 = 0.0602 + j0.0602
+
+        &Delta;V = RP + XQ = 0.0602&times;1 + 0.0602&times;0.75 = <span class="ans">0.1053 p.u. = 10.5%</span>
+
+        Power loss = I&sup2;R = 1.25&sup2; &times; 0.0602 = <span class="ans">0.094 p.u. = 94 kW</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 3.3: Short vs Medium vs Long line -->
+  <div class="worked" onclick="this.classList.toggle('open')">
+    <div class="worked-header">
+      <span><span class="tag orange">Ex 3.3</span> 150 km Line: Short vs Medium vs Long Model Comparison</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="worked-body">
+      <p><strong>Problem:</strong> 400 kV, 150 km, quad conductors. R=0.017 &Omega;/km, X<sub>L</sub>=0.27 &Omega;/km, b<sub>c</sub>=10.58 &mu;S/km. Load: 1800 MW at 0.9 lag. Find V<sub>s</sub> using all 3 models.</p>
+      <div class="eq">
+        <span class="label">Base: 2000 MVA, 400 kV &rarr; Z<sub>base</sub> = 80 &Omega;</span>
+        Z<sub>pu</sub> = (150/80)(0.017+j0.27) = 0.032 + j0.506
+        Y<sub>pu</sub> = 150 &times; 10.58&times;10<sup>-6</sup> &times; 80 = j0.127
+
+        I = (1800-j870)/2000 = 0.9 - j0.435 p.u.
+
+        <span class="label" style="margin-top:0.5rem;">SHORT LINE (B=Z, A=1):</span>
+        V<sub>s</sub> = V<sub>r</sub> + ZI = 1 + (0.032+j0.506)(0.9-j0.435)
+           = 1.249 + j0.442
+        <span class="ans">|V<sub>s</sub>| = 530 kV</span>
+
+        <span class="label" style="margin-top:0.5rem;">MEDIUM LINE (Nominal &Pi;, A = 1+ZY/2):</span>
+        A = 1 + (0.032+j0.506)(j0.127)/2 = 0.968 + j0.002
+        V<sub>s</sub> = AV<sub>r</sub> + BI<sub>r</sub> = 1.217 + j0.444
+        <span class="ans">|V<sub>s</sub>| = 518 kV</span>
+
+        <span class="label" style="margin-top:0.5rem;">LONG LINE (Exact, using series expansion):</span>
+        A = 0.968 + j2&times;10<sup>-3</sup>; B = 0.031 + j0.501
+        V<sub>s</sub> = 1.214 + j0.439
+        <span class="ans">|V<sub>s</sub>| = 518 kV</span>
+      </div>
+      <div class="card important" style="margin-top:0.8rem;">
+        <p><strong>Conclusion:</strong> Short-line model gives 530 kV (too high!), while medium and long models agree at 518 kV. For 150 km at 400 kV, the <strong>medium line model is adequate</strong>. Short-line model overpredicts V<sub>s</sub> because it ignores shunt capacitance (which generates Q and supports voltage).</p>
+        <p style="margin-top:0.5rem;color:var(--red);">Note: 518 kV is too high for a 400 kV system (max &asymp; 440 kV). Would need series capacitors or shunt compensation.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 3.1: Generator excitation and load angle -->
+  <div class="worked" onclick="this.classList.toggle('open')">
+    <div class="worked-header">
+      <span><span class="tag orange">Ex 3.1</span> Synchronous Generator: Excitation & Load Angle</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="worked-body">
+      <p><strong>Problem:</strong> 60 MW, 75 MVA, 11.8 kV generator. SCR = 0.63 (so X<sub>s</sub> = 1/0.63 = 1.59 p.u.). Find excitation E and load angle &delta; at full load (0.8 p.f. lag) and at unity p.f.</p>
+      <div class="eq">
+        <span class="label">X<sub>s</sub> = 1.59 p.u. = 1.59 &times; (11.8&sup2;/75) = 2.94 &Omega;/phase</span>
+
+        <span class="label" style="margin-top:0.3rem;">Power equation: P = (VE/X<sub>s</sub>) sin&delta;</span>
+
+        <span class="label" style="margin-top:0.5rem;">At 0.8 p.f. lag, full load (60 MW):</span>
+        From performance chart: E = 2.3 p.u., &delta; = 33&deg;
+
+        Check: sin&delta; = P &times; X<sub>s</sub> / (V &times; E &times; 3)
+        = 60&times;10&sup6; &times; 2.94 / (11800 &times; 2.3 &times; 11800/&radic;3)
+        sin&delta; = 0.55 &rarr; <span class="ans">&delta; = 33.4&deg;</span>
+
+        <span class="label" style="margin-top:0.5rem;">At unity p.f.:</span>
+        E = 1.7 p.u., <span class="ans">&delta; = 50&deg;</span>
+      </div>
+      <div class="card warning" style="margin-top:0.8rem;">
+        <p><strong>Key point:</strong> At unity p.f. the load angle is <strong>larger</strong> (50&deg; vs 33&deg;) because the machine needs less excitation &rarr; less margin to the 90&deg; stability limit. Over-excited machines (0.8 lag) are more stable!</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Relevant Textbook Practice Problems</h3>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">P2.13</div>
+    <div class="q-text"><strong>Cascading ABCD</strong> (matches Q5A-Q3): Two circuits with ABCD constants [1, 50, 0, 1] and [0.9&ang;2&deg;, 150&ang;79&deg;, 9&times;10<sup>-4</sup>&ang;91&deg;, 0.9&ang;2&deg;]. Find combined ABCD.</div>
+    <div class="q-explanation">
+      <p>Multiply the matrices: [ABCD]<sub>total</sub> = [ABCD]<sub>1</sub> &times; [ABCD]<sub>2</sub></p>
+      <div class="eq">
+        A<sub>0</sub> = A<sub>1</sub>A<sub>2</sub> + B<sub>1</sub>C<sub>2</sub>
+        B<sub>0</sub> = A<sub>1</sub>B<sub>2</sub> + B<sub>1</sub>D<sub>2</sub>
+        <span class="ans">Answer: A = 0.9&ang;4.85, B = 165.1&ang;63.6</span>
+      </div>
+      <p>This is the <strong>exact same technique</strong> needed for Q5A-Q3 (cable + OTL cascade)!</p>
+    </div>
+    <div class="q-toggle">Click for solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">P2.14</div>
+    <div class="q-text"><strong>V<sub>s</sub> calculation</strong> (matches voltage regulation): 132 kV line, R=0.156 &Omega;/km, X=0.4125 &Omega;/km. 125 MVA at 0.9 lag, V<sub>r</sub>=132 kV. Find V<sub>s</sub> for 16 km and 80 km. Use both methods.</div>
+    <div class="q-explanation">
+      <div class="eq">
+        <span class="label">For 16 km (short line):</span>
+        Z = 16(0.156 + j0.4125) = 2.5 + j6.6 &Omega;
+        V<sub>s</sub> = V<sub>r</sub> + IZ   where I = 125&times;10&sup6;/(&radic;3 &times; 132&times;10&sup3;)
+        <span class="ans">V<sub>s</sub> = 136.92 kV (accurate), 136.85 kV (approx)</span>
+
+        <span class="label" style="margin-top:0.3rem;">For 80 km:</span>
+        <span class="ans">V<sub>s</sub> = 157.95 kV (accurate), 156.27 kV (approx)</span>
+      </div>
+      <p>The approximate method works well for 16 km but starts to diverge at 80 km (1% error).</p>
+    </div>
+    <div class="q-toggle">Click for solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">P2.15</div>
+    <div class="q-text"><strong>Power between sources</strong> (matches power-angle): Generator (E=1.7 p.u., X<sub>s</sub>=2 p.u.) connected to infinite bus (V=1 p.u., X=0) via line. X/R=10, &delta;=30&deg;. Find P generated and P delivered.</div>
+    <div class="q-explanation">
+      <div class="eq">
+        <span class="label">Total impedance Z = R + jX, where X/R = 10</span>
+        Z = &radic;(R&sup2;+X&sup2;) = 2, and X/R = 10
+        &theta; = tan<sup>-1</sup>(10) &asymp; 84.3&deg;
+
+        P<sub>gen</sub> = (V<sub>G</sub>&sup2;/Z)cos&theta; - (V<sub>G</sub>V<sub>L</sub>/Z)cos(&theta;+&delta;)
+        <span class="ans">P<sub>gen</sub> = 0.49 p.u., P<sub>delivered</sub> = 0.44 p.u.</span>
+        <span class="label">Difference = I&sup2;R losses in the line</span>
+      </div>
+    </div>
+    <div class="q-toggle">Click for solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">P2.6</div>
+    <div class="q-text"><strong>Maximum power output</strong> (matches Q5A-Q5): Generator (X<sub>1</sub>) connected to load (fixed X<sub>2</sub> in parallel with variable R). Show max power when 1/R = 1/X<sub>1</sub> + 1/X<sub>2</sub>.</div>
+    <div class="q-explanation">
+      <p>Power delivered to R: P = I&sup2;R where I depends on the impedance seen.</p>
+      <p>The load impedance Z<sub>load</sub> = jX<sub>2</sub> || R. For maximum power transfer to R, take dP/dR = 0.</p>
+      <div class="eq">
+        <span class="ans">Result: 1/R = 1/X<sub>1</sub> + 1/X<sub>2</sub></span>
+        <span class="label">i.e., R = X<sub>1</sub>X<sub>2</sub>/(X<sub>1</sub>+X<sub>2</sub>) = X<sub>1</sub> || X<sub>2</sub></span>
+      </div>
+      <p>This is analogous to impedance matching. Similar concept to Q5A-Q5 where series capacitor changes effective X to maximize power transfer.</p>
+    </div>
+    <div class="q-toggle">Click for solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">P2.10</div>
+    <div class="q-text"><strong>Full p.u. system</strong>: Express all quantities in Figure 2.32 in p.u. (100 MVA base). Gen: 500 MVA, 22 kV, X=2 p.u. Transformer: 22/400 kV, X=0.1 p.u. Line: 80 km, R=0.1, X=0.5 &Omega;/km, b<sub>c</sub>=10 &mu;S/km. Load transformer: 400/11 kV, X=0.15 p.u.</div>
+    <div class="q-explanation">
+      <div class="eq">
+        <span class="label">Gen reactance (change base from 500 to 100 MVA):</span>
+        X<sub>gen</sub> = 2 &times; (100/500) = <span class="ans">0.4 p.u.</span>
+
+        <span class="label" style="margin-top:0.3rem;">Sending transformer (change from 500 to 100 MVA):</span>
+        X<sub>T1</sub> = 0.1 &times; (100/500) = <span class="ans">0.02 p.u.</span>
+
+        <span class="label" style="margin-top:0.3rem;">Line at 400 kV level:</span>
+        Z<sub>base</sub> = 400&sup2;/100 = 1600 &Omega;
+        Z<sub>line</sub> = 80(0.1+j0.5) = 8+j40 &Omega;
+        Z<sub>line,pu</sub> = <span class="ans">(8+j40)/1600 = 0.005+j0.025 p.u.</span>
+
+        <span class="label" style="margin-top:0.3rem;">Line capacitance (split half at each end):</span>
+        Y<sub>total</sub> = 80 &times; 10&times;10<sup>-6</sup> = 800 &mu;S
+        Y<sub>pu</sub> = 800&times;10<sup>-6</sup> &times; 1600 = <span class="ans">j1.28 p.u.</span>
+        (Half at each end: j0.64 p.u.)
+
+        <span class="label" style="margin-top:0.3rem;">Receiving transformer:</span>
+        X<sub>T2</sub> = 0.15 &times; (100/500) = <span class="ans">0.03 p.u.</span>
+      </div>
+    </div>
+    <div class="q-toggle">Click for solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">P2.12</div>
+    <div class="q-text"><strong>Power & losses in feeder</strong>: 440 V supply, 3 Y-connected loads in parallel via feeder (0.1+j0.5) &Omega;/phase. Loads: 5kW+4kVAr, 3kW+0kVAr, 10kW+2kVAr. Find I<sub>line</sub>, feeder losses, supply PF.</div>
+    <div class="q-explanation">
+      <div class="eq">
+        <span class="label">Total load: P=18 kW, Q=6 kVAr</span>
+        S = 18+j6 kVA; |S| = 19.0 kVA
+
+        I = S*/(&radic;3 V*) = 19000/(&radic;3 &times; 440) = <span class="ans">24.9 A</span>
+
+        <span class="label" style="margin-top:0.3rem;">Feeder losses per phase:</span>
+        P<sub>loss</sub> = 3 &times; I&sup2; &times; R = 3 &times; 24.9&sup2; &times; 0.1 = <span class="ans">186 W</span>
+        Q<sub>loss</sub> = 3 &times; I&sup2; &times; X = 3 &times; 24.9&sup2; &times; 0.5 = <span class="ans">930 VAr</span>
+
+        <span class="label" style="margin-top:0.3rem;">Total from supply:</span>
+        P<sub>supply</sub> = 18000 + 186 = 18.2 kW
+        Q<sub>supply</sub> = 6000 + 930 = 6.93 kVAr
+        PF = 18.2/&radic;(18.2&sup2;+6.93&sup2;) = <span class="ans">0.94 lagging</span>
+      </div>
+    </div>
+    <div class="q-toggle">Click for solution</div>
+  </div>
+
+  <h3>Quick Concept Checks (from Weedy Ch 3)</h3>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="tag cyan">Natural Load / SIL</span></div>
+      <div class="eq">
+        SIL = V&sup2;/Z<sub>c</sub>
+        <span class="label">At SIL: V&sup2;/X<sub>c</sub> = I&sup2;X<sub>L</sub></span>
+        <span class="label">V and I in phase everywhere</span>
+      </div>
+      <p>Typical values:</p>
+      <ul>
+        <li>132 kV: Z<sub>c</sub>=150&Omega;, SIL=50 MW</li>
+        <li>275 kV: Z<sub>c</sub>=315&Omega;, SIL=240 MW</li>
+        <li>400 kV: Z<sub>c</sub>=295&Omega;, SIL=540 MW</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag cyan">Cables vs OTL (Ch 3)</span></div>
+      <ul>
+        <li>Cable Z<sub>c</sub> &asymp; <strong>1/10th</strong> of OTL</li>
+        <li>Cable X<sub>L</sub>/R &asymp; 2-9 (vs 10-15 for OTL)</li>
+        <li>Cable C = 2&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>/ln(R/r)</li>
+        <li>&epsilon;<sub>r</sub> &asymp; 2.3 (XLPE), so C is much higher than OTL</li>
+        <li>Charging current: I<sub>c</sub> = V&omega;C per km</li>
+        <li>At 30-40 km, I<sub>c</sub> &asymp; thermal rating!</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="tag cyan">Line L and C formulas</span></div>
+      <div class="eq">
+        <span class="label">Single-phase (2-wire):</span>
+        L = (&mu;<sub>0</sub>/4&pi;)[1+4ln(d/r)] H/m
+        C = &pi;&epsilon;<sub>0</sub>/ln(d/r) F/m
+
+        <span class="label" style="margin-top:0.3rem;">3-phase (equilateral):</span>
+        L = (&mu;<sub>0</sub>/8&pi;)[1+4ln(d/r)] H/m (per phase)
+        C = 2&pi;&epsilon;<sub>0</sub>/ln(d/r) F/m (per phase)
+
+        <span class="label" style="margin-top:0.3rem;">Using GMR (r'=re<sup>-1/4</sup>):</span>
+        L = 4&times;10<sup>-7</sup> ln(d/r') H/m
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag cyan">Transposition</span></div>
+      <p>For unequal spacing d<sub>12</sub>, d<sub>23</sub>, d<sub>31</sub>:</p>
+      <div class="eq">
+        <span class="main">d<sub>eq</sub> = &radic;3(d<sub>12</sub> &times; d<sub>23</sub> &times; d<sub>31</sub>)</span>
+      </div>
+      <p>Conductors are rotated through all 3 positions along the line to equalize inductance. In practice, done at substations.</p>
+    </div>
+  </div>
+
+  <div class="card important">
+    <div class="card-title"><span class="tag pink">TRANSFORMER PHASE SHIFTS</span> (from Ch 3.8)</div>
+    <ul>
+      <li><strong>Y-Y</strong> or <strong>&Delta;-&Delta;</strong>: No phase shift</li>
+      <li><strong>Y-&Delta;</strong>: Positive sequence voltages advanced by <strong>+30&deg;</strong> on delta side</li>
+      <li><strong>&Delta;-Y</strong>: Positive sequence voltages delayed by <strong>-30&deg;</strong> on Y side</li>
+      <li>Transformers with <strong>different phase shifts CANNOT be paralleled</strong></li>
+      <li>Typical impedance: 10-20% for large transformers (&gt;20 MVA)</li>
+      <li>10% reactance means short-circuit current = <strong>10x rated</strong></li>
+    </ul>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- ========== FORMULA SHEET ========== -->
+<section class="topic" id="formulas">
+  <div class="topic-header">
+    <div class="topic-number" style="background:linear-gradient(135deg,var(--yellow),var(--orange));-webkit-background-clip:text;">F</div>
+    <div><h2>Master Formula Sheet</h2></div>
+  </div>
+
+  <div class="formula-sheet">
+    <h3 style="margin-top:0;">Transmission Line Core Formulas</h3>
+    <div class="eq">
+      <span class="label">Characteristic impedance & propagation:</span>
+      <span class="main">Z<sub>c</sub> = &radic;(L'/C') = &radic;(x<sub>l</sub>/b<sub>c</sub>)</span>
+      <span class="main">&beta; = &omega;&radic;(L'C') = &radic;(x<sub>l</sub> &middot; b<sub>c</sub>)    [rad/km]</span>
+      <span class="main">v<sub>p</sub> = 1/&radic;(L'C') = &omega;/&beta;    &asymp; 3&times;10<sup>8</sup> m/s (OTL)</span>
+
+      <span class="label" style="margin-top:0.8rem;">ABCD (lossless):</span>
+      A = D = cos(&beta;l)       B = jZ<sub>c</sub>sin(&beta;l)
+      C = j(1/Z<sub>c</sub>)sin(&beta;l)    AD - BC = 1
+
+      <span class="label" style="margin-top:0.8rem;">ABCD (lossy):</span>
+      A = D = cosh(&gamma;l)     B = Z<sub>c</sub>sinh(&gamma;l)
+      C = (1/Z<sub>c</sub>)sinh(&gamma;l)   &gamma; = &alpha;+j&beta; = &radic;(ZY)
+
+      <span class="label" style="margin-top:0.8rem;">Pi model:</span>
+      Z<sub>se</sub> = Z<sub>c</sub>sinh(&gamma;l)     Y<sub>sh</sub>/2 = (1/Z<sub>c</sub>)tanh(&gamma;l/2)
+
+      <span class="label" style="margin-top:0.8rem;">Short line (&lt;80 km):</span>
+      A=D=1, B=Z, C=0   (just series impedance)
+
+      <span class="label" style="margin-top:0.8rem;">SIL:</span>
+      <span class="main">SIL = V&sup2;/Z<sub>c</sub>    [MW, using line-line V in kV]</span>
+
+      <span class="label" style="margin-top:0.8rem;">Relationship: x<sub>l</sub> = Z<sub>c</sub>&sup2; &middot; b<sub>c</sub></span>
+    </div>
+
+    <h3>Power Formulas</h3>
+    <div class="eq">
+      <span class="label">Complex power:</span>
+      <span class="main">S = P + jQ = V &middot; I*     [VA]</span>
+
+      <span class="label" style="margin-top:0.5rem;">Through lossless line (jX):</span>
+      <span class="main">P = (V<sub>s</sub>V<sub>r</sub>/X)sin&delta;     P<sub>max</sub> = V<sub>s</sub>V<sub>r</sub>/X</span>
+
+      <span class="label" style="margin-top:0.5rem;">Voltage drop (approx, small &delta;):</span>
+      &Delta;V<sub>p</sub> = (RP + XQ)/V     &Delta;V<sub>q</sub> = (XP - RQ)/V
+      For transmission (R&lt;&lt;X): &Delta;V &asymp; XQ/V
+
+      <span class="label" style="margin-top:0.5rem;">3-phase power:</span>
+      <span class="main">P = &radic;3 V<sub>LL</sub> I<sub>L</sub> cos&phi;     Q = &radic;3 V<sub>LL</sub> I<sub>L</sub> sin&phi;</span>
+
+      <span class="label" style="margin-top:0.5rem;">Reactive power absorbed:</span>
+      By inductor: Q = I&sup2;X<sub>L</sub>     By line: Q = I&sup2;X
+      Generated by capacitor: Q = V&sup2;B = V&sup2;&omega;C
+    </div>
+
+    <h3>Per-Unit System</h3>
+    <div class="eq">
+      Z<sub>base</sub> = V<sub>base</sub>&sup2; / S<sub>base</sub>     I<sub>base</sub> = S<sub>base</sub> / (&radic;3 V<sub>base</sub>)
+      Z<sub>pu</sub> = Z(&Omega;) / Z<sub>base</sub> = Z(&Omega;) &times; S<sub>base</sub> / V<sub>base</sub>&sup2;
+      <span class="main">Change of base: Z<sub>pu,new</sub> = Z<sub>pu,old</sub> &times; (S<sub>new</sub>/S<sub>old</sub>) &times; (V<sub>old</sub>/V<sub>new</sub>)&sup2;</span>
+    </div>
+
+    <h3>Key Numbers to Remember</h3>
+    <div class="eq">
+      <span class="label">EHV Overhead Lines:</span>
+      Z<sub>c</sub> &asymp; 230-400 &Omega;    x<sub>l</sub> &asymp; 0.3-0.5 &Omega;/km    b<sub>c</sub> &asymp; 3-4 &mu;S/km
+      X/R &asymp; 10-15    &beta; &asymp; 0.0013 rad/km    v<sub>p</sub> &asymp; c
+
+      <span class="label" style="margin-top:0.5rem;">Cables (230 kV):</span>
+      Z<sub>c</sub> &asymp; 30-50 &Omega;    b<sub>c</sub> &asymp; 250 &mu;S/km (70x OTL!)
+      Max AC length: 30-40 km (reactive power limit)
+
+      <span class="label" style="margin-top:0.5rem;">Machines:</span>
+      X<sub>s</sub> &asymp; 1.5-2.0 p.u.     SCR &asymp; 0.55-0.63
+      f = np/60 (n rpm, p pole-pairs)
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<div style="text-align:center;padding:3rem 0;color:var(--text-dim);">
+  <p style="font-size:1.3rem;color:var(--accent2);font-weight:600;">You've got this!</p>
+  <p style="margin-top:0.4rem;">Focus on ABCD matrices, P-Q flow, and the Part B MCQs.</p>
+  <p style="margin-top:1rem;font-size:0.8rem;">EE238 Power Engineering II &bull; IIT Bombay &bull; Built from Weedy Ch 2-3, AMK slides, & review questions</p>
+</div>
+
+</main>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('backTop').classList.toggle('visible', h.scrollTop > 400);
+
+    // Side nav active state
+    document.querySelectorAll('.side-nav a').forEach(a => {
+      const sec = document.querySelector(a.getAttribute('href'));
+      if (sec) {
+        const r = sec.getBoundingClientRect();
+        a.classList.toggle('active', r.top < 300 && r.bottom > 100);
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
