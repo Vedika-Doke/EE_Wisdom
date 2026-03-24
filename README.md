@@ -43,6 +43,24 @@ Course project involving the design of an 8-bit toy CPU (i281).
 
 ---
 
+### EE_LearningAids
+Interactive study guides for IIT Bombay EE courses — open in any browser, no setup needed.
+
+#### EE238 - Power Engineering II
+**[Open Study Guide](https://vedika-doke.github.io/EE_Wisdom/ee238_study_guide.html)** (GitHub Pages link)
+
+A single-file HTML study guide with:
+- 10 topics covering transmission lines, 3-phase, per-unit, ABCD matrices, P&Q flow, Maxwell's equations
+- 18+ MCQs with click-to-reveal solutions
+- 6 long-form problems (Review Q 5A) with step-by-step strategies
+- Worked textbook examples from Weedy Ch 2-3
+- Master formula sheet
+- Dark theme, mobile-friendly, works offline
+
+*More courses will be added here over time.*
+
+---
+
 ## Tools & Technologies
 - **Languages:** C++, Python, VHDL
 - **Hardware:** Microcontrollers, sensors, custom PCBs

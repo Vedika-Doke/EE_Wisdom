@@ -145,8 +145,8 @@
     background: var(--surface2); border: 1px solid var(--border);
     border-radius: 10px; padding: 1rem 1.3rem; margin: 0.8rem 0;
     overflow-x: auto; font-size: 0.92rem; line-height: 2; color: var(--cyan);
-    white-space: pre-wrap; word-wrap: break-word;
   }
+  .eq div { margin: 0.15rem 0; }
   .eq .label { color: var(--text-dim); font-size: 0.78rem; display: block; margin-bottom: 0.2rem; }
   .eq .main { font-size: 1.05rem; color: var(--yellow); }
   .eq .ans { color: var(--green); font-weight: 500; }
@@ -1009,40 +1009,31 @@
 
   <h3>Power Transfer Through a Line</h3>
   <div class="svg-container">
-    <svg width="400" height="100" viewBox="0 0 400 100">
-      <circle cx="60" cy="50" r="25" fill="none" stroke="#a78bfa" stroke-width="2"/>
-      <text x="60" y="55" fill="#a78bfa" text-anchor="middle" font-size="14">~</text>
-      <text x="60" y="88" fill="#e4e4ef" text-anchor="middle" font-size="11">V<sub>G</sub>&ang;&delta;</text>
-      <line x1="85" y1="50" x2="140" y2="50" stroke="#e4e4ef" stroke-width="2"/>
-      <path d="M140,50 Q155,30 170,50 Q185,30 200,50 Q215,30 230,50 Q245,30 260,50" fill="none" stroke="#fbbf24" stroke-width="2"/>
-      <line x1="260" y1="50" x2="315" y2="50" stroke="#e4e4ef" stroke-width="2"/>
-      <text x="200" y="30" fill="#fbbf24" text-anchor="middle" font-size="11">R + jX</text>
-      <circle cx="340" cy="50" r="25" fill="none" stroke="#34d399" stroke-width="2"/>
-      <text x="340" y="55" fill="#34d399" text-anchor="middle" font-size="14">~</text>
-      <text x="340" y="88" fill="#e4e4ef" text-anchor="middle" font-size="11">V<sub>L</sub>&ang;0</text>
+    <svg width="460" height="110" viewBox="0 0 460 110">
+      <!-- Sending bus -->
+      <circle cx="70" cy="50" r="28" fill="none" stroke="#a78bfa" stroke-width="2"/>
+      <text x="70" y="56" fill="#a78bfa" text-anchor="middle" font-size="16" font-weight="600">~</text>
+      <text x="70" y="96" fill="#e4e4ef" text-anchor="middle" font-size="12">V<tspan font-size="9" dy="3">G</tspan><tspan dy="-3" dx="2">&#x2220;&#x03B4;</tspan></text>
+      <!-- Line -->
+      <line x1="98" y1="50" x2="155" y2="50" stroke="#e4e4ef" stroke-width="2"/>
+      <rect x="155" y="35" width="150" height="30" rx="6" fill="none" stroke="#fbbf24" stroke-width="2"/>
+      <text x="230" y="55" fill="#fbbf24" text-anchor="middle" font-size="13" font-weight="500">R + jX</text>
+      <line x1="305" y1="50" x2="362" y2="50" stroke="#e4e4ef" stroke-width="2"/>
+      <!-- Receiving bus -->
+      <circle cx="390" cy="50" r="28" fill="none" stroke="#34d399" stroke-width="2"/>
+      <text x="390" y="56" fill="#34d399" text-anchor="middle" font-size="16" font-weight="600">~</text>
+      <text x="390" y="96" fill="#e4e4ef" text-anchor="middle" font-size="12">V<tspan font-size="9" dy="3">L</tspan><tspan dy="-3" dx="2">&#x2220;0</tspan></text>
+      <!-- P arrow -->
+      <line x1="130" y1="22" x2="170" y2="22" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrO)"/>
+      <text x="115" y="18" fill="#fb923c" font-size="10">P, Q</text>
+      <defs><marker id="arrO" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#fb923c"/></marker></defs>
     </svg>
   </div>
 
   <div class="card important">
     <div class="card-title"><span class="tag pink">KEY EQUATIONS</span> (General Z = R + jX)</div>
-    <div class="eq">
-      <span class="label">At source end:</span>
-      P<sub>G</sub> = (V<sub>G</sub>&sup2;/Z) cos&theta; - (V<sub>G</sub>V<sub>L</sub>/Z) cos(&theta;+&delta;)
-
-      Q<sub>G</sub> = (V<sub>G</sub>&sup2;/Z) sin&theta; - (V<sub>G</sub>V<sub>L</sub>/Z) sin(&theta;+&delta;)
-
-      <span class="label">where &theta; = tan<sup>-1</sup>(X/R)</span>
-    </div>
-    <div class="eq" style="border-color:var(--green);">
-      <span class="label">For LOSSLESS line (R=0, &theta;=90&deg;):</span>
-      <span class="ans">P = (V<sub>G</sub>V<sub>L</sub> / X) sin(&delta;)</span>
-
-      <span class="ans">P<sub>max</sub> = V<sub>G</sub>V<sub>L</sub> / X</span>
-
-      Q<sub>G</sub> = (V<sub>G</sub>&sup2; - V<sub>G</sub>V<sub>L</sub> cos&delta;) / X
-
-      Q<sub>L</sub> = (V<sub>G</sub>V<sub>L</sub> cos&delta; - V<sub>L</sub>&sup2;) / X
-    </div>
+    <div class="eq"><span class="label">At source end:</span><div>P<sub>G</sub> = (V<sub>G</sub>&sup2;/Z) cos&theta; - (V<sub>G</sub>V<sub>L</sub>/Z) cos(&theta;+&delta;)</div><div>Q<sub>G</sub> = (V<sub>G</sub>&sup2;/Z) sin&theta; - (V<sub>G</sub>V<sub>L</sub>/Z) sin(&theta;+&delta;)</div><span class="label">where &theta; = tan<sup>-1</sup>(X/R)</span></div>
+    <div class="eq" style="border-color:var(--green);"><span class="label">For LOSSLESS line (R=0, &theta;=90&deg;):</span><div class="ans">P = (V<sub>G</sub>V<sub>L</sub> / X) sin(&delta;)</div><div class="ans">P<sub>max</sub> = V<sub>G</sub>V<sub>L</sub> / X</div><div>Q<sub>G</sub> = (V<sub>G</sub>&sup2; - V<sub>G</sub>V<sub>L</sub> cos&delta;) / X</div><div>Q<sub>L</sub> = (V<sub>G</sub>V<sub>L</sub> cos&delta; - V<sub>L</sub>&sup2;) / X</div></div>
   </div>
 
   <div class="card warning">
@@ -1150,11 +1141,50 @@
   <div class="quiz-q" onclick="this.classList.toggle('open')">
     <div class="q-num">Q3</div>
     <div class="q-text">Bundled conductor (equilateral triangle, 3 sub-conductors at same potential). Maximum E field at?</div>
+    <div class="svg-container" style="margin:0.5rem 0;">
+      <svg width="320" height="220" viewBox="0 0 320 220">
+        <!-- Three sub-conductors in equilateral triangle -->
+        <circle cx="160" cy="60" r="14" fill="none" stroke="#a78bfa" stroke-width="2"/>
+        <circle cx="110" cy="150" r="14" fill="none" stroke="#a78bfa" stroke-width="2"/>
+        <circle cx="210" cy="150" r="14" fill="none" stroke="#a78bfa" stroke-width="2"/>
+        <!-- + signs inside -->
+        <text x="160" y="65" fill="#a78bfa" text-anchor="middle" font-size="14" font-weight="700">+</text>
+        <text x="110" y="155" fill="#a78bfa" text-anchor="middle" font-size="14" font-weight="700">+</text>
+        <text x="210" y="155" fill="#a78bfa" text-anchor="middle" font-size="14" font-weight="700">+</text>
+        <!-- Dashed triangle connecting them -->
+        <line x1="160" y1="74" x2="110" y2="136" stroke="#555" stroke-width="1" stroke-dasharray="4"/>
+        <line x1="110" y1="136" x2="210" y2="136" stroke="#555" stroke-width="1" stroke-dasharray="4"/>
+        <line x1="210" y1="136" x2="160" y2="74" stroke="#555" stroke-width="1" stroke-dasharray="4"/>
+        <!-- Point Y - outer vertex (TOP, above top conductor) -->
+        <circle cx="160" cy="30" r="5" fill="#34d399"/>
+        <text x="175" y="35" fill="#34d399" font-size="13" font-weight="700">Y</text>
+        <!-- E field arrows from all 3 pointing UP at Y -->
+        <line x1="160" y1="46" x2="160" y2="37" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrY)"/>
+        <line x1="112" y1="138" x2="155" y2="35" stroke="#fbbf24" stroke-width="1" stroke-dasharray="2" opacity="0.4"/>
+        <line x1="208" y1="138" x2="165" y2="35" stroke="#fbbf24" stroke-width="1" stroke-dasharray="2" opacity="0.4"/>
+        <!-- Point W - between bottom two -->
+        <circle cx="160" cy="155" r="5" fill="#9393a8"/>
+        <text x="168" y="172" fill="#9393a8" font-size="12" font-weight="600">W</text>
+        <!-- Point X - center of triangle -->
+        <circle cx="160" cy="115" r="5" fill="#9393a8"/>
+        <text x="172" y="120" fill="#9393a8" font-size="12" font-weight="600">X</text>
+        <!-- Point Z - far right -->
+        <circle cx="260" cy="105" r="5" fill="#9393a8"/>
+        <text x="270" y="110" fill="#9393a8" font-size="12" font-weight="600">Z</text>
+        <!-- Label -->
+        <text x="160" y="205" fill="#e4e4ef" text-anchor="middle" font-size="11">3 sub-conductors at same potential (+)</text>
+        <!-- Arrow def -->
+        <defs><marker id="arrY" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#fbbf24"/></marker></defs>
+      </svg>
+    </div>
     <ul class="q-options">
       <li class="correct">Point Y (outer vertex where fields superpose constructively)</li>
       <li>Point W</li><li>Point X</li><li>Point Z</li>
     </ul>
-    <div class="q-explanation">At the outer vertex, electric fields from all 3 sub-conductors point roughly in the same direction (outward), so they superpose to give maximum intensity.</div>
+    <div class="q-explanation">
+      <p>At point <strong>Y</strong> (outer vertex), E fields from all 3 sub-conductors point roughly in the <strong>same outward direction</strong>, so they add up (constructive superposition) &rarr; maximum E.</p>
+      <p>At point X (center), fields from all 3 cancel out. At W (between two conductors), fields partially cancel.</p>
+    </div>
     <div class="q-toggle">Click to show solution</div>
   </div>
 
@@ -1187,7 +1217,13 @@
     <ul class="q-options">
       <li class="correct">10-15</li><li>60-100</li><li>0.1-0.5</li><li>1-2</li>
     </ul>
-    <div class="q-explanation">For EHV OTL, R is very small compared to X. Typical X/R &asymp; 10-15. (At distribution level, X/R &asymp; 1-2.)</div>
+    <div class="q-explanation">
+      <p><strong>Why 10-15?</strong> At 400 kV (EHV), conductors are thick aluminium with very low resistance. But the <strong>spacing between phases is large</strong> (several metres), which gives significant inductance.</p>
+      <p>From Table 3.2a (Weedy): 400 kV, 4&times;258mm&sup2; ACSR:</p>
+      <div class="eq"><div>R = 0.017 &Omega;/km</div><div>X<sub>L</sub> = 0.27 &Omega;/km</div><div>X/R = 0.27/0.017 = <span class="ans">15.8</span></div></div>
+      <p>Compare with distribution (11 kV): thinner wires, closer spacing &rarr; X/R &asymp; 1-2</p>
+      <p><strong>Rule of thumb:</strong> Higher voltage &rarr; thicker conductor (lower R) &rarr; higher X/R</p>
+    </div>
     <div class="q-toggle">Click to show solution</div>
   </div>
 
@@ -1199,8 +1235,12 @@
       <li class="correct">6.4, 73.6, 800 &mu;S</li>
     </ul>
     <div class="q-explanation">
-      <div class="eq">Z<sub>c</sub> &asymp; &radic;(x<sub>l</sub>/b<sub>c</sub>) &rarr; x<sub>l</sub> = Z<sub>c</sub>&sup2; &middot; b<sub>c</sub>
-      If b<sub>c</sub> = 800 &mu;S: x<sub>l</sub> = 300&sup2; &times; 800&times;10<sup>-6</sup> = 72 &Omega; &asymp; <span class="ans">73.6 &Omega;</span></div>
+      <p><strong>Method:</strong> Use Z<sub>c</sub> = &radic;(x<sub>l</sub>/b<sub>c</sub>) to check which option is consistent.</p>
+      <p><strong>Check Option 1:</strong> R=20.8, x<sub>l</sub>=24, b<sub>c</sub>=256.375 &mu;S</p>
+      <div class="eq"><div>Z<sub>c</sub> = &radic;(24 / 256.375&times;10<sup>-6</sup>) = &radic;(93600) = 306 &Omega; &asymp; 300 &#10004;</div><div>But X/R = 24/20.8 = 1.15 &mdash; way too low for 400 kV OTL! &#10008;</div></div>
+      <p><strong>Check Option 2:</strong> R=6.4, x<sub>l</sub>=73.6, b<sub>c</sub>=800 &mu;S</p>
+      <div class="eq"><div>Z<sub>c</sub> = &radic;(73.6 / 800&times;10<sup>-6</sup>) = &radic;(92000) = 303 &Omega; &asymp; 300 &#10004;</div><div>X/R = 73.6/6.4 = 11.5 &mdash; correct for EHV OTL &#10004;</div></div>
+      <p><strong>Both options give Z<sub>c</sub> &asymp; 300 &Omega;</strong>, but only Option 2 has a <strong>realistic X/R ratio</strong> for a 400 kV line. This is why you need to know typical X/R values (Q6)!</p>
     </div>
     <div class="q-toggle">Click to show solution</div>
   </div>
@@ -1296,8 +1336,40 @@
       <li class="correct">Voltage rises to ~1.035 p.u. at midpoint (bowl shape)</li>
     </ul>
     <div class="q-explanation">
-      <div class="eq">&theta; = &beta;l = 0.0013 &times; 400 = 0.52 rad &asymp; 30&deg;
-      V<sub>mid</sub> = |E<sub>s</sub>|/cos(&theta;/2) = 1.0/cos(15&deg;) = <span class="ans">1.035 p.u.</span></div>
+      <p><strong>Step 1:</strong> Find the electrical length of the line:</p>
+      <div class="eq"><div>&theta; = &beta; &times; l = 0.0013 &times; 400 = 0.52 rad &asymp; 30&deg;</div></div>
+      <p><strong>Step 2:</strong> At no-load, I<sub>r</sub> = 0. Use ABCD from sending end to midpoint (half the line, length l/2):</p>
+      <div class="eq"><div>V<sub>s</sub> = cos(&beta;l/2) &middot; V<sub>mid</sub> + jZ<sub>c</sub>sin(&beta;l/2) &middot; I<sub>mid</sub></div></div>
+      <p><strong>Step 3:</strong> By symmetry (both ends at same voltage, no load), the midpoint is where I = 0 and V is maximum. So at midpoint I<sub>mid</sub> = 0:</p>
+      <div class="eq"><div>V<sub>s</sub> = cos(&beta;l/2) &middot; V<sub>mid</sub></div><div style="margin-top:0.3rem;">Rearranging:</div><div class="ans">V<sub>mid</sub> = V<sub>s</sub> / cos(&beta;l/2) = 1.0 / cos(15&deg;) = 1.0 / 0.966 = 1.035 p.u.</div></div>
+      <p><strong>Why does voltage rise?</strong> At no-load, no current flows at the ends, but the line's distributed <strong>capacitance still generates reactive power</strong> (charging current). This Q has nowhere to go &rarr; it pushes the voltage up in the middle. This is the <strong>Ferranti effect</strong>.</p>
+      <p><strong>Shape:</strong> Voltage profile is a <strong>bowl (concave up)</strong> &mdash; 1.0 p.u. at both ends, peaks at 1.035 at midpoint.</p>
+      <!-- SVG: bowl shape voltage profile -->
+      <div class="svg-container" style="margin:0.5rem 0;">
+        <svg width="340" height="120" viewBox="0 0 340 120">
+          <!-- Axes -->
+          <line x1="40" y1="100" x2="300" y2="100" stroke="#555" stroke-width="1"/>
+          <line x1="40" y1="10" x2="40" y2="100" stroke="#555" stroke-width="1"/>
+          <!-- Voltage curve (bowl) -->
+          <path d="M40,70 Q170,20 300,70" fill="none" stroke="#34d399" stroke-width="2.5"/>
+          <!-- 1.0 p.u. reference line -->
+          <line x1="40" y1="70" x2="300" y2="70" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4"/>
+          <!-- Labels -->
+          <text x="15" y="74" fill="#fbbf24" font-size="9">1.0</text>
+          <text x="5" y="30" fill="#34d399" font-size="9">1.035</text>
+          <line x1="40" y1="28" x2="300" y2="28" stroke="#34d399" stroke-width="0.5" stroke-dasharray="2" opacity="0.4"/>
+          <!-- Dots at ends -->
+          <circle cx="40" cy="70" r="4" fill="#fbbf24"/>
+          <circle cx="300" cy="70" r="4" fill="#fbbf24"/>
+          <circle cx="170" cy="24" r="4" fill="#34d399"/>
+          <!-- Axis labels -->
+          <text x="35" y="115" fill="#9393a8" font-size="10">Send</text>
+          <text x="275" y="115" fill="#9393a8" font-size="10">Recv</text>
+          <text x="155" y="115" fill="#9393a8" font-size="10">Mid</text>
+          <text x="5" y="10" fill="#9393a8" font-size="9">V</text>
+          <text x="310" y="105" fill="#9393a8" font-size="9">z</text>
+        </svg>
+      </div>
     </div>
     <div class="q-toggle">Click to show solution</div>
   </div>
