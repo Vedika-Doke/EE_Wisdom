@@ -2059,20 +2059,55 @@ ED^2P = Energy x Delay^2
     <div class="inst-field rt"><div class="field-name">rt</div><div class="field-bits">5 bits</div></div>
     <div class="inst-field imm" style="min-width:180px;"><div class="field-name">immediate / offset</div><div class="field-bits">16 bits</div></div>
   </div>
-  <p>For immediate values, loads, stores, and branches. The 16-bit field is:</p>
-  <ul>
-    <li><strong>Arithmetic:</strong> <em>Sign-extended</em> to 32 bits (e.g., <code>addi</code>)</li>
-    <li><strong>Logical:</strong> <em>Zero-extended</em> to 32 bits (e.g., <code>andi</code>)</li>
-    <li><strong>Load/Store:</strong> Offset in <em>bytes</em> added to base register rs</li>
-    <li><strong>Branch:</strong> Offset in <em>words</em> (multiply by 4), relative to PC+4</li>
-  </ul>
+  <div class="key-box">
+    <h4>I-Type Key Points</h4>
+    <ul>
+      <li><code>op</code> &rarr; determines the operation (unlike R-type where funct does it)</li>
+      <li><code>rs</code> &rarr; <strong>source register</strong> (base address for lw/sw)</li>
+      <li><code>rt</code> &rarr; <strong>destination</strong> for loads/arithmetic, <strong>source</strong> for stores</li>
+      <li><code>immediate</code> &rarr; 16-bit constant, extended to 32 bits before use</li>
+    </ul>
+
+    <h4>How the 16-bit immediate is extended:</h4>
+    <table>
+      <tr><th>Use Case</th><th>Extension</th><th>Why</th><th>Example</th></tr>
+      <tr><td>Arithmetic (<code>addi</code>, <code>slti</code>)</td><td><strong>Sign-extended</strong></td><td>Need negative values (e.g., subtract via addi with -1)</td><td><code>addi $t0, $s0, -5</code></td></tr>
+      <tr><td>Logical (<code>andi</code>, <code>ori</code>)</td><td><strong>Zero-extended</strong></td><td>Bit masks should not have 1s prepended</td><td><code>andi $t0, $s0, 0xFF</code></td></tr>
+      <tr><td>Load/Store (<code>lw</code>, <code>sw</code>)</td><td><strong>Sign-extended</strong></td><td>Offset in <em>bytes</em>, can be negative. Added to base register rs.</td><td><code>lw $t0, -4($sp)</code></td></tr>
+      <tr><td>Branch (<code>beq</code>, <code>bne</code>)</td><td><strong>Sign-extended + shift left 2</strong></td><td>Offset in <em>words</em> (x4), relative to PC+4. Can branch backward.</td><td><code>beq $s0, $s1, -3</code></td></tr>
+    </table>
+
+    <p><strong>Example:</strong> <code>lw $t0, 40($s3)</code> &rarr; <code>$t0 = Memory[$s3 + 40]</code></p>
+    <pre>op=100011(lw) | rs=$s3(10011) | rt=$t0(01000) | immediate=0000000000101000 (40)</pre>
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">Sign vs Zero Extension - Why It Matters</div>
+    <p><strong>Sign-extend:</strong> Copy bit 15 into bits 16-31. E.g., <code>FFFC</code> (16-bit) &rarr; <code>FFFFFFFC</code> (32-bit) = -4</p>
+    <p><strong>Zero-extend:</strong> Fill bits 16-31 with 0s. E.g., <code>FFFC</code> (16-bit) &rarr; <code>0000FFFC</code> (32-bit) = 65532</p>
+    <p>Using <code>addi</code> instead of <code>ori</code> to load a constant with bit 15 = 1 would give a <strong>wrong negative value</strong> due to sign extension!</p>
+  </div>
 
   <h4>J-Type (Jump)</h4>
   <div class="inst-format">
     <div class="inst-field op"><div class="field-name">op</div><div class="field-bits">6 bits</div></div>
     <div class="inst-field addr" style="min-width:320px;"><div class="field-name">target address</div><div class="field-bits">26 bits</div></div>
   </div>
-  <p>For <code>j</code> and <code>jal</code>. Address = {PC+4[31:28], target[25:0], 00} (word-aligned concatenation).</p>
+  <div class="key-box">
+    <h4>J-Type Key Points</h4>
+    <p>Used only for <code>j</code> (jump) and <code>jal</code> (jump and link / procedure call).</p>
+    <p><strong>How the 32-bit target address is formed:</strong></p>
+    <pre>Full address = { PC+4[31:28] , target[25:0] , 00 }
+                 ^^^^^^^^^^^^   ^^^^^^^^^^^^   ^^
+                 top 4 bits     26 bits from   word-aligned
+                 from next PC   instruction    (always 00)</pre>
+    <ul>
+      <li>The 26-bit field gives a <strong>28-bit byte address</strong> (shift left 2 for word alignment)</li>
+      <li>Top 4 bits come from PC+4, so jump range is within the same <strong>256 MB region</strong></li>
+      <li><code>jal</code> also saves return address: <code>$ra = PC + 4</code> before jumping</li>
+      <li>To jump <em>anywhere</em> in 32-bit space, use <code>jr $rs</code> (R-type, full 32-bit register)</li>
+    </ul>
+  </div>
 
   <h3>Key MIPS Instructions</h3>
   <table>
