@@ -2038,8 +2038,19 @@ ED^2P = Energy x Delay^2
     <div class="inst-field sh"><div class="field-name">shamt</div><div class="field-bits">5 bits</div></div>
     <div class="inst-field fn"><div class="field-name">funct</div><div class="field-bits">6 bits</div></div>
   </div>
-  <p>For register-register ALU operations. <code>op</code> = 000000 for all R-type; <code>funct</code> determines the operation.</p>
-  <p>Example: <code>add $t0, $s0, $s1</code> &rarr; rd=$t0 (dest), rs=$s0 (source 1), rt=$s1 (source 2)</p>
+  <div class="key-box">
+    <h4>R-Type Key Points</h4>
+    <ul>
+      <li><code>op = 000000</code> &rarr; identifies R-type (same opcode for ALL R-type instructions)</li>
+      <li><code>rs</code>, <code>rt</code> &rarr; <strong>source registers</strong> (two inputs to ALU)</li>
+      <li><code>rd</code> &rarr; <strong>destination register</strong> (where result is written)</li>
+      <li><code>shamt</code> &rarr; shift amount (usually 0, used only for shift instructions like <code>sll</code>, <code>srl</code>)</li>
+      <li><code>funct</code> &rarr; <strong>actual operation</strong> (e.g., add=100000, sub=100010, and=100100)</li>
+    </ul>
+    <p><strong>Example:</strong> <code>add $t0, $s0, $s1</code> &rarr; <code>$t0 = $s0 + $s1</code></p>
+    <pre>op=000000 | rs=$s0(10000) | rt=$s1(10001) | rd=$t0(01000) | shamt=00000 | funct=100000</pre>
+    <p><strong>Takeaway:</strong> R-type uses registers only; <code>funct</code> decides the operation, not <code>op</code>.</p>
+  </div>
 
   <h4>I-Type (Immediate)</h4>
   <div class="inst-format">
