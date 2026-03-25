@@ -534,6 +534,7 @@
   <a class="nav-tab" href="#s14">Datapath</a>
   <a class="nav-tab" href="#s15">Pipelining</a>
   <a class="nav-tab" href="#s16">Cache</a>
+  <a class="nav-tab" href="#s17">MMU/VM</a>
   <a class="nav-tab" href="#quick">Recall</a>
   <a class="nav-tab" href="#quiz">Quiz</a>
 </div>
@@ -568,6 +569,7 @@
       <li><a href="#s14">MIPS Datapath: Single-Cycle & Multi-Cycle</a></li>
       <li><a href="#s15">Pipelining: Stages, Hazards & Performance</a></li>
       <li><a href="#s16">Cache Memory: Hierarchy, Mapping & Performance</a></li>
+      <li><a href="#s17">Virtual Memory & MMU (TLB, Page Tables, Page Faults)</a></li>
     </ol>
   </div>
 
@@ -1918,10 +1920,43 @@ RETI</pre>
     </table>
   </div>
 
+  <h4 style="color:var(--orange); margin-top:16px;">ISA Classification by Memory Addresses in ALU Instructions</h4>
+  <table>
+    <tr><th># Memory Addresses</th><th>Max Operands</th><th>Architecture Type</th><th>Examples</th></tr>
+    <tr><td><strong>0</strong></td><td>3</td><td>Load-Store</td><td>Alpha, ARM, <strong>MIPS</strong>, PowerPC, SPARC, SuperH, TM32</td></tr>
+    <tr><td><strong>1</strong></td><td>2</td><td>Register-Memory</td><td>IBM 360/370, Intel 80x86, Motorola 68000, TI TMS320C54x</td></tr>
+    <tr><td><strong>2</strong></td><td>2</td><td>Memory-Memory</td><td>VAX (also has three-operand formats)</td></tr>
+    <tr><td><strong>3</strong></td><td>3</td><td>Memory-Memory</td><td>VAX (also has two-operand formats)</td></tr>
+  </table>
+  <div class="key-box">
+    <p><strong># Memory Addresses</strong> = how many of the ALU operands can come directly from memory. Load-Store (0) means <em>none</em> &mdash; all operands must be in registers first.</p>
+  </div>
+
+  <h4 style="color:var(--cyan); margin-top:16px;">Comparison: Advantages &amp; Disadvantages</h4>
+  <table>
+    <tr><th>Architecture</th><th>Advantages</th><th>Disadvantages</th></tr>
+    <tr>
+      <td><strong>Load-Store</strong><br><span style="color:var(--muted); font-size:0.85rem;">(MIPS, ARM)</span></td>
+      <td>Fixed-length instructions, constant CPI &rarr; <strong>faster &amp; simpler hardware</strong>, easy to pipeline</td>
+      <td><strong>Longer programs</strong> &mdash; need separate lw/sw instructions to move data between memory and registers before any ALU operation</td>
+    </tr>
+    <tr>
+      <td><strong>Register-Memory</strong><br><span style="color:var(--muted); font-size:0.85rem;">(x86, 68000)</span></td>
+      <td><strong>Shorter programs</strong> &mdash; one operand can come directly from memory (no separate load needed)</td>
+      <td>Instruction length and CPI <strong>not fixed</strong> (harder to pipeline). Source variable may be <strong>destroyed</strong> (overwritten)</td>
+    </tr>
+    <tr>
+      <td><strong>Memory-Memory</strong><br><span style="color:var(--muted); font-size:0.85rem;">(VAX)</span></td>
+      <td><strong>Most compact code</strong> &mdash; all operands from memory, fewest instructions needed</td>
+      <td><strong>Large variation</strong> in instruction length &amp; CPI. Memory becomes a <strong>bottleneck</strong> (multiple memory accesses per instruction)</td>
+    </tr>
+  </table>
+
   <div class="key-box exam">
     <div class="label">Key Connection: 8051 vs MIPS</div>
     <p><strong>8051</strong> = Accumulator-based CISC. Most operations go through ACC. Variable instruction sizes (1-3 bytes).</p>
-    <p><strong>MIPS</strong> = Register-Register (Load-Store) RISC. 32 GPRs, only lw/sw touch memory. Fixed 32-bit instructions.</p>
+    <p><strong>MIPS</strong> = Load-Store RISC (0 memory addresses in ALU instructions). 32 GPRs, only lw/sw touch memory. Fixed 32-bit instructions. Constant CPI when pipelined.</p>
+    <p style="color:var(--yellow); margin-top:6px;"><strong>CPI = Cycles Per Instruction.</strong> Load-Store architectures achieve near-constant CPI because every instruction follows the same pipeline stages. Register-Memory and Memory-Memory have variable CPI because memory accesses take unpredictable time.</p>
   </div>
 
   <h3>What Makes a Good ISA?</h3>
@@ -2202,8 +2237,43 @@ ED^2P = Energy x Delay^2
 
   <div class="key-box concept">
     <div class="label">What is MIPS?</div>
-    <p><strong>MIPS</strong> = Microprocessor without Interlocked Pipeline Stages. A classic <strong>RISC</strong> architecture designed for efficient pipelining.</p>
-    <p><strong>MiniMIPS</strong> = The subset used in EE309 (from Parhami textbook). A teaching-friendly version of full MIPS.</p>
+    <p><strong>MIPS</strong> = <strong>M</strong>icroprocessor without <strong>I</strong>nterlocked <strong>P</strong>ipeline <strong>S</strong>tages.</p>
+    <ul>
+      <li>Also the name of the company that licenses this technology</li>
+      <li>A <strong>Load-Store</strong> architecture for <strong>RISC</strong> (Reduced Instruction Set Computer) based systems</li>
+      <li>Different variants of MIPS exist (MIPS I, II, III, IV, MIPS32, MIPS64)</li>
+    </ul>
+    <p style="margin-top:8px;"><strong>MiniMIPS</strong> = The subset used in EE309 (from Parhami textbook). A teaching-friendly version of full MIPS.</p>
+  </div>
+
+  <div class="key-box">
+    <div class="label">MIPS ISA (Basic Version) Key Facts</div>
+    <table>
+      <tr><th>Feature</th><th>Value</th><th>Notes</th></tr>
+      <tr><td><strong>Instruction Width</strong></td><td>Fixed <strong>32 bits</strong></td><td>All instructions are exactly 4 bytes &mdash; makes fetching and pipelining simple</td></tr>
+      <tr><td><strong>Address Size</strong></td><td><strong>32-bit</strong> addresses</td><td>2<sup>30</sup> word memory (each address points to a 4-byte word, so last 2 bits are always "00")</td></tr>
+      <tr><td><strong>Word Size</strong></td><td><strong>4 bytes</strong> (32 bits)</td><td>Word-aligned: word addresses must be divisible by 4</td></tr>
+      <tr><td><strong>GPRs</strong></td><td><strong>32 registers</strong></td><td>31 general-purpose + R0 hardwired to 0. R0=0 means no CLR instruction needed! (<code>AND Rn, R0</code> = clear Rn)</td></tr>
+      <tr><td><strong>FP Registers</strong></td><td><strong>16 double-precision</strong> or <strong>32 single-precision</strong></td><td>16 registers for 64-bit (double) data, or 32 registers for 32-bit (single/float) data</td></tr>
+    </table>
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">Why R0 = 0 is Clever</div>
+    <p>Since R0 ($zero) is always 0, MIPS doesn't need separate instructions for common operations:</p>
+    <ul>
+      <li><code>AND Rn, R0</code> &rarr; <strong>Clear register Rn</strong> (no CLR instruction needed!)</li>
+      <li><code>ADD Rd, Rs, R0</code> &rarr; <strong>Move Rs to Rd</strong> (no MOV instruction needed!)</li>
+      <li><code>SLT Rd, R0, Rs</code> &rarr; <strong>Test if Rs &gt; 0</strong></li>
+      <li><code>BEQ R0, R0, label</code> &rarr; <strong>Unconditional branch</strong> (always true)</li>
+    </ul>
+    <p style="color:var(--yellow); margin-top:6px;">This is a key RISC philosophy: keep the hardware simple by using clever combinations of existing instructions instead of adding specialized ones.</p>
+  </div>
+
+  <div class="key-box">
+    <div class="label">Why 2<sup>30</sup> Words and Not 2<sup>32</sup>?</div>
+    <p>MIPS has 32-bit addresses &rarr; 2<sup>32</sup> = 4 GB of <strong>byte</strong>-addressable memory. But since a word = 4 bytes, and words must be aligned to 4-byte boundaries, the two LSB bits of any word address are always <strong>"00"</strong>.</p>
+    <p>So: 2<sup>32</sup> bytes / 4 bytes per word = 2<sup>30</sup> <strong>words</strong>. The 2 LSB bits are implicit (not stored in the address for word access).</p>
   </div>
 
   <h3>MIPS Design Principles</h3>
@@ -2368,25 +2438,213 @@ ED^2P = Energy x Delay^2
     </ul>
   </div>
 
-  <h3>Key MIPS Instructions</h3>
+  <h3>Complete MIPS Instruction Reference (All Instructions with Full Forms)</h3>
+
+  <!-- ARITHMETIC -->
+  <h4 style="color:var(--yellow); margin-top:20px;">Arithmetic Instructions</h4>
   <table>
-    <tr><th>Category</th><th>Instruction</th><th>Example</th><th>Meaning</th><th>Type</th></tr>
-    <tr><td rowspan="4">Arithmetic</td><td><code>add</code></td><td><code>add $t0, $s0, $s1</code></td><td>$t0 = $s0 + $s1 (signed, trap on overflow)</td><td>R</td></tr>
-    <tr><td><code>sub</code></td><td><code>sub $t0, $s0, $s1</code></td><td>$t0 = $s0 - $s1</td><td>R</td></tr>
-    <tr><td><code>addi</code></td><td><code>addi $t0, $s0, 60</code></td><td>$t0 = $s0 + 60 (sign-extended imm)</td><td>I</td></tr>
-    <tr><td><code>slt</code></td><td><code>slt $t0, $s0, $s1</code></td><td>$t0 = ($s0 < $s1) ? 1 : 0</td><td>R</td></tr>
-    <tr><td rowspan="2">Logical</td><td><code>and/or/xor</code></td><td><code>and $t0, $s0, $s1</code></td><td>Bitwise AND/OR/XOR</td><td>R</td></tr>
-    <tr><td><code>andi/ori</code></td><td><code>andi $t0, $s0, 0xFF</code></td><td>Zero-extended immediate</td><td>I</td></tr>
-    <tr><td rowspan="2">Memory</td><td><code>lw</code></td><td><code>lw $t0, 40($s3)</code></td><td>$t0 = Memory[$s3 + 40]</td><td>I</td></tr>
-    <tr><td><code>sw</code></td><td><code>sw $t0, 40($s3)</code></td><td>Memory[$s3 + 40] = $t0</td><td>I</td></tr>
-    <tr><td rowspan="3">Branch</td><td><code>beq</code></td><td><code>beq $s0, $s1, L</code></td><td>if ($s0 == $s1) go to L</td><td>I</td></tr>
-    <tr><td><code>bne</code></td><td><code>bne $s0, $s1, L</code></td><td>if ($s0 != $s1) go to L</td><td>I</td></tr>
-    <tr><td><code>bltz</code></td><td><code>bltz $s0, L</code></td><td>if ($s0 < 0) go to L</td><td>I</td></tr>
-    <tr><td rowspan="3">Jump</td><td><code>j</code></td><td><code>j target</code></td><td>PC = target address</td><td>J</td></tr>
-    <tr><td><code>jal</code></td><td><code>jal func</code></td><td>$ra = PC+4, then jump (procedure call)</td><td>J</td></tr>
-    <tr><td><code>jr</code></td><td><code>jr $ra</code></td><td>PC = $ra (return from procedure)</td><td>R</td></tr>
-    <tr><td>Load Upper</td><td><code>lui</code></td><td><code>lui $s0, 60</code></td><td>$s0 = 60 &lt;&lt; 16 (upper 16 bits)</td><td>I</td></tr>
+    <tr><th>Instruction</th><th>Full Form</th><th>Syntax</th><th>Operation</th><th>Type</th><th>Notes</th></tr>
+    <tr><td><code>add</code></td><td><strong>Add</strong></td><td><code>add rd, rs, rt</code></td><td>rd = rs + rt</td><td>R</td><td>Signed; traps on overflow</td></tr>
+    <tr><td><code>addu</code></td><td><strong>Add Unsigned</strong></td><td><code>addu rd, rs, rt</code></td><td>rd = rs + rt</td><td>R</td><td>No overflow trap</td></tr>
+    <tr><td><code>addi</code></td><td><strong>Add Immediate</strong></td><td><code>addi rt, rs, imm</code></td><td>rt = rs + SE(imm)</td><td>I</td><td>Sign-extends 16-bit immediate</td></tr>
+    <tr><td><code>addiu</code></td><td><strong>Add Immediate Unsigned</strong></td><td><code>addiu rt, rs, imm</code></td><td>rt = rs + SE(imm)</td><td>I</td><td>Still sign-extends! Just no trap</td></tr>
+    <tr><td><code>sub</code></td><td><strong>Subtract</strong></td><td><code>sub rd, rs, rt</code></td><td>rd = rs - rt</td><td>R</td><td>Signed; traps on overflow</td></tr>
+    <tr><td><code>subu</code></td><td><strong>Subtract Unsigned</strong></td><td><code>subu rd, rs, rt</code></td><td>rd = rs - rt</td><td>R</td><td>No overflow trap</td></tr>
+    <tr><td><code>mult</code></td><td><strong>Multiply</strong></td><td><code>mult rs, rt</code></td><td>Hi:Lo = rs &times; rt</td><td>R</td><td>64-bit result in Hi and Lo</td></tr>
+    <tr><td><code>multu</code></td><td><strong>Multiply Unsigned</strong></td><td><code>multu rs, rt</code></td><td>Hi:Lo = rs &times; rt</td><td>R</td><td>Unsigned 64-bit result</td></tr>
+    <tr><td><code>div</code></td><td><strong>Divide</strong></td><td><code>div rs, rt</code></td><td>Lo = rs/rt, Hi = rs%rt</td><td>R</td><td>Lo = quotient, Hi = remainder</td></tr>
+    <tr><td><code>divu</code></td><td><strong>Divide Unsigned</strong></td><td><code>divu rs, rt</code></td><td>Lo = rs/rt, Hi = rs%rt</td><td>R</td><td>Unsigned division</td></tr>
+    <tr><td><code>slt</code></td><td><strong>Set if Less Than</strong></td><td><code>slt rd, rs, rt</code></td><td>rd = (rs &lt; rt) ? 1 : 0</td><td>R</td><td>Signed comparison</td></tr>
+    <tr><td><code>sltu</code></td><td><strong>Set if Less Than Unsigned</strong></td><td><code>sltu rd, rs, rt</code></td><td>rd = (rs &lt; rt) ? 1 : 0</td><td>R</td><td>Unsigned comparison</td></tr>
+    <tr><td><code>slti</code></td><td><strong>Set if Less Than Immediate</strong></td><td><code>slti rt, rs, imm</code></td><td>rt = (rs &lt; SE(imm)) ? 1 : 0</td><td>I</td><td>Signed compare with immediate</td></tr>
+    <tr><td><code>sltiu</code></td><td><strong>Set if Less Than Immediate Unsigned</strong></td><td><code>sltiu rt, rs, imm</code></td><td>rt = (rs &lt; SE(imm)) ? 1 : 0</td><td>I</td><td>Unsigned compare</td></tr>
   </table>
+
+  <div class="key-box important">
+    <div class="label">Trap: "Unsigned" Doesn't Mean No Sign-Extension!</div>
+    <p><code>addiu</code> still <strong>sign-extends</strong> the 16-bit immediate to 32 bits. The "unsigned" only means it <strong>doesn't trap on overflow</strong>. This is a common exam mistake!</p>
+    <p>Similarly, <code>mult</code> vs <code>multu</code> &mdash; both multiply, but <code>mult</code> treats operands as signed, <code>multu</code> as unsigned.</p>
+  </div>
+
+  <!-- LOGICAL -->
+  <h4 style="color:var(--cyan); margin-top:20px;">Logical Instructions</h4>
+  <table>
+    <tr><th>Instruction</th><th>Full Form</th><th>Syntax</th><th>Operation</th><th>Type</th><th>Notes</th></tr>
+    <tr><td><code>and</code></td><td><strong>AND</strong></td><td><code>and rd, rs, rt</code></td><td>rd = rs AND rt</td><td>R</td><td>Bitwise AND</td></tr>
+    <tr><td><code>andi</code></td><td><strong>AND Immediate</strong></td><td><code>andi rt, rs, imm</code></td><td>rt = rs AND ZE(imm)</td><td>I</td><td><span class="red">Zero-extends</span> immediate (not sign!)</td></tr>
+    <tr><td><code>or</code></td><td><strong>OR</strong></td><td><code>or rd, rs, rt</code></td><td>rd = rs OR rt</td><td>R</td><td>Bitwise OR</td></tr>
+    <tr><td><code>ori</code></td><td><strong>OR Immediate</strong></td><td><code>ori rt, rs, imm</code></td><td>rt = rs OR ZE(imm)</td><td>I</td><td><span class="red">Zero-extends</span> immediate</td></tr>
+    <tr><td><code>xor</code></td><td><strong>Exclusive OR</strong></td><td><code>xor rd, rs, rt</code></td><td>rd = rs XOR rt</td><td>R</td><td>Bitwise XOR</td></tr>
+    <tr><td><code>xori</code></td><td><strong>Exclusive OR Immediate</strong></td><td><code>xori rt, rs, imm</code></td><td>rt = rs XOR ZE(imm)</td><td>I</td><td>Zero-extends immediate</td></tr>
+    <tr><td><code>nor</code></td><td><strong>NOT OR</strong></td><td><code>nor rd, rs, rt</code></td><td>rd = NOT(rs OR rt)</td><td>R</td><td>Used as NOT: <code>nor rd, rs, $zero</code></td></tr>
+  </table>
+
+  <div class="key-box exam">
+    <div class="label">Sign-Extend vs Zero-Extend</div>
+    <p><strong>Arithmetic immediates</strong> (<code>addi</code>, <code>slti</code>) use <strong>sign-extension</strong> (SE) &mdash; bit 15 is copied to upper 16 bits.</p>
+    <p><strong>Logical immediates</strong> (<code>andi</code>, <code>ori</code>, <code>xori</code>) use <strong>zero-extension</strong> (ZE) &mdash; upper 16 bits are filled with 0s.</p>
+    <p>This is why you use <code>ori</code> (not <code>addi</code>) to load the lower 16 bits after <code>lui</code>!</p>
+  </div>
+
+  <!-- SHIFT -->
+  <h4 style="color:var(--green); margin-top:20px;">Shift Instructions</h4>
+  <table>
+    <tr><th>Instruction</th><th>Full Form</th><th>Syntax</th><th>Operation</th><th>Type</th><th>Notes</th></tr>
+    <tr><td><code>sll</code></td><td><strong>Shift Left Logical</strong></td><td><code>sll rd, rt, shamt</code></td><td>rd = rt &lt;&lt; shamt</td><td>R</td><td>Fills with 0s from right. <code>sll $zero,$zero,0</code> = NOP</td></tr>
+    <tr><td><code>srl</code></td><td><strong>Shift Right Logical</strong></td><td><code>srl rd, rt, shamt</code></td><td>rd = rt &gt;&gt;&gt; shamt</td><td>R</td><td>Fills with 0s from left (unsigned shift)</td></tr>
+    <tr><td><code>sra</code></td><td><strong>Shift Right Arithmetic</strong></td><td><code>sra rd, rt, shamt</code></td><td>rd = rt &gt;&gt; shamt</td><td>R</td><td>Fills with sign bit (preserves sign)</td></tr>
+    <tr><td><code>sllv</code></td><td><strong>Shift Left Logical Variable</strong></td><td><code>sllv rd, rt, rs</code></td><td>rd = rt &lt;&lt; rs[4:0]</td><td>R</td><td>Shift amount from register (lower 5 bits)</td></tr>
+    <tr><td><code>srlv</code></td><td><strong>Shift Right Logical Variable</strong></td><td><code>srlv rd, rt, rs</code></td><td>rd = rt &gt;&gt;&gt; rs[4:0]</td><td>R</td><td>Shift amount from register</td></tr>
+    <tr><td><code>srav</code></td><td><strong>Shift Right Arithmetic Variable</strong></td><td><code>srav rd, rt, rs</code></td><td>rd = rt &gt;&gt; rs[4:0]</td><td>R</td><td>Arithmetic shift, amount from register</td></tr>
+  </table>
+
+  <div class="key-box">
+    <h4>Shift Left = Multiply, Shift Right = Divide</h4>
+    <ul>
+      <li><code>sll $t0, $s0, 2</code> &rarr; $t0 = $s0 &times; 4 (fast multiply by power of 2)</li>
+      <li><code>srl $t0, $s0, 3</code> &rarr; $t0 = $s0 / 8 (unsigned divide by power of 2)</li>
+      <li><code>sra $t0, $s0, 1</code> &rarr; $t0 = $s0 / 2 (signed divide, preserves negative)</li>
+      <li><strong>Logical shift</strong> fills with 0s. <strong>Arithmetic shift</strong> fills with the sign bit.</li>
+    </ul>
+  </div>
+
+  <!-- MEMORY -->
+  <h4 style="color:var(--orange); margin-top:20px;">Memory (Load/Store) Instructions</h4>
+  <table>
+    <tr><th>Instruction</th><th>Full Form</th><th>Syntax</th><th>Operation</th><th>Type</th><th>Notes</th></tr>
+    <tr><td><code>lw</code></td><td><strong>Load Word</strong></td><td><code>lw rt, offset(rs)</code></td><td>rt = Memory[rs + SE(offset)]</td><td>I</td><td>Loads 32 bits (4 bytes). Must be word-aligned.</td></tr>
+    <tr><td><code>sw</code></td><td><strong>Store Word</strong></td><td><code>sw rt, offset(rs)</code></td><td>Memory[rs + SE(offset)] = rt</td><td>I</td><td>Stores 32 bits. Must be word-aligned.</td></tr>
+    <tr><td><code>lh</code></td><td><strong>Load Halfword</strong></td><td><code>lh rt, offset(rs)</code></td><td>rt = SE(Memory[rs + offset]<sub>16bit</sub>)</td><td>I</td><td>Loads 16 bits, sign-extends to 32</td></tr>
+    <tr><td><code>lhu</code></td><td><strong>Load Halfword Unsigned</strong></td><td><code>lhu rt, offset(rs)</code></td><td>rt = ZE(Memory[rs + offset]<sub>16bit</sub>)</td><td>I</td><td>Loads 16 bits, zero-extends to 32</td></tr>
+    <tr><td><code>sh</code></td><td><strong>Store Halfword</strong></td><td><code>sh rt, offset(rs)</code></td><td>Memory[rs + offset]<sub>16bit</sub> = rt[15:0]</td><td>I</td><td>Stores lower 16 bits</td></tr>
+    <tr><td><code>lb</code></td><td><strong>Load Byte</strong></td><td><code>lb rt, offset(rs)</code></td><td>rt = SE(Memory[rs + offset]<sub>8bit</sub>)</td><td>I</td><td>Loads 8 bits, sign-extends to 32</td></tr>
+    <tr><td><code>lbu</code></td><td><strong>Load Byte Unsigned</strong></td><td><code>lbu rt, offset(rs)</code></td><td>rt = ZE(Memory[rs + offset]<sub>8bit</sub>)</td><td>I</td><td>Loads 8 bits, zero-extends to 32</td></tr>
+    <tr><td><code>sb</code></td><td><strong>Store Byte</strong></td><td><code>sb rt, offset(rs)</code></td><td>Memory[rs + offset]<sub>8bit</sub> = rt[7:0]</td><td>I</td><td>Stores lowest 8 bits</td></tr>
+    <tr><td><code>lui</code></td><td><strong>Load Upper Immediate</strong></td><td><code>lui rt, imm</code></td><td>rt = imm &lt;&lt; 16</td><td>I</td><td>Upper 16 bits = imm, lower 16 = 0</td></tr>
+  </table>
+
+  <div class="key-box important">
+    <div class="label">Alignment Requirements</div>
+    <ul>
+      <li><code>lw</code>/<code>sw</code>: address must be divisible by <strong>4</strong> (word-aligned)</li>
+      <li><code>lh</code>/<code>sh</code>: address must be divisible by <strong>2</strong> (halfword-aligned)</li>
+      <li><code>lb</code>/<code>sb</code>: <strong>any address</strong> (byte = smallest unit)</li>
+      <li>Misaligned access causes an <strong>Address Error exception</strong></li>
+    </ul>
+  </div>
+
+  <!-- BRANCH & JUMP -->
+  <h4 style="color:var(--accent1); margin-top:20px;">Branch &amp; Jump Instructions</h4>
+  <table>
+    <tr><th>Instruction</th><th>Full Form</th><th>Syntax</th><th>Operation</th><th>Type</th><th>Notes</th></tr>
+    <tr><td><code>beq</code></td><td><strong>Branch if Equal</strong></td><td><code>beq rs, rt, label</code></td><td>if (rs == rt) PC = PC+4 + SE(offset)&lt;&lt;2</td><td>I</td><td>PC-relative addressing</td></tr>
+    <tr><td><code>bne</code></td><td><strong>Branch if Not Equal</strong></td><td><code>bne rs, rt, label</code></td><td>if (rs != rt) PC = PC+4 + SE(offset)&lt;&lt;2</td><td>I</td><td>PC-relative addressing</td></tr>
+    <tr><td><code>bltz</code></td><td><strong>Branch if Less Than Zero</strong></td><td><code>bltz rs, label</code></td><td>if (rs &lt; 0) branch</td><td>I</td><td>Checks sign bit of rs</td></tr>
+    <tr><td><code>bgtz</code></td><td><strong>Branch if Greater Than Zero</strong></td><td><code>bgtz rs, label</code></td><td>if (rs &gt; 0) branch</td><td>I</td><td>Signed comparison with 0</td></tr>
+    <tr><td><code>blez</code></td><td><strong>Branch if Less or Equal to Zero</strong></td><td><code>blez rs, label</code></td><td>if (rs &le; 0) branch</td><td>I</td><td>Signed comparison with 0</td></tr>
+    <tr><td><code>bgez</code></td><td><strong>Branch if Greater or Equal to Zero</strong></td><td><code>bgez rs, label</code></td><td>if (rs &ge; 0) branch</td><td>I</td><td>Signed comparison with 0</td></tr>
+    <tr><td><code>j</code></td><td><strong>Jump</strong></td><td><code>j target</code></td><td>PC = {PC+4[31:28], target, 00}</td><td>J</td><td>26-bit target &rarr; 256MB range</td></tr>
+    <tr><td><code>jal</code></td><td><strong>Jump and Link</strong></td><td><code>jal target</code></td><td>$ra = PC+4; then jump</td><td>J</td><td>For procedure/function calls</td></tr>
+    <tr><td><code>jr</code></td><td><strong>Jump Register</strong></td><td><code>jr rs</code></td><td>PC = rs</td><td>R</td><td>Full 32-bit jump. Used for return (<code>jr $ra</code>)</td></tr>
+    <tr><td><code>jalr</code></td><td><strong>Jump and Link Register</strong></td><td><code>jalr rd, rs</code></td><td>rd = PC+4; PC = rs</td><td>R</td><td>Like jal but target from register</td></tr>
+  </table>
+
+  <div class="key-box">
+    <h4>Branch Address Calculation</h4>
+    <p><strong>Branch target</strong> = PC + 4 + (sign-extended offset &times; 4)</p>
+    <p>The &times;4 (shift left 2) is because instructions are word-aligned. The 16-bit offset gives a range of <strong>&plusmn;128 KB</strong> from the branch instruction.</p>
+    <p><strong>Jump target</strong> = {PC+4[31:28], 26-bit addr, 00} &mdash; upper 4 bits from PC, giving a <strong>256 MB</strong> region.</p>
+  </div>
+
+  <!-- SPECIAL -->
+  <h4 style="color:var(--purple); margin-top:20px;">Special &amp; Hi/Lo Instructions</h4>
+  <table>
+    <tr><th>Instruction</th><th>Full Form</th><th>Syntax</th><th>Operation</th><th>Type</th><th>Notes</th></tr>
+    <tr><td><code>mfhi</code></td><td><strong>Move From Hi</strong></td><td><code>mfhi rd</code></td><td>rd = Hi</td><td>R</td><td>Get upper 32 bits of mult result or remainder of div</td></tr>
+    <tr><td><code>mflo</code></td><td><strong>Move From Lo</strong></td><td><code>mflo rd</code></td><td>rd = Lo</td><td>R</td><td>Get lower 32 bits of mult result or quotient of div</td></tr>
+    <tr><td><code>mthi</code></td><td><strong>Move To Hi</strong></td><td><code>mthi rs</code></td><td>Hi = rs</td><td>R</td><td>Write to Hi register</td></tr>
+    <tr><td><code>mtlo</code></td><td><strong>Move To Lo</strong></td><td><code>mtlo rs</code></td><td>Lo = rs</td><td>R</td><td>Write to Lo register</td></tr>
+    <tr><td><code>syscall</code></td><td><strong>System Call</strong></td><td><code>syscall</code></td><td>Generate system call exception</td><td>R</td><td>OS service request</td></tr>
+    <tr><td><code>break</code></td><td><strong>Break</strong></td><td><code>break</code></td><td>Generate breakpoint exception</td><td>R</td><td>Debugging</td></tr>
+    <tr><td><code>nop</code></td><td><strong>No Operation</strong></td><td><code>nop</code></td><td>Do nothing</td><td>R</td><td>Encodes as <code>sll $zero, $zero, 0</code></td></tr>
+  </table>
+
+  <!-- QUICK REFERENCE -->
+  <h4 style="color:var(--yellow); margin-top:20px;">Quick Reference: All MIPS Mnemonics &amp; Full Forms</h4>
+  <div class="two-col">
+    <div class="key-box">
+      <h4>Arithmetic &amp; Comparison</h4>
+      <ul>
+        <li><code>add</code> &mdash; <strong>Add</strong></li>
+        <li><code>addu</code> &mdash; <strong>Add Unsigned</strong></li>
+        <li><code>addi</code> &mdash; <strong>Add Immediate</strong></li>
+        <li><code>addiu</code> &mdash; <strong>Add Immediate Unsigned</strong></li>
+        <li><code>sub</code> &mdash; <strong>Subtract</strong></li>
+        <li><code>subu</code> &mdash; <strong>Subtract Unsigned</strong></li>
+        <li><code>mult</code> &mdash; <strong>Multiply</strong></li>
+        <li><code>multu</code> &mdash; <strong>Multiply Unsigned</strong></li>
+        <li><code>div</code> &mdash; <strong>Divide</strong></li>
+        <li><code>divu</code> &mdash; <strong>Divide Unsigned</strong></li>
+        <li><code>slt</code> &mdash; <strong>Set if Less Than</strong></li>
+        <li><code>sltu</code> &mdash; <strong>Set if Less Than Unsigned</strong></li>
+        <li><code>slti</code> &mdash; <strong>Set if Less Than Immediate</strong></li>
+        <li><code>sltiu</code> &mdash; <strong>Set if Less Than Immediate Unsigned</strong></li>
+      </ul>
+    </div>
+    <div class="key-box">
+      <h4>Logical &amp; Shift</h4>
+      <ul>
+        <li><code>and</code> &mdash; <strong>AND</strong></li>
+        <li><code>andi</code> &mdash; <strong>AND Immediate</strong></li>
+        <li><code>or</code> &mdash; <strong>OR</strong></li>
+        <li><code>ori</code> &mdash; <strong>OR Immediate</strong></li>
+        <li><code>xor</code> &mdash; <strong>Exclusive OR</strong></li>
+        <li><code>xori</code> &mdash; <strong>Exclusive OR Immediate</strong></li>
+        <li><code>nor</code> &mdash; <strong>NOT OR</strong></li>
+        <li><code>sll</code> &mdash; <strong>Shift Left Logical</strong></li>
+        <li><code>srl</code> &mdash; <strong>Shift Right Logical</strong></li>
+        <li><code>sra</code> &mdash; <strong>Shift Right Arithmetic</strong></li>
+        <li><code>sllv</code> &mdash; <strong>Shift Left Logical Variable</strong></li>
+        <li><code>srlv</code> &mdash; <strong>Shift Right Logical Variable</strong></li>
+        <li><code>srav</code> &mdash; <strong>Shift Right Arithmetic Variable</strong></li>
+      </ul>
+    </div>
+  </div>
+  <div class="two-col">
+    <div class="key-box">
+      <h4>Memory (Load/Store)</h4>
+      <ul>
+        <li><code>lw</code> &mdash; <strong>Load Word</strong> (32-bit)</li>
+        <li><code>sw</code> &mdash; <strong>Store Word</strong> (32-bit)</li>
+        <li><code>lh</code> &mdash; <strong>Load Halfword</strong> (16-bit, sign-ext)</li>
+        <li><code>lhu</code> &mdash; <strong>Load Halfword Unsigned</strong> (16-bit, zero-ext)</li>
+        <li><code>sh</code> &mdash; <strong>Store Halfword</strong> (16-bit)</li>
+        <li><code>lb</code> &mdash; <strong>Load Byte</strong> (8-bit, sign-ext)</li>
+        <li><code>lbu</code> &mdash; <strong>Load Byte Unsigned</strong> (8-bit, zero-ext)</li>
+        <li><code>sb</code> &mdash; <strong>Store Byte</strong> (8-bit)</li>
+        <li><code>lui</code> &mdash; <strong>Load Upper Immediate</strong></li>
+      </ul>
+    </div>
+    <div class="key-box">
+      <h4>Branch, Jump &amp; Special</h4>
+      <ul>
+        <li><code>beq</code> &mdash; <strong>Branch if Equal</strong></li>
+        <li><code>bne</code> &mdash; <strong>Branch if Not Equal</strong></li>
+        <li><code>bltz</code> &mdash; <strong>Branch if Less Than Zero</strong></li>
+        <li><code>bgtz</code> &mdash; <strong>Branch if Greater Than Zero</strong></li>
+        <li><code>blez</code> &mdash; <strong>Branch if Less or Equal to Zero</strong></li>
+        <li><code>bgez</code> &mdash; <strong>Branch if Greater or Equal to Zero</strong></li>
+        <li><code>j</code> &mdash; <strong>Jump</strong></li>
+        <li><code>jal</code> &mdash; <strong>Jump and Link</strong></li>
+        <li><code>jr</code> &mdash; <strong>Jump Register</strong></li>
+        <li><code>jalr</code> &mdash; <strong>Jump and Link Register</strong></li>
+        <li><code>mfhi</code> &mdash; <strong>Move From Hi</strong></li>
+        <li><code>mflo</code> &mdash; <strong>Move From Lo</strong></li>
+        <li><code>syscall</code> &mdash; <strong>System Call</strong></li>
+        <li><code>nop</code> &mdash; <strong>No Operation</strong></li>
+      </ul>
+    </div>
+  </div>
 
   <div class="key-box exam">
     <div class="label">Loading a 32-bit Constant</div>
@@ -2394,6 +2652,143 @@ ED^2P = Energy x Delay^2
     <pre>lui $s0, 0x0061    ; Load upper 16 bits: $s0 = 0x00610000
 ori $s0, $s0, 40   ; Load lower 16 bits: $s0 = 0x00610028</pre>
     <p>Cannot use <code>addi</code> for lower half because sign-extension may corrupt upper bits!</p>
+  </div>
+
+  <h3>MIPS Pseudo Instructions</h3>
+  <div class="key-box concept">
+    <div class="label">What Are Pseudo Instructions?</div>
+    <p>Pseudo instructions are <strong>not real hardware instructions</strong>. They are convenience instructions provided by the <strong>assembler</strong> that get translated into one or more real MIPS instructions before execution. They make assembly programming easier and more readable.</p>
+    <p>The assembler uses register <code>$at</code> (<code>$1</code>) as a temporary register for these translations &mdash; that's why <code>$at</code> is reserved and you should never use it directly.</p>
+  </div>
+
+  <table>
+    <tr><th>Pseudo Instruction</th><th>Meaning</th><th>Translates To (Real Instructions)</th></tr>
+    <tr>
+      <td><code>move $t0, $t1</code></td>
+      <td>Copy $t1 into $t0</td>
+      <td><code>add $t0, $zero, $t1</code></td>
+    </tr>
+    <tr>
+      <td><code>li $t0, imm</code></td>
+      <td><strong>Load Immediate</strong> &mdash; load a constant into register</td>
+      <td>If imm fits in 16 bits: <code>addi $t0, $zero, imm</code><br>
+          If 32-bit: <code>lui $at, upper16</code> then <code>ori $t0, $at, lower16</code></td>
+    </tr>
+    <tr>
+      <td><code>la $t0, label</code></td>
+      <td><strong>Load Address</strong> &mdash; load a memory address into register</td>
+      <td><code>lui $at, upper16(label)</code> then <code>ori $t0, $at, lower16(label)</code></td>
+    </tr>
+    <tr>
+      <td><code>nop</code></td>
+      <td><strong>No Operation</strong> &mdash; do nothing</td>
+      <td><code>sll $zero, $zero, 0</code></td>
+    </tr>
+    <tr>
+      <td><code>blt $s0, $s1, L</code></td>
+      <td><strong>Branch if Less Than</strong></td>
+      <td><code>slt $at, $s0, $s1</code> then <code>bne $at, $zero, L</code></td>
+    </tr>
+    <tr>
+      <td><code>ble $s0, $s1, L</code></td>
+      <td><strong>Branch if Less or Equal</strong></td>
+      <td><code>slt $at, $s1, $s0</code> then <code>beq $at, $zero, L</code></td>
+    </tr>
+    <tr>
+      <td><code>bgt $s0, $s1, L</code></td>
+      <td><strong>Branch if Greater Than</strong></td>
+      <td><code>slt $at, $s1, $s0</code> then <code>bne $at, $zero, L</code></td>
+    </tr>
+    <tr>
+      <td><code>bge $s0, $s1, L</code></td>
+      <td><strong>Branch if Greater or Equal</strong></td>
+      <td><code>slt $at, $s0, $s1</code> then <code>beq $at, $zero, L</code></td>
+    </tr>
+    <tr>
+      <td><code>not $t0, $t1</code></td>
+      <td><strong>Bitwise NOT</strong></td>
+      <td><code>nor $t0, $t1, $zero</code></td>
+    </tr>
+    <tr>
+      <td><code>neg $t0, $t1</code></td>
+      <td><strong>Negate</strong> (2's complement)</td>
+      <td><code>sub $t0, $zero, $t1</code></td>
+    </tr>
+    <tr>
+      <td><code>abs $t0, $t1</code></td>
+      <td><strong>Absolute Value</strong></td>
+      <td><code>slt $at, $t1, $zero</code> &rarr; <code>beq $at, $zero, +1</code> &rarr; <code>sub $t0, $zero, $t1</code></td>
+    </tr>
+    <tr>
+      <td><code>mul $t0, $s0, $s1</code></td>
+      <td><strong>Multiply</strong> (result in register)</td>
+      <td><code>mult $s0, $s1</code> then <code>mflo $t0</code></td>
+    </tr>
+    <tr>
+      <td><code>div $t0, $s0, $s1</code></td>
+      <td><strong>Divide</strong> (quotient in register)</td>
+      <td><code>div $s0, $s1</code> then <code>mflo $t0</code></td>
+    </tr>
+    <tr>
+      <td><code>rem $t0, $s0, $s1</code></td>
+      <td><strong>Remainder</strong></td>
+      <td><code>div $s0, $s1</code> then <code>mfhi $t0</code></td>
+    </tr>
+    <tr>
+      <td><code>lw $t0, addr32</code></td>
+      <td><strong>Load Word</strong> from 32-bit address</td>
+      <td><code>lui $at, upper16(addr)</code> then <code>lw $t0, lower16(addr)($at)</code></td>
+    </tr>
+    <tr>
+      <td><code>sw $t0, addr32</code></td>
+      <td><strong>Store Word</strong> to 32-bit address</td>
+      <td><code>lui $at, upper16(addr)</code> then <code>sw $t0, lower16(addr)($at)</code></td>
+    </tr>
+  </table>
+
+  <div class="key-box exam">
+    <div class="label">Exam Tip: How blt Works (Step by Step)</div>
+    <p>MIPS hardware only has <code>beq</code> and <code>bne</code> for branching. There is <strong>no blt, bgt, ble, bge in hardware</strong>. The assembler builds them using <code>slt</code> + <code>beq/bne</code>:</p>
+    <pre style="margin:10px 0;">
+<span style="color:var(--yellow);"># Pseudo:</span>  blt $s0, $s1, LABEL    (branch if $s0 &lt; $s1)
+
+<span style="color:var(--green);"># Real:</span>    slt $at, $s0, $s1      ; $at = 1 if $s0 &lt; $s1, else 0
+           bne $at, $zero, LABEL  ; if $at != 0 (i.e., $at == 1), branch</pre>
+    <p><strong>Logic:</strong> First, <code>slt</code> sets <code>$at = 1</code> if the "less than" condition is true. Then <code>bne</code> checks if <code>$at</code> is non-zero (true) and branches.</p>
+  </div>
+
+  <div class="key-box important">
+    <div class="label">Why $at ($1) is Reserved</div>
+    <p>The assembler needs a scratch register to translate pseudo instructions into real instructions. <code>$at</code> (Assembler Temporary, register $1) is reserved for this purpose. If you use <code>$at</code> in your code, a pseudo instruction translation could <strong>overwrite your value silently</strong>!</p>
+  </div>
+
+  <div class="key-box">
+    <h4>Quick Reference: Pseudo Instruction Full Forms</h4>
+    <div class="two-col">
+      <div>
+        <ul>
+          <li><code>li</code> &mdash; <strong>Load Immediate</strong></li>
+          <li><code>la</code> &mdash; <strong>Load Address</strong></li>
+          <li><code>move</code> &mdash; <strong>Move (copy register)</strong></li>
+          <li><code>nop</code> &mdash; <strong>No Operation</strong></li>
+          <li><code>blt</code> &mdash; <strong>Branch if Less Than</strong></li>
+          <li><code>ble</code> &mdash; <strong>Branch if Less or Equal</strong></li>
+          <li><code>bgt</code> &mdash; <strong>Branch if Greater Than</strong></li>
+          <li><code>bge</code> &mdash; <strong>Branch if Greater or Equal</strong></li>
+        </ul>
+      </div>
+      <div>
+        <ul>
+          <li><code>not</code> &mdash; <strong>Bitwise NOT</strong></li>
+          <li><code>neg</code> &mdash; <strong>Negate</strong></li>
+          <li><code>abs</code> &mdash; <strong>Absolute Value</strong></li>
+          <li><code>mul</code> &mdash; <strong>Multiply (to register)</strong></li>
+          <li><code>div</code> &mdash; <strong>Divide (quotient to register)</strong></li>
+          <li><code>rem</code> &mdash; <strong>Remainder</strong></li>
+          <li><code>$at</code> &mdash; <strong>Assembler Temporary ($1)</strong></li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <h3>MIPS Addressing Summary</h3>
@@ -2472,6 +2867,345 @@ ori $s0, $s0, 40   ; Load lower 16 bits: $s0 = 0x00610028</pre>
     <tr><td><code>beq $rs, $rt, off</code></td><td>Read inst</td><td>Read rs, rt</td><td>Compare rs, rt</td><td>-</td><td>- (update PC if equal)</td></tr>
     <tr><td><code>j target</code></td><td>Read inst</td><td>-</td><td>Compute target addr</td><td>-</td><td>- (update PC)</td></tr>
   </table>
+
+  <!-- INTERACTIVE DATAPATH SIMULATION -->
+  <h3>Interactive Single-Cycle Datapath Simulator</h3>
+  <p style="color:var(--muted); margin-bottom:12px;">Select an instruction type to see how data flows through the datapath. Active components and paths light up. The controller sets the control signals shown below.</p>
+
+  <div style="text-align:center; margin-bottom:16px;">
+    <button class="dp-btn dp-btn-active" onclick="showDatapath('rtype')">R-type (add)</button>
+    <button class="dp-btn" onclick="showDatapath('lw')">lw (load word)</button>
+    <button class="dp-btn" onclick="showDatapath('sw')">sw (store word)</button>
+    <button class="dp-btn" onclick="showDatapath('beq')">beq (branch)</button>
+    <button class="dp-btn" onclick="showDatapath('j')">j (jump)</button>
+  </div>
+
+  <style>
+    .dp-btn {
+      padding: 8px 18px; margin: 4px; background: var(--card2); color: var(--cyan);
+      border: 1px solid #444; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.2s;
+    }
+    .dp-btn:hover { border-color: var(--cyan); background: var(--accent2); }
+    .dp-btn-active { background: var(--accent2); border-color: var(--cyan); }
+    .dp-svg-box { background: var(--card); border-radius: 12px; padding: 16px; border: 1px solid #333; overflow-x: auto; }
+    .dp-info { margin-top: 16px; }
+    .dp-step { padding: 10px 16px; margin: 6px 0; background: var(--card2); border-radius: 8px; border-left: 3px solid #444; transition: all 0.3s; }
+    .dp-step-active { border-left-color: var(--green); background: #1a2a1a; }
+    .dp-step-num { color: var(--yellow); font-weight: bold; margin-right: 8px; }
+    .dp-ctrl-table { margin-top: 16px; }
+    .dp-ctrl-table td.sig-on { color: var(--green); font-weight: bold; }
+    .dp-ctrl-table td.sig-off { color: #555; }
+    .dp-ctrl-table td.sig-x { color: #666; font-style: italic; }
+  </style>
+
+  <div class="dp-svg-box">
+    <svg id="dp-svg" width="780" height="420" viewBox="0 0 780 420">
+      <!-- PC -->
+      <rect id="dp-pc" x="15" y="160" width="50" height="50" rx="6" fill="#1a1a2e" stroke="#555" stroke-width="2"/>
+      <text x="40" y="190" fill="#e0e0e0" font-size="12" text-anchor="middle" font-weight="bold">PC</text>
+
+      <!-- Inst Memory -->
+      <rect id="dp-imem" x="90" y="130" width="90" height="110" rx="8" fill="#1a1a2e" stroke="#555" stroke-width="2"/>
+      <text x="135" y="175" fill="#e0e0e0" font-size="11" text-anchor="middle" font-weight="bold">Inst</text>
+      <text x="135" y="192" fill="#e0e0e0" font-size="11" text-anchor="middle" font-weight="bold">Memory</text>
+
+      <!-- Register File -->
+      <rect id="dp-rf" x="220" y="120" width="100" height="130" rx="8" fill="#1a1a2e" stroke="#555" stroke-width="2"/>
+      <text x="270" y="165" fill="#e0e0e0" font-size="11" text-anchor="middle" font-weight="bold">Register</text>
+      <text x="270" y="182" fill="#e0e0e0" font-size="11" text-anchor="middle" font-weight="bold">File</text>
+      <text x="270" y="200" fill="#9e9e9e" font-size="9" text-anchor="middle">Read rs, rt</text>
+      <text x="270" y="215" fill="#9e9e9e" font-size="9" text-anchor="middle">Write rd</text>
+
+      <!-- Sign Extend -->
+      <rect id="dp-se" x="230" y="280" width="80" height="40" rx="6" fill="#1a1a2e" stroke="#555" stroke-width="2"/>
+      <text x="270" y="305" fill="#e0e0e0" font-size="10" text-anchor="middle">Sign Ext</text>
+
+      <!-- ALU Src MUX -->
+      <rect id="dp-alumux" x="355" y="195" width="30" height="50" rx="4" fill="#1a1a2e" stroke="#555" stroke-width="2"/>
+      <text x="370" y="225" fill="#9e9e9e" font-size="8" text-anchor="middle">MUX</text>
+      <text id="dp-alusrc-label" x="370" y="260" fill="#666" font-size="8" text-anchor="middle">ALUSrc</text>
+
+      <!-- ALU -->
+      <rect id="dp-alu" x="410" y="140" width="80" height="110" rx="8" fill="#1a1a2e" stroke="#555" stroke-width="2"/>
+      <text x="450" y="185" fill="#e0e0e0" font-size="13" text-anchor="middle" font-weight="bold">ALU</text>
+      <text x="450" y="205" fill="#9e9e9e" font-size="9" text-anchor="middle">Result</text>
+      <!-- Zero flag -->
+      <text id="dp-zero" x="495" y="165" fill="#555" font-size="8" text-anchor="start">Zero?</text>
+
+      <!-- Data Memory -->
+      <rect id="dp-dmem" x="530" y="140" width="90" height="110" rx="8" fill="#1a1a2e" stroke="#555" stroke-width="2"/>
+      <text x="575" y="185" fill="#e0e0e0" font-size="11" text-anchor="middle" font-weight="bold">Data</text>
+      <text x="575" y="202" fill="#e0e0e0" font-size="11" text-anchor="middle" font-weight="bold">Memory</text>
+
+      <!-- MemToReg MUX -->
+      <rect id="dp-wbmux" x="660" y="175" width="30" height="50" rx="4" fill="#1a1a2e" stroke="#555" stroke-width="2"/>
+      <text x="675" y="205" fill="#9e9e9e" font-size="8" text-anchor="middle">MUX</text>
+      <text id="dp-m2r-label" x="675" y="240" fill="#666" font-size="8" text-anchor="middle">MemToReg</text>
+
+      <!-- Controller -->
+      <rect id="dp-ctrl" x="220" y="20" width="120" height="60" rx="8" fill="#1a1a2e" stroke="#555" stroke-width="2"/>
+      <text x="280" y="48" fill="#e0e0e0" font-size="12" text-anchor="middle" font-weight="bold">Controller</text>
+      <text x="280" y="65" fill="#9e9e9e" font-size="9" text-anchor="middle">Sets control signals</text>
+
+      <!-- PC+4 Adder -->
+      <rect id="dp-pcadd" x="90" y="40" width="60" height="35" rx="6" fill="#1a1a2e" stroke="#555" stroke-width="2"/>
+      <text x="120" y="55" fill="#e0e0e0" font-size="9" text-anchor="middle">PC+4</text>
+      <text x="120" y="67" fill="#e0e0e0" font-size="9" text-anchor="middle">Adder</text>
+
+      <!-- Branch Adder -->
+      <rect id="dp-bradd" x="410" y="40" width="70" height="35" rx="6" fill="#1a1a2e" stroke="#555" stroke-width="2"/>
+      <text x="445" y="55" fill="#e0e0e0" font-size="9" text-anchor="middle">Branch</text>
+      <text x="445" y="67" fill="#e0e0e0" font-size="9" text-anchor="middle">Adder</text>
+
+      <!-- PC Src MUX -->
+      <rect id="dp-pcmux" x="520" y="35" width="30" height="45" rx="4" fill="#1a1a2e" stroke="#555" stroke-width="2"/>
+      <text x="535" y="62" fill="#9e9e9e" font-size="8" text-anchor="middle">MUX</text>
+      <text id="dp-pcsrc-label" x="535" y="90" fill="#666" font-size="8" text-anchor="middle">PCSrc</text>
+
+      <!-- PATHS (initially grey, JS will light them up) -->
+      <!-- PC to Inst Mem -->
+      <line id="dp-p1" x1="65" y1="185" x2="90" y2="185" stroke="#555" stroke-width="2"/>
+      <!-- Inst Mem to Register File -->
+      <line id="dp-p2" x1="180" y1="185" x2="220" y2="185" stroke="#555" stroke-width="2"/>
+      <!-- RF read data 1 to ALU -->
+      <line id="dp-p3" x1="320" y1="170" x2="410" y2="170" stroke="#555" stroke-width="2"/>
+      <!-- RF read data 2 to MUX -->
+      <line id="dp-p4" x1="320" y1="210" x2="355" y2="210" stroke="#555" stroke-width="2"/>
+      <!-- MUX to ALU -->
+      <line id="dp-p5" x1="385" y1="220" x2="410" y2="210" stroke="#555" stroke-width="2"/>
+      <!-- ALU to Data Mem -->
+      <line id="dp-p6" x1="490" y1="195" x2="530" y2="195" stroke="#555" stroke-width="2"/>
+      <!-- Data Mem to WB MUX -->
+      <line id="dp-p7" x1="620" y1="195" x2="660" y2="195" stroke="#555" stroke-width="2"/>
+      <!-- ALU result to WB MUX (bypass) -->
+      <line id="dp-p8" x1="490" y1="210" x2="510" y2="210" stroke="#555" stroke-width="2"/>
+      <line id="dp-p8b" x1="510" y1="210" x2="510" y2="330" stroke="#555" stroke-width="2"/>
+      <line id="dp-p8c" x1="510" y1="330" x2="700" y2="330" stroke="#555" stroke-width="2"/>
+      <line id="dp-p8d" x1="700" y1="330" x2="700" y2="225" stroke="#555" stroke-width="2"/>
+      <line id="dp-p8e" x1="690" y1="215" x2="700" y2="225" stroke="#555" stroke-width="2"/>
+      <!-- WB MUX back to Register File -->
+      <line id="dp-p9" x1="690" y1="200" x2="730" y2="200" stroke="#555" stroke-width="2"/>
+      <line id="dp-p9b" x1="730" y1="200" x2="730" y2="370" stroke="#555" stroke-width="2"/>
+      <line id="dp-p9c" x1="730" y1="370" x2="270" y2="370" stroke="#555" stroke-width="2"/>
+      <line id="dp-p9d" x1="270" y1="370" x2="270" y2="250" stroke="#555" stroke-width="2"/>
+      <!-- Sign extend to MUX -->
+      <line id="dp-p10" x1="310" y1="300" x2="370" y2="300" stroke="#555" stroke-width="2"/>
+      <line id="dp-p10b" x1="370" y1="300" x2="370" y2="245" stroke="#555" stroke-width="2"/>
+      <!-- PC to PC+4 adder -->
+      <line id="dp-p11" x1="40" y1="160" x2="40" y2="57" stroke="#555" stroke-width="2"/>
+      <line id="dp-p11b" x1="40" y1="57" x2="90" y2="57" stroke="#555" stroke-width="2"/>
+      <!-- PC+4 to branch adder -->
+      <line id="dp-p12" x1="150" y1="57" x2="410" y2="57" stroke="#555" stroke-width="2"/>
+      <!-- Branch adder to PC MUX -->
+      <line id="dp-p13" x1="480" y1="57" x2="520" y2="57" stroke="#555" stroke-width="2"/>
+      <!-- PC MUX back to PC -->
+      <line id="dp-p14" x1="535" y1="35" x2="535" y2="15" stroke="#555" stroke-width="2"/>
+      <line id="dp-p14b" x1="535" y1="15" x2="15" y2="15" stroke="#555" stroke-width="2"/>
+      <line id="dp-p14c" x1="15" y1="15" x2="15" y2="185" stroke="#555" stroke-width="2"/>
+      <line id="dp-p14d" x1="15" y1="185" x2="15" y2="185" stroke="#555" stroke-width="2"/>
+      <!-- ALU Zero to PC MUX (branch AND) -->
+      <line id="dp-p15" x1="495" y1="158" x2="535" y2="80" stroke="#555" stroke-width="1.5" stroke-dasharray="4"/>
+      <!-- RF data2 to Data Mem (for sw) -->
+      <line id="dp-p16" x1="320" y1="220" x2="340" y2="220" stroke="#555" stroke-width="2"/>
+      <line id="dp-p16b" x1="340" y1="220" x2="340" y2="350" stroke="#555" stroke-width="2"/>
+      <line id="dp-p16c" x1="340" y1="350" x2="560" y2="350" stroke="#555" stroke-width="2"/>
+      <line id="dp-p16d" x1="560" y1="350" x2="560" y2="250" stroke="#555" stroke-width="2"/>
+
+      <!-- Controller lines (dashed) -->
+      <line id="dp-ctrl1" x1="280" y1="80" x2="280" y2="120" stroke="#555" stroke-width="1" stroke-dasharray="3"/>
+      <line id="dp-ctrl2" x1="340" y1="50" x2="450" y2="50" stroke="#555" stroke-width="1" stroke-dasharray="3"/>
+      <line id="dp-ctrl3" x1="300" y1="80" x2="300" y2="100" stroke="#555" stroke-width="1" stroke-dasharray="3"/>
+    </svg>
+  </div>
+
+  <!-- Step by step explanation -->
+  <div class="dp-info" id="dp-steps"></div>
+
+  <!-- Control signals table -->
+  <div class="dp-info">
+    <h4 style="color:var(--yellow); margin-bottom:8px;">Control Signals from Controller</h4>
+    <table class="dp-ctrl-table" id="dp-ctrl-tbl">
+      <tr><th>Signal</th><th>Value</th><th>What It Does</th></tr>
+      <tr><td>RegDst</td><td id="cs-regdst">-</td><td>Which field is the destination register? 0=rt (I-type), 1=rd (R-type)</td></tr>
+      <tr><td>ALUSrc</td><td id="cs-alusrc">-</td><td>ALU second input: 0=register (rt), 1=sign-extended immediate</td></tr>
+      <tr><td>MemToReg</td><td id="cs-memtoreg">-</td><td>Write-back data: 0=ALU result, 1=memory data</td></tr>
+      <tr><td>RegWrite</td><td id="cs-regwrite">-</td><td>1=write to register file, 0=don't write</td></tr>
+      <tr><td>MemRead</td><td id="cs-memread">-</td><td>1=read from data memory</td></tr>
+      <tr><td>MemWrite</td><td id="cs-memwrite">-</td><td>1=write to data memory</td></tr>
+      <tr><td>Branch</td><td id="cs-branch">-</td><td>1=this is a branch instruction (AND with ALU Zero)</td></tr>
+      <tr><td>Jump</td><td id="cs-jump">-</td><td>1=unconditional jump</td></tr>
+      <tr><td>ALUOp</td><td id="cs-aluop">-</td><td>Tells ALU control what operation family (00=add for lw/sw, 01=sub for beq, 10=funct field for R-type)</td></tr>
+    </table>
+  </div>
+
+  <script>
+  const dpConfig = {
+    rtype: {
+      name: "R-type (add $rd, $rs, $rt)",
+      components: ['dp-pc','dp-imem','dp-rf','dp-alu','dp-wbmux','dp-ctrl','dp-pcadd'],
+      paths: {
+        active: ['dp-p1','dp-p2','dp-p3','dp-p4','dp-p5','dp-p8','dp-p8b','dp-p8c','dp-p8d','dp-p8e','dp-p9','dp-p9b','dp-p9c','dp-p9d','dp-p11','dp-p11b','dp-p14','dp-p14b','dp-p14c','dp-ctrl1','dp-ctrl2'],
+        colors: {active:'#f5c518', wb:'#b388ff'}
+      },
+      signals: {RegDst:'1',ALUSrc:'0',MemToReg:'0',RegWrite:'1',MemRead:'0',MemWrite:'0',Branch:'0',Jump:'0',ALUOp:'10'},
+      signalClass: {RegDst:'on',ALUSrc:'off',MemToReg:'off',RegWrite:'on',MemRead:'off',MemWrite:'off',Branch:'off',Jump:'off',ALUOp:'on'},
+      steps: [
+        {n:1, text:"<strong>Instruction Fetch:</strong> PC sends address to Instruction Memory. The instruction is fetched. PC+4 Adder computes next PC.", active:true},
+        {n:2, text:"<strong>Decode & Register Read:</strong> Controller decodes opcode (000000 = R-type). Register File reads <strong>rs</strong> and <strong>rt</strong> values.", active:true},
+        {n:3, text:"<strong>ALU Execute:</strong> ALUSrc=<strong>0</strong> &rarr; MUX selects register rt (not immediate). ALU performs the operation (add/sub/and/or) based on the <strong>funct</strong> field. ALUOp=10 tells ALU control to look at funct.", active:true},
+        {n:4, text:"<strong>Memory:</strong> <em>Skipped!</em> R-type doesn't access data memory. MemRead=0, MemWrite=0.", active:false},
+        {n:5, text:"<strong>Write Back:</strong> MemToReg=<strong>0</strong> &rarr; MUX selects ALU result (not memory data). RegDst=<strong>1</strong> &rarr; destination is <strong>rd</strong> field. RegWrite=<strong>1</strong> &rarr; result is written to register file.", active:true}
+      ]
+    },
+    lw: {
+      name: "lw $rt, offset($rs)",
+      components: ['dp-pc','dp-imem','dp-rf','dp-se','dp-alumux','dp-alu','dp-dmem','dp-wbmux','dp-ctrl','dp-pcadd'],
+      paths: {
+        active: ['dp-p1','dp-p2','dp-p3','dp-p5','dp-p6','dp-p7','dp-p9','dp-p9b','dp-p9c','dp-p9d','dp-p10','dp-p10b','dp-p11','dp-p11b','dp-p14','dp-p14b','dp-p14c','dp-ctrl1','dp-ctrl2'],
+        colors: {}
+      },
+      signals: {RegDst:'0',ALUSrc:'1',MemToReg:'1',RegWrite:'1',MemRead:'1',MemWrite:'0',Branch:'0',Jump:'0',ALUOp:'00'},
+      signalClass: {RegDst:'off',ALUSrc:'on',MemToReg:'on',RegWrite:'on',MemRead:'on',MemWrite:'off',Branch:'off',Jump:'off',ALUOp:'off'},
+      steps: [
+        {n:1, text:"<strong>Instruction Fetch:</strong> PC sends address to Instruction Memory. Instruction fetched. PC+4 computed.", active:true},
+        {n:2, text:"<strong>Decode & Register Read:</strong> Controller sees opcode (100011 = lw). Register File reads <strong>rs</strong> (base register). The 16-bit offset is <strong>sign-extended</strong> to 32 bits.", active:true},
+        {n:3, text:"<strong>ALU Execute:</strong> ALUSrc=<strong>1</strong> &rarr; MUX selects sign-extended immediate (not rt). ALU <strong>adds</strong> rs + offset to compute the memory address. ALUOp=00 means always add.", active:true},
+        {n:4, text:"<strong>Memory Read:</strong> MemRead=<strong>1</strong> &rarr; Data Memory reads from the computed address. The loaded data comes out of Data Memory.", active:true},
+        {n:5, text:"<strong>Write Back:</strong> MemToReg=<strong>1</strong> &rarr; MUX selects memory data (not ALU result). RegDst=<strong>0</strong> &rarr; destination is <strong>rt</strong> field. RegWrite=<strong>1</strong> &rarr; loaded data written to register file.", active:true}
+      ]
+    },
+    sw: {
+      name: "sw $rt, offset($rs)",
+      components: ['dp-pc','dp-imem','dp-rf','dp-se','dp-alumux','dp-alu','dp-dmem','dp-ctrl','dp-pcadd'],
+      paths: {
+        active: ['dp-p1','dp-p2','dp-p3','dp-p5','dp-p6','dp-p10','dp-p10b','dp-p16','dp-p16b','dp-p16c','dp-p16d','dp-p11','dp-p11b','dp-p14','dp-p14b','dp-p14c','dp-ctrl1','dp-ctrl2'],
+        colors: {}
+      },
+      signals: {RegDst:'X',ALUSrc:'1',MemToReg:'X',RegWrite:'0',MemRead:'0',MemWrite:'1',Branch:'0',Jump:'0',ALUOp:'00'},
+      signalClass: {RegDst:'x',ALUSrc:'on',MemToReg:'x',RegWrite:'off',MemRead:'off',MemWrite:'on',Branch:'off',Jump:'off',ALUOp:'off'},
+      steps: [
+        {n:1, text:"<strong>Instruction Fetch:</strong> PC sends address to Instruction Memory. Instruction fetched. PC+4 computed.", active:true},
+        {n:2, text:"<strong>Decode & Register Read:</strong> Controller sees opcode (101011 = sw). Register File reads <strong>rs</strong> (base) and <strong>rt</strong> (data to store). Offset is sign-extended.", active:true},
+        {n:3, text:"<strong>ALU Execute:</strong> ALUSrc=<strong>1</strong> &rarr; MUX selects sign-extended offset. ALU computes rs + offset = memory address.", active:true},
+        {n:4, text:"<strong>Memory Write:</strong> MemWrite=<strong>1</strong> &rarr; Data Memory <strong>writes</strong> the value from rt into the computed address. The rt data travels from Register File through a separate path to Data Memory's write-data input.", active:true},
+        {n:5, text:"<strong>Write Back:</strong> <em>Skipped!</em> RegWrite=<strong>0</strong> &rarr; nothing written to register file. sw only writes to memory, not to registers. RegDst and MemToReg are <strong>don't-care (X)</strong>.", active:false}
+      ]
+    },
+    beq: {
+      name: "beq $rs, $rt, offset",
+      components: ['dp-pc','dp-imem','dp-rf','dp-se','dp-alu','dp-ctrl','dp-pcadd','dp-bradd','dp-pcmux'],
+      paths: {
+        active: ['dp-p1','dp-p2','dp-p3','dp-p4','dp-p5','dp-p10','dp-p10b','dp-p11','dp-p11b','dp-p12','dp-p13','dp-p14','dp-p14b','dp-p14c','dp-p15','dp-ctrl1','dp-ctrl2'],
+        colors: {}
+      },
+      signals: {RegDst:'X',ALUSrc:'0',MemToReg:'X',RegWrite:'0',MemRead:'0',MemWrite:'0',Branch:'1',Jump:'0',ALUOp:'01'},
+      signalClass: {RegDst:'x',ALUSrc:'off',MemToReg:'x',RegWrite:'off',MemRead:'off',MemWrite:'off',Branch:'on',Jump:'off',ALUOp:'on'},
+      steps: [
+        {n:1, text:"<strong>Instruction Fetch:</strong> PC sends address to Instruction Memory. Instruction fetched. PC+4 computed.", active:true},
+        {n:2, text:"<strong>Decode & Register Read:</strong> Controller sees opcode (000100 = beq). Register File reads <strong>rs</strong> and <strong>rt</strong>. Sign-extended offset goes to Branch Adder which computes: <strong>PC+4 + (offset&times;4)</strong> = branch target.", active:true},
+        {n:3, text:"<strong>ALU Compare:</strong> ALUSrc=<strong>0</strong> &rarr; both register values go to ALU. ALUOp=01 &rarr; ALU <strong>subtracts</strong> rs - rt. If result is 0, the <strong>Zero flag</strong> is set to 1 (meaning rs == rt).", active:true},
+        {n:4, text:"<strong>Branch Decision:</strong> Branch=<strong>1</strong> AND Zero=<strong>1</strong> &rarr; PCSrc MUX selects the branch target address (from Branch Adder) instead of PC+4. If Zero=0, branch is NOT taken, PC+4 is used.", active:true},
+        {n:5, text:"<strong>Write Back:</strong> <em>Skipped!</em> beq doesn't write to registers or memory. It only changes PC.", active:false}
+      ]
+    },
+    j: {
+      name: "j target",
+      components: ['dp-pc','dp-imem','dp-ctrl','dp-pcadd','dp-pcmux'],
+      paths: {
+        active: ['dp-p1','dp-p2','dp-p11','dp-p11b','dp-p14','dp-p14b','dp-p14c','dp-ctrl1'],
+        colors: {}
+      },
+      signals: {RegDst:'X',ALUSrc:'X',MemToReg:'X',RegWrite:'0',MemRead:'0',MemWrite:'0',Branch:'X',Jump:'1',ALUOp:'XX'},
+      signalClass: {RegDst:'x',ALUSrc:'x',MemToReg:'x',RegWrite:'off',MemRead:'off',MemWrite:'off',Branch:'x',Jump:'on',ALUOp:'x'},
+      steps: [
+        {n:1, text:"<strong>Instruction Fetch:</strong> PC sends address to Instruction Memory. Instruction fetched.", active:true},
+        {n:2, text:"<strong>Decode:</strong> Controller sees opcode (000010 = j). The 26-bit target field is extracted from the instruction.", active:true},
+        {n:3, text:"<strong>Jump Address:</strong> Jump target = <strong>{PC+4[31:28], IR[25:0], 00}</strong>. Takes upper 4 bits from PC+4, appends the 26-bit target, appends 00 (word-aligned). Jump=<strong>1</strong> &rarr; MUX selects this address for PC.", active:true},
+        {n:4, text:"<strong>Memory:</strong> <em>Skipped!</em> Jump doesn't access data memory.", active:false},
+        {n:5, text:"<strong>Write Back:</strong> <em>Skipped!</em> Jump doesn't write to registers.", active:false}
+      ]
+    }
+  };
+
+  function showDatapath(type) {
+    const cfg = dpConfig[type];
+    // Update buttons
+    document.querySelectorAll('.dp-btn').forEach(b => b.classList.remove('dp-btn-active'));
+    event.target.classList.add('dp-btn-active');
+
+    // Reset all components
+    const allComps = ['dp-pc','dp-imem','dp-rf','dp-se','dp-alumux','dp-alu','dp-dmem','dp-wbmux','dp-ctrl','dp-pcadd','dp-bradd','dp-pcmux'];
+    allComps.forEach(id => {
+      const el = document.getElementById(id);
+      if(el) { el.setAttribute('stroke','#333'); el.setAttribute('fill','#1a1a2e'); }
+    });
+
+    // Reset all paths
+    const allPaths = document.querySelectorAll('#dp-svg line');
+    allPaths.forEach(l => { l.setAttribute('stroke','#333'); l.setAttribute('stroke-width','1.5'); });
+
+    // Light up active components
+    const compColors = {'dp-pc':'#e94560','dp-imem':'#e94560','dp-rf':'#00e5ff','dp-se':'#00e5ff','dp-alumux':'#f5c518','dp-alu':'#f5c518','dp-dmem':'#00e676','dp-wbmux':'#b388ff','dp-ctrl':'#ff9100','dp-pcadd':'#e94560','dp-bradd':'#ff4081','dp-pcmux':'#ff4081'};
+    cfg.components.forEach(id => {
+      const el = document.getElementById(id);
+      if(el) {
+        el.setAttribute('stroke', compColors[id] || '#f5c518');
+        el.setAttribute('stroke-width','2.5');
+      }
+    });
+
+    // Light up active paths
+    cfg.paths.active.forEach(id => {
+      const el = document.getElementById(id);
+      if(el) { el.setAttribute('stroke','#f5c518'); el.setAttribute('stroke-width','2.5'); }
+    });
+
+    // Update steps
+    const stepsDiv = document.getElementById('dp-steps');
+    stepsDiv.innerHTML = '<h4 style="color:var(--cyan); margin-bottom:8px;">Step-by-Step: ' + cfg.name + '</h4>' +
+      cfg.steps.map(s =>
+        '<div class="dp-step ' + (s.active ? 'dp-step-active' : '') + '">' +
+        '<span class="dp-step-num">Step ' + s.n + '.</span>' + s.text + '</div>'
+      ).join('');
+
+    // Update control signals
+    const sigs = ['RegDst','ALUSrc','MemToReg','RegWrite','MemRead','MemWrite','Branch','Jump','ALUOp'];
+    const sigIds = ['cs-regdst','cs-alusrc','cs-memtoreg','cs-regwrite','cs-memread','cs-memwrite','cs-branch','cs-jump','cs-aluop'];
+    const classMap = {on:'sig-on', off:'sig-off', x:'sig-x'};
+    sigs.forEach((s,i) => {
+      const td = document.getElementById(sigIds[i]);
+      td.textContent = cfg.signals[s];
+      td.className = classMap[cfg.signalClass[s]] || '';
+    });
+  }
+
+  // Initialize
+  showDatapath('rtype');
+  </script>
+
+  <div class="key-box concept" style="margin-top:20px;">
+    <div class="label">Controller vs Datapath — The Key Idea</div>
+    <p>The <strong>Datapath</strong> is the hardware that does the actual work: ALU, registers, memory, MUXes, wires. It's the "muscles".</p>
+    <p>The <strong>Controller</strong> is the brain that tells the datapath what to do each cycle. It reads the <strong>opcode</strong> (and funct field for R-type) and sets <strong>control signals</strong> that configure the MUXes, enable/disable reads and writes, and tell the ALU what operation to perform.</p>
+    <p><strong>Same datapath, different signals = different instruction behavior.</strong> The hardware doesn't change — only the control signals change based on the instruction type.</p>
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">Exam Classic: Control Signal Table</div>
+    <table>
+      <tr><th>Signal</th><th>R-type</th><th>lw</th><th>sw</th><th>beq</th><th>j</th></tr>
+      <tr><td><strong>RegDst</strong></td><td style="color:var(--green);">1</td><td>0</td><td>X</td><td>X</td><td>X</td></tr>
+      <tr><td><strong>ALUSrc</strong></td><td>0</td><td style="color:var(--green);">1</td><td style="color:var(--green);">1</td><td>0</td><td>X</td></tr>
+      <tr><td><strong>MemToReg</strong></td><td>0</td><td style="color:var(--green);">1</td><td>X</td><td>X</td><td>X</td></tr>
+      <tr><td><strong>RegWrite</strong></td><td style="color:var(--green);">1</td><td style="color:var(--green);">1</td><td>0</td><td>0</td><td>0</td></tr>
+      <tr><td><strong>MemRead</strong></td><td>0</td><td style="color:var(--green);">1</td><td>0</td><td>0</td><td>0</td></tr>
+      <tr><td><strong>MemWrite</strong></td><td>0</td><td>0</td><td style="color:var(--green);">1</td><td>0</td><td>0</td></tr>
+      <tr><td><strong>Branch</strong></td><td>0</td><td>0</td><td>0</td><td style="color:var(--green);">1</td><td>X</td></tr>
+      <tr><td><strong>Jump</strong></td><td>0</td><td>0</td><td>0</td><td>0</td><td style="color:var(--green);">1</td></tr>
+      <tr><td><strong>ALUOp</strong></td><td>10</td><td>00</td><td>00</td><td>01</td><td>XX</td></tr>
+    </table>
+    <p style="margin-top:8px; color:var(--muted);"><strong>X</strong> = don't care (signal doesn't matter because the component it controls isn't used). <span style="color:var(--green);">Green</span> = the signal that makes this instruction type unique.</p>
+  </div>
 
   <hr class="divider">
 
@@ -2776,8 +3510,54 @@ add $t0, ...  ; fetch this?
       <li>Pipelining improves <strong>throughput</strong>, not latency of individual instructions</li>
       <li>Pipeline clock rate limited by <strong>slowest stage</strong></li>
       <li>Pipeline registers (IF/ID, ID/EX, etc.) add small overhead</li>
-      <li>In MIPS, register file can be <strong>read in first half and written in second half</strong> of the same cycle (solves some data hazards)</li>
+      <li>In MIPS, register file can be <strong>read in first half and written in second half</strong> of the same cycle (solves some data hazards) &mdash; see detailed explanation below</li>
     </ul>
+  </div>
+
+  <div class="key-box concept">
+    <div class="label">Register File: Write-in-First-Half, Read-in-Second-Half (Explained)</div>
+    <p>The register file is designed so that each clock cycle is <strong>split into two halves</strong>:</p>
+    <ul>
+      <li><strong>1st half of the cycle:</strong> Writes happen (WB stage writes its result to the register file)</li>
+      <li><strong>2nd half of the cycle:</strong> Reads happen (ID stage reads register values)</li>
+    </ul>
+
+    <h4 style="color:var(--yellow); margin-top:16px;">Why Does This Matter?</h4>
+    <p>Consider this code where <code>sub</code> depends on the result of <code>add</code>:</p>
+    <pre style="margin:10px 0;">add $s0, $t0, $t1    ; writes result to $s0
+...                  ; (instruction 2)
+...                  ; (instruction 3)
+sub $t2, $s0, $t3    ; reads $s0 — needs the updated value!</pre>
+
+    <p style="margin-top:12px;">Here's the pipeline timing &mdash; <code>sub</code> is 3 instructions after <code>add</code>:</p>
+    <pre style="margin:10px 0; color:var(--cyan);">
+Cycle:    1     2     3     4     5     6     7     8
+add:     IF    ID    EX   MEM   <span style="color:var(--yellow);">WB</span>
+                                 <span style="color:var(--yellow);">&uarr; writes $s0 (1st half of cycle 5)</span>
+i2:            IF    ID    EX   MEM   WB
+i3:                  IF    ID    EX   MEM   WB
+sub:                       IF   <span style="color:var(--green);">ID</span>    EX   MEM   WB
+                                 <span style="color:var(--green);">&uarr; reads $s0 (2nd half of cycle 5)</span></pre>
+
+    <p style="margin-top:12px;"><strong>In Cycle 5, both stages share the same cycle:</strong></p>
+    <ul>
+      <li><strong>1st half:</strong> <code>add</code>'s WB stage <strong>writes</strong> the new value of <code>$s0</code> into the register file</li>
+      <li><strong>2nd half:</strong> <code>sub</code>'s ID stage <strong>reads</strong> <code>$s0</code> &mdash; and gets the <strong>correct, updated value!</strong></li>
+    </ul>
+
+    <h4 style="color:var(--accent1); margin-top:16px;">Without This Trick</h4>
+    <p>If both read and write happened at the same edge of the clock, <code>sub</code> would read the <strong>old/stale value</strong> of <code>$s0</code>, producing a wrong result. You'd need an extra forwarding path or a stall cycle to fix it.</p>
+
+    <h4 style="color:var(--green); margin-top:16px;">Key Takeaway</h4>
+    <p>This hardware trick <strong>eliminates data hazards when the dependent instructions are exactly 3 apart</strong> (WB and ID overlap in the same cycle). For instructions closer together (1 or 2 apart), you still need <strong>forwarding/bypassing</strong> or <strong>stalls</strong>.</p>
+
+    <table style="margin-top:12px;">
+      <tr><th>Gap Between Instructions</th><th>Hazard?</th><th>Solution</th></tr>
+      <tr><td>1 apart (immediately next)</td><td class="red">Yes &mdash; EX vs ID</td><td>Forwarding from EX/MEM register</td></tr>
+      <tr><td>2 apart</td><td class="red">Yes &mdash; MEM vs ID</td><td>Forwarding from MEM/WB register</td></tr>
+      <tr><td>3 apart</td><td style="color:var(--green);">No &mdash; solved by split-cycle register file</td><td>Write 1st half, Read 2nd half</td></tr>
+      <tr><td>4+ apart</td><td style="color:var(--green);">No hazard at all</td><td>WB finishes before ID starts</td></tr>
+    </table>
   </div>
 </div>
 
@@ -2972,6 +3752,281 @@ Example: 128B cache, 16B blocks, 2-way set-associative
   <div class="key-box">
     <p>Most processors use <strong>separate instruction cache and data cache</strong> (split cache / Harvard-style at L1).</p>
     <p>This avoids structural hazards in pipelining (IF and MEM stages can access memory simultaneously).</p>
+  </div>
+
+  <h3>Storage Components &mdash; Sizes &amp; Locations</h3>
+  <table>
+    <tr><th>Component</th><th>Typical Size</th><th>Location</th><th>Access Time</th><th>Notes</th></tr>
+    <tr>
+      <td><strong>Registers</strong></td>
+      <td>Up to 1K addresses (8-bit to 64-bit data)</td>
+      <td>On-chip (inside CPU)</td>
+      <td>&lt; 1 ns</td>
+      <td>Typically up to <strong>32 registers</strong> in CPUs (MIPS, ARM). GPUs can have up to 1K.</td>
+    </tr>
+    <tr>
+      <td><strong>L1 Cache</strong></td>
+      <td><strong>16 KB &ndash; 256 KB</strong></td>
+      <td>On-chip</td>
+      <td>~1&ndash;3 ns</td>
+      <td>Split into I-cache and D-cache. Per-core. Fastest cache level.</td>
+    </tr>
+    <tr>
+      <td><strong>L2 Cache</strong></td>
+      <td><strong>256 KB &ndash; 8 MB</strong></td>
+      <td>On-chip</td>
+      <td>~3&ndash;10 ns</td>
+      <td>Usually per-core or shared between 2 cores.</td>
+    </tr>
+    <tr>
+      <td><strong>L3 Cache</strong></td>
+      <td><strong>8 MB &ndash; 64 MB</strong></td>
+      <td>Typically on-chip (sometimes off-chip)</td>
+      <td>~10&ndash;30 ns</td>
+      <td><strong>Shared between multiple cores.</strong> Last level before main memory.</td>
+    </tr>
+    <tr>
+      <td><strong>Main Memory (DRAM)</strong></td>
+      <td>4 GB &ndash; 128 GB+</td>
+      <td>Off-chip (separate chips on motherboard)</td>
+      <td>~50&ndash;100 ns</td>
+      <td>Volatile. Managed by memory controller.</td>
+    </tr>
+    <tr>
+      <td><strong>Secondary Storage (SSD/HDD)</strong></td>
+      <td>256 GB &ndash; TBs</td>
+      <td>Off-chip (separate device)</td>
+      <td>~0.1 ms (SSD) / ~10 ms (HDD)</td>
+      <td>Non-volatile. Persistent storage.</td>
+    </tr>
+  </table>
+
+  <div class="key-box">
+    <p>Storage occupies a lot of space and it is difficult to manage addresses &mdash; that's why we have a <strong>hierarchy</strong>: small-fast memory close to CPU, large-slow memory farther away. Caches use <strong>address mapping</strong> to store frequently used data from lower levels.</p>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 17: MMU & VIRTUAL MEMORY -->
+<!-- ============================================ -->
+<div class="section mips-section" id="s17">
+  <h2>17. Virtual Memory &amp; MMU (Memory Management Unit)</h2>
+
+  <div class="key-box concept">
+    <div class="label">Why Virtual Memory?</div>
+    <p>Programs think they have access to a large, contiguous block of memory &mdash; but physical RAM is limited and shared between many programs. <strong>Virtual memory</strong> solves this by giving each program its own <strong>virtual address space</strong> and translating addresses to physical memory on the fly.</p>
+    <ul style="margin-top:8px;">
+      <li><strong>Extends physical memory (RAM)</strong> by using secondary memory (disk/SSD). When RAM is full, less-used data is moved to disk.</li>
+      <li><strong>Extends the address space</strong> &mdash; e.g., 4 GB address space with 32-bit addresses, even if physical RAM is only 2 GB.</li>
+      <li>Uses <strong>paging and segmentation</strong> to shorten/manage the address space efficiently.</li>
+      <li><strong>Less frequently used data is swapped</strong> between physical memory and secondary memory (disk). Only the "working set" stays in RAM.</li>
+      <li><strong>Memory protection &amp; isolation</strong> &mdash; each process gets its own address space, preventing one process from corrupting another's memory.</li>
+      <li><strong>Sharing:</strong> Multiple programs can share the same physical page (e.g., shared libraries) without conflict.</li>
+    </ul>
+  </div>
+
+  <div class="key-box important">
+    <div class="label">Warning: Performance Degradation</div>
+    <p>Virtual memory <strong>can lead to performance degradation</strong> when:</p>
+    <ul>
+      <li><strong>Thrashing:</strong> Too many page faults &mdash; the system spends more time swapping pages to/from disk than doing useful work. Happens when the working set is larger than physical RAM.</li>
+      <li><strong>TLB misses:</strong> If the program accesses many scattered pages, TLB hit rate drops, adding extra memory accesses for page table lookups.</li>
+      <li><strong>Double memory access:</strong> Without TLB, every access needs 2 memory reads (page table + actual data).</li>
+    </ul>
+    <p style="color:var(--yellow); margin-top:6px;">The tradeoff: virtual memory gives flexibility and protection, but at the cost of potential slowdown from address translation overhead and page faults.</p>
+  </div>
+
+  <h3>Virtual vs Physical Addresses</h3>
+  <div class="two-col">
+    <div class="key-box">
+      <h4 style="color:var(--cyan);">Virtual Address (VA)</h4>
+      <p>What the <strong>CPU/program</strong> sees and uses. Generated by the processor during instruction fetch and data access.</p>
+      <p>Example: In a 32-bit system, VA space = 2<sup>32</sup> = <strong>4 GB</strong> per process.</p>
+    </div>
+    <div class="key-box">
+      <h4 style="color:var(--green);">Physical Address (PA)</h4>
+      <p>The <strong>actual address</strong> in physical RAM (DRAM). This is what goes on the memory bus.</p>
+      <p>Physical memory is usually <strong>smaller</strong> than virtual address space.</p>
+    </div>
+  </div>
+
+  <h3>The MMU (Memory Management Unit)</h3>
+  <div class="key-box concept">
+    <div class="label">What is the MMU?</div>
+    <p>The MMU is a <strong>hardware unit</strong> (inside or near the CPU) that translates virtual addresses to physical addresses. Every memory access goes through the MMU.</p>
+    <h4 style="color:var(--yellow); margin-top:12px;">MMU Functions:</h4>
+    <ul>
+      <li><strong>Address Translation:</strong> Translates the address used by the program (virtual) to the actual physical memory address &mdash; they may not be the same!</li>
+      <li><strong>Memory Protection:</strong> Prevents programs from accessing each other's memory locations. Each process is isolated in its own address space.</li>
+      <li><strong>Paging &amp; Segmentation:</strong> Manages the mapping of virtual pages to physical frames, and optionally segments of memory.</li>
+      <li><strong>Cache Control:</strong> Controls cache behavior &mdash; determines which memory regions are cacheable, cache policies, and coherence.</li>
+    </ul>
+  </div>
+
+  <div class="key-box" style="border-left-color:var(--orange);">
+    <div class="label" style="color:var(--orange);">Memory Controller</div>
+    <p>The <strong>Memory Controller</strong> is responsible for managing the <strong>flow of data between the memory (DRAM) and the CPU</strong>. It handles:</p>
+    <ul>
+      <li>Read/Write requests to DRAM</li>
+      <li>Timing and refresh cycles for DRAM (DRAM needs periodic refresh to retain data)</li>
+      <li>Arbitrating between multiple memory requests (from different cores, DMA, etc.)</li>
+      <li>Address decoding &mdash; mapping requests to the correct DRAM bank/row/column</li>
+    </ul>
+    <p style="margin-top:8px; color:var(--muted);">In modern processors, the memory controller is <strong>integrated on-chip</strong> (e.g., Intel since Nehalem, AMD since Athlon 64). Older systems had it on a separate <strong>northbridge</strong> chip.</p>
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">MMU vs Memory Controller</div>
+    <table>
+      <tr><th>Aspect</th><th>MMU</th><th>Memory Controller</th></tr>
+      <tr><td><strong>Job</strong></td><td>Translate virtual &rarr; physical addresses</td><td>Manage data flow between CPU and DRAM</td></tr>
+      <tr><td><strong>Handles</strong></td><td>Address translation, protection, paging, TLB</td><td>DRAM read/write, timing, refresh, arbitration</td></tr>
+      <tr><td><strong>Location</strong></td><td>Inside CPU (part of pipeline)</td><td>On-chip (modern) or northbridge (older)</td></tr>
+      <tr><td><strong>Works with</strong></td><td>Page tables, TLB</td><td>DRAM chips (DDR4/DDR5 etc.)</td></tr>
+    </table>
+  </div>
+
+  <div class="flow">
+    <div class="flow-box">CPU generates<br><strong>Virtual Address</strong></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box" style="border-color:var(--yellow); color:var(--yellow);">MMU<br><strong>Translates VA &rarr; PA</strong></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box">Physical Memory<br><strong>accessed via PA</strong></div>
+  </div>
+
+  <h3>Paging: How Virtual Memory Works</h3>
+  <div class="key-box">
+    <p>Both virtual and physical memory are divided into fixed-size blocks:</p>
+    <ul>
+      <li><strong>Virtual Page</strong> &mdash; a fixed-size block in virtual address space (typically <strong>4 KB</strong>)</li>
+      <li><strong>Physical Frame (Page Frame)</strong> &mdash; a same-size block in physical RAM</li>
+    </ul>
+    <p>The MMU maps each virtual page to a physical frame. Not all pages need to be in RAM &mdash; some can be on disk (<strong>swap space</strong>).</p>
+  </div>
+
+  <h4 style="color:var(--yellow); margin-top:16px;">Virtual Address Breakdown</h4>
+  <div class="inst-format" style="max-width:500px;">
+    <div class="inst-field op" style="flex:2;"><div class="field-name">Virtual Page Number (VPN)</div><div class="field-bits">upper bits</div></div>
+    <div class="inst-field rd" style="flex:1;"><div class="field-name">Page Offset</div><div class="field-bits">lower bits</div></div>
+  </div>
+  <div class="inst-format" style="max-width:500px; margin-top:4px;">
+    <div class="inst-field rs" style="flex:2;"><div class="field-name">Physical Frame Number (PFN)</div><div class="field-bits">from page table</div></div>
+    <div class="inst-field rd" style="flex:1;"><div class="field-name">Page Offset</div><div class="field-bits">same bits (unchanged)</div></div>
+  </div>
+  <p style="color:var(--muted); margin-top:6px;">The <strong>page offset stays the same</strong> &mdash; only the VPN is translated to PFN. With 4 KB pages: offset = 12 bits (log<sub>2</sub>(4096)).</p>
+
+  <div class="key-box formula">
+    <div class="label">Address Translation Formula</div>
+    <pre>Page size = 2^p bytes  &rarr;  Offset = p bits
+
+Virtual Address:   | VPN (n-p bits) | Offset (p bits) |
+Physical Address:  | PFN (m-p bits) | Offset (p bits) |
+
+Example: 32-bit VA, 28-bit PA, 4 KB pages (p=12)
+  VPN = 32-12 = 20 bits  &rarr;  2^20 = 1M virtual pages
+  PFN = 28-12 = 16 bits  &rarr;  2^16 = 64K physical frames
+  Page Table entries needed = 2^20 = ~1 million</pre>
+  </div>
+
+  <h3>Page Table</h3>
+  <div class="key-box">
+    <p>The <strong>page table</strong> is a data structure (stored in <strong>main memory</strong>) that maps each VPN to a PFN. Each process has its own page table.</p>
+    <table style="margin-top:8px;">
+      <tr><th>Field</th><th>What It Stores</th></tr>
+      <tr><td><strong>Valid Bit</strong></td><td>1 = page is in physical memory. 0 = page is on disk (or not allocated).</td></tr>
+      <tr><td><strong>PFN (Physical Frame Number)</strong></td><td>The physical frame where this virtual page is stored.</td></tr>
+      <tr><td><strong>Dirty Bit</strong></td><td>1 = page has been written to (must write back to disk before evicting).</td></tr>
+      <tr><td><strong>Reference/Access Bit</strong></td><td>1 = page was recently accessed. Used by replacement policies (e.g., LRU).</td></tr>
+      <tr><td><strong>Protection Bits</strong></td><td>Read/Write/Execute permissions for this page.</td></tr>
+    </table>
+  </div>
+
+  <h3>Page Fault</h3>
+  <div class="key-box important">
+    <div class="label">What Happens on a Page Fault?</div>
+    <p>When a program accesses a virtual page whose <strong>valid bit = 0</strong> (page not in physical RAM):</p>
+    <ol style="margin-top:8px;">
+      <li>CPU generates a <strong>page fault exception</strong></li>
+      <li>OS takes over (trap to kernel)</li>
+      <li>OS finds the page on <strong>disk (swap space)</strong></li>
+      <li>OS selects a physical frame to use (may need to <strong>evict</strong> another page &mdash; if dirty, write it back to disk first)</li>
+      <li>OS loads the page from disk into the selected frame</li>
+      <li>OS updates the page table (set valid=1, store new PFN)</li>
+      <li>OS restarts the faulting instruction</li>
+    </ol>
+    <p style="margin-top:8px; color:var(--accent1);"><strong>Page faults are extremely expensive</strong> &mdash; disk access takes millions of CPU cycles. That's why we want a very high hit rate in physical memory.</p>
+  </div>
+
+  <h3>TLB (Translation Lookaside Buffer)</h3>
+  <div class="key-box concept">
+    <div class="label">The Problem</div>
+    <p>Every memory access requires <strong>two</strong> memory accesses: one to read the page table (VA &rarr; PA translation), and one for the actual data. This <strong>doubles</strong> memory access time!</p>
+  </div>
+
+  <div class="key-box" style="border-left-color:var(--green);">
+    <div class="label" style="color:var(--green);">The Solution: TLB</div>
+    <p>The <strong>TLB</strong> is a small, fast <strong>cache for page table entries</strong>, built into the MMU. It stores recent VPN &rarr; PFN translations.</p>
+    <ul>
+      <li><strong>TLB Hit:</strong> VPN found in TLB &rarr; PFN returned immediately (~1 cycle). No need to access page table in memory.</li>
+      <li><strong>TLB Miss:</strong> VPN not in TLB &rarr; must access page table in memory (slow). The result is then cached in the TLB for next time.</li>
+    </ul>
+    <p style="margin-top:8px;">Typical TLB: <strong>16&ndash;512 entries</strong>, fully associative or set-associative. Hit rate usually <strong>&gt;99%</strong> due to locality.</p>
+  </div>
+
+  <h4 style="color:var(--cyan); margin-top:16px;">Complete Memory Access Flow</h4>
+  <div class="flow" style="flex-wrap:wrap;">
+    <div class="flow-box">CPU: Virtual<br>Address</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box" style="border-color:var(--green);">TLB<br>Lookup</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box" style="border-color:var(--yellow);">TLB Hit?</div>
+  </div>
+  <div style="margin:8px 0 8px 40px;">
+    <p style="color:var(--green);"><strong>Yes (TLB Hit):</strong> Get PFN from TLB &rarr; form PA &rarr; access cache/memory &rarr; done!</p>
+    <p style="color:var(--accent1);"><strong>No (TLB Miss):</strong> Access Page Table in memory &rarr;</p>
+    <ul style="margin-left:20px;">
+      <li>Page Table <strong>valid=1</strong>? Get PFN, update TLB, retry access.</li>
+      <li>Page Table <strong>valid=0</strong>? <strong>Page Fault!</strong> OS loads page from disk, updates page table &amp; TLB, restart instruction.</li>
+    </ul>
+  </div>
+
+  <div class="key-box formula">
+    <div class="label">Memory Access Time with TLB</div>
+    <pre>Effective Access Time =
+  (TLB Hit Rate) x (TLB access + Memory access) +
+  (TLB Miss Rate) x (TLB access + Page Table access + Memory access)
+
+If page fault occurs, add disk access time (~millions of cycles)
+
+Example: TLB hit rate=98%, TLB=1ns, Memory=100ns, Page table=100ns
+  EAT = 0.98 x (1+100) + 0.02 x (1+100+100)
+      = 0.98 x 101 + 0.02 x 201
+      = 98.98 + 4.02 = 103 ns</pre>
+  </div>
+
+  <h3>Virtual Memory vs Cache &mdash; Comparison</h3>
+  <table>
+    <tr><th>Aspect</th><th>Cache</th><th>Virtual Memory</th></tr>
+    <tr><td><strong>Maps</strong></td><td>Memory address &rarr; cache location</td><td>Virtual address &rarr; physical address</td></tr>
+    <tr><td><strong>Block size</strong></td><td>Small (16&ndash;128 bytes)</td><td>Large (4 KB pages)</td></tr>
+    <tr><td><strong>Miss penalty</strong></td><td>~100 cycles (go to DRAM)</td><td>~Millions of cycles (go to disk!)</td></tr>
+    <tr><td><strong>Managed by</strong></td><td>Hardware (automatic)</td><td>OS + Hardware (MMU/TLB)</td></tr>
+    <tr><td><strong>Replacement</strong></td><td>LRU / Random (hardware)</td><td>LRU approximation (OS, via reference bits)</td></tr>
+    <tr><td><strong>Write policy</strong></td><td>Write-through or Write-back</td><td>Always write-back (disk too slow for write-through)</td></tr>
+    <tr><td><strong>Miss = called</strong></td><td>Cache miss</td><td>Page fault</td></tr>
+  </table>
+
+  <div class="key-box exam">
+    <div class="label">Exam Summary: MMU &amp; Virtual Memory</div>
+    <ul>
+      <li><strong>MMU</strong> = hardware that translates virtual addresses to physical addresses</li>
+      <li><strong>Page Table</strong> = maps VPN &rarr; PFN (stored in main memory, one per process)</li>
+      <li><strong>TLB</strong> = fast cache for page table entries (avoids double memory access)</li>
+      <li><strong>Page Fault</strong> = page not in RAM, must load from disk (very expensive)</li>
+      <li><strong>Page offset is never translated</strong> &mdash; only VPN changes to PFN</li>
+      <li>Virtual memory always uses <strong>write-back</strong> (disk is too slow for write-through)</li>
+      <li>Virtual memory always uses <strong>fully associative</strong> placement (any page can go to any frame) &mdash; because page fault penalty is so high, we minimize misses at all costs</li>
+    </ul>
   </div>
 </div>
 
