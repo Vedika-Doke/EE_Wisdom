@@ -1,0 +1,2796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EE 309 - Microprocessors & Computer Architecture Complete Study Guide</title>
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --card: #1a1a2e;
+    --card2: #16213e;
+    --accent1: #e94560;
+    --accent2: #0f3460;
+    --yellow: #f5c518;
+    --green: #00e676;
+    --cyan: #00e5ff;
+    --pink: #ff4081;
+    --orange: #ff9100;
+    --text: #e0e0e0;
+    --muted: #9e9e9e;
+    --purple: #b388ff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    line-height: 1.7;
+    padding: 20px;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  h1 {
+    text-align: center;
+    font-size: 2.2rem;
+    background: linear-gradient(135deg, var(--yellow), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--muted);
+    margin-bottom: 40px;
+    font-size: 1rem;
+  }
+
+  /* Navigation Tabs */
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    padding: 12px 0;
+    z-index: 100;
+    border-bottom: 1px solid #333;
+  }
+  .nav-tab {
+    padding: 8px 16px;
+    background: var(--card);
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: var(--cyan);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .nav-tab:hover {
+    background: var(--accent2);
+    border-color: var(--cyan);
+    transform: translateY(-2px);
+  }
+  .nav-tab.active {
+    background: var(--accent2);
+    border-color: var(--cyan);
+  }
+
+  /* Table of Contents */
+  .toc {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 24px 32px;
+    margin-bottom: 40px;
+    border-left: 4px solid var(--cyan);
+  }
+  .toc h2 { color: var(--cyan); margin-bottom: 12px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: var(--green); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .toc-group { margin-top: 12px; }
+  .toc-group-title {
+    color: var(--orange);
+    font-weight: bold;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  /* Sections */
+  .section {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    border-left: 4px solid var(--accent1);
+  }
+  .section.mips-section { border-left-color: var(--purple); }
+  .section.arch-section { border-left-color: var(--orange); }
+  .section h2 {
+    color: var(--yellow);
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+  }
+  .section h3 {
+    color: var(--cyan);
+    font-size: 1.2rem;
+    margin: 18px 0 10px;
+  }
+  .section h4 {
+    color: var(--orange);
+    margin: 14px 0 8px;
+  }
+
+  /* Key concept boxes */
+  .key-box {
+    background: #1e2a3a;
+    border: 1px solid var(--accent2);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 14px 0;
+  }
+  .key-box.important {
+    border-color: var(--accent1);
+    background: #2a1525;
+  }
+  .key-box.formula {
+    border-color: var(--yellow);
+    background: #2a2515;
+    font-family: 'Courier New', monospace;
+  }
+  .key-box.exam {
+    border-color: var(--pink);
+    background: #2d1530;
+  }
+  .key-box.concept {
+    border-color: var(--purple);
+    background: #1e1535;
+  }
+  .key-box .label {
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .key-box.important .label { color: var(--accent1); }
+  .key-box.formula .label { color: var(--yellow); }
+  .key-box.exam .label { color: var(--pink); }
+  .key-box.concept .label { color: var(--purple); }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 0.92rem;
+  }
+  th {
+    background: var(--accent2);
+    color: var(--yellow);
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid #333;
+  }
+  td {
+    padding: 8px 14px;
+    border: 1px solid #333;
+    background: #111;
+  }
+  tr:nth-child(even) td { background: #1a1a1a; }
+
+  /* Mnemonic / memory aid */
+  .mnemonic {
+    background: linear-gradient(135deg, #1a0030, #0a1030);
+    border: 2px dashed var(--pink);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    text-align: center;
+  }
+  .mnemonic .title {
+    color: var(--pink);
+    font-weight: bold;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .mnemonic .content {
+    color: var(--yellow);
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+
+  /* Code blocks */
+  code, .code {
+    font-family: 'Courier New', monospace;
+    background: #000;
+    color: var(--green);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+  pre {
+    background: #000;
+    color: var(--green);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 10px 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  /* Flowchart-style */
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 14px 0;
+  }
+  .flow-box {
+    background: var(--accent2);
+    color: var(--cyan);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  .flow-arrow { color: var(--yellow); font-size: 1.4rem; }
+
+  ul { padding-left: 20px; margin: 8px 0; }
+  li { margin: 4px 0; }
+  strong { color: var(--yellow); }
+  em { color: var(--cyan); font-style: normal; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 700px) {
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .nav-tabs { position: static; }
+  }
+
+  .highlight { color: var(--yellow); font-weight: bold; }
+  .red { color: var(--accent1); }
+  .green { color: var(--green); }
+  .pink { color: var(--pink); }
+  .cyan { color: var(--cyan); }
+  .orange { color: var(--orange); }
+  .purple { color: var(--purple); }
+
+  .divider {
+    border: none;
+    border-top: 1px solid #333;
+    margin: 20px 0;
+  }
+
+  /* Quick recall cards */
+  .recall-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    margin: 14px 0;
+  }
+  .recall-card {
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .recall-card .q {
+    color: var(--orange);
+    font-weight: bold;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+  }
+  .recall-card .a {
+    color: var(--green);
+    font-size: 0.95rem;
+  }
+
+  .register-bits {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+    margin: 10px 0;
+  }
+  .register-bits .bit {
+    width: 60px;
+    padding: 8px 4px;
+    text-align: center;
+    background: #1a1a2e;
+    border: 1px solid #444;
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: var(--cyan);
+  }
+  .register-bits .bit.highlight-bit {
+    background: #2a1525;
+    border-color: var(--accent1);
+    color: var(--yellow);
+  }
+
+  /* SVG Visualizations */
+  .viz-container {
+    background: #0a0a1a;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+    overflow-x: auto;
+    text-align: center;
+  }
+  .viz-container svg {
+    max-width: 100%;
+    height: auto;
+  }
+  .viz-title {
+    color: var(--cyan);
+    font-weight: bold;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  /* Instruction format boxes */
+  .inst-format {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin: 12px 0;
+    font-family: monospace;
+  }
+  .inst-field {
+    padding: 10px 12px;
+    text-align: center;
+    border: 2px solid #555;
+    font-size: 0.85rem;
+    min-width: 60px;
+  }
+  .inst-field .field-name {
+    font-weight: bold;
+    color: var(--cyan);
+  }
+  .inst-field .field-bits {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .inst-field.op { background: #2a1525; border-color: var(--accent1); }
+  .inst-field.rs { background: #1a2a35; border-color: var(--cyan); }
+  .inst-field.rt { background: #1a3525; border-color: var(--green); }
+  .inst-field.rd { background: #2a2515; border-color: var(--yellow); }
+  .inst-field.sh { background: #1e1535; border-color: var(--purple); }
+  .inst-field.fn { background: #2d1530; border-color: var(--pink); }
+  .inst-field.imm { background: #1a2a25; border-color: var(--orange); }
+  .inst-field.addr { background: #1e2a3a; border-color: #4488ff; }
+
+  /* Pipeline diagram */
+  .pipeline-table {
+    border-collapse: collapse;
+    margin: 16px auto;
+    font-family: monospace;
+    font-size: 0.8rem;
+  }
+  .pipeline-table th, .pipeline-table td {
+    padding: 6px 10px;
+    border: 1px solid #444;
+    text-align: center;
+    min-width: 50px;
+  }
+  .pipeline-table .stage-if { background: #2a1525; color: var(--accent1); font-weight: bold; }
+  .pipeline-table .stage-id { background: #1a2a35; color: var(--cyan); font-weight: bold; }
+  .pipeline-table .stage-ex { background: #2a2515; color: var(--yellow); font-weight: bold; }
+  .pipeline-table .stage-mem { background: #1a3525; color: var(--green); font-weight: bold; }
+  .pipeline-table .stage-wb { background: #1e1535; color: var(--purple); font-weight: bold; }
+  .pipeline-table .empty { background: #0a0a0a; }
+  .pipeline-table .hazard { background: #4a1515; color: var(--accent1); }
+
+  /* Animated elements */
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  .pulse { animation: pulse 2s infinite; }
+
+  @keyframes slideRight {
+    0% { transform: translateX(-10px); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+  }
+
+  /* Section divider */
+  .section-divider {
+    text-align: center;
+    margin: 50px 0 30px;
+    position: relative;
+  }
+  .section-divider::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent1), var(--yellow), var(--cyan), transparent);
+  }
+  .section-divider span {
+    background: var(--bg);
+    padding: 0 20px;
+    position: relative;
+    color: var(--yellow);
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+  }
+
+  /* Comparison cards */
+  .compare-card {
+    background: #111;
+    border-radius: 8px;
+    padding: 16px;
+    border: 1px solid #333;
+  }
+  .compare-card h4 {
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed #444;
+  }
+
+  /* Step indicator */
+  .step-list {
+    counter-reset: step-counter;
+    list-style: none;
+    padding-left: 0;
+  }
+  .step-list li {
+    counter-increment: step-counter;
+    padding: 8px 0 8px 50px;
+    position: relative;
+    margin: 4px 0;
+  }
+  .step-list li::before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 0;
+    top: 6px;
+    width: 32px;
+    height: 32px;
+    background: var(--accent2);
+    border: 2px solid var(--cyan);
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-weight: bold;
+    color: var(--cyan);
+    font-size: 0.85rem;
+  }
+
+  /* Cache visualization */
+  .cache-addr {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin: 12px 0;
+    font-family: monospace;
+  }
+  .cache-field {
+    padding: 12px 16px;
+    text-align: center;
+    border: 2px solid;
+    font-size: 0.85rem;
+  }
+  .cache-field.tag { background: #2a1525; border-color: var(--accent1); color: var(--accent1); }
+  .cache-field.index { background: #1a2a35; border-color: var(--cyan); color: var(--cyan); }
+  .cache-field.offset { background: #1a3525; border-color: var(--green); color: var(--green); }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>EE 309: Microprocessors & Computer Architecture</h1>
+<p class="subtitle">Complete Study Guide - 8051 Microcontroller, MIPS Architecture, Pipelining, Cache Memory & More</p>
+
+<!-- STICKY NAV -->
+<div class="nav-tabs">
+  <a class="nav-tab" href="#s1">Architecture</a>
+  <a class="nav-tab" href="#s2">Memory</a>
+  <a class="nav-tab" href="#s3">Registers</a>
+  <a class="nav-tab" href="#s4">Addressing</a>
+  <a class="nav-tab" href="#s5">Instructions</a>
+  <a class="nav-tab" href="#s6">Branching</a>
+  <a class="nav-tab" href="#s7">Ports</a>
+  <a class="nav-tab" href="#s8">Timers</a>
+  <a class="nav-tab" href="#s9">Interrupts</a>
+  <a class="nav-tab" href="#s10">Serial</a>
+  <a class="nav-tab" href="#s11">Multiprocessor</a>
+  <a class="nav-tab" href="#s12">Comp Arch</a>
+  <a class="nav-tab" href="#s13">MIPS ISA</a>
+  <a class="nav-tab" href="#s14">Datapath</a>
+  <a class="nav-tab" href="#s15">Pipelining</a>
+  <a class="nav-tab" href="#s16">Cache</a>
+  <a class="nav-tab" href="#quick">Recall</a>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+
+  <div class="toc-group">
+    <div class="toc-group-title">Part I: 8051 Microcontroller</div>
+    <ol>
+      <li><a href="#s1">Architecture Basics (Von Neumann vs Harvard)</a></li>
+      <li><a href="#s2">8051 Memory Organization</a></li>
+      <li><a href="#s3">Registers, SFRs & PSW</a></li>
+      <li><a href="#s4">Addressing Modes (5 types)</a></li>
+      <li><a href="#s5">Instruction Set (Arithmetic, Logical, Data Transfer)</a></li>
+      <li><a href="#s6">Branching: JMP vs CALL (ACALL/LCALL/AJMP/LJMP/SJMP)</a></li>
+      <li><a href="#s7">Port Structures & I/O</a></li>
+      <li><a href="#s8">Timers/Counters - All 4 Modes</a></li>
+      <li><a href="#s9">Interrupts & Priority System</a></li>
+      <li><a href="#s10">Serial Communication (UART & Modes)</a></li>
+      <li><a href="#s11">Multiprocessor Communication (with Visualization)</a></li>
+    </ol>
+  </div>
+
+  <div class="toc-group">
+    <div class="toc-group-title">Part II: Computer Architecture & MIPS</div>
+    <ol start="12">
+      <li><a href="#s12">Computer Architecture: Performance, Amdahl's Law, Power</a></li>
+      <li><a href="#s13">MIPS ISA - Registers, Formats, Instructions</a></li>
+      <li><a href="#s14">MIPS Datapath: Single-Cycle & Multi-Cycle</a></li>
+      <li><a href="#s15">Pipelining: Stages, Hazards & Performance</a></li>
+      <li><a href="#s16">Cache Memory: Hierarchy, Mapping & Performance</a></li>
+    </ol>
+  </div>
+
+  <div class="toc-group">
+    <div class="toc-group-title">Quick Reference</div>
+    <ol start="17">
+      <li><a href="#quick">Quick Recall Cards</a></li>
+    </ol>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 1: ARCHITECTURE -->
+<!-- ============================================ -->
+<div class="section" id="s1">
+  <h2>1. Architecture Basics</h2>
+
+  <h3>What is a Microprocessor System?</h3>
+  <ul>
+    <li><strong>ALU</strong> - Arithmetic Logic Unit</li>
+    <li><strong>CU</strong> - Control Unit (coordinates everything, acts like an FSM)</li>
+    <li><strong>Memory</strong> - ROM (long term) + RAM</li>
+    <li><strong>I/O Devices</strong></li>
+  </ul>
+  <p>Together these form the <strong>Hardware Architecture</strong>.</p>
+
+  <h3>Von Neumann vs Harvard</h3>
+  <div class="two-col">
+    <div class="key-box">
+      <h4>Von Neumann</h4>
+      <ul>
+        <li><strong>Single shared memory</strong> for data & instructions</li>
+        <li>Single bus (bottleneck!)</li>
+        <li>Instructions & data accessed <em>one at a time</em></li>
+        <li>Simpler design, cheaper</li>
+        <li>Slower</li>
+      </ul>
+    </div>
+    <div class="key-box">
+      <h4>Harvard (8051 uses this!)</h4>
+      <ul>
+        <li><strong>Separate program & data memory</strong></li>
+        <li>Separate buses</li>
+        <li>Instructions & data accessed <em>simultaneously</em></li>
+        <li>More complex, more expensive</li>
+        <li>Faster</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="viz-container">
+    <div class="viz-title">Architecture Comparison</div>
+    <svg width="700" height="220" viewBox="0 0 700 220">
+      <!-- Von Neumann -->
+      <text x="175" y="20" fill="#f5c518" font-size="14" font-weight="bold" text-anchor="middle">Von Neumann Architecture</text>
+      <rect x="30" y="40" width="90" height="50" rx="8" fill="#1a1a2e" stroke="#e94560" stroke-width="2"/>
+      <text x="75" y="70" fill="#00e5ff" font-size="12" text-anchor="middle">CPU</text>
+      <line x1="120" y1="65" x2="170" y2="65" stroke="#f5c518" stroke-width="3" marker-end="url(#arrow)"/>
+      <line x1="170" y1="65" x2="120" y2="65" stroke="#f5c518" stroke-width="3"/>
+      <rect x="170" y="35" width="120" height="60" rx="8" fill="#1a1a2e" stroke="#00e676" stroke-width="2"/>
+      <text x="230" y="58" fill="#e0e0e0" font-size="10" text-anchor="middle">Instructions</text>
+      <text x="230" y="73" fill="#e0e0e0" font-size="10" text-anchor="middle">+ Data</text>
+      <text x="230" y="88" fill="#ff9100" font-size="9" text-anchor="middle">(Shared Memory)</text>
+      <rect x="50" y="110" width="250" height="24" rx="4" fill="#2a1525" stroke="#e94560" stroke-width="1.5"/>
+      <text x="175" y="126" fill="#e94560" font-size="10" text-anchor="middle">Single Bus (BOTTLENECK)</text>
+
+      <!-- Harvard -->
+      <text x="525" y="20" fill="#f5c518" font-size="14" font-weight="bold" text-anchor="middle">Harvard Architecture</text>
+      <rect x="455" y="40" width="90" height="50" rx="8" fill="#1a1a2e" stroke="#e94560" stroke-width="2"/>
+      <text x="500" y="70" fill="#00e5ff" font-size="12" text-anchor="middle">CPU</text>
+      <!-- Program Memory -->
+      <rect x="580" y="30" width="100" height="35" rx="6" fill="#1a1a2e" stroke="#b388ff" stroke-width="2"/>
+      <text x="630" y="52" fill="#b388ff" font-size="10" text-anchor="middle">Program Mem</text>
+      <line x1="545" y1="50" x2="580" y2="48" stroke="#b388ff" stroke-width="2"/>
+      <!-- Data Memory -->
+      <rect x="580" y="75" width="100" height="35" rx="6" fill="#1a1a2e" stroke="#00e676" stroke-width="2"/>
+      <text x="630" y="97" fill="#00e676" font-size="10" text-anchor="middle">Data Memory</text>
+      <line x1="545" y1="75" x2="580" y2="92" stroke="#00e676" stroke-width="2"/>
+      <!-- Buses -->
+      <rect x="460" y="110" width="120" height="20" rx="4" fill="#1e1535" stroke="#b388ff" stroke-width="1"/>
+      <text x="520" y="124" fill="#b388ff" font-size="9" text-anchor="middle">Program Bus</text>
+      <rect x="460" y="135" width="120" height="20" rx="4" fill="#1a3525" stroke="#00e676" stroke-width="1"/>
+      <text x="520" y="149" fill="#00e676" font-size="9" text-anchor="middle">Data Bus</text>
+
+      <!-- Comparison -->
+      <text x="175" y="160" fill="#e94560" font-size="11" text-anchor="middle">Slower, simpler, cheaper</text>
+      <text x="525" y="180" fill="#00e676" font-size="11" text-anchor="middle">Faster, simultaneous access</text>
+      <text x="525" y="195" fill="#f5c518" font-size="11" text-anchor="middle">8051 uses this!</text>
+    </svg>
+  </div>
+
+  <div class="key-box important">
+    <div class="label">Von Neumann Bottleneck</div>
+    In Von Neumann, instruction fetch and data access <strong>compete for the same bus</strong>. Harvard avoids this by using separate buses.
+  </div>
+
+  <h3>Microprocessor vs Microcontroller vs SoC</h3>
+  <table>
+    <tr><th>Feature</th><th>Microprocessor</th><th>Microcontroller</th><th>SoC</th></tr>
+    <tr><td>Components</td><td>CPU only; prog/data mem external</td><td>All on same chip (RAM, ROM, peripherals)</td><td>Specific purpose, everything integrated</td></tr>
+    <tr><td>Purpose</td><td>General</td><td>General purpose, processor-heavy</td><td>Specific purpose</td></tr>
+    <tr><td>Peripherals</td><td>External</td><td>ADC, DAC, Bluetooth, WiFi, Serial, etc.</td><td>Application-specific</td></tr>
+  </table>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 2: MEMORY -->
+<!-- ============================================ -->
+<div class="section" id="s2">
+  <h2>2. 8051 Memory Organization</h2>
+
+  <h3>Program Memory (ROM/Flash)</h3>
+  <ul>
+    <li><strong>Size:</strong> Up to 64 KB (address space: 0000H to FFFFH)</li>
+    <li>Each memory unit = 1 Byte, needs 16-bit address (2<sup>16</sup> = 65536 locations)</li>
+    <li><strong>Read-only</strong> - we can flash instructions before running</li>
+    <li><strong>EA pin:</strong> EA=1 means internal ROM; EA=0 means external ROM</li>
+  </ul>
+
+  <h3>Data Memory (RAM)</h3>
+  <table>
+    <tr><th>Type</th><th>Size</th><th>Address Range</th><th>Notes</th></tr>
+    <tr><td>Internal RAM</td><td>128 Bytes</td><td>00H - 7FH</td><td>Direct & Indirect addressing</td></tr>
+    <tr><td>SFRs</td><td>~21 registers</td><td>80H - FFH</td><td>Direct addressing ONLY</td></tr>
+    <tr><td>External RAM</td><td>Up to 64 KB</td><td>via DPTR</td><td>Read/Write, accessed via MOVX</td></tr>
+  </table>
+
+  <h3>Internal RAM Breakdown (00H-7FH)</h3>
+
+  <div class="viz-container">
+    <div class="viz-title">8051 Internal RAM Map</div>
+    <svg width="500" height="320" viewBox="0 0 500 320">
+      <!-- RAM blocks -->
+      <rect x="100" y="10" width="300" height="40" rx="6" fill="#2a1525" stroke="#e94560" stroke-width="2"/>
+      <text x="250" y="25" fill="#f5c518" font-size="11" text-anchor="middle" font-weight="bold">00H - 07H</text>
+      <text x="250" y="42" fill="#00e676" font-size="10" text-anchor="middle">Register Bank 0 (R0-R7) DEFAULT</text>
+
+      <rect x="100" y="55" width="300" height="35" rx="6" fill="#1a1a2e" stroke="#444" stroke-width="1.5"/>
+      <text x="250" y="72" fill="#e0e0e0" font-size="10" text-anchor="middle">08H - 0FH: Register Bank 1</text>
+      <text x="250" y="85" fill="#9e9e9e" font-size="9" text-anchor="middle">10H - 17H: Bank 2 | 18H - 1FH: Bank 3</text>
+
+      <rect x="100" y="100" width="300" height="40" rx="6" fill="#1e1535" stroke="#b388ff" stroke-width="2"/>
+      <text x="250" y="117" fill="#b388ff" font-size="11" text-anchor="middle" font-weight="bold">20H - 2FH</text>
+      <text x="250" y="133" fill="#e0e0e0" font-size="10" text-anchor="middle">Bit Addressable RAM (128 bits)</text>
+
+      <rect x="100" y="145" width="300" height="40" rx="6" fill="#1a2a35" stroke="#00e5ff" stroke-width="2"/>
+      <text x="250" y="162" fill="#00e5ff" font-size="11" text-anchor="middle" font-weight="bold">30H - 7FH</text>
+      <text x="250" y="178" fill="#e0e0e0" font-size="10" text-anchor="middle">General Purpose RAM (80 bytes)</text>
+
+      <rect x="100" y="195" width="300" height="40" rx="6" fill="#2a2515" stroke="#f5c518" stroke-width="2"/>
+      <text x="250" y="212" fill="#f5c518" font-size="11" text-anchor="middle" font-weight="bold">80H - FFH</text>
+      <text x="250" y="228" fill="#e0e0e0" font-size="10" text-anchor="middle">SFRs (Direct addressing ONLY)</text>
+
+      <!-- SP Arrow -->
+      <line x1="70" y1="50" x2="98" y2="50" stroke="#ff4081" stroke-width="2" stroke-dasharray="4"/>
+      <text x="30" y="54" fill="#ff4081" font-size="10" text-anchor="start">SP=07H</text>
+
+      <!-- Labels -->
+      <text x="250" y="265" fill="#9e9e9e" font-size="10" text-anchor="middle">Total Internal RAM: 128 Bytes (00H-7FH)</text>
+      <text x="250" y="280" fill="#9e9e9e" font-size="10" text-anchor="middle">SFRs occupy upper 128 addresses (80H-FFH)</text>
+      <text x="250" y="300" fill="#ff9100" font-size="10" text-anchor="middle">External RAM: Up to 64KB accessed via MOVX with DPTR</text>
+    </svg>
+  </div>
+
+  <div class="key-box important">
+    <div class="label">Important - Stack Pointer</div>
+    SP initializes to <code>07H</code> after reset. Programmers usually change SP at start of program to <code>MOV SP, #2FH</code> (above bit-addressable RAM) to avoid overwriting register banks.
+  </div>
+
+  <h3>Efficiency of Access (fastest to slowest)</h3>
+  <div class="flow">
+    <div class="flow-box">SFRs</div>
+    <div class="flow-arrow">&gt;</div>
+    <div class="flow-box">Registers (R0-R7)</div>
+    <div class="flow-arrow">&gt;</div>
+    <div class="flow-box">Internal RAM</div>
+    <div class="flow-arrow">&gt;</div>
+    <div class="flow-box">External RAM</div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 3: REGISTERS -->
+<!-- ============================================ -->
+<div class="section" id="s3">
+  <h2>3. Registers, SFRs & PSW</h2>
+
+  <h3>Key Registers</h3>
+  <ul>
+    <li><strong>ACC (Accumulator)</strong> - SFR address E0H, bit addressable (E0.0 to E0.7). Mnemonic = <code>A</code>, but <code>PUSH ACC</code> not <code>PUSH A</code></li>
+    <li><strong>B Register</strong> - Used with MUL and DIV</li>
+    <li><strong>PSW</strong> - Program Status Word (flags)</li>
+    <li><strong>SP</strong> - Stack Pointer (init 07H)</li>
+    <li><strong>DPTR</strong> - 16-bit Data Pointer = DPH + DPL (2 SFRs)</li>
+    <li><strong>PC</strong> - Program Counter (16-bit, points to next instruction in program memory)</li>
+  </ul>
+
+  <h3>PSW - Program Status Word (D0H)</h3>
+  <div class="register-bits">
+    <div class="bit highlight-bit">CY<br>PSW.7</div>
+    <div class="bit highlight-bit">AC<br>PSW.6</div>
+    <div class="bit">F0<br>PSW.5</div>
+    <div class="bit highlight-bit">RS1<br>PSW.4</div>
+    <div class="bit highlight-bit">RS0<br>PSW.3</div>
+    <div class="bit highlight-bit">OV<br>PSW.2</div>
+    <div class="bit">--<br>PSW.1</div>
+    <div class="bit">P<br>PSW.0</div>
+  </div>
+
+  <table>
+    <tr><th>Flag</th><th>What it does</th><th>When set</th></tr>
+    <tr><td><strong>CY (Carry)</strong></td><td>Carry out of bit 7</td><td>Unsigned overflow (result > 255)</td></tr>
+    <tr><td><strong>AC (Aux Carry)</strong></td><td>Carry out of bit 3</td><td>Used for BCD (DA instruction)</td></tr>
+    <tr><td><strong>OV (Overflow)</strong></td><td>Signed overflow</td><td>Result out of -128 to +127 range</td></tr>
+    <tr><td><strong>P (Parity)</strong></td><td>Set by hardware every cycle</td><td>Odd number of 1s in accumulator</td></tr>
+    <tr><td><strong>RS1, RS0</strong></td><td>Select register bank</td><td>00=Bank0, 01=Bank1, 10=Bank2, 11=Bank3</td></tr>
+  </table>
+
+  <div class="key-box exam">
+    <div class="label">Exam Tip - Overflow Flag</div>
+    <p>OV is set when A & B have the <strong>same sign</strong> and the result has a <strong>different sign</strong>.</p>
+    <p>Formula: <code>OV = C7 XOR C6</code> (carry into bit 7 XOR carry into bit 6)</p>
+    <p>CY is for <strong>unsigned</strong> interpretation. OV is for <strong>signed (2's complement)</strong> interpretation.</p>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 4: ADDRESSING MODES -->
+<!-- ============================================ -->
+<div class="section" id="s4">
+  <h2>4. Addressing Modes (5 Types)</h2>
+
+  <table>
+    <tr><th>#</th><th>Mode</th><th>Example</th><th>Explanation</th></tr>
+    <tr>
+      <td>1</td>
+      <td><strong>Immediate</strong></td>
+      <td><code>MOV A, #2FH</code></td>
+      <td>Data is right there in the instruction itself (in program memory). The <code>#</code> symbol is the giveaway.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><strong>Direct</strong></td>
+      <td><code>MOV A, 30H</code></td>
+      <td>The value <em>stored at</em> memory address 30H is moved to A. Creates a <strong>copy</strong>. Only lower 128B RAM + SFRs.</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><strong>Register</strong></td>
+      <td><code>MOV A, R7</code></td>
+      <td>2 bytes: 1 data + 1 opcode. Register number (3 bits) embedded in opcode itself. Fast!</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><strong>Indirect</strong></td>
+      <td><code>MOV A, @R0</code></td>
+      <td>R0/R1 holds an <em>address</em>; the value at that address goes into A. Only R0, R1 (8-bit) or DPTR (16-bit). Works with both internal & external RAM.</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><strong>Indexed</strong></td>
+      <td><code>MOVC A, @A+DPTR</code></td>
+      <td>Base address (DPTR or PC) + index (A) = effective address. Used for <strong>Look-Up Tables (LUT)</strong>. Only works with A. Read-only program memory.</td>
+    </tr>
+  </table>
+
+  <div class="mnemonic">
+    <div class="title">Memory Aid for Addressing Modes</div>
+    <div class="content">"I Drink Red Indian Ink" = Immediate, Direct, Register, Indirect, Indexed</div>
+  </div>
+
+  <div class="key-box">
+    <h4>LUT (Look-Up Table) Example</h4>
+    <pre>MOV DPTR, #Table    ; base address
+MOV A, #index_val   ; index
+MOVC A, @A+DPTR     ; fetch value from table
+...
+Table: DB 10h, 20h, 30h, 40h  ; data bytes</pre>
+    <p>DPTR is used when LUT is far from instruction. If LUT is right after the instruction, PC naturally becomes the base (use <code>MOVC A, @A+PC</code>).</p>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 5: INSTRUCTION SET -->
+<!-- ============================================ -->
+<div class="section" id="s5">
+  <h2>5. Instruction Set</h2>
+
+  <h3>Arithmetic Instructions</h3>
+  <table>
+    <tr><th>Instruction</th><th>Operation</th><th>MCs</th><th>Flags Affected</th></tr>
+    <tr><td><code>ADD A, &lt;src&gt;</code></td><td>A = A + src</td><td>1</td><td>CY, AC, OV</td></tr>
+    <tr><td><code>ADDC A, &lt;src&gt;</code></td><td>A = A + src + CY</td><td>1</td><td>CY, AC, OV</td></tr>
+    <tr><td><code>SUBB A, &lt;src&gt;</code></td><td>A = A - src - CY (borrow)</td><td>1</td><td>CY, AC, OV</td></tr>
+    <tr><td><code>INC &lt;byte&gt;</code></td><td>byte = byte + 1</td><td>1</td><td class="red">NONE! Flags don't change</td></tr>
+    <tr><td><code>INC DPTR</code></td><td>DPTR = DPTR + 1</td><td>2</td><td>NONE (16-bit, wraps to 0)</td></tr>
+    <tr><td><code>DEC &lt;byte&gt;</code></td><td>byte = byte - 1</td><td>1</td><td>NONE (but zero flag changes on DEC A)</td></tr>
+    <tr><td><code>MUL AB</code></td><td>A = low byte, B = high byte</td><td>4</td><td>CY=0 always, OV if result>255</td></tr>
+    <tr><td><code>DIV AB</code></td><td>A = quotient, B = remainder</td><td>4</td><td>CY=0, OV=0 (OV=1 if div by 0)</td></tr>
+    <tr><td><code>DA A</code></td><td>Decimal Adjust after BCD add</td><td>1</td><td>CY, AC</td></tr>
+  </table>
+
+  <div class="key-box important">
+    <div class="label">Critical - INC doesn't affect flags!</div>
+    This is a classic exam trap. <code>INC</code> does NOT set carry, overflow, or any flag. Only <code>ADD/ADDC/SUBB</code> do.
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">DA (Decimal Adjust) - How it works</div>
+    <p>After adding two BCD numbers with ADD/ADDC:</p>
+    <ul>
+      <li>If lower nibble > 9 OR AC=1, add 06H to lower nibble</li>
+      <li>If upper nibble > 9 OR CY=1, add 60H to upper nibble</li>
+    </ul>
+    <p>Example: 45h + 45h = 8Ah. DA sees lower nibble A>9, adds 6 &rarr; result = 90h (BCD for 90).</p>
+  </div>
+
+  <h3>Logical Instructions</h3>
+  <table>
+    <tr><th>Instruction</th><th>Meaning</th><th>Notes</th></tr>
+    <tr><td><code>ANL</code></td><td>Bitwise AND</td><td>Can work on ports directly (read-modify-write)</td></tr>
+    <tr><td><code>ORL</code></td><td>Bitwise OR</td><td></td></tr>
+    <tr><td><code>XRL</code></td><td>Bitwise XOR</td><td></td></tr>
+    <tr><td><code>CPL A</code></td><td>NOT A (complement)</td><td></td></tr>
+    <tr><td><code>CLR A</code></td><td>A = 00H</td><td></td></tr>
+    <tr><td><code>RL A</code></td><td>Rotate Left</td><td>A7 goes to A0 (no carry involved)</td></tr>
+    <tr><td><code>RLC A</code></td><td>Rotate Left through Carry</td><td>A7&rarr;CY, CY&rarr;A0 (9-bit rotation)</td></tr>
+    <tr><td><code>RR A</code></td><td>Rotate Right</td><td>A0 goes to A7</td></tr>
+    <tr><td><code>RRC A</code></td><td>Rotate Right through Carry</td><td>A0&rarr;CY, CY&rarr;A7</td></tr>
+    <tr><td><code>SWAP A</code></td><td>Swap nibbles</td><td>Upper 4 bits &harr; Lower 4 bits. <span class="red">Doesn't change carry flag!</span></td></tr>
+  </table>
+
+  <div class="key-box">
+    <h4>SWAP A Visualization</h4>
+    <pre>Before: A7 A6 A5 A4 | A3 A2 A1 A0
+After : A3 A2 A1 A0 | A7 A6 A5 A4</pre>
+    <p>Useful for BCD: if A < 100, SWAP + mask can convert binary to BCD quickly.</p>
+  </div>
+
+  <h3>Machine Cycles</h3>
+  <div class="key-box formula">
+    <div class="label">Formula</div>
+    <p>1 Machine Cycle = 12 clock cycles (for standard 8051)</p>
+    <p>1 MC @ 12 MHz = 12/12,000,000 = 1 &mu;s</p>
+    <p>Instructions take 1 to 4 MCs, and 1 to 3 bytes.</p>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 6: BRANCHING -->
+<!-- ============================================ -->
+<div class="section" id="s6">
+  <h2>6. Branching Instructions: JMP vs CALL</h2>
+
+  <h3>The Key Difference</h3>
+  <div class="two-col">
+    <div class="key-box">
+      <h4>JMP (Just Jump)</h4>
+      <p>Simply changes PC to new location. <strong>Nothing pushed to stack.</strong> No RET required.</p>
+    </div>
+    <div class="key-box">
+      <h4>CALL (Call Subroutine)</h4>
+      <p><strong>Pushes return address (PC) onto stack</strong>, then jumps. Clubbed with <code>RET</code> to return.</p>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Instruction</th><th>Type</th><th>Address Bits</th><th>Range</th><th>Bytes</th><th>Stack?</th></tr>
+    <tr><td><code>ACALL</code></td><td>Call</td><td>11-bit</td><td>Same 2KB page</td><td>2</td><td>Yes (push PC)</td></tr>
+    <tr><td><code>LCALL</code></td><td>Call</td><td>16-bit</td><td>Entire 64KB</td><td>3</td><td>Yes (push PC)</td></tr>
+    <tr><td><code>AJMP</code></td><td>Jump</td><td>11-bit</td><td>Same 2KB page</td><td>2</td><td>No</td></tr>
+    <tr><td><code>LJMP</code></td><td>Jump</td><td>16-bit</td><td>Entire 64KB</td><td>3</td><td>No</td></tr>
+    <tr><td><code>SJMP</code></td><td>Jump</td><td>8-bit signed</td><td>-128 to +127 relative</td><td>2</td><td>No</td></tr>
+  </table>
+
+  <div class="key-box exam">
+    <div class="label">Exam Classic - ACALL Page Address</div>
+    <p>ACALL uses 11 address bits from the instruction + <strong>5 page bits from PC_next</strong> (not current PC!).</p>
+    <p>Why PC_next? Because instruction fetch happens first &rarr; PC increments &rarr; then the upper 5 bits are taken from this new PC value.</p>
+    <p>This means ACALL can only call within the <strong>same 2KB page</strong> as the <em>next</em> instruction.</p>
+  </div>
+
+  <h3>Steps for ACALL/LCALL</h3>
+  <div class="flow">
+    <div class="flow-box">Step 1<br>PC = PC + 2 (or +3)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box">Step 2<br>Push PC onto stack<br>(SP++, low byte; SP++, high byte)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box">Step 3<br>Load new address into PC</div>
+  </div>
+
+  <h3>Steps for AJMP/LJMP</h3>
+  <div class="flow">
+    <div class="flow-box">Step 1<br>PC = PC + 2 (or +3)</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box">Step 3 directly<br>Load new address into PC<br>(No stack operation!)</div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 7: PORTS -->
+<!-- ============================================ -->
+<div class="section" id="s7">
+  <h2>7. Port Structures & I/O</h2>
+
+  <table>
+    <tr><th>Port</th><th>Address</th><th>Alternate Function</th></tr>
+    <tr><td>P0</td><td>80H</td><td>Address/Data bus (AD0-AD7) for external memory. <strong>Open drain</strong> - needs external pull-up</td></tr>
+    <tr><td>P1</td><td>90H</td><td>General I/O only (has internal pull-up)</td></tr>
+    <tr><td>P2</td><td>A0H</td><td>Upper address byte (A8-A15) for external memory</td></tr>
+    <tr><td>P3</td><td>B0H</td><td>Special functions: RxD, TxD, INT0, INT1, T0, T1, WR, RD</td></tr>
+  </table>
+
+  <h3>Port 3 Pin Functions</h3>
+  <table>
+    <tr><th>Pin</th><th>Bit</th><th>Function</th></tr>
+    <tr><td>P3.0</td><td>RxD</td><td>Serial Receive</td></tr>
+    <tr><td>P3.1</td><td>TxD</td><td>Serial Transmit</td></tr>
+    <tr><td>P3.2</td><td>INT0</td><td>External Interrupt 0</td></tr>
+    <tr><td>P3.3</td><td>INT1</td><td>External Interrupt 1</td></tr>
+    <tr><td>P3.4</td><td>T0</td><td>Timer 0 external input</td></tr>
+    <tr><td>P3.5</td><td>T1</td><td>Timer 1 external input</td></tr>
+    <tr><td>P3.6</td><td>WR</td><td>External RAM write</td></tr>
+    <tr><td>P3.7</td><td>RD</td><td>External RAM read</td></tr>
+  </table>
+
+  <h3>Read vs Write vs Read-Modify-Write</h3>
+  <div class="key-box">
+    <ul>
+      <li><strong>Read (from pins):</strong> <code>MOV A, P0</code> - reads actual pin values. Does NOT change port SFR.</li>
+      <li><strong>Write (to latch):</strong> <code>MOV P0, #55H</code> - writes to port SFR/latch. Changes output.</li>
+      <li><strong>Read-Modify-Write:</strong> <code>ANL P0, A</code> or <code>DJNZ P1, label</code> - reads from SFR (latch), modifies, writes back. Reads entire byte, modifies target bits, writes whole byte back.</li>
+    </ul>
+  </div>
+
+  <div class="key-box important">
+    <div class="label">To use a port as input</div>
+    You must write '1' to the port latch first! <code>MOV P0, #FFH</code> then read.
+    Output port unless we specifically write '1' to the port/pin.
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 8: TIMERS -->
+<!-- ============================================ -->
+<div class="section" id="s8">
+  <h2>8. Timers/Counters - All 4 Modes</h2>
+
+  <div class="key-box">
+    <p>8051 has <strong>two</strong> 16-bit timers: <strong>Timer 0</strong> (TH0 + TL0) and <strong>Timer 1</strong> (TH1 + TL1).</p>
+    <p>Each can work as a <em>Timer</em> (counts internal clock / machine cycles) or as a <em>Counter</em> (counts external edges on T0/T1 pins).</p>
+  </div>
+
+  <h3>How the Timer Clock Works</h3>
+  <div class="key-box formula">
+    <div class="label">Timer Clock</div>
+    <p>Timer mode: counts at <strong>f<sub>osc</sub> / 12</strong> (= 1 count per machine cycle)</p>
+    <p>Counter mode: counts <strong>falling edges</strong> on external pin (T0 = P3.4, T1 = P3.5)</p>
+    <p>The edge is sampled in S5P2 of each machine cycle, so max external count rate = f<sub>osc</sub>/24</p>
+  </div>
+
+  <h3>TMOD Register (Timer Mode - address 89H)</h3>
+  <p><strong>NOT bit addressable!</strong> Must be written as a whole byte.</p>
+  <div class="register-bits">
+    <div class="bit highlight-bit">GATE<br>T1</div>
+    <div class="bit highlight-bit">C/T<br>T1</div>
+    <div class="bit highlight-bit">M1<br>T1</div>
+    <div class="bit highlight-bit">M0<br>T1</div>
+    <div class="bit">GATE<br>T0</div>
+    <div class="bit">C/T<br>T0</div>
+    <div class="bit">M1<br>T0</div>
+    <div class="bit">M0<br>T0</div>
+  </div>
+  <p style="text-align:center; color: var(--muted);">&larr; Timer 1 (upper nibble) &nbsp;|&nbsp; Timer 0 (lower nibble) &rarr;</p>
+
+  <table>
+    <tr><th>Bit</th><th>Name</th><th>Function</th></tr>
+    <tr><td>GATE</td><td>Gating</td><td>If GATE=1, timer runs only when INTx pin is HIGH <strong>AND</strong> TRx=1. If GATE=0, timer runs whenever TRx=1.</td></tr>
+    <tr><td>C/T</td><td>Counter/Timer</td><td>C/T=0: Timer (internal clock). C/T=1: Counter (external pin edges).</td></tr>
+    <tr><td>M1, M0</td><td>Mode Select</td><td>See table below</td></tr>
+  </table>
+
+  <h3>The 4 Timer Modes - Detailed</h3>
+
+  <table>
+    <tr><th>M1</th><th>M0</th><th>Mode</th><th>Description</th><th>Size</th></tr>
+    <tr><td>0</td><td>0</td><td><strong>Mode 0</strong></td><td>13-bit Timer/Counter</td><td>TLx = 5 bits, THx = 8 bits (total 13)</td></tr>
+    <tr><td>0</td><td>1</td><td><strong>Mode 1</strong></td><td>16-bit Timer/Counter</td><td>TLx = 8 bits, THx = 8 bits (full 16)</td></tr>
+    <tr><td>1</td><td>0</td><td><strong>Mode 2</strong></td><td>8-bit Auto-Reload</td><td>TLx = 8 bits (counts), THx = 8 bits (reload value)</td></tr>
+    <tr><td>1</td><td>1</td><td><strong>Mode 3</strong></td><td>Split Timer (Timer 0 only)</td><td>TL0 and TH0 become two independent 8-bit timers</td></tr>
+  </table>
+
+  <h4>Mode 1: 16-bit Timer (most common for delays)</h4>
+  <div class="key-box important">
+    <div class="label">This is the workhorse mode</div>
+    <p>Full 16-bit counter: TLx (low byte) + THx (high byte). Counts from loaded value up to FFFFH, then overflows to 0000H and sets <strong>TFx = 1</strong>.</p>
+    <p><strong>Max count:</strong> 2<sup>16</sup> = 65,536</p>
+    <p><strong>No auto-reload!</strong> After overflow, you must manually reload THx and TLx in your ISR.</p>
+  </div>
+
+  <div class="key-box formula">
+    <div class="label">Delay Calculation - Mode 1</div>
+    <pre>Delay = (65536 - initial_value) x (12 / f_osc)
+
+To get a specific count N:
+  Load value = 65536 - N
+
+Example: f_osc = 11.0592 MHz, want 1000 counts
+  Load = 65536 - 1000 = 64536 = FC18H
+  TH0 = FCH, TL0 = 18H
+  Delay = 1000 x (12/11059200) = 1.085 ms</pre>
+  </div>
+
+  <h4>Mode 2: 8-bit Auto-Reload (best for baud rate generation)</h4>
+  <div class="key-box important">
+    <div class="label">Key Mode for Serial Communication</div>
+    <p>TLx counts up. When it overflows (FFH &rarr; 00H), <strong>TFx is set</strong> AND the value in THx is <strong>automatically reloaded</strong> into TLx.</p>
+    <p>THx holds the reload value (you set it once, it keeps reloading).</p>
+    <p><strong>Max count:</strong> 256 (8-bit). Good for generating precise, repetitive time intervals.</p>
+    <p><strong>Most commonly used:</strong> Timer 1 in Mode 2 for generating serial port baud rate.</p>
+  </div>
+
+  <h4>Mode 3: Split Timer (Timer 0 only!)</h4>
+  <div class="key-box">
+    <p>Splits Timer 0 into <strong>two independent 8-bit timers</strong>:</p>
+    <ul>
+      <li><strong>TL0:</strong> Uses C/T, GATE, TR0, TF0 (like a normal 8-bit timer 0)</li>
+      <li><strong>TH0:</strong> Counts machine cycles only (timer mode). Uses <strong>TR1 and TF1</strong> (borrows Timer 1's control bits!)</li>
+    </ul>
+    <p>When Timer 0 is in Mode 3, Timer 1 can still run in Modes 0/1/2 but <strong>cannot set TF1</strong> (it's being used by TH0). Timer 1 is usually used for baud rate generation in this case.</p>
+  </div>
+
+  <h3>TCON Register (Timer Control - address 88H)</h3>
+  <p><strong>Bit addressable!</strong></p>
+  <div class="register-bits">
+    <div class="bit highlight-bit">TF1<br>TCON.7</div>
+    <div class="bit">TR1<br>TCON.6</div>
+    <div class="bit highlight-bit">TF0<br>TCON.5</div>
+    <div class="bit">TR0<br>TCON.4</div>
+    <div class="bit">IE1<br>TCON.3</div>
+    <div class="bit">IT1<br>TCON.2</div>
+    <div class="bit">IE0<br>TCON.1</div>
+    <div class="bit">IT0<br>TCON.0</div>
+  </div>
+
+  <h3>Timer Programming Example</h3>
+  <pre>; Toggle P1.0 every 100 machine cycles using Timer 0, Mode 2
+ORG 0000H
+LJMP Main
+
+ORG 000BH          ; Timer 0 ISR vector
+CPL P1.0            ; Toggle pin
+RETI                ; Return & clear TF0
+
+Main:
+  MOV TMOD, #02H   ; Timer 0, Mode 2 (auto-reload)
+  MOV TH0, #9CH    ; Reload value = 256 - 100 = 156 = 9CH
+  MOV IE, #82H     ; Enable Timer 0 interrupt (EA=1, ET0=1)
+  SETB TR0          ; Start timer
+HERE: SJMP HERE     ; Loop forever, ISR does the work</pre>
+
+  <div class="mnemonic">
+    <div class="title">Remember Timer Modes</div>
+    <div class="content">
+      Mode 0 = "13-bit legacy (think: old 8048)"<br>
+      Mode 1 = "16-bit full (the big delay maker)"<br>
+      Mode 2 = "8-bit auto-reload (the baud rate king)"<br>
+      Mode 3 = "Split personality (only Timer 0, steals TR1/TF1)"
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 9: INTERRUPTS -->
+<!-- ============================================ -->
+<div class="section" id="s9">
+  <h2>9. Interrupts & Priority System</h2>
+
+  <h3>What Happens When an Interrupt Fires</h3>
+  <div class="key-box important">
+    <div class="label">ISR Entry - What Hardware Does Automatically</div>
+    <ol>
+      <li>Finishes the current instruction (however many MCs it needs)</li>
+      <li><strong>Pushes PC</strong> onto stack (return address)</li>
+      <li>Loads PC with the <strong>interrupt vector address</strong></li>
+    </ol>
+    <p class="red"><strong>Hardware does NOT save:</strong> Registers, PSW, ACC, or anything else! Only PC is saved. YOU must PUSH/POP them in your ISR.</p>
+  </div>
+
+  <h3>ISR Structure (What YOU must write)</h3>
+  <pre>; ISR Template
+  PUSH ACC        ; Save registers that ISR will use
+  PUSH PSW
+  PUSH &lt;other regs&gt;
+
+  ; ... your ISR code ...
+
+  POP &lt;other regs&gt;  ; Restore in reverse order
+  POP PSW
+  POP ACC
+  RETI              ; Return from interrupt (NOT RET!)</pre>
+
+  <div class="key-box important">
+    <div class="label">RETI vs RET</div>
+    <p><code>RETI</code> does two things: (1) pops PC from stack like RET, and (2) <strong>clears the interrupt priority flags</strong> so the system knows this priority level is free again. Using plain <code>RET</code> would mess up the priority system!</p>
+  </div>
+
+  <h3>Interrupt Sources, Flags & Vector Addresses</h3>
+  <table>
+    <tr><th>Priority<br>(Default)</th><th>Source</th><th>Flag</th><th>Vector Address</th><th>Flag Cleared By</th></tr>
+    <tr><td>Highest (1)</td><td>External Interrupt 0 (INT0)</td><td>IE0</td><td><strong>0003H</strong></td><td>Auto (edge) / Hardware (level)</td></tr>
+    <tr><td>2</td><td>Timer 0 Overflow</td><td>TF0</td><td><strong>000BH</strong></td><td>Auto when CPU vectors to ISR</td></tr>
+    <tr><td>3</td><td>External Interrupt 1 (INT1)</td><td>IE1</td><td><strong>0013H</strong></td><td>Auto (edge) / Hardware (level)</td></tr>
+    <tr><td>4</td><td>Timer 1 Overflow</td><td>TF1</td><td><strong>001BH</strong></td><td>Auto when CPU vectors to ISR</td></tr>
+    <tr><td>Lowest (5)</td><td>Serial Port (RI or TI)</td><td>RI / TI</td><td><strong>0023H</strong></td><td class="red">Must be cleared by SOFTWARE!</td></tr>
+  </table>
+
+  <div class="mnemonic">
+    <div class="title">Vector Address Memory Trick</div>
+    <div class="content">
+      03H, 0BH, 13H, 1BH, 23H &mdash; they're 8 apart (except first is 03H)<br>
+      "0-3, 0-B, 1-3, 1-B, 2-3" &mdash; notice the pattern: 3, B, 3, B, 3
+    </div>
+  </div>
+
+  <h3>IE Register - Interrupt Enable (A8H, bit addressable)</h3>
+  <div class="register-bits">
+    <div class="bit highlight-bit">EA<br>IE.7</div>
+    <div class="bit">--<br>IE.6</div>
+    <div class="bit">--<br>IE.5</div>
+    <div class="bit">ES<br>IE.4</div>
+    <div class="bit">ET1<br>IE.3</div>
+    <div class="bit">EX1<br>IE.2</div>
+    <div class="bit">ET0<br>IE.1</div>
+    <div class="bit">EX0<br>IE.0</div>
+  </div>
+
+  <div class="key-box important">
+    <div class="label">Two conditions for an interrupt to work</div>
+    <p><strong>EA = 1</strong> (global enable, bit 7 of IE) <strong>AND</strong> the individual bit = 1</p>
+    <p>Example: To enable Timer 0 interrupt: <code>MOV IE, #82H</code> (EA=1, ET0=1)</p>
+  </div>
+
+  <h3>IP Register - Interrupt Priority (B8H, bit addressable)</h3>
+  <div class="key-box important">
+    <div class="label">Critical Concept - Two-Level Priority</div>
+    <p>Each interrupt can be set to <strong>HIGH</strong> (bit=1) or <strong>LOW</strong> (bit=0) priority. That's it - only 2 levels.</p>
+    <p><strong>IP does NOT change the order within a level!</strong> It only selects which group (high or low) an interrupt belongs to.</p>
+    <p><strong>Within each group, the default polling order (IE0 > TF0 > IE1 > TF1 > RI/TI) STILL applies.</strong></p>
+  </div>
+
+  <h3>Edge vs Level Triggered (External Interrupts)</h3>
+  <table>
+    <tr><th>Type</th><th>ITx bit</th><th>Behavior</th><th>Flag clearing</th></tr>
+    <tr><td><strong>Edge Triggered</strong></td><td>ITx = 1</td><td>Fires on <strong>high-to-low transition</strong></td><td>IEx auto-cleared when CPU vectors to ISR</td></tr>
+    <tr><td><strong>Level Triggered</strong></td><td>ITx = 0</td><td>Fires as long as INTx pin is <strong>LOW</strong></td><td>IEx cleared by hardware when pin goes high. <span class="red">If pin stays LOW, interrupt re-fires!</span></td></tr>
+  </table>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 10: SERIAL COMMUNICATION -->
+<!-- ============================================ -->
+<div class="section" id="s10">
+  <h2>10. Serial Communication (UART)</h2>
+
+  <h3>Synchronous vs Asynchronous</h3>
+  <div class="two-col">
+    <div class="key-box">
+      <h4>Synchronous</h4>
+      <ul>
+        <li>Clock signal sent alongside data</li>
+        <li>Data sent in blocks of bytes with preamble</li>
+        <li>No start/stop bits needed</li>
+        <li>More reliable</li>
+      </ul>
+    </div>
+    <div class="key-box">
+      <h4>Asynchronous (UART)</h4>
+      <ul>
+        <li>No shared clock line</li>
+        <li>Uses <strong>start bit + data + stop bit</strong> for framing</li>
+        <li>Both sides must agree on same baud rate</li>
+        <li><strong>8051 uses this (modes 1,2,3)</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>UART Frame Structure</h3>
+  <div class="viz-container">
+    <div class="viz-title">UART Data Frame (LSB First)</div>
+    <svg width="650" height="120" viewBox="0 0 650 120">
+      <!-- Idle -->
+      <rect x="10" y="30" width="50" height="40" rx="4" fill="#1a3525" stroke="#00e676" stroke-width="1.5"/>
+      <text x="35" y="55" fill="#00e676" font-size="10" text-anchor="middle">IDLE</text>
+      <text x="35" y="45" fill="#9e9e9e" font-size="8" text-anchor="middle">HIGH</text>
+      <!-- Start bit -->
+      <rect x="65" y="30" width="45" height="40" rx="4" fill="#2a1525" stroke="#e94560" stroke-width="2"/>
+      <text x="87" y="48" fill="#e94560" font-size="10" text-anchor="middle" font-weight="bold">START</text>
+      <text x="87" y="62" fill="#e94560" font-size="9" text-anchor="middle">0</text>
+      <!-- Data bits -->
+      <rect x="115" y="30" width="35" height="40" rx="3" fill="#1a2a35" stroke="#00e5ff" stroke-width="1.5"/>
+      <text x="132" y="55" fill="#00e5ff" font-size="10" text-anchor="middle">D0</text>
+      <rect x="153" y="30" width="35" height="40" rx="3" fill="#1a2a35" stroke="#00e5ff" stroke-width="1.5"/>
+      <text x="170" y="55" fill="#00e5ff" font-size="10" text-anchor="middle">D1</text>
+      <rect x="191" y="30" width="35" height="40" rx="3" fill="#1a2a35" stroke="#00e5ff" stroke-width="1.5"/>
+      <text x="208" y="55" fill="#00e5ff" font-size="10" text-anchor="middle">D2</text>
+      <rect x="229" y="30" width="35" height="40" rx="3" fill="#1a2a35" stroke="#00e5ff" stroke-width="1.5"/>
+      <text x="246" y="55" fill="#00e5ff" font-size="10" text-anchor="middle">D3</text>
+      <rect x="267" y="30" width="35" height="40" rx="3" fill="#1a2a35" stroke="#00e5ff" stroke-width="1.5"/>
+      <text x="284" y="55" fill="#00e5ff" font-size="10" text-anchor="middle">D4</text>
+      <rect x="305" y="30" width="35" height="40" rx="3" fill="#1a2a35" stroke="#00e5ff" stroke-width="1.5"/>
+      <text x="322" y="55" fill="#00e5ff" font-size="10" text-anchor="middle">D5</text>
+      <rect x="343" y="30" width="35" height="40" rx="3" fill="#1a2a35" stroke="#00e5ff" stroke-width="1.5"/>
+      <text x="360" y="55" fill="#00e5ff" font-size="10" text-anchor="middle">D6</text>
+      <rect x="381" y="30" width="35" height="40" rx="3" fill="#1a2a35" stroke="#00e5ff" stroke-width="1.5"/>
+      <text x="398" y="55" fill="#00e5ff" font-size="10" text-anchor="middle">D7</text>
+      <!-- Optional 9th bit -->
+      <rect x="420" y="30" width="45" height="40" rx="3" fill="#1e1535" stroke="#b388ff" stroke-width="1.5" stroke-dasharray="4"/>
+      <text x="442" y="48" fill="#b388ff" font-size="9" text-anchor="middle">D8/TB8</text>
+      <text x="442" y="62" fill="#9e9e9e" font-size="8" text-anchor="middle">(Mode 2,3)</text>
+      <!-- Stop bit -->
+      <rect x="470" y="30" width="45" height="40" rx="4" fill="#2a2515" stroke="#f5c518" stroke-width="2"/>
+      <text x="492" y="48" fill="#f5c518" font-size="10" text-anchor="middle" font-weight="bold">STOP</text>
+      <text x="492" y="62" fill="#f5c518" font-size="9" text-anchor="middle">1</text>
+      <!-- Idle -->
+      <rect x="520" y="30" width="50" height="40" rx="4" fill="#1a3525" stroke="#00e676" stroke-width="1.5"/>
+      <text x="545" y="55" fill="#00e676" font-size="10" text-anchor="middle">IDLE</text>
+
+      <!-- Labels -->
+      <text x="35" y="90" fill="#9e9e9e" font-size="9" text-anchor="middle">1</text>
+      <text x="255" y="90" fill="#00e5ff" font-size="9" text-anchor="middle">8 data bits (LSB first)</text>
+      <text x="545" y="90" fill="#9e9e9e" font-size="9" text-anchor="middle">HIGH</text>
+
+      <!-- Arrow showing time -->
+      <line x1="65" y1="15" x2="515" y2="15" stroke="#f5c518" stroke-width="1.5" marker-end="url(#arrowY)"/>
+      <text x="290" y="12" fill="#f5c518" font-size="9" text-anchor="middle">Time (D0 goes out first) &rarr;</text>
+
+      <defs>
+        <marker id="arrowY" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#f5c518"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <h3>SBUF - Serial Buffer (99H)</h3>
+  <div class="key-box important">
+    <div class="label">Same address, two separate physical registers!</div>
+    <p><code>MOV SBUF, A</code> &rarr; writes to <strong>transmit buffer</strong> (starts transmission immediately)</p>
+    <p><code>MOV A, SBUF</code> &rarr; reads from <strong>receive buffer</strong></p>
+  </div>
+
+  <h3>SCON Register - Serial Control (98H, bit addressable)</h3>
+  <div class="register-bits">
+    <div class="bit highlight-bit">SM0<br>SCON.7</div>
+    <div class="bit highlight-bit">SM1<br>SCON.6</div>
+    <div class="bit">SM2<br>SCON.5</div>
+    <div class="bit">REN<br>SCON.4</div>
+    <div class="bit">TB8<br>SCON.3</div>
+    <div class="bit">RB8<br>SCON.2</div>
+    <div class="bit highlight-bit">TI<br>SCON.1</div>
+    <div class="bit highlight-bit">RI<br>SCON.0</div>
+  </div>
+
+  <table>
+    <tr><th>Bit</th><th>Function</th></tr>
+    <tr><td><strong>SM0, SM1</strong></td><td>Mode select (see table below)</td></tr>
+    <tr><td><strong>SM2</strong></td><td>Multiprocessor communication enable. In mode 2/3: if SM2=1, RI is set only when 9th bit=1 (address frame)</td></tr>
+    <tr><td><strong>REN</strong></td><td>Receive Enable. Must be 1 to receive data.</td></tr>
+    <tr><td><strong>TB8</strong></td><td>Transmit bit 8 (9th data bit for modes 2 & 3). Programmable.</td></tr>
+    <tr><td><strong>RB8</strong></td><td>Receive bit 8 (received 9th bit in modes 2 & 3)</td></tr>
+    <tr><td><strong>TI</strong></td><td>Transmit Interrupt flag. Set when transmission done. <span class="red">MUST be cleared by software!</span></td></tr>
+    <tr><td><strong>RI</strong></td><td>Receive Interrupt flag. Set when byte received. <span class="red">MUST be cleared by software!</span></td></tr>
+  </table>
+
+  <h3>4 Serial Communication Modes</h3>
+  <table>
+    <tr><th>SM0</th><th>SM1</th><th>Mode</th><th>Description</th><th>Baud Rate</th><th>Data Bits</th></tr>
+    <tr><td>0</td><td>0</td><td><strong>Mode 0</strong></td><td>Shift Register (Synchronous)</td><td>f<sub>osc</sub>/12 (fixed)</td><td>8</td></tr>
+    <tr><td>0</td><td>1</td><td><strong>Mode 1</strong></td><td>8-bit UART (most common)</td><td>Variable (Timer 1)</td><td>8 + start/stop</td></tr>
+    <tr><td>1</td><td>0</td><td><strong>Mode 2</strong></td><td>9-bit UART</td><td>f<sub>osc</sub>/32 or f<sub>osc</sub>/64</td><td>9 + start/stop</td></tr>
+    <tr><td>1</td><td>1</td><td><strong>Mode 3</strong></td><td>9-bit UART</td><td>Variable (Timer 1)</td><td>9 + start/stop</td></tr>
+  </table>
+
+  <h3>Baud Rate Calculation</h3>
+  <div class="key-box formula">
+    <div class="label">The Master Formula (Modes 1 & 3)</div>
+    <pre>Baud Rate = (2^SMOD / 32) x Timer 1 overflow rate
+
+Timer 1 overflow rate = f_osc / (12 x (256 - TH1))
+
+Combined:
+Baud Rate = (2^SMOD / 32) x f_osc / (12 x (256 - TH1))
+
+SMOD = bit 7 of PCON register
+  SMOD = 0: normal
+  SMOD = 1: doubles baud rate</pre>
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">Why 11.0592 MHz and NOT 12 MHz?</div>
+    <p><strong>12 MHz cannot generate standard baud rates!</strong> 11.0592 MHz divides evenly to give exact standard rates like 9600, 19200, etc.</p>
+    <pre>With 11.0592 MHz, SMOD=1, TH1 = FDH (253):
+Baud = (2/32) x 11059200 / (12 x (256-253))
+     = (1/16) x 11059200 / 36
+     = 19200 bps       (If SMOD=0: 9600 bps)</pre>
+  </div>
+
+  <h3>Data Transfer Rate Concepts</h3>
+  <div class="key-box concept">
+    <div class="label">Three Ways to Measure Speed</div>
+    <ul>
+      <li><strong>Baud Rate:</strong> Number of <em>signal changes</em> per second (Hz). Used in modems.</li>
+      <li><strong>Data Rate:</strong> Number of <em>bits</em> transferred per second (bps). If each signal has N voltage levels, data rate = baud rate x log<sub>2</sub>(N).</li>
+      <li><strong>Effective Data Rate:</strong> Number of <em>actual data bits</em> per second (excluding start/stop/parity overhead).</li>
+    </ul>
+    <p>Example: 2400 baud, 4 voltage levels, 1 start + 8 data + 2 stop bits:</p>
+    <pre>Data rate = 2400 x log2(4) = 2400 x 2 = 4800 bps
+Effective ratio = 8 / (1+8+2) = 8/11
+Effective data rate = 4800 x 8/11 = 3490.9 bps</pre>
+  </div>
+
+  <h3>Transmit & Receive Process</h3>
+  <div class="two-col">
+    <div class="key-box">
+      <h4>Transmit</h4>
+      <ol>
+        <li>Write to SBUF: <code>MOV SBUF, A</code></li>
+        <li>Hardware sends start bit, 8 data bits, stop bit</li>
+        <li>When done, <strong>TI flag is set</strong></li>
+        <li><strong>You must clear TI</strong>: <code>CLR TI</code></li>
+      </ol>
+    </div>
+    <div class="key-box">
+      <h4>Receive</h4>
+      <ol>
+        <li>Set <code>REN = 1</code> to enable receiving</li>
+        <li>Hardware detects start bit, shifts in data</li>
+        <li>When byte complete, <strong>RI flag is set</strong></li>
+        <li>Read SBUF: <code>MOV A, SBUF</code></li>
+        <li><strong>Clear RI</strong>: <code>CLR RI</code></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="key-box important">
+    <div class="label">RI and TI share the SAME interrupt vector (0023H)!</div>
+    <p>Your serial ISR must check <em>which</em> flag is set to determine if it was a transmit-complete or receive-complete event.</p>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 11: MULTIPROCESSOR -->
+<!-- ============================================ -->
+<div class="section" id="s11">
+  <h2>11. Multiprocessor Communication</h2>
+
+  <div class="key-box concept">
+    <div class="label">The Big Idea</div>
+    <p>One <strong>Master</strong> 8051 needs to communicate with multiple <strong>Slave</strong> 8051s on a shared serial bus. Problem: How does the master address a specific slave without every slave processing every byte?</p>
+    <p><strong>Solution:</strong> Use the <strong>9th data bit</strong> (TB8/RB8) in Mode 2 or Mode 3 as an address/data flag, combined with the <strong>SM2 bit</strong> in SCON.</p>
+  </div>
+
+  <h3>How SM2 Filtering Works</h3>
+  <div class="key-box important">
+    <div class="label">The SM2 Mechanism</div>
+    <p>When <strong>SM2 = 1</strong> in a slave: the RI flag is <strong>only set when the received 9th bit = 1</strong>. Frames with 9th bit = 0 are silently ignored (RI never set, no interrupt).</p>
+    <p>When <strong>SM2 = 0</strong>: RI is set for <em>every</em> received frame, regardless of the 9th bit.</p>
+  </div>
+
+  <h3>Step-by-Step Protocol</h3>
+
+  <div class="viz-container">
+    <div class="viz-title">Multiprocessor Communication Protocol Visualization</div>
+    <svg width="750" height="600" viewBox="0 0 750 600">
+      <!-- Title -->
+      <text x="375" y="25" fill="#f5c518" font-size="14" font-weight="bold" text-anchor="middle">8051 Multiprocessor Communication (Mode 2/3 with SM2)</text>
+
+      <!-- Phase 1: Initial State -->
+      <rect x="20" y="45" width="710" height="100" rx="8" fill="#0a0a1a" stroke="#444" stroke-width="1"/>
+      <text x="375" y="60" fill="#00e5ff" font-size="12" font-weight="bold" text-anchor="middle">Phase 1: All Slaves Listening for Address (SM2 = 1)</text>
+
+      <!-- Master -->
+      <rect x="50" y="75" width="80" height="55" rx="8" fill="#2a1525" stroke="#e94560" stroke-width="2"/>
+      <text x="90" y="97" fill="#e94560" font-size="11" text-anchor="middle" font-weight="bold">MASTER</text>
+      <text x="90" y="112" fill="#9e9e9e" font-size="9" text-anchor="middle">SM2 = 0</text>
+
+      <!-- Bus line -->
+      <line x1="130" y1="100" x2="680" y2="100" stroke="#f5c518" stroke-width="3"/>
+      <text x="400" y="93" fill="#f5c518" font-size="9" text-anchor="middle">Shared Serial Bus (TxD/RxD)</text>
+
+      <!-- Slaves -->
+      <rect x="220" y="75" width="70" height="55" rx="6" fill="#1a1a2e" stroke="#00e676" stroke-width="1.5"/>
+      <text x="255" y="95" fill="#00e676" font-size="10" text-anchor="middle" font-weight="bold">Slave A</text>
+      <text x="255" y="108" fill="#9e9e9e" font-size="8" text-anchor="middle">SM2=1</text>
+      <text x="255" y="120" fill="#b388ff" font-size="8" text-anchor="middle">Addr: 01H</text>
+
+      <rect x="340" y="75" width="70" height="55" rx="6" fill="#1a1a2e" stroke="#00e676" stroke-width="1.5"/>
+      <text x="375" y="95" fill="#00e676" font-size="10" text-anchor="middle" font-weight="bold">Slave B</text>
+      <text x="375" y="108" fill="#9e9e9e" font-size="8" text-anchor="middle">SM2=1</text>
+      <text x="375" y="120" fill="#b388ff" font-size="8" text-anchor="middle">Addr: 02H</text>
+
+      <rect x="460" y="75" width="70" height="55" rx="6" fill="#1a1a2e" stroke="#00e676" stroke-width="1.5"/>
+      <text x="495" y="95" fill="#00e676" font-size="10" text-anchor="middle" font-weight="bold">Slave C</text>
+      <text x="495" y="108" fill="#9e9e9e" font-size="8" text-anchor="middle">SM2=1</text>
+      <text x="495" y="120" fill="#b388ff" font-size="8" text-anchor="middle">Addr: 03H</text>
+
+      <rect x="580" y="75" width="70" height="55" rx="6" fill="#1a1a2e" stroke="#00e676" stroke-width="1.5"/>
+      <text x="615" y="95" fill="#00e676" font-size="10" text-anchor="middle" font-weight="bold">Slave D</text>
+      <text x="615" y="108" fill="#9e9e9e" font-size="8" text-anchor="middle">SM2=1</text>
+      <text x="615" y="120" fill="#b388ff" font-size="8" text-anchor="middle">Addr: 04H</text>
+
+      <!-- Phase 2: Master sends address -->
+      <rect x="20" y="160" width="710" height="85" rx="8" fill="#0a0a1a" stroke="#444" stroke-width="1"/>
+      <text x="375" y="175" fill="#f5c518" font-size="12" font-weight="bold" text-anchor="middle">Phase 2: Master Sends Address Byte with 9th bit = 1</text>
+
+      <!-- Address frame -->
+      <rect x="80" y="190" width="300" height="40" rx="6" fill="#2a2515" stroke="#f5c518" stroke-width="2"/>
+      <text x="155" y="206" fill="#00e5ff" font-size="10" text-anchor="middle">Data: 02H (Slave B addr)</text>
+      <text x="155" y="222" fill="#e94560" font-size="10" text-anchor="middle" font-weight="bold">TB8 = 1 (ADDRESS frame)</text>
+      <text x="330" y="215" fill="#f5c518" font-size="11" text-anchor="middle" font-weight="bold">&rarr;</text>
+
+      <!-- All slaves receive -->
+      <text x="540" y="200" fill="#00e676" font-size="10" text-anchor="middle">ALL slaves get interrupted</text>
+      <text x="540" y="215" fill="#9e9e9e" font-size="9" text-anchor="middle">(SM2=1, 9th bit=1 &rarr; RI set)</text>
+      <text x="540" y="230" fill="#ff9100" font-size="9" text-anchor="middle">Each checks: "Is this MY address?"</text>
+
+      <!-- Phase 3: Slave B selected -->
+      <rect x="20" y="260" width="710" height="100" rx="8" fill="#0a0a1a" stroke="#444" stroke-width="1"/>
+      <text x="375" y="278" fill="#00e676" font-size="12" font-weight="bold" text-anchor="middle">Phase 3: Slave B Matches - Clears SM2 to Receive Data</text>
+
+      <rect x="220" y="290" width="70" height="55" rx="6" fill="#1a1a2e" stroke="#444" stroke-width="1" stroke-dasharray="3"/>
+      <text x="255" y="310" fill="#9e9e9e" font-size="10" text-anchor="middle">Slave A</text>
+      <text x="255" y="325" fill="#9e9e9e" font-size="8" text-anchor="middle">SM2=1</text>
+      <text x="255" y="340" fill="#e94560" font-size="8" text-anchor="middle">Not me!</text>
+
+      <rect x="340" y="290" width="70" height="55" rx="6" fill="#1a3525" stroke="#00e676" stroke-width="3"/>
+      <text x="375" y="307" fill="#00e676" font-size="10" text-anchor="middle" font-weight="bold">Slave B</text>
+      <text x="375" y="322" fill="#f5c518" font-size="9" text-anchor="middle" font-weight="bold">SM2=0</text>
+      <text x="375" y="340" fill="#00e676" font-size="8" text-anchor="middle">That's me!</text>
+
+      <rect x="460" y="290" width="70" height="55" rx="6" fill="#1a1a2e" stroke="#444" stroke-width="1" stroke-dasharray="3"/>
+      <text x="495" y="310" fill="#9e9e9e" font-size="10" text-anchor="middle">Slave C</text>
+      <text x="495" y="325" fill="#9e9e9e" font-size="8" text-anchor="middle">SM2=1</text>
+      <text x="495" y="340" fill="#e94560" font-size="8" text-anchor="middle">Not me!</text>
+
+      <rect x="580" y="290" width="70" height="55" rx="6" fill="#1a1a2e" stroke="#444" stroke-width="1" stroke-dasharray="3"/>
+      <text x="615" y="310" fill="#9e9e9e" font-size="10" text-anchor="middle">Slave D</text>
+      <text x="615" y="325" fill="#9e9e9e" font-size="8" text-anchor="middle">SM2=1</text>
+      <text x="615" y="340" fill="#e94560" font-size="8" text-anchor="middle">Not me!</text>
+
+      <!-- Phase 4: Data transfer -->
+      <rect x="20" y="375" width="710" height="100" rx="8" fill="#0a0a1a" stroke="#444" stroke-width="1"/>
+      <text x="375" y="393" fill="#b388ff" font-size="12" font-weight="bold" text-anchor="middle">Phase 4: Master Sends Data with 9th bit = 0</text>
+
+      <!-- Data frames -->
+      <rect x="50" y="405" width="180" height="30" rx="4" fill="#1e1535" stroke="#b388ff" stroke-width="1.5"/>
+      <text x="140" y="425" fill="#b388ff" font-size="10" text-anchor="middle">Data: 55H | TB8=0</text>
+
+      <rect x="240" y="405" width="180" height="30" rx="4" fill="#1e1535" stroke="#b388ff" stroke-width="1.5"/>
+      <text x="330" y="425" fill="#b388ff" font-size="10" text-anchor="middle">Data: AAH | TB8=0</text>
+
+      <!-- Only Slave B receives -->
+      <text x="540" y="415" fill="#00e676" font-size="10" text-anchor="middle">Only Slave B processes data</text>
+      <text x="540" y="432" fill="#9e9e9e" font-size="9" text-anchor="middle">(SM2=0, so RI set for ALL frames)</text>
+
+      <!-- Ignored label -->
+      <text x="540" y="455" fill="#e94560" font-size="9" text-anchor="middle">Slaves A, C, D: SM2=1, bit9=0</text>
+      <text x="540" y="468" fill="#e94560" font-size="9" text-anchor="middle">&rarr; RI NOT set, frames ignored</text>
+
+      <!-- Phase 5: Done -->
+      <rect x="20" y="490" width="710" height="55" rx="8" fill="#0a0a1a" stroke="#444" stroke-width="1"/>
+      <text x="375" y="510" fill="#ff9100" font-size="12" font-weight="bold" text-anchor="middle">Phase 5: Communication Complete - Slave B Restores SM2 = 1</text>
+      <text x="375" y="530" fill="#9e9e9e" font-size="10" text-anchor="middle">All slaves back to listening mode. Master can now address another slave.</text>
+
+      <!-- Legend -->
+      <rect x="50" y="560" width="15" height="15" rx="2" fill="#2a1525" stroke="#e94560" stroke-width="1.5"/>
+      <text x="72" y="572" fill="#e0e0e0" font-size="9">9th bit = 1 (Address Frame)</text>
+      <rect x="230" y="560" width="15" height="15" rx="2" fill="#1e1535" stroke="#b388ff" stroke-width="1.5"/>
+      <text x="252" y="572" fill="#e0e0e0" font-size="9">9th bit = 0 (Data Frame)</text>
+      <rect x="420" y="560" width="15" height="15" rx="2" fill="#1a3525" stroke="#00e676" stroke-width="2"/>
+      <text x="442" y="572" fill="#e0e0e0" font-size="9">Selected Slave (SM2=0)</text>
+      <rect x="600" y="560" width="15" height="15" rx="2" fill="#1a1a2e" stroke="#444" stroke-width="1" stroke-dasharray="3"/>
+      <text x="622" y="572" fill="#e0e0e0" font-size="9">Ignored</text>
+    </svg>
+  </div>
+
+  <h3>Master vs Slave SM2 Settings</h3>
+  <table>
+    <tr><th>Device</th><th>SM2</th><th>Why</th></tr>
+    <tr><td>Master</td><td>0</td><td>Master transmits everything, doesn't need address filtering</td></tr>
+    <tr><td>Slave (listening for address)</td><td>1</td><td>Only gets interrupt when 9th bit=1 (address frame)</td></tr>
+    <tr><td>Slave (selected, receiving data)</td><td>0</td><td>Receives all bytes normally</td></tr>
+  </table>
+
+  <h3>Multiprocessor Communication Code Example</h3>
+  <div class="two-col">
+    <div class="key-box">
+      <h4>Master Code (Sending to Slave B = 02H)</h4>
+      <pre>; Setup: Mode 3, SM2=0
+MOV SCON, #11010000b ; Mode 3, REN=1
+; ... setup Timer 1 for baud ...
+
+; Step 1: Send address byte
+SETB TB8        ; 9th bit = 1 (address)
+MOV SBUF, #02H  ; Send address 02H
+WAIT1: JNB TI, WAIT1
+CLR TI
+
+; Step 2: Send data bytes
+CLR TB8         ; 9th bit = 0 (data)
+MOV SBUF, #55H  ; Send data
+WAIT2: JNB TI, WAIT2
+CLR TI</pre>
+    </div>
+    <div class="key-box">
+      <h4>Slave B Code (Address = 02H)</h4>
+      <pre>; Setup: Mode 3, SM2=1
+MOV SCON, #11110000b ; Mode 3, SM2=1, REN=1
+
+; ISR at 0023H:
+PUSH ACC
+JNB RI, TX_ISR
+CLR RI
+MOV A, SBUF
+; Check if address matches
+CJNE A, #02H, NOT_ME
+CLR SM2     ; I'm selected! Receive data
+SJMP DONE
+
+NOT_ME:
+SETB SM2    ; Not for me, keep filtering
+SJMP DONE
+
+TX_ISR: CLR TI
+DONE:
+POP ACC
+RETI</pre>
+    </div>
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">Exam Tip - Multiprocessor</div>
+    <p>Key things to remember: (1) Must use <strong>Mode 2 or Mode 3</strong> (need 9th bit). (2) <strong>SM2=1</strong> means "only interrupt me for address frames". (3) Master always has SM2=0. (4) Selected slave clears SM2 to receive data, then restores SM2=1 when done.</p>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- PART II DIVIDER -->
+<!-- ============================================ -->
+<div class="section-divider">
+  <span>Part II: Computer Architecture & MIPS</span>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 12: COMP ARCH -->
+<!-- ============================================ -->
+<div class="section arch-section" id="s12">
+  <h2>12. Computer Architecture: Performance, Amdahl's Law & Power</h2>
+
+  <h3>Architecture vs Organization</h3>
+  <div class="two-col">
+    <div class="key-box">
+      <h4 style="color: var(--cyan);">Computer Architecture</h4>
+      <p>End-user / <strong>programmer's perspective</strong></p>
+      <ul>
+        <li>Instruction Set Architecture (ISA)</li>
+        <li>What operations are available</li>
+        <li>How to program the machine</li>
+      </ul>
+    </div>
+    <div class="key-box">
+      <h4 style="color: var(--orange);">Computer Organization</h4>
+      <p>Circuit designer's / <strong>hardware implementation</strong> perspective</p>
+      <ul>
+        <li>How modules are organized</li>
+        <li>How data flows through hardware</li>
+        <li>Datapath, control, pipelining</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>ISA Classification: Operand Location</h3>
+  <div class="key-box concept">
+    <div class="label">Four ISA Classes (Where ALU Operands Come From)</div>
+    <table>
+      <tr><th>Class</th><th>How it works</th><th>Example</th><th>Pros / Cons</th></tr>
+      <tr><td><strong>Stack</strong></td><td>Operands on top of stack (TOS). ALU pops inputs, pushes result.</td><td>Java bytecode</td><td>Simple, compact code. Hard to pipeline.</td></tr>
+      <tr><td><strong>Accumulator</strong></td><td>One implicit operand is the accumulator. Source from memory/register.</td><td><strong>8051</strong> (ACC)</td><td>Simple. Bottleneck: ACC is always involved.</td></tr>
+      <tr><td><strong>Register-Memory</strong></td><td>One operand from register, one from memory. Result to register.</td><td>x86 (80x86)</td><td>Flexible but variable-length encoding.</td></tr>
+      <tr><td><strong>Register-Register (Load-Store)</strong></td><td>ALL ALU operands must be in registers. Separate lw/sw for memory.</td><td><strong>MIPS</strong>, ARM</td><td>Best for pipelining. More instructions needed.</td></tr>
+    </table>
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">Key Connection: 8051 vs MIPS</div>
+    <p><strong>8051</strong> = Accumulator-based CISC. Most operations go through ACC. Variable instruction sizes (1-3 bytes).</p>
+    <p><strong>MIPS</strong> = Register-Register (Load-Store) RISC. 32 GPRs, only lw/sw touch memory. Fixed 32-bit instructions.</p>
+  </div>
+
+  <h3>What Makes a Good ISA?</h3>
+  <div class="key-box">
+    <ul>
+      <li>Require <strong>less program memory</strong> (avoid rarely used instructions)</li>
+      <li>Be <strong>easier to compile</strong> (less optimization needed)</li>
+      <li>Involve <strong>easier processor design</strong> (smaller core, simpler circuits)</li>
+      <li>Provide <strong>faster program execution</strong></li>
+    </ul>
+    <p>ISA depends on: operations supported by ALU, operand location (register/memory/stack), number of operands (fixed or variable), operand range, and instruction size.</p>
+  </div>
+
+  <h3>CPU Performance Equation</h3>
+  <div class="key-box formula">
+    <div class="label">The Iron Law of Performance</div>
+    <pre>CPU Time = Instruction Count x CPI x Clock Cycle Time
+
+         = (IC x CPI) / Clock Rate
+
+Where:
+  IC  = Instruction Count (determined by ISA & compiler)
+  CPI = Cycles Per Instruction (determined by CPU design)
+  Clock Rate = f_clk (determined by hardware technology)</pre>
+  </div>
+
+  <div class="key-box">
+    <h4>What Affects Each Factor?</h4>
+    <table>
+      <tr><th>Factor</th><th>Determined By</th><th>Improve By</th></tr>
+      <tr><td><strong>IC</strong></td><td>ISA, compiler, algorithm</td><td>Better algorithm, compiler optimization</td></tr>
+      <tr><td><strong>CPI</strong></td><td>CPU microarchitecture</td><td>Pipelining, caching, branch prediction</td></tr>
+      <tr><td><strong>Clock Rate</strong></td><td>Technology, circuit design</td><td>Better fabrication, shorter critical path</td></tr>
+    </table>
+  </div>
+
+  <h3>Throughput vs Latency</h3>
+  <div class="two-col">
+    <div class="compare-card">
+      <h4 style="color: var(--cyan);">Throughput</h4>
+      <p>= #tasks / total time</p>
+      <p>How many tasks completed per second. Pipelining increases throughput!</p>
+    </div>
+    <div class="compare-card">
+      <h4 style="color: var(--orange);">Latency</h4>
+      <p>= time for one task to complete</p>
+      <p>How long one task takes from start to finish. Pipelining does NOT improve latency.</p>
+    </div>
+  </div>
+
+  <h3>Amdahl's Law</h3>
+  <div class="key-box formula">
+    <div class="label">Amdahl's Law - The Speedup Limit</div>
+    <pre>Speedup = 1 / [(1 - f) + f/S]
+
+Where:
+  f = fraction of execution time that CAN be improved
+  S = speedup of the improved portion
+
+Key Insight: Even with infinite speedup of f:
+  Max Speedup = 1 / (1 - f)
+
+Example: 80% of code is parallelizable, 4x speedup on that part:
+  Speedup = 1 / [(1-0.8) + 0.8/4] = 1 / [0.2 + 0.2] = 2.5x
+  (NOT 4x! The 20% serial portion limits us!)</pre>
+  </div>
+
+  <div class="viz-container">
+    <div class="viz-title">Amdahl's Law - Visual Intuition</div>
+    <svg width="600" height="200" viewBox="0 0 600 200">
+      <!-- Before -->
+      <text x="50" y="25" fill="#f5c518" font-size="12" font-weight="bold">Before Optimization:</text>
+      <rect x="50" y="35" width="100" height="35" rx="4" fill="#2a1525" stroke="#e94560" stroke-width="2"/>
+      <text x="100" y="57" fill="#e94560" font-size="10" text-anchor="middle">Serial (20%)</text>
+      <rect x="150" y="35" width="400" height="35" rx="4" fill="#1a2a35" stroke="#00e5ff" stroke-width="2"/>
+      <text x="350" y="57" fill="#00e5ff" font-size="10" text-anchor="middle">Parallelizable (80%)</text>
+
+      <!-- After 4x speedup -->
+      <text x="50" y="95" fill="#00e676" font-size="12" font-weight="bold">After 4x Speedup on Parallel Part:</text>
+      <rect x="50" y="105" width="100" height="35" rx="4" fill="#2a1525" stroke="#e94560" stroke-width="2"/>
+      <text x="100" y="127" fill="#e94560" font-size="10" text-anchor="middle">Serial (20%)</text>
+      <rect x="150" y="105" width="100" height="35" rx="4" fill="#1a3525" stroke="#00e676" stroke-width="2"/>
+      <text x="200" y="127" fill="#00e676" font-size="10" text-anchor="middle">80%/4 = 20%</text>
+
+      <!-- Result -->
+      <text x="300" y="127" fill="#f5c518" font-size="12" font-weight="bold">Total = 40% &rarr; Speedup = 2.5x</text>
+
+      <!-- After infinite speedup -->
+      <text x="50" y="165" fill="#ff4081" font-size="12" font-weight="bold">With Infinite Speedup on Parallel:</text>
+      <rect x="50" y="175" width="100" height="20" rx="4" fill="#2a1525" stroke="#e94560" stroke-width="2"/>
+      <text x="100" y="190" fill="#e94560" font-size="9" text-anchor="middle">Serial (20%)</text>
+      <text x="200" y="190" fill="#ff4081" font-size="11" font-weight="bold">Max Speedup = 1/0.2 = 5x only!</text>
+    </svg>
+  </div>
+
+  <h3>Power, Energy & V<sub>dd</sub> Tradeoffs</h3>
+
+  <div class="key-box concept">
+    <div class="label">Why Power Matters</div>
+    <p>Power determines <strong>heat dissipation</strong> (cooling cost), <strong>battery life</strong> (mobile devices), and ultimately limits how fast we can clock a chip. The "power wall" is a major reason clock speeds stopped increasing around 2005.</p>
+  </div>
+
+  <div class="key-box formula">
+    <div class="label">Two Types of Power Dissipation</div>
+    <pre>Total Power = Dynamic Power + Static Power
+
+<strong>Dynamic Power</strong> (switching activity):
+  P_dynamic = C x V_dd^2 x f_clk x alpha
+
+  C     = load capacitance (determined by circuit/technology)
+  V_dd  = supply voltage (e.g., 1.0V, 1.2V, 3.3V, 5V)
+  f_clk = clock frequency
+  alpha = activity factor (fraction of gates switching per cycle)
+
+<strong>Static Power</strong> (leakage - always on!):
+  P_static = V_dd x I_leakage
+
+  Leakage current flows even when transistors are "off"
+  Becomes dominant at smaller technology nodes (45nm, 7nm, etc.)
+  Cannot be reduced by lowering frequency!</pre>
+  </div>
+
+  <div class="key-box formula">
+    <div class="label">Energy & Performance Products</div>
+    <pre>Energy per operation:   E = C x V_dd^2     (Joules per switching event)
+Delay (gate delay):     t_d ~ V_dd / (V_dd - V_th)^2
+                        (approximately ~ 1/V_dd for V_dd >> V_th)
+
+Power-Delay Product:    PDP ~ C x V_dd^3     (lower = more efficient)
+Energy-Delay Product:   EDP ~ C x V_dd       (lower = better metric)
+
+Key Insight: Reducing V_dd improves energy efficiency but
+             increases delay (slower operation).</pre>
+  </div>
+
+  <div class="viz-container">
+    <div class="viz-title">V_dd Tradeoff: Power vs Speed</div>
+    <svg width="600" height="200" viewBox="0 0 600 200">
+      <!-- Axes -->
+      <line x1="80" y1="170" x2="550" y2="170" stroke="#555" stroke-width="1.5"/>
+      <line x1="80" y1="170" x2="80" y2="30" stroke="#555" stroke-width="1.5"/>
+      <text x="315" y="195" fill="#9e9e9e" font-size="10" text-anchor="middle">Supply Voltage (V_dd) &rarr;</text>
+      <text x="40" y="100" fill="#9e9e9e" font-size="10" text-anchor="middle" transform="rotate(-90, 40, 100)">Value &rarr;</text>
+
+      <!-- Power curve (quadratic) -->
+      <path d="M 100,165 Q 200,155 300,120 Q 400,60 520,35" fill="none" stroke="#e94560" stroke-width="2.5"/>
+      <text x="530" y="35" fill="#e94560" font-size="10" font-weight="bold">Power (V^2 x f)</text>
+
+      <!-- Speed curve (increases with V) -->
+      <path d="M 100,160 Q 200,140 300,100 Q 400,70 520,55" fill="none" stroke="#00e676" stroke-width="2.5" stroke-dasharray="6"/>
+      <text x="530" y="55" fill="#00e676" font-size="10" font-weight="bold">Speed</text>
+
+      <!-- Energy efficiency curve -->
+      <path d="M 100,60 Q 200,120 300,145 Q 400,155 520,162" fill="none" stroke="#00e5ff" stroke-width="2" stroke-dasharray="3"/>
+      <text x="530" y="162" fill="#00e5ff" font-size="10" font-weight="bold">Efficiency</text>
+
+      <!-- Sweet spot -->
+      <circle cx="260" cy="130" r="20" fill="none" stroke="#f5c518" stroke-width="2" stroke-dasharray="4"/>
+      <text x="260" y="125" fill="#f5c518" font-size="9" text-anchor="middle" font-weight="bold">Sweet</text>
+      <text x="260" y="138" fill="#f5c518" font-size="9" text-anchor="middle" font-weight="bold">Spot</text>
+
+      <!-- Voltage labels -->
+      <text x="100" y="182" fill="#9e9e9e" font-size="8" text-anchor="middle">Low V</text>
+      <text x="520" y="182" fill="#9e9e9e" font-size="8" text-anchor="middle">High V</text>
+    </svg>
+  </div>
+
+  <div class="key-box important">
+    <div class="label">V_dd Throughout History</div>
+    <table>
+      <tr><th>Technology Era</th><th>Typical V_dd</th><th>Notes</th></tr>
+      <tr><td>8051 / TTL era</td><td><strong>5V</strong></td><td>Standard Vcc for 8051, high power but robust</td></tr>
+      <tr><td>3.3V logic</td><td><strong>3.3V</strong></td><td>CMOS, lower power, compatible with many ICs</td></tr>
+      <tr><td>Modern CPUs</td><td><strong>0.8 - 1.2V</strong></td><td>Very low voltage, leakage becomes significant</td></tr>
+    </table>
+    <p><strong>8051 operates at V<sub>cc</sub> = 5V</strong> (or 3.3V for low-power variants). Power consumption is in the milliwatt range.</p>
+  </div>
+
+  <div class="key-box concept">
+    <div class="label">Hardware Parallelism for Low Power</div>
+    <p><strong>Trick:</strong> Duplicate hardware, run each copy at half speed &rarr; same throughput but <strong>significantly lower power</strong>.</p>
+    <p>Why? If you halve the frequency, you can <strong>also reduce V<sub>dd</sub></strong> (slower transistors tolerate lower voltage). Since P ~ V<sup>2</sup> &times; f:</p>
+    <pre>Original:    P = C x V^2 x f
+2 copies at half speed, V reduced to 0.7V:
+Each copy:   P = C x (0.7V)^2 x (f/2) = 0.245 x C x V^2 x f
+Total (2x):  P_total = 0.49 x C x V^2 x f  (51% power reduction!)</pre>
+    <p>Same throughput, half the power. This is why modern CPUs have many cores at lower clock speeds.</p>
+  </div>
+
+  <h3>Evaluation Metrics / Benchmarks</h3>
+  <div class="key-box formula">
+    <div class="label">Which Metric to Optimize?</div>
+    <pre>PDP   = Power x Delay      ~ CV_dd^2    (Energy/Task)
+  --> Focuses entirely on energy consumption/task
+  --> For extremely low energy use cases (sensors, IoT)
+
+EDP   = Energy x Delay     ~ CV_dd
+  --> Optimized to <strong>balance</strong> Energy and Performance
+  --> Has a minimum at an optimal V_dd (~0.9V in the lecture graph)
+
+E^2DP = Energy^2 x Delay
+  --> Optimized for low Energy/task applications
+
+ED^2P = Energy x Delay^2
+  --> Optimized for high-performance applications</pre>
+  </div>
+
+  <h3>Architecture Summary: Parallelism & Pipelining Power Savings</h3>
+  <div class="key-box important">
+    <div class="label">Real Results from Chandrakasan et al. (IEEE 1992)</div>
+    <table>
+      <tr><th>Architecture Type</th><th>V<sub>dd</sub></th><th>Area</th><th>Power (normalized)</th></tr>
+      <tr><td>Simple datapath (no pipeline/parallel)</td><td><strong>5V</strong></td><td>1x</td><td><strong>1.00</strong></td></tr>
+      <tr><td>Pipelined datapath</td><td><strong>2.9V</strong></td><td>1.3x</td><td><strong>0.39</strong></td></tr>
+      <tr><td>Parallel datapath</td><td><strong>2.9V</strong></td><td>3.4x</td><td><strong>0.36</strong></td></tr>
+      <tr><td>Pipeline + Parallel</td><td><strong>2.0V</strong></td><td>3.7x</td><td><strong>0.20</strong></td></tr>
+    </table>
+    <p><strong>Same throughput in all cases!</strong> By using pipelining + parallelism, we can reduce V<sub>dd</sub> from 5V to 2V and achieve <strong>5x power reduction</strong> at the cost of 3.7x more area.</p>
+  </div>
+
+  <h3>Dynamic Voltage & Frequency Scaling (DVFS)</h3>
+  <div class="key-box concept">
+    <div class="label">How Modern Processors Save Power</div>
+    <p><strong>DVFS</strong> dynamically adjusts V<sub>dd</sub> and f<sub>clk</sub> based on workload:</p>
+    <ul>
+      <li><strong>High workload:</strong> Increase V<sub>dd</sub> and frequency for max performance</li>
+      <li><strong>Low workload:</strong> Decrease V<sub>dd</sub> and frequency to save power</li>
+      <li><strong>Idle:</strong> Drop to minimum voltage, or even power gate (turn off) parts of the chip</li>
+    </ul>
+    <p>The OS/firmware controls this. Reduces V<sub>dd</sub> &rarr; power drops quadratically. This is why your laptop doesn't always run at max frequency.</p>
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">Exam Tips - Power & V<sub>cc</sub></div>
+    <ul>
+      <li><strong>Dynamic power dominates</strong> at higher voltages and frequencies</li>
+      <li><strong>Static power (leakage)</strong> dominates at very low voltages / advanced nodes</li>
+      <li>Reducing V<sub>dd</sub> by 2x reduces dynamic power by <strong>4x</strong> (quadratic!)</li>
+      <li>Reducing frequency by 2x reduces dynamic power by <strong>2x</strong> (linear)</li>
+      <li><strong>PDP ~ CV<sub>dd</sub><sup>2</sup></strong> (energy/task, quadratic dependence on V<sub>dd</sub>)</li>
+      <li><strong>EDP</strong> has a minimum &mdash; there's an <strong>optimal V<sub>dd</sub></strong> that minimizes energy-delay</li>
+      <li>Energy-Delay tradeoff can be broken using <strong>more hardware</strong> (parallelism, pipelining)</li>
+      <li>8051 V<sub>cc</sub> = 5V (40-pin DIP: pin 40 = Vcc, pin 20 = GND)</li>
+      <li>Performance benchmarks differ by task: gaming, video encoding, compiler, AI training</li>
+    </ul>
+  </div>
+
+  <h3>CISC vs RISC</h3>
+  <table>
+    <tr><th>Feature</th><th>CISC (e.g., 8051, x86)</th><th>RISC (e.g., MIPS, ARM)</th></tr>
+    <tr><td>Instruction Size</td><td>Variable (1-3 bytes)</td><td>Fixed (32-bit)</td></tr>
+    <tr><td>Philosophy</td><td>"Complex" - one instruction does a lot</td><td>"Reduced" - simple, fast instructions</td></tr>
+    <tr><td>Pipelining</td><td>Very difficult (variable size/timing)</td><td>Highly optimized for pipelining</td></tr>
+    <tr><td>Memory Access</td><td>Instructions can access memory directly</td><td>Load/Store only - operations on registers</td></tr>
+    <tr><td>Machine Cycles</td><td>Variable per instruction (1-4+)</td><td>Ideally 1 CPI with pipelining</td></tr>
+    <tr><td>Registers</td><td>Few, specialized</td><td>Many (32), general-purpose</td></tr>
+    <tr><td>Code Size</td><td>Smaller (complex instructions)</td><td>Larger (more simple instructions)</td></tr>
+  </table>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 13: MIPS ISA -->
+<!-- ============================================ -->
+<div class="section mips-section" id="s13">
+  <h2>13. MIPS ISA - Complete Guide</h2>
+
+  <div class="key-box concept">
+    <div class="label">What is MIPS?</div>
+    <p><strong>MIPS</strong> = Microprocessor without Interlocked Pipeline Stages. A classic <strong>RISC</strong> architecture designed for efficient pipelining.</p>
+    <p><strong>MiniMIPS</strong> = The subset used in EE309 (from Parhami textbook). A teaching-friendly version of full MIPS.</p>
+  </div>
+
+  <h3>MIPS Design Principles</h3>
+  <div class="key-box">
+    <ol>
+      <li><strong>Simplicity favors regularity</strong> - 3 operands per instruction, fixed formats</li>
+      <li><strong>Smaller is faster</strong> - Only 32 registers (5 bits to address)</li>
+      <li><strong>Make the common case fast</strong> - Immediate operands (I-type) for common operations</li>
+      <li><strong>Good design demands good compromises</strong> - Same length instructions with different formats</li>
+    </ol>
+  </div>
+
+  <h3>MiniMIPS Architecture Overview</h3>
+  <div class="viz-container">
+    <div class="viz-title">MiniMIPS Subsystems</div>
+    <svg width="650" height="250" viewBox="0 0 650 250">
+      <!-- Memory -->
+      <rect x="150" y="10" width="350" height="40" rx="8" fill="#1a2a35" stroke="#00e5ff" stroke-width="2"/>
+      <text x="325" y="25" fill="#f5c518" font-size="11" text-anchor="middle" font-weight="bold">Memory (up to 2^30 words)</text>
+      <text x="325" y="42" fill="#9e9e9e" font-size="9" text-anchor="middle">4 Bytes/word | Byte-addressable | Word-aligned</text>
+
+      <!-- EIU -->
+      <rect x="30" y="70" width="220" height="110" rx="8" fill="#1a1a2e" stroke="#e94560" stroke-width="2"/>
+      <text x="140" y="90" fill="#e94560" font-size="12" text-anchor="middle" font-weight="bold">EIU (Main Processor)</text>
+      <text x="140" y="108" fill="#e0e0e0" font-size="10" text-anchor="middle">Execution & Integer Unit</text>
+      <rect x="50" y="118" width="80" height="25" rx="4" fill="#2a1525" stroke="#e94560" stroke-width="1"/>
+      <text x="90" y="135" fill="#f5c518" font-size="9" text-anchor="middle">$0 - $31 (GPRs)</text>
+      <rect x="145" y="118" width="50" height="25" rx="4" fill="#2a1525" stroke="#e94560" stroke-width="1"/>
+      <text x="170" y="135" fill="#f5c518" font-size="9" text-anchor="middle">ALU</text>
+      <rect x="50" y="150" width="80" height="22" rx="4" fill="#2a2515" stroke="#f5c518" stroke-width="1"/>
+      <text x="90" y="165" fill="#f5c518" font-size="9" text-anchor="middle">Hi | Lo regs</text>
+      <text x="180" y="165" fill="#9e9e9e" font-size="8" text-anchor="middle">(mul/div)</text>
+
+      <!-- FPU -->
+      <rect x="280" y="70" width="170" height="80" rx="8" fill="#1a1a2e" stroke="#00e676" stroke-width="2"/>
+      <text x="365" y="90" fill="#00e676" font-size="12" text-anchor="middle" font-weight="bold">FPU (Coprocessor 1)</text>
+      <text x="365" y="108" fill="#e0e0e0" font-size="10" text-anchor="middle">Floating-Point Unit</text>
+      <rect x="300" y="118" width="130" height="22" rx="4" fill="#1a3525" stroke="#00e676" stroke-width="1"/>
+      <text x="365" y="133" fill="#00e676" font-size="9" text-anchor="middle">$0-$31 FP Registers</text>
+
+      <!-- TMU -->
+      <rect x="480" y="70" width="150" height="80" rx="8" fill="#1a1a2e" stroke="#ff9100" stroke-width="2"/>
+      <text x="555" y="90" fill="#ff9100" font-size="12" text-anchor="middle" font-weight="bold">TMU (Coprocessor 0)</text>
+      <text x="555" y="108" fill="#e0e0e0" font-size="10" text-anchor="middle">Trap & Memory Unit</text>
+      <rect x="495" y="118" width="120" height="22" rx="4" fill="#2a2515" stroke="#ff9100" stroke-width="1"/>
+      <text x="555" y="133" fill="#ff9100" font-size="9" text-anchor="middle">BadVAddr|Status|EPC</text>
+
+      <!-- Connections -->
+      <line x1="140" y1="55" x2="140" y2="70" stroke="#e94560" stroke-width="2"/>
+      <line x1="365" y1="55" x2="365" y2="70" stroke="#00e676" stroke-width="2"/>
+      <line x1="555" y1="55" x2="555" y2="70" stroke="#ff9100" stroke-width="1.5" stroke-dasharray="4"/>
+
+      <!-- Key info -->
+      <rect x="30" y="195" width="600" height="45" rx="6" fill="#0a0a1a" stroke="#444" stroke-width="1"/>
+      <text x="325" y="213" fill="#f5c518" font-size="11" text-anchor="middle" font-weight="bold">Key: 32-bit architecture | 32 GPRs | Load-Store | Fixed 32-bit instructions</text>
+      <text x="325" y="230" fill="#9e9e9e" font-size="10" text-anchor="middle">Big-endian byte ordering | 5-stage pipeline: IF &rarr; ID &rarr; EX &rarr; MEM &rarr; WB</text>
+    </svg>
+  </div>
+
+  <h3>MIPS Registers ($0 - $31)</h3>
+  <table>
+    <tr><th>Register</th><th>Name</th><th>Purpose</th><th>Saved?</th></tr>
+    <tr><td><strong>$0</strong></td><td>$zero</td><td>Hardwired to constant <strong>0</strong> (always reads 0, writes ignored)</td><td>N/A</td></tr>
+    <tr><td><strong>$1</strong></td><td>$at</td><td>Reserved for assembler</td><td>-</td></tr>
+    <tr><td><strong>$2-$3</strong></td><td>$v0-$v1</td><td>Procedure return values</td><td>No</td></tr>
+    <tr><td><strong>$4-$7</strong></td><td>$a0-$a3</td><td>Procedure arguments</td><td>No</td></tr>
+    <tr><td><strong>$8-$15</strong></td><td>$t0-$t7</td><td>Temporary values</td><td>No (caller-saved)</td></tr>
+    <tr><td><strong>$16-$23</strong></td><td>$s0-$s7</td><td>Saved across procedure calls</td><td><strong>Yes</strong> (callee-saved)</td></tr>
+    <tr><td><strong>$24-$25</strong></td><td>$t8-$t9</td><td>More temporaries</td><td>No</td></tr>
+    <tr><td><strong>$26-$27</strong></td><td>$k0-$k1</td><td>Reserved for OS kernel</td><td>-</td></tr>
+    <tr><td><strong>$28</strong></td><td>$gp</td><td>Global pointer</td><td>Yes</td></tr>
+    <tr><td><strong>$29</strong></td><td>$sp</td><td>Stack pointer</td><td>Yes</td></tr>
+    <tr><td><strong>$30</strong></td><td>$fp</td><td>Frame pointer</td><td>Yes</td></tr>
+    <tr><td><strong>$31</strong></td><td>$ra</td><td>Return address (set by <code>jal</code>)</td><td>Yes</td></tr>
+  </table>
+
+  <div class="key-box important">
+    <div class="label">Special Registers</div>
+    <p><strong>Hi & Lo:</strong> Special registers for multiplication & division results. <code>MUL</code> stores 64-bit result: Hi=upper 32, Lo=lower 32. <code>DIV</code>: Lo=quotient, Hi=remainder. Access via <code>mfhi</code> and <code>mflo</code>.</p>
+    <p><strong>$0 = zero:</strong> Always 0. Useful for moves: <code>add $t0, $s0, $zero</code> copies $s0 to $t0.</p>
+  </div>
+
+  <h3>Three Instruction Formats</h3>
+
+  <h4>R-Type (Register)</h4>
+  <div class="inst-format">
+    <div class="inst-field op"><div class="field-name">op</div><div class="field-bits">6 bits</div></div>
+    <div class="inst-field rs"><div class="field-name">rs</div><div class="field-bits">5 bits</div></div>
+    <div class="inst-field rt"><div class="field-name">rt</div><div class="field-bits">5 bits</div></div>
+    <div class="inst-field rd"><div class="field-name">rd</div><div class="field-bits">5 bits</div></div>
+    <div class="inst-field sh"><div class="field-name">shamt</div><div class="field-bits">5 bits</div></div>
+    <div class="inst-field fn"><div class="field-name">funct</div><div class="field-bits">6 bits</div></div>
+  </div>
+  <p>For register-register ALU operations. <code>op</code> = 000000 for all R-type; <code>funct</code> determines the operation.</p>
+  <p>Example: <code>add $t0, $s0, $s1</code> &rarr; rd=$t0 (dest), rs=$s0 (source 1), rt=$s1 (source 2)</p>
+
+  <h4>I-Type (Immediate)</h4>
+  <div class="inst-format">
+    <div class="inst-field op"><div class="field-name">op</div><div class="field-bits">6 bits</div></div>
+    <div class="inst-field rs"><div class="field-name">rs</div><div class="field-bits">5 bits</div></div>
+    <div class="inst-field rt"><div class="field-name">rt</div><div class="field-bits">5 bits</div></div>
+    <div class="inst-field imm" style="min-width:180px;"><div class="field-name">immediate / offset</div><div class="field-bits">16 bits</div></div>
+  </div>
+  <p>For immediate values, loads, stores, and branches. The 16-bit field is:</p>
+  <ul>
+    <li><strong>Arithmetic:</strong> <em>Sign-extended</em> to 32 bits (e.g., <code>addi</code>)</li>
+    <li><strong>Logical:</strong> <em>Zero-extended</em> to 32 bits (e.g., <code>andi</code>)</li>
+    <li><strong>Load/Store:</strong> Offset in <em>bytes</em> added to base register rs</li>
+    <li><strong>Branch:</strong> Offset in <em>words</em> (multiply by 4), relative to PC+4</li>
+  </ul>
+
+  <h4>J-Type (Jump)</h4>
+  <div class="inst-format">
+    <div class="inst-field op"><div class="field-name">op</div><div class="field-bits">6 bits</div></div>
+    <div class="inst-field addr" style="min-width:320px;"><div class="field-name">target address</div><div class="field-bits">26 bits</div></div>
+  </div>
+  <p>For <code>j</code> and <code>jal</code>. Address = {PC+4[31:28], target[25:0], 00} (word-aligned concatenation).</p>
+
+  <h3>Key MIPS Instructions</h3>
+  <table>
+    <tr><th>Category</th><th>Instruction</th><th>Example</th><th>Meaning</th><th>Type</th></tr>
+    <tr><td rowspan="4">Arithmetic</td><td><code>add</code></td><td><code>add $t0, $s0, $s1</code></td><td>$t0 = $s0 + $s1 (signed, trap on overflow)</td><td>R</td></tr>
+    <tr><td><code>sub</code></td><td><code>sub $t0, $s0, $s1</code></td><td>$t0 = $s0 - $s1</td><td>R</td></tr>
+    <tr><td><code>addi</code></td><td><code>addi $t0, $s0, 60</code></td><td>$t0 = $s0 + 60 (sign-extended imm)</td><td>I</td></tr>
+    <tr><td><code>slt</code></td><td><code>slt $t0, $s0, $s1</code></td><td>$t0 = ($s0 < $s1) ? 1 : 0</td><td>R</td></tr>
+    <tr><td rowspan="2">Logical</td><td><code>and/or/xor</code></td><td><code>and $t0, $s0, $s1</code></td><td>Bitwise AND/OR/XOR</td><td>R</td></tr>
+    <tr><td><code>andi/ori</code></td><td><code>andi $t0, $s0, 0xFF</code></td><td>Zero-extended immediate</td><td>I</td></tr>
+    <tr><td rowspan="2">Memory</td><td><code>lw</code></td><td><code>lw $t0, 40($s3)</code></td><td>$t0 = Memory[$s3 + 40]</td><td>I</td></tr>
+    <tr><td><code>sw</code></td><td><code>sw $t0, 40($s3)</code></td><td>Memory[$s3 + 40] = $t0</td><td>I</td></tr>
+    <tr><td rowspan="3">Branch</td><td><code>beq</code></td><td><code>beq $s0, $s1, L</code></td><td>if ($s0 == $s1) go to L</td><td>I</td></tr>
+    <tr><td><code>bne</code></td><td><code>bne $s0, $s1, L</code></td><td>if ($s0 != $s1) go to L</td><td>I</td></tr>
+    <tr><td><code>bltz</code></td><td><code>bltz $s0, L</code></td><td>if ($s0 < 0) go to L</td><td>I</td></tr>
+    <tr><td rowspan="3">Jump</td><td><code>j</code></td><td><code>j target</code></td><td>PC = target address</td><td>J</td></tr>
+    <tr><td><code>jal</code></td><td><code>jal func</code></td><td>$ra = PC+4, then jump (procedure call)</td><td>J</td></tr>
+    <tr><td><code>jr</code></td><td><code>jr $ra</code></td><td>PC = $ra (return from procedure)</td><td>R</td></tr>
+    <tr><td>Load Upper</td><td><code>lui</code></td><td><code>lui $s0, 60</code></td><td>$s0 = 60 &lt;&lt; 16 (upper 16 bits)</td><td>I</td></tr>
+  </table>
+
+  <div class="key-box exam">
+    <div class="label">Loading a 32-bit Constant</div>
+    <p>MIPS immediate fields are only 16 bits. To load a full 32-bit constant:</p>
+    <pre>lui $s0, 0x0061    ; Load upper 16 bits: $s0 = 0x00610000
+ori $s0, $s0, 40   ; Load lower 16 bits: $s0 = 0x00610028</pre>
+    <p>Cannot use <code>addi</code> for lower half because sign-extension may corrupt upper bits!</p>
+  </div>
+
+  <h3>MIPS Addressing Summary</h3>
+  <div class="key-box">
+    <ul>
+      <li><strong>Big-endian:</strong> Most significant byte at lowest address</li>
+      <li><strong>Word = 4 bytes:</strong> Addresses are byte addresses, words at 0, 4, 8, 12...</li>
+      <li><strong>Word-aligned:</strong> Word addresses must be divisible by 4</li>
+      <li><strong>Memory size:</strong> 2<sup>30</sup> words (2<sup>32</sup> bytes) addressable</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 14: DATAPATH -->
+<!-- ============================================ -->
+<div class="section mips-section" id="s14">
+  <h2>14. MIPS Datapath: Single-Cycle & Multi-Cycle</h2>
+
+  <h3>Single-Cycle Datapath</h3>
+  <div class="key-box concept">
+    <div class="label">Core Idea</div>
+    <p>Every instruction completes in <strong>exactly one clock cycle</strong>. CPI = 1 always.</p>
+    <p><strong>Problem:</strong> Clock cycle must be long enough for the <strong>slowest instruction</strong> (typically <code>lw</code>). Fast instructions (like <code>add</code>) waste time.</p>
+  </div>
+
+  <div class="viz-container">
+    <div class="viz-title">Single-Cycle Instruction Execution Flow</div>
+    <svg width="700" height="180" viewBox="0 0 700 180">
+      <!-- Stages -->
+      <rect x="20" y="50" width="110" height="70" rx="8" fill="#2a1525" stroke="#e94560" stroke-width="2"/>
+      <text x="75" y="75" fill="#e94560" font-size="11" text-anchor="middle" font-weight="bold">Instruction</text>
+      <text x="75" y="90" fill="#e94560" font-size="11" text-anchor="middle" font-weight="bold">Fetch</text>
+      <text x="75" y="108" fill="#9e9e9e" font-size="9" text-anchor="middle">PC &rarr; Inst Cache</text>
+
+      <line x1="130" y1="85" x2="150" y2="85" stroke="#f5c518" stroke-width="2" marker-end="url(#arrowY)"/>
+
+      <rect x="150" y="50" width="110" height="70" rx="8" fill="#1a2a35" stroke="#00e5ff" stroke-width="2"/>
+      <text x="205" y="75" fill="#00e5ff" font-size="11" text-anchor="middle" font-weight="bold">Register</text>
+      <text x="205" y="90" fill="#00e5ff" font-size="11" text-anchor="middle" font-weight="bold">Readout</text>
+      <text x="205" y="108" fill="#9e9e9e" font-size="9" text-anchor="middle">Decode + Read rs, rt</text>
+
+      <line x1="260" y1="85" x2="280" y2="85" stroke="#f5c518" stroke-width="2" marker-end="url(#arrowY)"/>
+
+      <rect x="280" y="50" width="110" height="70" rx="8" fill="#2a2515" stroke="#f5c518" stroke-width="2"/>
+      <text x="335" y="75" fill="#f5c518" font-size="11" text-anchor="middle" font-weight="bold">ALU</text>
+      <text x="335" y="90" fill="#f5c518" font-size="11" text-anchor="middle" font-weight="bold">Operation</text>
+      <text x="335" y="108" fill="#9e9e9e" font-size="9" text-anchor="middle">Execute / Addr Calc</text>
+
+      <line x1="390" y1="85" x2="410" y2="85" stroke="#f5c518" stroke-width="2" marker-end="url(#arrowY)"/>
+
+      <rect x="410" y="50" width="110" height="70" rx="8" fill="#1a3525" stroke="#00e676" stroke-width="2"/>
+      <text x="465" y="75" fill="#00e676" font-size="11" text-anchor="middle" font-weight="bold">Data</text>
+      <text x="465" y="90" fill="#00e676" font-size="11" text-anchor="middle" font-weight="bold">Read/Store</text>
+      <text x="465" y="108" fill="#9e9e9e" font-size="9" text-anchor="middle">Memory Access</text>
+
+      <line x1="520" y1="85" x2="540" y2="85" stroke="#f5c518" stroke-width="2" marker-end="url(#arrowY)"/>
+
+      <rect x="540" y="50" width="110" height="70" rx="8" fill="#1e1535" stroke="#b388ff" stroke-width="2"/>
+      <text x="595" y="75" fill="#b388ff" font-size="11" text-anchor="middle" font-weight="bold">Register</text>
+      <text x="595" y="90" fill="#b388ff" font-size="11" text-anchor="middle" font-weight="bold">Write Back</text>
+      <text x="595" y="108" fill="#9e9e9e" font-size="9" text-anchor="middle">Write result to rd</text>
+
+      <!-- Single cycle note -->
+      <line x1="20" y1="140" x2="650" y2="140" stroke="#e94560" stroke-width="1.5" stroke-dasharray="6"/>
+      <text x="335" y="160" fill="#e94560" font-size="11" text-anchor="middle" font-weight="bold">All 5 stages in ONE clock cycle (clock = slowest instruction)</text>
+    </svg>
+  </div>
+
+  <h3>How Each Instruction Type Uses the Datapath</h3>
+  <table>
+    <tr><th>Instruction</th><th>Fetch</th><th>Decode/Read</th><th>Execute</th><th>Memory</th><th>Write Back</th></tr>
+    <tr><td><code>add $rd, $rs, $rt</code></td><td>Read inst</td><td>Read rs, rt</td><td>ALU: rs + rt</td><td>-</td><td>Write ALU result to rd</td></tr>
+    <tr><td><code>lw $rt, imm($rs)</code></td><td>Read inst</td><td>Read rs</td><td>ALU: rs + SE(imm)</td><td>Read Memory[ALU]</td><td>Write mem data to rt</td></tr>
+    <tr><td><code>sw $rt, imm($rs)</code></td><td>Read inst</td><td>Read rs, rt</td><td>ALU: rs + SE(imm)</td><td>Write rt to Memory[ALU]</td><td>-</td></tr>
+    <tr><td><code>beq $rs, $rt, off</code></td><td>Read inst</td><td>Read rs, rt</td><td>Compare rs, rt</td><td>-</td><td>- (update PC if equal)</td></tr>
+    <tr><td><code>j target</code></td><td>Read inst</td><td>-</td><td>Compute target addr</td><td>-</td><td>- (update PC)</td></tr>
+  </table>
+
+  <hr class="divider">
+
+  <h3>Multi-Cycle Datapath</h3>
+  <div class="key-box concept">
+    <div class="label">Why Multi-Cycle?</div>
+    <p>Single-cycle wastes time: clock = slowest instruction. <strong>Multi-cycle breaks each instruction into smaller steps</strong>, each taking one (shorter) clock cycle. Different instructions take different numbers of cycles (3-5).</p>
+    <p><strong>Advantages:</strong> Shorter clock period + resource reuse (single ALU, single memory).</p>
+  </div>
+
+  <div class="key-box">
+    <h4>Key Differences from Single-Cycle</h4>
+    <ul>
+      <li><strong>Single memory unit</strong> for both instructions and data (not separate caches)</li>
+      <li><strong>Single ALU</strong> (no separate adder for PC+4)</li>
+      <li><strong>Intermediate registers</strong> between stages: IR (Instruction Register), MDR (Memory Data Register), X, Y, Z registers - hold values between cycles</li>
+      <li>These intermediate registers are <strong>NOT visible to the programmer</strong></li>
+    </ul>
+  </div>
+
+  <h3>Multi-Cycle Execution: Cycle by Cycle</h3>
+
+  <div class="key-box formula">
+    <div class="label">Cycle 1: Instruction Fetch (ALL instructions)</div>
+    <pre>IR &larr; Memory[PC]     ; Fetch instruction, store in IR
+PC &larr; PC + 4          ; Increment PC</pre>
+  </div>
+
+  <div class="key-box formula">
+    <div class="label">Cycle 2: Instruction Decode & Register Fetch (ALL instructions)</div>
+    <pre>X &larr; Reg[IR[25:21]]   ; Read register rs
+Y &larr; Reg[IR[20:16]]   ; Read register rt (even if not needed)
+Z &larr; PC + SE(IR[15:0]) &lt;&lt; 2   ; Compute branch target (speculative)</pre>
+  </div>
+
+  <div class="key-box formula">
+    <div class="label">Cycle 3: Execution (depends on instruction type)</div>
+    <pre>Memory reference (lw/sw):  Z &larr; X + SE(IR[15:0])     ; Compute address
+ALU (R-type):              Z &larr; X op Y               ; Perform operation
+Branch (beq/bne):          if(X == Y) PC &larr; Z        ; Conditional branch
+Jump (j):                  PC &larr; {PC[31:28], IR[25:0], 00}</pre>
+  </div>
+
+  <div class="key-box formula">
+    <div class="label">Cycle 4: Memory Access or R-type Completion</div>
+    <pre>lw:      MDR &larr; Memory[Z]        ; Read from data memory
+sw:      Memory[Z] &larr; Y            ; Write rt to data memory
+R-type:  Reg[IR[15:11]] &larr; Z      ; Write ALU result to rd</pre>
+  </div>
+
+  <div class="key-box formula">
+    <div class="label">Cycle 5: Write Back (lw only)</div>
+    <pre>lw:      Reg[IR[20:16]] &larr; MDR   ; Write memory data to rt</pre>
+  </div>
+
+  <h3>Cycles Per Instruction Type</h3>
+  <table>
+    <tr><th>Instruction</th><th>Cycles</th><th>Stages Used</th></tr>
+    <tr><td><code>R-type</code> (add, sub, and, etc.)</td><td><strong>4</strong></td><td>IF &rarr; ID &rarr; EX &rarr; WB</td></tr>
+    <tr><td><code>lw</code> (load word)</td><td><strong>5</strong></td><td>IF &rarr; ID &rarr; EX &rarr; MEM &rarr; WB</td></tr>
+    <tr><td><code>sw</code> (store word)</td><td><strong>4</strong></td><td>IF &rarr; ID &rarr; EX &rarr; MEM</td></tr>
+    <tr><td><code>beq/bne</code> (branch)</td><td><strong>3</strong></td><td>IF &rarr; ID &rarr; EX</td></tr>
+    <tr><td><code>j</code> (jump)</td><td><strong>3</strong></td><td>IF &rarr; ID &rarr; EX</td></tr>
+  </table>
+
+  <div class="key-box exam">
+    <div class="label">Single-Cycle vs Multi-Cycle Comparison</div>
+    <table>
+      <tr><th>Aspect</th><th>Single-Cycle</th><th>Multi-Cycle</th></tr>
+      <tr><td>CPI</td><td>Always 1</td><td>3-5 (variable)</td></tr>
+      <tr><td>Clock Period</td><td>Long (slowest instruction)</td><td>Short (one step)</td></tr>
+      <tr><td>Hardware</td><td>Separate ALU + Adder, 2 memories</td><td>Single ALU, single memory</td></tr>
+      <tr><td>Overall Performance</td><td>Slower (wasted cycles)</td><td>Better (flexible timing)</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 15: PIPELINING -->
+<!-- ============================================ -->
+<div class="section mips-section" id="s15">
+  <h2>15. Pipelining: Stages, Hazards & Performance</h2>
+
+  <div class="key-box concept">
+    <div class="label">The Core Insight</div>
+    <p>Pipelining is like a <strong>laundry assembly line</strong>: while one load is drying, start washing the next. Each instruction still takes the same time (latency), but <strong>throughput increases</strong> because multiple instructions overlap.</p>
+    <p>Ideally, a 5-stage pipeline gives <strong>5x throughput improvement</strong> (but NOT 5x speedup on a single instruction).</p>
+  </div>
+
+  <h3>MIPS 5-Stage Pipeline</h3>
+
+  <div class="viz-container">
+    <div class="viz-title">The 5 Pipeline Stages</div>
+    <svg width="700" height="140" viewBox="0 0 700 140">
+      <!-- Stage boxes with pipeline registers between them -->
+      <rect x="10" y="30" width="110" height="80" rx="8" fill="#2a1525" stroke="#e94560" stroke-width="2.5"/>
+      <text x="65" y="55" fill="#e94560" font-size="13" text-anchor="middle" font-weight="bold">IF</text>
+      <text x="65" y="72" fill="#e0e0e0" font-size="9" text-anchor="middle">Instruction</text>
+      <text x="65" y="85" fill="#e0e0e0" font-size="9" text-anchor="middle">Fetch</text>
+      <text x="65" y="100" fill="#9e9e9e" font-size="8" text-anchor="middle">Read inst memory</text>
+
+      <!-- Pipeline register -->
+      <rect x="122" y="35" width="8" height="70" rx="2" fill="#f5c518"/>
+      <text x="126" y="25" fill="#f5c518" font-size="7" text-anchor="middle">IF/ID</text>
+
+      <rect x="140" y="30" width="110" height="80" rx="8" fill="#1a2a35" stroke="#00e5ff" stroke-width="2.5"/>
+      <text x="195" y="55" fill="#00e5ff" font-size="13" text-anchor="middle" font-weight="bold">ID</text>
+      <text x="195" y="72" fill="#e0e0e0" font-size="9" text-anchor="middle">Decode &</text>
+      <text x="195" y="85" fill="#e0e0e0" font-size="9" text-anchor="middle">Reg Read</text>
+      <text x="195" y="100" fill="#9e9e9e" font-size="8" text-anchor="middle">Read rs, rt regs</text>
+
+      <rect x="252" y="35" width="8" height="70" rx="2" fill="#f5c518"/>
+      <text x="256" y="25" fill="#f5c518" font-size="7" text-anchor="middle">ID/EX</text>
+
+      <rect x="270" y="30" width="110" height="80" rx="8" fill="#2a2515" stroke="#f5c518" stroke-width="2.5"/>
+      <text x="325" y="55" fill="#f5c518" font-size="13" text-anchor="middle" font-weight="bold">EX</text>
+      <text x="325" y="72" fill="#e0e0e0" font-size="9" text-anchor="middle">Execute /</text>
+      <text x="325" y="85" fill="#e0e0e0" font-size="9" text-anchor="middle">Addr Calc</text>
+      <text x="325" y="100" fill="#9e9e9e" font-size="8" text-anchor="middle">ALU operation</text>
+
+      <rect x="382" y="35" width="8" height="70" rx="2" fill="#f5c518"/>
+      <text x="386" y="25" fill="#f5c518" font-size="7" text-anchor="middle">EX/MEM</text>
+
+      <rect x="400" y="30" width="110" height="80" rx="8" fill="#1a3525" stroke="#00e676" stroke-width="2.5"/>
+      <text x="455" y="55" fill="#00e676" font-size="13" text-anchor="middle" font-weight="bold">MEM</text>
+      <text x="455" y="72" fill="#e0e0e0" font-size="9" text-anchor="middle">Memory</text>
+      <text x="455" y="85" fill="#e0e0e0" font-size="9" text-anchor="middle">Access</text>
+      <text x="455" y="100" fill="#9e9e9e" font-size="8" text-anchor="middle">Read/Write data</text>
+
+      <rect x="512" y="35" width="8" height="70" rx="2" fill="#f5c518"/>
+      <text x="516" y="25" fill="#f5c518" font-size="7" text-anchor="middle">MEM/WB</text>
+
+      <rect x="530" y="30" width="110" height="80" rx="8" fill="#1e1535" stroke="#b388ff" stroke-width="2.5"/>
+      <text x="585" y="55" fill="#b388ff" font-size="13" text-anchor="middle" font-weight="bold">WB</text>
+      <text x="585" y="72" fill="#e0e0e0" font-size="9" text-anchor="middle">Write</text>
+      <text x="585" y="85" fill="#e0e0e0" font-size="9" text-anchor="middle">Back</text>
+      <text x="585" y="100" fill="#9e9e9e" font-size="8" text-anchor="middle">Write to reg file</text>
+    </svg>
+  </div>
+
+  <h3>Pipeline Timing Diagram</h3>
+  <div class="key-box">
+    <p>Each instruction enters the pipeline one cycle after the previous one:</p>
+  </div>
+  <table class="pipeline-table">
+    <tr>
+      <th>Instruction</th><th>CC1</th><th>CC2</th><th>CC3</th><th>CC4</th><th>CC5</th><th>CC6</th><th>CC7</th><th>CC8</th><th>CC9</th>
+    </tr>
+    <tr>
+      <td><code>lw $s1, 8($t0)</code></td>
+      <td class="stage-if">IF</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+      <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td>
+    </tr>
+    <tr>
+      <td><code>lw $s2, 16($t0)</code></td>
+      <td class="empty"></td><td class="stage-if">IF</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+      <td class="empty"></td><td class="empty"></td><td class="empty"></td>
+    </tr>
+    <tr>
+      <td><code>lw $s3, 24($t0)</code></td>
+      <td class="empty"></td><td class="empty"></td><td class="stage-if">IF</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+      <td class="empty"></td><td class="empty"></td>
+    </tr>
+    <tr>
+      <td><code>add $t1, $s1, $s2</code></td>
+      <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="stage-if">IF</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+      <td class="empty"></td>
+    </tr>
+    <tr>
+      <td><code>sub $t2, $s1, $s3</code></td>
+      <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="stage-if">IF</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+    </tr>
+  </table>
+
+  <div class="two-col">
+    <div class="compare-card">
+      <h4 style="color: var(--accent1);">Start-up Region</h4>
+      <p>First few cycles where pipeline isn't fully utilized. All stages are not busy yet.</p>
+    </div>
+    <div class="compare-card">
+      <h4 style="color: var(--cyan);">Drainage Region</h4>
+      <p>Last few cycles where earlier stages are idle because last instruction has moved on.</p>
+    </div>
+  </div>
+
+  <h3>Pipeline Performance</h3>
+  <div class="key-box formula">
+    <div class="label">Performance Comparison</div>
+    <pre>Single-cycle: N instructions take N x T_longest cycles
+
+Pipelined: N instructions take (N + stages - 1) x T_stage cycles
+  where T_stage = T_longest_stage (not T_longest_instruction!)
+
+Example: IF=2ns, ID=1ns, EX=2ns, MEM=2ns, WB=1ns
+  Single-cycle clock = 2+1+2+2+1 = 8 ns
+  Pipelined clock = max(2,1,2,2,1) = 2 ns per stage
+
+  3 instructions:
+  Single-cycle: 3 x 8 = 24 ns
+  Pipelined: (3 + 5 - 1) x 2 = 14 ns
+
+Speedup approaches number of stages as N &rarr; large</pre>
+  </div>
+
+  <h3>Why MIPS is Pipeline-Friendly</h3>
+  <div class="key-box">
+    <ul>
+      <li><strong>Fixed-length instructions</strong> - fetch in 1 stage, decode in next</li>
+      <li><strong>Few instruction formats</strong> - register fields always in same position</li>
+      <li><strong>Memory operands only in lw/sw</strong> - address calc in EX, access in MEM</li>
+      <li><strong>Word-aligned memory</strong> - single transfer per access</li>
+      <li>Each functional unit used <strong>once per instruction</strong> at the <strong>same stage</strong></li>
+    </ul>
+  </div>
+
+  <h3>Pipeline Hazards</h3>
+  <p>Situations where the next instruction <strong>cannot execute in the next clock cycle</strong>.</p>
+
+  <div class="three-col">
+    <div class="key-box important">
+      <h4>Data Hazard</h4>
+      <p>An instruction depends on the result of a previous instruction still in the pipeline.</p>
+      <pre>add $s0, $t0, $t1
+sub $t2, $s0, $t3
+     ^^ needs $s0
+     but add hasn't
+     written it yet!</pre>
+      <p><strong>Solutions:</strong> Forwarding/bypassing, stalling (NOP insertion)</p>
+    </div>
+    <div class="key-box important">
+      <h4>Control Hazard</h4>
+      <p>Branch decision not known when next instruction needs to be fetched.</p>
+      <pre>beq $s0, $s1, L
+add $t0, ...  ; fetch this?
+              ; or the
+              ; branch target?</pre>
+      <p><strong>Solutions:</strong> Branch prediction, delayed branching, stall</p>
+    </div>
+    <div class="key-box important">
+      <h4>Structural Hazard</h4>
+      <p>Two instructions need the same hardware resource simultaneously.</p>
+      <p>Example: single memory for both inst fetch and data access.</p>
+      <p><strong>Solution:</strong> Duplicate resources (separate inst & data caches)</p>
+    </div>
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">Key Pipeline Observations</div>
+    <ul>
+      <li>Pipelining improves <strong>throughput</strong>, not latency of individual instructions</li>
+      <li>Pipeline clock rate limited by <strong>slowest stage</strong></li>
+      <li>Pipeline registers (IF/ID, ID/EX, etc.) add small overhead</li>
+      <li>In MIPS, register file can be <strong>read in first half and written in second half</strong> of the same cycle (solves some data hazards)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 16: CACHE MEMORY -->
+<!-- ============================================ -->
+<div class="section mips-section" id="s16">
+  <h2>16. Cache Memory: Hierarchy, Mapping & Performance</h2>
+
+  <h3>The Memory Wall Problem</h3>
+  <div class="key-box concept">
+    <div class="label">Why We Need Cache</div>
+    <p>Processor speed: ~1 ns per operation. Main memory (DRAM) access: ~50-100 ns. That's a <strong>50-100x gap</strong>!</p>
+    <p><strong>Solution:</strong> Place a small, fast <strong>cache</strong> (SRAM) between CPU and main memory. Cache holds copies of frequently used data.</p>
+  </div>
+
+  <h3>Memory Hierarchy</h3>
+  <div class="viz-container">
+    <div class="viz-title">Memory Hierarchy Pyramid</div>
+    <svg width="550" height="300" viewBox="0 0 550 300">
+      <!-- Pyramid layers -->
+      <polygon points="275,20 320,70 230,70" fill="#2a1525" stroke="#e94560" stroke-width="2"/>
+      <text x="275" y="55" fill="#e94560" font-size="10" text-anchor="middle" font-weight="bold">Registers</text>
+
+      <polygon points="230,75 320,75 365,130 185,130" fill="#1e1535" stroke="#b388ff" stroke-width="2"/>
+      <text x="275" y="100" fill="#b388ff" font-size="10" text-anchor="middle" font-weight="bold">L1 Cache</text>
+      <text x="275" y="115" fill="#9e9e9e" font-size="8" text-anchor="middle">~few ns</text>
+
+      <polygon points="185,135 365,135 410,190 140,190" fill="#1a2a35" stroke="#00e5ff" stroke-width="2"/>
+      <text x="275" y="158" fill="#00e5ff" font-size="10" text-anchor="middle" font-weight="bold">L2 Cache</text>
+      <text x="275" y="175" fill="#9e9e9e" font-size="8" text-anchor="middle">~10 ns</text>
+
+      <polygon points="140,195 410,195 455,250 95,250" fill="#1a3525" stroke="#00e676" stroke-width="2"/>
+      <text x="275" y="218" fill="#00e676" font-size="10" text-anchor="middle" font-weight="bold">Main Memory (DRAM)</text>
+      <text x="275" y="235" fill="#9e9e9e" font-size="8" text-anchor="middle">~100s of ns</text>
+
+      <polygon points="95,255 455,255 490,285 60,285" fill="#2a2515" stroke="#f5c518" stroke-width="2"/>
+      <text x="275" y="275" fill="#f5c518" font-size="10" text-anchor="middle" font-weight="bold">Disk / SSD (Secondary Storage)</text>
+
+      <!-- Labels on right -->
+      <text x="490" y="55" fill="#e94560" font-size="9">~100s bytes, 1 ns</text>
+      <text x="490" y="105" fill="#b388ff" font-size="9">~KBs, few ns</text>
+      <text x="490" y="165" fill="#00e5ff" font-size="9">~MBs, ~10 ns</text>
+      <text x="490" y="225" fill="#00e676" font-size="9">~GBs, ~100 ns</text>
+      <text x="490" y="275" fill="#f5c518" font-size="9">~TBs, ms</text>
+
+      <!-- Arrows -->
+      <text x="30" y="100" fill="#e94560" font-size="10" font-weight="bold">Faster</text>
+      <text x="25" y="115" fill="#e94560" font-size="10">&uarr;</text>
+      <text x="30" y="250" fill="#00e676" font-size="10" font-weight="bold">Bigger</text>
+      <text x="25" y="235" fill="#00e676" font-size="10">&darr;</text>
+    </svg>
+  </div>
+
+  <h3>Principle of Locality</h3>
+  <div class="two-col">
+    <div class="key-box">
+      <h4 style="color: var(--cyan);">Temporal Locality</h4>
+      <p>If a data item is accessed, it will <strong>likely be accessed again soon</strong>.</p>
+      <p>Example: Loop variables, frequently called functions.</p>
+      <p><em>Cache exploits this by keeping recently used data.</em></p>
+    </div>
+    <div class="key-box">
+      <h4 style="color: var(--green);">Spatial Locality</h4>
+      <p>If a data item is accessed, <strong>nearby items will likely be accessed soon</strong>.</p>
+      <p>Example: Array elements, sequential instructions.</p>
+      <p><em>Cache exploits this by fetching entire blocks (cache lines).</em></p>
+    </div>
+  </div>
+
+  <h3>Cache Terminology</h3>
+  <table>
+    <tr><th>Term</th><th>Definition</th></tr>
+    <tr><td><strong>Block (Line)</strong></td><td>Unit of data transferred between cache and memory (e.g., 16 or 32 bytes)</td></tr>
+    <tr><td><strong>Cache Hit</strong></td><td>Requested data found in cache. Access time = hit time.</td></tr>
+    <tr><td><strong>Cache Miss</strong></td><td>Data NOT in cache. Must fetch from main memory. Time = hit time + miss penalty.</td></tr>
+    <tr><td><strong>Hit Rate</strong></td><td>Fraction of accesses found in cache (typically 90-99%)</td></tr>
+    <tr><td><strong>Miss Rate</strong></td><td>= 1 - Hit Rate</td></tr>
+    <tr><td><strong>Miss Penalty</strong></td><td>Time to replace a block + deliver to CPU (10-100+ cycles)</td></tr>
+    <tr><td><strong>Valid Bit</strong></td><td>1 = cache entry contains valid data; 0 = empty/invalid</td></tr>
+  </table>
+
+  <div class="key-box formula">
+    <div class="label">Average Memory Access Time (AMAT)</div>
+    <pre>AMAT = Hit Time + (Miss Rate x Miss Penalty)
+
+Example: Hit time = 1 cycle, miss rate = 5%, miss penalty = 100 cycles
+  AMAT = 1 + (0.05 x 100) = 1 + 5 = 6 cycles</pre>
+  </div>
+
+  <h3>Cache Organization: Three Types</h3>
+
+  <h4>1. Direct-Mapped Cache</h4>
+  <div class="key-box">
+    <p>Each memory block maps to <strong>exactly one</strong> cache location.</p>
+    <p><strong>Cache block index = (Block # in memory) mod (# blocks in cache)</strong></p>
+  </div>
+
+  <div class="viz-container">
+    <div class="viz-title">Direct-Mapped Cache Address Breakdown</div>
+    <svg width="550" height="160" viewBox="0 0 550 160">
+      <!-- Address fields -->
+      <rect x="30" y="30" width="220" height="50" rx="6" fill="#2a1525" stroke="#e94560" stroke-width="2"/>
+      <text x="140" y="50" fill="#e94560" font-size="12" text-anchor="middle" font-weight="bold">Tag</text>
+      <text x="140" y="68" fill="#9e9e9e" font-size="9" text-anchor="middle">(remaining bits)</text>
+
+      <rect x="250" y="30" width="120" height="50" rx="6" fill="#1a2a35" stroke="#00e5ff" stroke-width="2"/>
+      <text x="310" y="50" fill="#00e5ff" font-size="12" text-anchor="middle" font-weight="bold">Index</text>
+      <text x="310" y="68" fill="#9e9e9e" font-size="9" text-anchor="middle">(log2 #blocks)</text>
+
+      <rect x="370" y="30" width="120" height="50" rx="6" fill="#1a3525" stroke="#00e676" stroke-width="2"/>
+      <text x="430" y="50" fill="#00e676" font-size="12" text-anchor="middle" font-weight="bold">Byte Offset</text>
+      <text x="430" y="68" fill="#9e9e9e" font-size="9" text-anchor="middle">(log2 block_size)</text>
+
+      <!-- Total -->
+      <text x="275" y="105" fill="#f5c518" font-size="11" text-anchor="middle" font-weight="bold">32-bit address</text>
+
+      <!-- Example -->
+      <text x="275" y="130" fill="#e0e0e0" font-size="10" text-anchor="middle">Example: 128B cache, 32B blocks &rarr; 4 blocks</text>
+      <text x="275" y="148" fill="#e0e0e0" font-size="10" text-anchor="middle">Tag = 25 bits | Index = 2 bits | Offset = 5 bits</text>
+    </svg>
+  </div>
+
+  <div class="key-box">
+    <p><strong>Lookup:</strong> Use <em>Index</em> to find the cache block &rarr; compare stored <em>Tag</em> with address Tag &rarr; check <em>Valid bit</em> = 1 &rarr; Hit!</p>
+    <p><strong>Pros:</strong> Simple, fast lookup. <strong>Cons:</strong> Conflict misses (two blocks mapping to same index evict each other).</p>
+  </div>
+
+  <h4>2. Fully Associative Cache</h4>
+  <div class="key-box">
+    <p>A block can be placed in <strong>ANY</strong> cache location. No index needed!</p>
+    <p>Address = <strong>Tag | Byte Offset</strong> only.</p>
+    <p>Must compare tag against <strong>all</strong> entries simultaneously (needs comparators for every entry).</p>
+    <p><strong>Pros:</strong> No conflict misses. <strong>Cons:</strong> Expensive hardware (many comparators), slow for large caches.</p>
+  </div>
+
+  <h4>3. N-Way Set-Associative Cache</h4>
+  <div class="key-box important">
+    <div class="label">The Practical Compromise</div>
+    <p>Cache divided into <strong>sets</strong>. Each set has <strong>N blocks</strong> (N "ways").</p>
+    <p><strong>Set index = (Block #) mod (# of sets)</strong></p>
+    <p>Within a set, block can go in <strong>any of the N ways</strong> (fully associative within the set).</p>
+  </div>
+
+  <div class="viz-container">
+    <div class="viz-title">Set-Associative Address Breakdown</div>
+    <svg width="550" height="100" viewBox="0 0 550 100">
+      <rect x="30" y="20" width="200" height="50" rx="6" fill="#2a1525" stroke="#e94560" stroke-width="2"/>
+      <text x="130" y="40" fill="#e94560" font-size="12" text-anchor="middle" font-weight="bold">Tag</text>
+      <text x="130" y="58" fill="#9e9e9e" font-size="9" text-anchor="middle">(remaining bits)</text>
+
+      <rect x="230" y="20" width="140" height="50" rx="6" fill="#1a2a35" stroke="#00e5ff" stroke-width="2"/>
+      <text x="300" y="40" fill="#00e5ff" font-size="12" text-anchor="middle" font-weight="bold">Set Index</text>
+      <text x="300" y="58" fill="#9e9e9e" font-size="9" text-anchor="middle">(log2 #sets)</text>
+
+      <rect x="370" y="20" width="120" height="50" rx="6" fill="#1a3525" stroke="#00e676" stroke-width="2"/>
+      <text x="430" y="40" fill="#00e676" font-size="12" text-anchor="middle" font-weight="bold">Byte Offset</text>
+      <text x="430" y="58" fill="#9e9e9e" font-size="9" text-anchor="middle">(log2 block_size)</text>
+
+      <text x="275" y="90" fill="#f5c518" font-size="10" text-anchor="middle">Direct-mapped = 1-way | Fully-associative = m-way (m = #blocks)</text>
+    </svg>
+  </div>
+
+  <h3>Cache Organization Comparison</h3>
+  <table>
+    <tr><th>Type</th><th>Mapping</th><th>Lookup Speed</th><th>Conflict Misses</th><th>Hardware Cost</th></tr>
+    <tr><td><strong>Direct-Mapped</strong></td><td>1 possible location</td><td>Fastest</td><td>High</td><td>Cheapest</td></tr>
+    <tr><td><strong>N-way Set-Assoc</strong></td><td>N possible locations</td><td>Moderate</td><td>Moderate</td><td>Moderate</td></tr>
+    <tr><td><strong>Fully Associative</strong></td><td>Any location</td><td>Slowest</td><td>None</td><td>Most expensive</td></tr>
+  </table>
+
+  <div class="key-box exam">
+    <div class="label">Cache Address Bit Calculation</div>
+    <pre>Given: Cache size = S bytes, Block size = B bytes, N-way set-associative
+
+Number of blocks = S / B
+Number of sets   = (S / B) / N
+
+Offset bits = log2(B)          ; to address bytes within a block
+Index bits  = log2(#sets)      ; to select which set
+Tag bits    = 32 - index - offset  ; remaining bits
+
+Example: 128B cache, 16B blocks, 2-way set-associative
+  Blocks = 128/16 = 8
+  Sets = 8/2 = 4
+  Offset = log2(16) = 4 bits
+  Index = log2(4) = 2 bits
+  Tag = 32 - 2 - 4 = 26 bits</pre>
+  </div>
+
+  <h3>Split Cache</h3>
+  <div class="key-box">
+    <p>Most processors use <strong>separate instruction cache and data cache</strong> (split cache / Harvard-style at L1).</p>
+    <p>This avoids structural hazards in pipelining (IF and MEM stages can access memory simultaneously).</p>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- QUICK RECALL -->
+<!-- ============================================ -->
+<div class="section-divider">
+  <span>Quick Reference</span>
+</div>
+
+<div class="section" id="quick">
+  <h2>Quick Recall Cards</h2>
+
+  <h3 style="color: var(--accent1);">8051 Microcontroller</h3>
+  <div class="recall-grid">
+    <div class="recall-card">
+      <div class="q">How many clock cycles = 1 MC?</div>
+      <div class="a">12 clock cycles</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">SP initializes to?</div>
+      <div class="a">07H (top of Bank 0)</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">PC initializes to?</div>
+      <div class="a">0000H</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">Port registers init to?</div>
+      <div class="a">FFH (all 1s = input mode)</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">Which port needs external pull-up?</div>
+      <div class="a">Port 0 (open drain)</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">PUSH does what to SP?</div>
+      <div class="a">SP++ first, then stores value at new SP location</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">POP does what to SP?</div>
+      <div class="a">Reads value at SP, then SP-- (decrements)</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">Timer 0 ISR vector address?</div>
+      <div class="a">000BH</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">Serial port vector address?</div>
+      <div class="a">0023H</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">Which timer mode for baud rate?</div>
+      <div class="a">Mode 2 (8-bit auto-reload), usually Timer 1</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">SMOD bit does what?</div>
+      <div class="a">Doubles the baud rate (bit 7 of PCON)</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">Why 11.0592 MHz?</div>
+      <div class="a">Gives exact standard baud rates. 12MHz can't!</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">MUL AB: where do results go?</div>
+      <div class="a">A = low byte, B = high byte. CY always 0.</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">DIV AB: where do results go?</div>
+      <div class="a">A = quotient, B = remainder</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">RETI vs RET?</div>
+      <div class="a">RETI also clears interrupt priority flags. Use RETI in ISRs only!</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">Which flags must be cleared by software?</div>
+      <div class="a">RI and TI (serial port flags)</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">ACALL range?</div>
+      <div class="a">Same 2KB page (11-bit address, 5 bits from PC_next)</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">What does hardware save on interrupt?</div>
+      <div class="a">ONLY PC. Not ACC, not PSW, not registers.</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">How many priority levels?</div>
+      <div class="a">Only 2: High and Low. IP register selects group, not order.</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">SM2=1 in multiprocessor mode?</div>
+      <div class="a">RI only set when 9th bit=1 (address frames only)</div>
+    </div>
+  </div>
+
+  <h3 style="color: var(--purple); margin-top: 30px;">MIPS & Computer Architecture</h3>
+  <div class="recall-grid">
+    <div class="recall-card">
+      <div class="q">CPU Time formula?</div>
+      <div class="a">IC x CPI x Clock Period = IC x CPI / Clock Rate</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">Amdahl's Law?</div>
+      <div class="a">Speedup = 1/[(1-f) + f/S]. Max = 1/(1-f) if S=inf.</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">MIPS = ?</div>
+      <div class="a">Microprocessor without Interlocked Pipeline Stages (RISC)</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">How many GPRs in MIPS?</div>
+      <div class="a">32 registers, each 32-bit wide. $0 always = 0.</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">MIPS instruction size?</div>
+      <div class="a">Fixed 32-bit (4 bytes) for ALL instructions.</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">3 MIPS instruction formats?</div>
+      <div class="a">R-type (register), I-type (immediate), J-type (jump)</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">R-type opcode field?</div>
+      <div class="a">op=000000 for all R-types. funct field determines operation.</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">addi: sign or zero extend?</div>
+      <div class="a">Sign-extended. andi/ori: zero-extended.</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">How to load 32-bit constant?</div>
+      <div class="a">lui (upper 16) + ori (lower 16). NOT addi for lower!</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">5 pipeline stages?</div>
+      <div class="a">IF &rarr; ID &rarr; EX &rarr; MEM &rarr; WB</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">Pipelining improves?</div>
+      <div class="a">Throughput (NOT latency of individual instructions)</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">Pipeline clock rate limited by?</div>
+      <div class="a">The slowest stage (not slowest instruction)</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">3 types of pipeline hazards?</div>
+      <div class="a">Data, Control (branch), Structural (resource conflict)</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">Single-cycle CPI?</div>
+      <div class="a">Always 1, but clock cycle is long (slowest instruction)</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">Multi-cycle lw takes how many cycles?</div>
+      <div class="a">5 cycles: IF, ID, EX, MEM, WB (most expensive)</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">Multi-cycle branch takes?</div>
+      <div class="a">3 cycles: IF, ID, EX</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">Temporal vs Spatial Locality?</div>
+      <div class="a">Temporal: same item reused. Spatial: nearby items used.</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">AMAT formula?</div>
+      <div class="a">Hit Time + (Miss Rate x Miss Penalty)</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">Direct-mapped vs Fully-associative?</div>
+      <div class="a">Direct: 1 location (fast, conflicts). Fully: any location (slow, no conflicts).</div>
+    </div>
+    <div class="recall-card">
+      <div class="q">Dynamic Power formula?</div>
+      <div class="a">P = C x V_dd^2 x f_clk</div>
+    </div>
+  </div>
+</div>
+
+<p style="text-align:center; color: var(--muted); margin-top: 40px; padding: 20px;">
+  EE 309 Complete Study Guide - 8051 + MIPS + Computer Architecture<br>
+  Covering: Architecture, Memory, Registers, Instructions, Timers, Interrupts, Serial Comm, Multiprocessor,<br>
+  Performance, MIPS ISA, Datapath, Pipelining, and Cache Memory.
+</p>
+
+</div>
+</body>
+</html>
