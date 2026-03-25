@@ -3186,8 +3186,133 @@ ori $s0, $s0, 40   ; Load lower 16 bits: $s0 = 0x00610028</pre>
   <div class="key-box concept" style="margin-top:20px;">
     <div class="label">Controller vs Datapath — The Key Idea</div>
     <p>The <strong>Datapath</strong> is the hardware that does the actual work: ALU, registers, memory, MUXes, wires. It's the "muscles".</p>
-    <p>The <strong>Controller</strong> is the brain that tells the datapath what to do each cycle. It reads the <strong>opcode</strong> (and funct field for R-type) and sets <strong>control signals</strong> that configure the MUXes, enable/disable reads and writes, and tell the ALU what operation to perform.</p>
+    <p>The <strong>Controller</strong> is the brain that tells the datapath what to do each cycle. It reads the <strong>opcode</strong> (bits [31&ndash;26]) and sets <strong>control signals</strong> that configure the MUXes, enable/disable reads and writes, and tell the ALU what operation to perform.</p>
     <p><strong>Same datapath, different signals = different instruction behavior.</strong> The hardware doesn't change — only the control signals change based on the instruction type.</p>
+  </div>
+
+  <div class="key-box important">
+    <div class="label">Critical: Data from ALU Can NEVER Go Directly to Data Memory as Data!</div>
+    <p>The ALU result goes to the Data Memory's <strong>Address</strong> input &mdash; it provides the <em>address</em> to read from or write to. But the ALU result <strong>cannot</strong> be written into memory as data.</p>
+    <p>The <strong>Write Data</strong> input of Data Memory comes from <strong>Read Data 2</strong> of the Register File (i.e., the value of register <code>rt</code>). This is a separate, dedicated path.</p>
+    <h4 style="color:var(--cyan); margin-top:12px;">Example: lw $t0, 100($s0)</h4>
+    <div class="flow" style="flex-wrap:wrap;">
+      <div class="flow-box">ALU computes<br><strong>$s0 + 100</strong></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-box" style="border-color:var(--green);">Data Memory<br><strong>Address</strong> input</div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-box">Data Memory reads<br>from that address</div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-box" style="border-color:var(--purple);">Read Data &rarr; MUX<br>&rarr; written to <strong>$t0</strong></div>
+    </div>
+    <p style="color:var(--green); margin-top:6px;">ALU result = <strong>address</strong> (tells memory <em>where</em> to look). Memory outputs the <strong>data</strong> stored at that address. That data travels through the MemToReg MUX and gets written into register $t0.</p>
+
+    <h4 style="color:var(--orange); margin-top:16px;">Example: sw $t0, 100($s0)</h4>
+    <div class="flow" style="flex-wrap:wrap;">
+      <div class="flow-box">ALU computes<br><strong>$s0 + 100</strong></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-box" style="border-color:var(--green);">Data Memory<br><strong>Address</strong> input</div>
+    </div>
+    <div class="flow" style="flex-wrap:wrap; margin-top:4px;">
+      <div class="flow-box">Register File<br>Read Data 2 = <strong>$t0</strong></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-box" style="border-color:var(--accent1);">Data Memory<br><strong>Write Data</strong> input</div>
+    </div>
+    <p style="color:var(--orange); margin-top:6px;">Two separate paths! ALU result goes as the <strong>address</strong> (where to write). $t0's value goes as the <strong>data</strong> (what to write). The ALU result itself is <strong>never</strong> stored in memory as data &mdash; it only tells memory the location.</p>
+
+    <div style="margin-top:12px; padding:10px; background:#2a1a1a; border-radius:8px; border-left:3px solid var(--accent1);">
+      <p style="color:var(--accent1);"><strong>Key takeaway:</strong> The ALU &rarr; Data Memory path is the <strong>Address</strong> wire only. The Register File &rarr; Data Memory path is the <strong>Write Data</strong> wire. Data from ALU can <strong>never</strong> go to memory as data; it can only go as an address.</p>
+    </div>
+  </div>
+
+  <h3>Datapath Components &amp; Connections (Detailed)</h3>
+  <div class="key-box">
+    <h4>Instruction Field Routing</h4>
+    <p>The 32-bit instruction from Instruction Memory is split and routed to different parts of the datapath:</p>
+    <table>
+      <tr><th>Instruction Bits</th><th>Goes To</th><th>Purpose</th></tr>
+      <tr><td><code>[31&ndash;26]</code> (opcode)</td><td><strong>Controller</strong></td><td>Determines instruction type, generates all control signals</td></tr>
+      <tr><td><code>[25&ndash;21]</code> (rs)</td><td>Register File &rarr; <strong>Read Register 1</strong></td><td>First source register</td></tr>
+      <tr><td><code>[20&ndash;16]</code> (rt)</td><td>Register File &rarr; <strong>Read Register 2</strong></td><td>Second source register (also destination for I-type)</td></tr>
+      <tr><td><code>[15&ndash;11]</code> (rd)</td><td><strong>RegDst MUX</strong> (input 1)</td><td>Destination register for R-type</td></tr>
+      <tr><td><code>[15&ndash;0]</code> (immediate)</td><td><strong>Sign Extend</strong> unit (16&rarr;32 bits)</td><td>Immediate/offset for I-type instructions</td></tr>
+      <tr><td><code>[5&ndash;0]</code> (funct)</td><td><strong>ALU Control</strong></td><td>Determines the specific ALU operation for R-type (add, sub, and, or, slt, etc.)</td></tr>
+    </table>
+  </div>
+
+  <div class="key-box">
+    <h4>The 4 MUXes in Single-Cycle Datapath</h4>
+    <table>
+      <tr><th>MUX</th><th>Control Signal</th><th>Input 0</th><th>Input 1</th><th>Purpose</th></tr>
+      <tr>
+        <td><strong>RegDst MUX</strong></td>
+        <td>RegDst</td>
+        <td>rt field [20&ndash;16]</td>
+        <td>rd field [15&ndash;11]</td>
+        <td>Selects destination register: rt for I-type (lw), rd for R-type</td>
+      </tr>
+      <tr>
+        <td><strong>ALUSrc MUX</strong></td>
+        <td>ALUSrc</td>
+        <td>Read Data 2 (register rt)</td>
+        <td>Sign-extended immediate</td>
+        <td>Selects ALU's second input: register value or immediate</td>
+      </tr>
+      <tr>
+        <td><strong>MemToReg MUX</strong></td>
+        <td>MemToReg</td>
+        <td>ALU result</td>
+        <td>Data Memory read data</td>
+        <td>Selects what's written back to register file: ALU result (R-type) or memory data (lw)</td>
+      </tr>
+      <tr>
+        <td><strong>PCSrc MUX</strong></td>
+        <td>Branch AND Zero</td>
+        <td>PC + 4 (normal next instruction)</td>
+        <td>Branch target (PC+4 + offset&times;4)</td>
+        <td>Selects next PC: sequential or branch target. Only selects input 1 when Branch=1 AND ALU Zero=1</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="key-box">
+    <h4>ALU Control Unit</h4>
+    <p>The ALU Control is a <strong>separate, smaller controller</strong> that determines the exact ALU operation. It takes two inputs:</p>
+    <ul>
+      <li><strong>ALUOp</strong> (2 bits, from main Controller) &mdash; tells the ALU Control what "family" of operation</li>
+      <li><strong>Funct field</strong> (bits [5&ndash;0] of instruction) &mdash; the specific R-type operation</li>
+    </ul>
+    <table style="margin-top:8px;">
+      <tr><th>ALUOp</th><th>Funct Field</th><th>ALU Action</th><th>Used By</th></tr>
+      <tr><td>00</td><td>X (ignored)</td><td><strong>Add</strong></td><td>lw, sw (address calculation)</td></tr>
+      <tr><td>01</td><td>X (ignored)</td><td><strong>Subtract</strong></td><td>beq (compare rs and rt)</td></tr>
+      <tr><td>10</td><td>100000 (add)</td><td><strong>Add</strong></td><td>R-type add</td></tr>
+      <tr><td>10</td><td>100010 (sub)</td><td><strong>Subtract</strong></td><td>R-type sub</td></tr>
+      <tr><td>10</td><td>100100 (and)</td><td><strong>AND</strong></td><td>R-type and</td></tr>
+      <tr><td>10</td><td>100101 (or)</td><td><strong>OR</strong></td><td>R-type or</td></tr>
+      <tr><td>10</td><td>101010 (slt)</td><td><strong>Set Less Than</strong></td><td>R-type slt</td></tr>
+    </table>
+    <p style="margin-top:8px; color:var(--muted);">When ALUOp=00 or 01, the funct field is <strong>ignored</strong> &mdash; the operation is already determined. Only when ALUOp=10 (R-type) does the ALU Control look at the funct field to decide the exact operation.</p>
+  </div>
+
+  <div class="key-box">
+    <h4>Two Adders (Not Just the ALU!)</h4>
+    <p>The single-cycle datapath has <strong>two separate adders</strong> in addition to the main ALU:</p>
+    <ul>
+      <li><strong>PC+4 Adder:</strong> Adds constant <strong>4</strong> to PC. Always runs. Produces the default next instruction address.</li>
+      <li><strong>Branch Adder:</strong> Adds the sign-extended, shifted offset to PC+4. Produces the branch target address. Its output feeds the PCSrc MUX (input 1).</li>
+    </ul>
+    <p>The <strong>Shift Left 2</strong> unit between Sign Extend and Branch Adder multiplies the offset by 4 (word alignment) before adding to PC+4.</p>
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">PCSrc MUX Logic</div>
+    <p>The PCSrc MUX selects the next PC value:</p>
+    <ul>
+      <li><strong>Input 0:</strong> PC+4 (regular next instruction) &mdash; used for R-type, lw, sw, j, and untaken branches</li>
+      <li><strong>Input 1:</strong> Branch target (PC+4 + offset&times;4) &mdash; used <strong>only</strong> when Branch=1 AND ALU Zero=1 (branch taken)</li>
+    </ul>
+    <p>The selection is controlled by an <strong>AND gate</strong>: PCSrc = Branch AND Zero. This means the branch target is selected only when the Controller says it's a branch instruction AND the ALU comparison result is zero (equal).</p>
+    <p style="color:var(--muted); margin-top:4px;">For <strong>jump (j)</strong>, there's actually a third input to the MUX: the jump target address constructed from {PC+4[31:28], IR[25:0], 00}.</p>
   </div>
 
   <div class="key-box exam">
