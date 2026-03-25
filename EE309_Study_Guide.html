@@ -522,6 +522,7 @@
   <a class="nav-tab" href="#s3">Registers</a>
   <a class="nav-tab" href="#s4">Addressing</a>
   <a class="nav-tab" href="#s5">Instructions</a>
+  <a class="nav-tab" href="#s5b">Full Instruction Ref</a>
   <a class="nav-tab" href="#s6">Branching</a>
   <a class="nav-tab" href="#s7">Ports</a>
   <a class="nav-tab" href="#s8">Timers</a>
@@ -534,6 +535,7 @@
   <a class="nav-tab" href="#s15">Pipelining</a>
   <a class="nav-tab" href="#s16">Cache</a>
   <a class="nav-tab" href="#quick">Recall</a>
+  <a class="nav-tab" href="#quiz">Quiz</a>
 </div>
 
 <!-- TABLE OF CONTENTS -->
@@ -548,6 +550,7 @@
       <li><a href="#s3">Registers, SFRs & PSW</a></li>
       <li><a href="#s4">Addressing Modes (5 types)</a></li>
       <li><a href="#s5">Instruction Set (Arithmetic, Logical, Data Transfer)</a></li>
+      <li><a href="#s5b">Complete 8051 Instruction Reference (All Instructions with Full Forms)</a></li>
       <li><a href="#s6">Branching: JMP vs CALL (ACALL/LCALL/AJMP/LJMP/SJMP)</a></li>
       <li><a href="#s7">Port Structures & I/O</a></li>
       <li><a href="#s8">Timers/Counters - All 4 Modes</a></li>
@@ -572,6 +575,7 @@
     <div class="toc-group-title">Quick Reference</div>
     <ol start="17">
       <li><a href="#quick">Quick Recall Cards</a></li>
+      <li><a href="#quiz">Interactive Quiz (Test Yourself!)</a></li>
     </ol>
   </div>
 </div>
@@ -910,6 +914,261 @@ After : A3 A2 A1 A0 | A7 A6 A5 A4</pre>
     <p>1 Machine Cycle = 12 clock cycles (for standard 8051)</p>
     <p>1 MC @ 12 MHz = 12/12,000,000 = 1 &mu;s</p>
     <p>Instructions take 1 to 4 MCs, and 1 to 3 bytes.</p>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 5B: COMPLETE INSTRUCTION REFERENCE -->
+<!-- ============================================ -->
+<div class="section" id="s5b">
+  <h2>5B. Complete 8051 Instruction Reference (All Instructions with Full Forms)</h2>
+
+  <div class="key-box concept">
+    <div class="label">8051 Instruction Set Overview</div>
+    <p>The 8051 has <strong>111 instructions</strong> with <strong>255 opcodes</strong> (1 opcode unused). Instructions are 1, 2, or 3 bytes long and take 1, 2, or 4 machine cycles.</p>
+    <p>Categories: <strong>Arithmetic (24)</strong>, <strong>Logical (25)</strong>, <strong>Data Transfer (28)</strong>, <strong>Boolean/Bit (17)</strong>, <strong>Branching/Program Control (17)</strong>.</p>
+  </div>
+
+  <!-- ARITHMETIC -->
+  <h3>Arithmetic Instructions (Full Forms)</h3>
+  <table>
+    <tr><th>Mnemonic</th><th>Full Form</th><th>Syntax</th><th>Operation</th><th>Bytes</th><th>MCs</th><th>Flags</th></tr>
+    <tr><td><code>ADD</code></td><td><strong>Add</strong></td><td><code>ADD A, Rn</code></td><td>A = A + Rn</td><td>1</td><td>1</td><td>CY, AC, OV, P</td></tr>
+    <tr><td><code>ADD</code></td><td><strong>Add</strong></td><td><code>ADD A, direct</code></td><td>A = A + (direct)</td><td>2</td><td>1</td><td>CY, AC, OV, P</td></tr>
+    <tr><td><code>ADD</code></td><td><strong>Add</strong></td><td><code>ADD A, @Ri</code></td><td>A = A + ((Ri))</td><td>1</td><td>1</td><td>CY, AC, OV, P</td></tr>
+    <tr><td><code>ADD</code></td><td><strong>Add</strong></td><td><code>ADD A, #data</code></td><td>A = A + immediate</td><td>2</td><td>1</td><td>CY, AC, OV, P</td></tr>
+    <tr><td><code>ADDC</code></td><td><strong>Add with Carry</strong></td><td><code>ADDC A, Rn</code></td><td>A = A + Rn + CY</td><td>1</td><td>1</td><td>CY, AC, OV, P</td></tr>
+    <tr><td><code>ADDC</code></td><td><strong>Add with Carry</strong></td><td><code>ADDC A, direct</code></td><td>A = A + (direct) + CY</td><td>2</td><td>1</td><td>CY, AC, OV, P</td></tr>
+    <tr><td><code>ADDC</code></td><td><strong>Add with Carry</strong></td><td><code>ADDC A, @Ri</code></td><td>A = A + ((Ri)) + CY</td><td>1</td><td>1</td><td>CY, AC, OV, P</td></tr>
+    <tr><td><code>ADDC</code></td><td><strong>Add with Carry</strong></td><td><code>ADDC A, #data</code></td><td>A = A + data + CY</td><td>2</td><td>1</td><td>CY, AC, OV, P</td></tr>
+    <tr><td><code>SUBB</code></td><td><strong>Subtract with Borrow</strong></td><td><code>SUBB A, Rn</code></td><td>A = A - Rn - CY</td><td>1</td><td>1</td><td>CY, AC, OV, P</td></tr>
+    <tr><td><code>SUBB</code></td><td><strong>Subtract with Borrow</strong></td><td><code>SUBB A, direct</code></td><td>A = A - (direct) - CY</td><td>2</td><td>1</td><td>CY, AC, OV, P</td></tr>
+    <tr><td><code>SUBB</code></td><td><strong>Subtract with Borrow</strong></td><td><code>SUBB A, @Ri</code></td><td>A = A - ((Ri)) - CY</td><td>1</td><td>1</td><td>CY, AC, OV, P</td></tr>
+    <tr><td><code>SUBB</code></td><td><strong>Subtract with Borrow</strong></td><td><code>SUBB A, #data</code></td><td>A = A - data - CY</td><td>2</td><td>1</td><td>CY, AC, OV, P</td></tr>
+    <tr><td><code>INC</code></td><td><strong>Increment</strong></td><td><code>INC A</code></td><td>A = A + 1</td><td>1</td><td>1</td><td class="red">P only</td></tr>
+    <tr><td><code>INC</code></td><td><strong>Increment</strong></td><td><code>INC Rn</code></td><td>Rn = Rn + 1</td><td>1</td><td>1</td><td class="red">NONE</td></tr>
+    <tr><td><code>INC</code></td><td><strong>Increment</strong></td><td><code>INC direct</code></td><td>(direct) = (direct) + 1</td><td>2</td><td>1</td><td class="red">NONE</td></tr>
+    <tr><td><code>INC</code></td><td><strong>Increment</strong></td><td><code>INC @Ri</code></td><td>((Ri)) = ((Ri)) + 1</td><td>1</td><td>1</td><td class="red">NONE</td></tr>
+    <tr><td><code>INC</code></td><td><strong>Increment</strong></td><td><code>INC DPTR</code></td><td>DPTR = DPTR + 1</td><td>1</td><td>2</td><td class="red">NONE</td></tr>
+    <tr><td><code>DEC</code></td><td><strong>Decrement</strong></td><td><code>DEC A</code></td><td>A = A - 1</td><td>1</td><td>1</td><td>P only</td></tr>
+    <tr><td><code>DEC</code></td><td><strong>Decrement</strong></td><td><code>DEC Rn</code></td><td>Rn = Rn - 1</td><td>1</td><td>1</td><td class="red">NONE</td></tr>
+    <tr><td><code>DEC</code></td><td><strong>Decrement</strong></td><td><code>DEC direct</code></td><td>(direct) = (direct) - 1</td><td>2</td><td>1</td><td class="red">NONE</td></tr>
+    <tr><td><code>DEC</code></td><td><strong>Decrement</strong></td><td><code>DEC @Ri</code></td><td>((Ri)) = ((Ri)) - 1</td><td>1</td><td>1</td><td class="red">NONE</td></tr>
+    <tr><td><code>MUL</code></td><td><strong>Multiply</strong></td><td><code>MUL AB</code></td><td>B:A = A &times; B</td><td>1</td><td>4</td><td>CY=0, OV, P</td></tr>
+    <tr><td><code>DIV</code></td><td><strong>Divide</strong></td><td><code>DIV AB</code></td><td>A = A/B (quot), B = A%B (rem)</td><td>1</td><td>4</td><td>CY=0, OV, P</td></tr>
+    <tr><td><code>DA</code></td><td><strong>Decimal Adjust</strong></td><td><code>DA A</code></td><td>BCD correction after ADD/ADDC</td><td>1</td><td>1</td><td>CY, P</td></tr>
+  </table>
+
+  <!-- LOGICAL -->
+  <h3>Logical Instructions (Full Forms)</h3>
+  <table>
+    <tr><th>Mnemonic</th><th>Full Form</th><th>Syntax</th><th>Operation</th><th>Bytes</th><th>MCs</th></tr>
+    <tr><td><code>ANL</code></td><td><strong>AND Logical</strong></td><td><code>ANL A, Rn</code></td><td>A = A AND Rn</td><td>1</td><td>1</td></tr>
+    <tr><td><code>ANL</code></td><td><strong>AND Logical</strong></td><td><code>ANL A, direct</code></td><td>A = A AND (direct)</td><td>2</td><td>1</td></tr>
+    <tr><td><code>ANL</code></td><td><strong>AND Logical</strong></td><td><code>ANL A, @Ri</code></td><td>A = A AND ((Ri))</td><td>1</td><td>1</td></tr>
+    <tr><td><code>ANL</code></td><td><strong>AND Logical</strong></td><td><code>ANL A, #data</code></td><td>A = A AND data</td><td>2</td><td>1</td></tr>
+    <tr><td><code>ANL</code></td><td><strong>AND Logical</strong></td><td><code>ANL direct, A</code></td><td>(direct) = (direct) AND A</td><td>2</td><td>1</td></tr>
+    <tr><td><code>ANL</code></td><td><strong>AND Logical</strong></td><td><code>ANL direct, #data</code></td><td>(direct) = (direct) AND data</td><td>3</td><td>2</td></tr>
+    <tr><td><code>ORL</code></td><td><strong>OR Logical</strong></td><td><code>ORL A, Rn</code></td><td>A = A OR Rn</td><td>1</td><td>1</td></tr>
+    <tr><td><code>ORL</code></td><td><strong>OR Logical</strong></td><td><code>ORL A, direct</code></td><td>A = A OR (direct)</td><td>2</td><td>1</td></tr>
+    <tr><td><code>ORL</code></td><td><strong>OR Logical</strong></td><td><code>ORL A, @Ri</code></td><td>A = A OR ((Ri))</td><td>1</td><td>1</td></tr>
+    <tr><td><code>ORL</code></td><td><strong>OR Logical</strong></td><td><code>ORL A, #data</code></td><td>A = A OR data</td><td>2</td><td>1</td></tr>
+    <tr><td><code>ORL</code></td><td><strong>OR Logical</strong></td><td><code>ORL direct, A</code></td><td>(direct) = (direct) OR A</td><td>2</td><td>1</td></tr>
+    <tr><td><code>ORL</code></td><td><strong>OR Logical</strong></td><td><code>ORL direct, #data</code></td><td>(direct) = (direct) OR data</td><td>3</td><td>2</td></tr>
+    <tr><td><code>XRL</code></td><td><strong>Exclusive OR Logical</strong></td><td><code>XRL A, Rn</code></td><td>A = A XOR Rn</td><td>1</td><td>1</td></tr>
+    <tr><td><code>XRL</code></td><td><strong>Exclusive OR Logical</strong></td><td><code>XRL A, direct</code></td><td>A = A XOR (direct)</td><td>2</td><td>1</td></tr>
+    <tr><td><code>XRL</code></td><td><strong>Exclusive OR Logical</strong></td><td><code>XRL A, @Ri</code></td><td>A = A XOR ((Ri))</td><td>1</td><td>1</td></tr>
+    <tr><td><code>XRL</code></td><td><strong>Exclusive OR Logical</strong></td><td><code>XRL A, #data</code></td><td>A = A XOR data</td><td>2</td><td>1</td></tr>
+    <tr><td><code>XRL</code></td><td><strong>Exclusive OR Logical</strong></td><td><code>XRL direct, A</code></td><td>(direct) = (direct) XOR A</td><td>2</td><td>1</td></tr>
+    <tr><td><code>XRL</code></td><td><strong>Exclusive OR Logical</strong></td><td><code>XRL direct, #data</code></td><td>(direct) = (direct) XOR data</td><td>3</td><td>2</td></tr>
+    <tr><td><code>CLR</code></td><td><strong>Clear</strong></td><td><code>CLR A</code></td><td>A = 00H</td><td>1</td><td>1</td></tr>
+    <tr><td><code>CPL</code></td><td><strong>Complement</strong></td><td><code>CPL A</code></td><td>A = NOT A (1's complement)</td><td>1</td><td>1</td></tr>
+    <tr><td><code>RL</code></td><td><strong>Rotate Left</strong></td><td><code>RL A</code></td><td>Rotate A left by 1 bit (A.7&rarr;A.0)</td><td>1</td><td>1</td></tr>
+    <tr><td><code>RLC</code></td><td><strong>Rotate Left through Carry</strong></td><td><code>RLC A</code></td><td>A.7&rarr;CY, CY&rarr;A.0 (9-bit rotate)</td><td>1</td><td>1</td></tr>
+    <tr><td><code>RR</code></td><td><strong>Rotate Right</strong></td><td><code>RR A</code></td><td>Rotate A right by 1 bit (A.0&rarr;A.7)</td><td>1</td><td>1</td></tr>
+    <tr><td><code>RRC</code></td><td><strong>Rotate Right through Carry</strong></td><td><code>RRC A</code></td><td>A.0&rarr;CY, CY&rarr;A.7 (9-bit rotate)</td><td>1</td><td>1</td></tr>
+    <tr><td><code>SWAP</code></td><td><strong>Swap Nibbles</strong></td><td><code>SWAP A</code></td><td>A[7:4] &harr; A[3:0]</td><td>1</td><td>1</td></tr>
+  </table>
+
+  <!-- DATA TRANSFER -->
+  <h3>Data Transfer Instructions (Full Forms)</h3>
+  <table>
+    <tr><th>Mnemonic</th><th>Full Form</th><th>Syntax</th><th>Operation</th><th>Bytes</th><th>MCs</th></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move</strong></td><td><code>MOV A, Rn</code></td><td>A = Rn</td><td>1</td><td>1</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move</strong></td><td><code>MOV A, direct</code></td><td>A = (direct)</td><td>2</td><td>1</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move</strong></td><td><code>MOV A, @Ri</code></td><td>A = ((Ri))</td><td>1</td><td>1</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move</strong></td><td><code>MOV A, #data</code></td><td>A = immediate data</td><td>2</td><td>1</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move</strong></td><td><code>MOV Rn, A</code></td><td>Rn = A</td><td>1</td><td>1</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move</strong></td><td><code>MOV Rn, direct</code></td><td>Rn = (direct)</td><td>2</td><td>2</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move</strong></td><td><code>MOV Rn, #data</code></td><td>Rn = immediate</td><td>2</td><td>1</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move</strong></td><td><code>MOV direct, A</code></td><td>(direct) = A</td><td>2</td><td>1</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move</strong></td><td><code>MOV direct, Rn</code></td><td>(direct) = Rn</td><td>2</td><td>2</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move</strong></td><td><code>MOV direct, direct</code></td><td>(dest) = (src)</td><td>3</td><td>2</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move</strong></td><td><code>MOV direct, @Ri</code></td><td>(direct) = ((Ri))</td><td>2</td><td>2</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move</strong></td><td><code>MOV direct, #data</code></td><td>(direct) = data</td><td>3</td><td>2</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move</strong></td><td><code>MOV @Ri, A</code></td><td>((Ri)) = A</td><td>1</td><td>1</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move</strong></td><td><code>MOV @Ri, direct</code></td><td>((Ri)) = (direct)</td><td>2</td><td>2</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move</strong></td><td><code>MOV @Ri, #data</code></td><td>((Ri)) = data</td><td>2</td><td>1</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move (16-bit)</strong></td><td><code>MOV DPTR, #data16</code></td><td>DPTR = 16-bit immediate</td><td>3</td><td>2</td></tr>
+    <tr><td><code>MOVC</code></td><td><strong>Move Code byte</strong></td><td><code>MOVC A, @A+DPTR</code></td><td>A = Code[(A) + (DPTR)]</td><td>1</td><td>2</td></tr>
+    <tr><td><code>MOVC</code></td><td><strong>Move Code byte</strong></td><td><code>MOVC A, @A+PC</code></td><td>A = Code[(A) + (PC)]</td><td>1</td><td>2</td></tr>
+    <tr><td><code>MOVX</code></td><td><strong>Move External</strong></td><td><code>MOVX A, @Ri</code></td><td>A = External RAM[(Ri)] (8-bit addr)</td><td>1</td><td>2</td></tr>
+    <tr><td><code>MOVX</code></td><td><strong>Move External</strong></td><td><code>MOVX A, @DPTR</code></td><td>A = External RAM[(DPTR)] (16-bit addr)</td><td>1</td><td>2</td></tr>
+    <tr><td><code>MOVX</code></td><td><strong>Move External</strong></td><td><code>MOVX @Ri, A</code></td><td>External RAM[(Ri)] = A</td><td>1</td><td>2</td></tr>
+    <tr><td><code>MOVX</code></td><td><strong>Move External</strong></td><td><code>MOVX @DPTR, A</code></td><td>External RAM[(DPTR)] = A</td><td>1</td><td>2</td></tr>
+    <tr><td><code>PUSH</code></td><td><strong>Push onto Stack</strong></td><td><code>PUSH direct</code></td><td>SP++, then (SP) = (direct)</td><td>2</td><td>2</td></tr>
+    <tr><td><code>POP</code></td><td><strong>Pop from Stack</strong></td><td><code>POP direct</code></td><td>(direct) = (SP), then SP--</td><td>2</td><td>2</td></tr>
+    <tr><td><code>XCH</code></td><td><strong>Exchange</strong></td><td><code>XCH A, Rn</code></td><td>A &harr; Rn</td><td>1</td><td>1</td></tr>
+    <tr><td><code>XCH</code></td><td><strong>Exchange</strong></td><td><code>XCH A, direct</code></td><td>A &harr; (direct)</td><td>2</td><td>1</td></tr>
+    <tr><td><code>XCH</code></td><td><strong>Exchange</strong></td><td><code>XCH A, @Ri</code></td><td>A &harr; ((Ri))</td><td>1</td><td>1</td></tr>
+    <tr><td><code>XCHD</code></td><td><strong>Exchange Digit (lower nibble)</strong></td><td><code>XCHD A, @Ri</code></td><td>A[3:0] &harr; ((Ri))[3:0]</td><td>1</td><td>1</td></tr>
+  </table>
+
+  <div class="key-box important">
+    <div class="label">MOV vs MOVC vs MOVX</div>
+    <ul>
+      <li><strong>MOV</strong> = Move data within internal RAM and SFRs</li>
+      <li><strong>MOVC</strong> = Move Code &mdash; reads from <em>program memory</em> (ROM/Flash). Used for lookup tables. The "C" stands for <strong>Code</strong>.</li>
+      <li><strong>MOVX</strong> = Move External &mdash; reads/writes <em>external data RAM</em>. The "X" stands for <strong>eXternal</strong>. Uses RD# and WR# signals.</li>
+    </ul>
+  </div>
+
+  <!-- BOOLEAN / BIT MANIPULATION -->
+  <h3>Boolean / Bit Manipulation Instructions (Full Forms)</h3>
+  <table>
+    <tr><th>Mnemonic</th><th>Full Form</th><th>Syntax</th><th>Operation</th><th>Bytes</th><th>MCs</th></tr>
+    <tr><td><code>CLR</code></td><td><strong>Clear Carry</strong></td><td><code>CLR C</code></td><td>CY = 0</td><td>1</td><td>1</td></tr>
+    <tr><td><code>CLR</code></td><td><strong>Clear Bit</strong></td><td><code>CLR bit</code></td><td>bit = 0</td><td>2</td><td>1</td></tr>
+    <tr><td><code>SETB</code></td><td><strong>Set Bit</strong></td><td><code>SETB C</code></td><td>CY = 1</td><td>1</td><td>1</td></tr>
+    <tr><td><code>SETB</code></td><td><strong>Set Bit</strong></td><td><code>SETB bit</code></td><td>bit = 1</td><td>2</td><td>1</td></tr>
+    <tr><td><code>CPL</code></td><td><strong>Complement Carry</strong></td><td><code>CPL C</code></td><td>CY = NOT CY</td><td>1</td><td>1</td></tr>
+    <tr><td><code>CPL</code></td><td><strong>Complement Bit</strong></td><td><code>CPL bit</code></td><td>bit = NOT bit</td><td>2</td><td>1</td></tr>
+    <tr><td><code>ANL</code></td><td><strong>AND Logical (bit)</strong></td><td><code>ANL C, bit</code></td><td>CY = CY AND bit</td><td>2</td><td>2</td></tr>
+    <tr><td><code>ANL</code></td><td><strong>AND Logical (bit)</strong></td><td><code>ANL C, /bit</code></td><td>CY = CY AND (NOT bit)</td><td>2</td><td>2</td></tr>
+    <tr><td><code>ORL</code></td><td><strong>OR Logical (bit)</strong></td><td><code>ORL C, bit</code></td><td>CY = CY OR bit</td><td>2</td><td>2</td></tr>
+    <tr><td><code>ORL</code></td><td><strong>OR Logical (bit)</strong></td><td><code>ORL C, /bit</code></td><td>CY = CY OR (NOT bit)</td><td>2</td><td>2</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move (bit)</strong></td><td><code>MOV C, bit</code></td><td>CY = bit</td><td>2</td><td>1</td></tr>
+    <tr><td><code>MOV</code></td><td><strong>Move (bit)</strong></td><td><code>MOV bit, C</code></td><td>bit = CY</td><td>2</td><td>2</td></tr>
+    <tr><td><code>JC</code></td><td><strong>Jump if Carry set</strong></td><td><code>JC rel</code></td><td>if CY=1, PC = PC + 2 + rel</td><td>2</td><td>2</td></tr>
+    <tr><td><code>JNC</code></td><td><strong>Jump if No Carry</strong></td><td><code>JNC rel</code></td><td>if CY=0, PC = PC + 2 + rel</td><td>2</td><td>2</td></tr>
+    <tr><td><code>JB</code></td><td><strong>Jump if Bit set</strong></td><td><code>JB bit, rel</code></td><td>if bit=1, jump</td><td>3</td><td>2</td></tr>
+    <tr><td><code>JNB</code></td><td><strong>Jump if Not Bit set</strong></td><td><code>JNB bit, rel</code></td><td>if bit=0, jump</td><td>3</td><td>2</td></tr>
+    <tr><td><code>JBC</code></td><td><strong>Jump if Bit set &amp; Clear bit</strong></td><td><code>JBC bit, rel</code></td><td>if bit=1, clear bit &amp; jump</td><td>3</td><td>2</td></tr>
+  </table>
+
+  <div class="key-box">
+    <h4>Bit-Addressable Regions</h4>
+    <ul>
+      <li><strong>Internal RAM:</strong> Bytes 20H&ndash;2FH (bit addresses 00H&ndash;7FH = 128 bits)</li>
+      <li><strong>SFRs:</strong> Only SFRs whose addresses end in 0H or 8H are bit-addressable (e.g., P0=80H, TCON=88H, SCON=98H, IE=A8H, IP=B8H, PSW=D0H, ACC=E0H, B=F0H)</li>
+    </ul>
+  </div>
+
+  <!-- BRANCHING / PROGRAM CONTROL -->
+  <h3>Branching &amp; Program Control Instructions (Full Forms)</h3>
+  <table>
+    <tr><th>Mnemonic</th><th>Full Form</th><th>Syntax</th><th>Operation</th><th>Bytes</th><th>MCs</th></tr>
+    <tr><td><code>ACALL</code></td><td><strong>Absolute Call</strong></td><td><code>ACALL addr11</code></td><td>Push PC, jump within 2KB page</td><td>2</td><td>2</td></tr>
+    <tr><td><code>LCALL</code></td><td><strong>Long Call</strong></td><td><code>LCALL addr16</code></td><td>Push PC, jump anywhere in 64KB</td><td>3</td><td>2</td></tr>
+    <tr><td><code>RET</code></td><td><strong>Return from subroutine</strong></td><td><code>RET</code></td><td>Pop PC from stack</td><td>1</td><td>2</td></tr>
+    <tr><td><code>RETI</code></td><td><strong>Return from Interrupt</strong></td><td><code>RETI</code></td><td>Pop PC, re-enable interrupt level</td><td>1</td><td>2</td></tr>
+    <tr><td><code>AJMP</code></td><td><strong>Absolute Jump</strong></td><td><code>AJMP addr11</code></td><td>Jump within 2KB page</td><td>2</td><td>2</td></tr>
+    <tr><td><code>LJMP</code></td><td><strong>Long Jump</strong></td><td><code>LJMP addr16</code></td><td>Jump anywhere in 64KB</td><td>3</td><td>2</td></tr>
+    <tr><td><code>SJMP</code></td><td><strong>Short Jump</strong></td><td><code>SJMP rel</code></td><td>PC = PC + 2 + rel (-128 to +127)</td><td>2</td><td>2</td></tr>
+    <tr><td><code>JMP</code></td><td><strong>Jump Indirect</strong></td><td><code>JMP @A+DPTR</code></td><td>PC = A + DPTR (scatter/jump table)</td><td>1</td><td>2</td></tr>
+    <tr><td><code>JZ</code></td><td><strong>Jump if Zero</strong></td><td><code>JZ rel</code></td><td>if A=0, jump</td><td>2</td><td>2</td></tr>
+    <tr><td><code>JNZ</code></td><td><strong>Jump if Not Zero</strong></td><td><code>JNZ rel</code></td><td>if A&ne;0, jump</td><td>2</td><td>2</td></tr>
+    <tr><td><code>CJNE</code></td><td><strong>Compare and Jump if Not Equal</strong></td><td><code>CJNE A, direct, rel</code></td><td>if A &ne; (direct), jump; sets CY if A &lt; (direct)</td><td>3</td><td>2</td></tr>
+    <tr><td><code>CJNE</code></td><td><strong>Compare and Jump if Not Equal</strong></td><td><code>CJNE A, #data, rel</code></td><td>if A &ne; data, jump</td><td>3</td><td>2</td></tr>
+    <tr><td><code>CJNE</code></td><td><strong>Compare and Jump if Not Equal</strong></td><td><code>CJNE Rn, #data, rel</code></td><td>if Rn &ne; data, jump</td><td>3</td><td>2</td></tr>
+    <tr><td><code>CJNE</code></td><td><strong>Compare and Jump if Not Equal</strong></td><td><code>CJNE @Ri, #data, rel</code></td><td>if ((Ri)) &ne; data, jump</td><td>3</td><td>2</td></tr>
+    <tr><td><code>DJNZ</code></td><td><strong>Decrement and Jump if Not Zero</strong></td><td><code>DJNZ Rn, rel</code></td><td>Rn = Rn-1; if Rn&ne;0, jump</td><td>2</td><td>2</td></tr>
+    <tr><td><code>DJNZ</code></td><td><strong>Decrement and Jump if Not Zero</strong></td><td><code>DJNZ direct, rel</code></td><td>(direct)--; if &ne;0, jump</td><td>3</td><td>2</td></tr>
+    <tr><td><code>NOP</code></td><td><strong>No Operation</strong></td><td><code>NOP</code></td><td>Do nothing (1 MC delay)</td><td>1</td><td>1</td></tr>
+  </table>
+
+  <div class="key-box exam">
+    <div class="label">Exam Tip: CJNE sets Carry!</div>
+    <p><code>CJNE</code> is the only way to do a "greater than / less than" comparison in 8051:</p>
+    <ul>
+      <li>If operand1 <strong>&lt;</strong> operand2 &rarr; <strong>CY = 1</strong></li>
+      <li>If operand1 <strong>&ge;</strong> operand2 &rarr; <strong>CY = 0</strong></li>
+    </ul>
+    <p>So after <code>CJNE A, #50H, NEXT</code>: check <code>JC</code> to see if A &lt; 50H.</p>
+  </div>
+
+  <!-- FULL FORM QUICK REFERENCE -->
+  <h3>Quick Reference: All Mnemonics &amp; Their Full Forms</h3>
+  <div class="two-col">
+    <div class="key-box">
+      <h4>Arithmetic &amp; Logical</h4>
+      <ul>
+        <li><code>ADD</code> &mdash; <strong>Add</strong></li>
+        <li><code>ADDC</code> &mdash; <strong>Add with Carry</strong></li>
+        <li><code>SUBB</code> &mdash; <strong>Subtract with Borrow</strong></li>
+        <li><code>INC</code> &mdash; <strong>Increment</strong></li>
+        <li><code>DEC</code> &mdash; <strong>Decrement</strong></li>
+        <li><code>MUL</code> &mdash; <strong>Multiply</strong></li>
+        <li><code>DIV</code> &mdash; <strong>Divide</strong></li>
+        <li><code>DA</code> &mdash; <strong>Decimal Adjust</strong></li>
+        <li><code>ANL</code> &mdash; <strong>AND Logical</strong></li>
+        <li><code>ORL</code> &mdash; <strong>OR Logical</strong></li>
+        <li><code>XRL</code> &mdash; <strong>Exclusive OR Logical</strong></li>
+        <li><code>CLR</code> &mdash; <strong>Clear</strong></li>
+        <li><code>CPL</code> &mdash; <strong>Complement</strong></li>
+        <li><code>RL</code> &mdash; <strong>Rotate Left</strong></li>
+        <li><code>RLC</code> &mdash; <strong>Rotate Left through Carry</strong></li>
+        <li><code>RR</code> &mdash; <strong>Rotate Right</strong></li>
+        <li><code>RRC</code> &mdash; <strong>Rotate Right through Carry</strong></li>
+        <li><code>SWAP</code> &mdash; <strong>Swap Nibbles</strong></li>
+      </ul>
+    </div>
+    <div class="key-box">
+      <h4>Data Transfer &amp; Control</h4>
+      <ul>
+        <li><code>MOV</code> &mdash; <strong>Move</strong></li>
+        <li><code>MOVC</code> &mdash; <strong>Move Code byte</strong></li>
+        <li><code>MOVX</code> &mdash; <strong>Move External</strong></li>
+        <li><code>PUSH</code> &mdash; <strong>Push onto Stack</strong></li>
+        <li><code>POP</code> &mdash; <strong>Pop from Stack</strong></li>
+        <li><code>XCH</code> &mdash; <strong>Exchange</strong></li>
+        <li><code>XCHD</code> &mdash; <strong>Exchange Digit (lower nibble)</strong></li>
+        <li><code>SETB</code> &mdash; <strong>Set Bit</strong></li>
+        <li><code>ACALL</code> &mdash; <strong>Absolute Call</strong></li>
+        <li><code>LCALL</code> &mdash; <strong>Long Call</strong></li>
+        <li><code>AJMP</code> &mdash; <strong>Absolute Jump</strong></li>
+        <li><code>LJMP</code> &mdash; <strong>Long Jump</strong></li>
+        <li><code>SJMP</code> &mdash; <strong>Short Jump</strong></li>
+        <li><code>RET</code> &mdash; <strong>Return from Subroutine</strong></li>
+        <li><code>RETI</code> &mdash; <strong>Return from Interrupt</strong></li>
+        <li><code>JZ</code> &mdash; <strong>Jump if Zero</strong></li>
+        <li><code>JNZ</code> &mdash; <strong>Jump if Not Zero</strong></li>
+        <li><code>JC</code> &mdash; <strong>Jump if Carry set</strong></li>
+        <li><code>JNC</code> &mdash; <strong>Jump if No Carry</strong></li>
+        <li><code>JB</code> &mdash; <strong>Jump if Bit set</strong></li>
+        <li><code>JNB</code> &mdash; <strong>Jump if Not Bit set</strong></li>
+        <li><code>JBC</code> &mdash; <strong>Jump if Bit set &amp; Clear</strong></li>
+        <li><code>CJNE</code> &mdash; <strong>Compare and Jump if Not Equal</strong></li>
+        <li><code>DJNZ</code> &mdash; <strong>Decrement and Jump if Not Zero</strong></li>
+        <li><code>NOP</code> &mdash; <strong>No Operation</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="key-box concept">
+    <div class="label">Addressing Mode Notation</div>
+    <ul>
+      <li><code>Rn</code> &mdash; Register R0&ndash;R7 of the selected bank</li>
+      <li><code>direct</code> &mdash; 8-bit internal RAM or SFR address (00H&ndash;FFH)</li>
+      <li><code>@Ri</code> &mdash; Indirect addressing using R0 or R1 as pointer</li>
+      <li><code>#data</code> &mdash; 8-bit immediate constant</li>
+      <li><code>#data16</code> &mdash; 16-bit immediate constant (only for MOV DPTR)</li>
+      <li><code>rel</code> &mdash; 8-bit signed offset (-128 to +127) relative to next instruction</li>
+      <li><code>addr11</code> &mdash; 11-bit address (2KB page, used by ACALL/AJMP)</li>
+      <li><code>addr16</code> &mdash; 16-bit address (full 64KB, used by LCALL/LJMP)</li>
+      <li><code>bit</code> &mdash; Bit address in bit-addressable area (00H&ndash;7FH) or SFR bits</li>
+      <li><code>/bit</code> &mdash; Complement of the addressed bit (bit itself unchanged)</li>
+    </ul>
   </div>
 </div>
 
@@ -2842,6 +3101,251 @@ Example: 128B cache, 16B blocks, 2-way set-associative
     </div>
   </div>
 </div>
+
+<!-- ============================================ -->
+<!-- SECTION: INTERACTIVE QUIZ -->
+<!-- ============================================ -->
+<div class="section" id="quiz">
+  <h2>Interactive Quiz - Test Yourself!</h2>
+  <p style="color: var(--muted); margin-bottom: 20px;">Click an option to check your answer. Green = correct, Red = wrong. Score is tracked at the bottom.</p>
+
+  <div id="quiz-container"></div>
+
+  <div id="quiz-score" style="text-align:center; margin-top:30px; padding:20px; background:var(--card); border-radius:12px; border:2px solid var(--cyan);">
+    <span style="font-size:1.4rem; color:var(--cyan);">Score: <span id="score-correct">0</span> / <span id="score-total">0</span></span>
+    <span id="score-pct" style="margin-left:15px; color:var(--yellow); font-size:1.2rem;"></span>
+    <br><button onclick="resetQuiz()" style="margin-top:12px; padding:8px 24px; background:var(--accent1); color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:1rem;">Reset Quiz</button>
+  </div>
+</div>
+
+<p style="text-align:center; color: var(--muted); margin-top: 40px; padding: 20px;">
+  EE 309 Complete Study Guide - 8051 + MIPS + Computer Architecture<br>
+  Covering: Architecture, Memory, Registers, Instructions, Timers, Interrupts, Serial Comm, Multiprocessor,<br>
+  Performance, MIPS ISA, Datapath, Pipelining, and Cache Memory.
+</p>
+
+</div>
+
+<script>
+const quizData = [
+  // 8051 Architecture
+  {q: "What architecture does the 8051 use?", opts: ["Von Neumann", "Harvard", "Modified Harvard", "RISC"], ans: 1,
+   exp: "8051 uses Harvard architecture with separate program (ROM) and data (RAM) memory buses."},
+  {q: "How much internal RAM does a standard 8051 have?", opts: ["64 bytes", "128 bytes", "256 bytes", "512 bytes"], ans: 1,
+   exp: "Standard 8051 has 128 bytes of internal RAM (00H-7FH). The 8052 variant has 256 bytes."},
+  {q: "What is the full form of PSW?", opts: ["Program Status Word", "Processor Status Word", "Program State Word", "Peripheral Status Word"], ans: 0,
+   exp: "PSW = Program Status Word, located at address D0H, contains CY, AC, F0, RS1, RS0, OV, -, P flags."},
+
+  // Instructions - Full Forms
+  {q: "What does MOVC stand for?", opts: ["Move Constant", "Move Code byte", "Move with Carry", "Move to Counter"], ans: 1,
+   exp: "MOVC = Move Code byte. It reads from program memory (ROM/Flash), used for lookup tables."},
+  {q: "What does MOVX stand for?", opts: ["Move Extended", "Move External", "Move Extra", "Move with XOR"], ans: 1,
+   exp: "MOVX = Move External. It reads/writes external data RAM. 'X' stands for eXternal."},
+  {q: "What is the full form of ACALL?", opts: ["Auto Call", "Absolute Call", "Address Call", "Accumulator Call"], ans: 1,
+   exp: "ACALL = Absolute Call. Uses 11-bit address, can call within the same 2KB page."},
+  {q: "What does LCALL stand for?", opts: ["Local Call", "Long Call", "Linear Call", "Logical Call"], ans: 1,
+   exp: "LCALL = Long Call. Uses 16-bit address, can call anywhere in the entire 64KB program space."},
+  {q: "What is the full form of SJMP?", opts: ["System Jump", "Short Jump", "Stack Jump", "Signed Jump"], ans: 1,
+   exp: "SJMP = Short Jump. Uses 8-bit signed offset for relative jump (-128 to +127 bytes)."},
+  {q: "What does DJNZ stand for?", opts: ["Direct Jump if Not Zero", "Decrement and Jump if Not Zero", "Double Jump if Not Zero", "Delayed Jump if Not Zero"], ans: 1,
+   exp: "DJNZ = Decrement and Jump if Not Zero. Decrements the operand and jumps if result is not zero."},
+  {q: "What is the full form of CJNE?", opts: ["Carry Jump if Not Equal", "Compare and Jump if Not Equal", "Conditional Jump if Not Equal", "Clear and Jump if Not Equal"], ans: 1,
+   exp: "CJNE = Compare and Jump if Not Equal. Also sets CY flag if first operand < second operand."},
+  {q: "What does RETI stand for?", opts: ["Return Immediate", "Return from Interrupt", "Return with Timer Interrupt", "Reset Interrupt"], ans: 1,
+   exp: "RETI = Return from Interrupt. Pops PC from stack AND re-enables the interrupt priority level."},
+  {q: "What is the full form of SUBB?", opts: ["Subtract Binary", "Subtract with Borrow", "Subtract Byte", "Subtract and Branch"], ans: 1,
+   exp: "SUBB = Subtract with Borrow. A = A - source - CY. There is NO SUB instruction in 8051 (must clear CY first)."},
+  {q: "What does ADDC stand for?", opts: ["Add and Check Carry", "Add with Carry", "Add Double with Carry", "Address and Carry"], ans: 1,
+   exp: "ADDC = Add with Carry. A = A + source + CY. Used for multi-byte addition."},
+  {q: "What is the full form of ANL?", opts: ["AND Logic", "AND Logical", "Analyze Logic", "AND with Latch"], ans: 1,
+   exp: "ANL = AND Logical. Performs bitwise AND operation."},
+  {q: "What does ORL stand for?", opts: ["OR Logical", "OR with Latch", "OR and Load", "Operation Result Logical"], ans: 0,
+   exp: "ORL = OR Logical. Performs bitwise OR operation."},
+  {q: "What is the full form of XRL?", opts: ["XOR Logical", "Exclusive OR Logical", "External OR Logical", "Exchange and Rotate Left"], ans: 1,
+   exp: "XRL = Exclusive OR Logical. Performs bitwise XOR operation."},
+  {q: "What does RLC stand for?", opts: ["Rotate Left with Clear", "Rotate Left through Carry", "Rotate Left and Compare", "Rotate Left Circular"], ans: 1,
+   exp: "RLC = Rotate Left through Carry. A.7 goes to CY, CY goes to A.0 (9-bit rotation)."},
+  {q: "What does SETB stand for?", opts: ["Set Byte", "Set Bit", "Set Binary", "Set Buffer"], ans: 1,
+   exp: "SETB = Set Bit. Sets the specified bit to 1."},
+  {q: "What does XCHD stand for?", opts: ["Exchange Double", "Exchange Digit", "Exchange Data", "Exchange Direct"], ans: 1,
+   exp: "XCHD = Exchange Digit. Exchanges only the lower nibble (4 bits) between A and indirect RAM."},
+  {q: "What is the full form of JBC?", opts: ["Jump if Bit and Clear", "Jump if Bit set and Clear bit", "Jump Back and Continue", "Jump if Below Carry"], ans: 1,
+   exp: "JBC = Jump if Bit set and Clear bit. If the bit is 1, it clears the bit and jumps."},
+
+  // Instruction behavior
+  {q: "Which instruction does NOT affect any flags?", opts: ["ADD A, R0", "INC R3", "SUBB A, #05H", "MUL AB"], ans: 1,
+   exp: "INC does NOT affect CY, AC, or OV flags. This is a classic exam trap!"},
+  {q: "How many machine cycles does MUL AB take?", opts: ["1 MC", "2 MCs", "3 MCs", "4 MCs"], ans: 3,
+   exp: "MUL AB takes 4 machine cycles - the longest instruction in the 8051 instruction set (along with DIV AB)."},
+  {q: "After CJNE A, #50H, NEXT - if CY=1, what does it mean?", opts: ["A = 50H", "A > 50H", "A < 50H", "A >= 50H"], ans: 2,
+   exp: "CJNE sets CY=1 when the first operand < second operand. So CY=1 means A < 50H."},
+  {q: "What is the difference between RET and RETI?", opts: ["No difference", "RETI also re-enables interrupt level", "RETI clears all flags", "RETI pops more bytes"], ans: 1,
+   exp: "RETI pops PC from stack AND clears the interrupt-in-service flag, allowing same-level interrupts again."},
+  {q: "PUSH and POP use which addressing mode?", opts: ["Register", "Immediate", "Direct only", "Indirect"], ans: 2,
+   exp: "PUSH and POP only use direct addressing. You write PUSH ACC (E0H), not PUSH A. PUSH 00H pushes R0."},
+
+  // Memory & Addressing
+  {q: "Which bytes in internal RAM are bit-addressable?", opts: ["00H-1FH", "20H-2FH", "30H-7FH", "80H-FFH"], ans: 1,
+   exp: "Bytes 20H-2FH (16 bytes = 128 bits) are bit-addressable with bit addresses 00H-7FH."},
+  {q: "How many register banks does the 8051 have?", opts: ["2", "4", "8", "16"], ans: 1,
+   exp: "4 register banks (Bank 0-3), each with 8 registers (R0-R7), selected by RS1:RS0 bits in PSW."},
+  {q: "What does @Ri mean in 8051 addressing?", opts: ["Register addressing", "Immediate addressing", "Indirect addressing using R0 or R1", "Direct addressing"], ans: 2,
+   exp: "@Ri = Indirect addressing. Only R0 and R1 can be used as pointers for internal RAM indirect access."},
+
+  // Timers
+  {q: "In Timer Mode 1, what is the timer size?", opts: ["8-bit", "13-bit", "16-bit", "Two 8-bit"], ans: 2,
+   exp: "Mode 1 = 16-bit timer/counter using both TH and TL registers."},
+  {q: "How is 1 machine cycle related to clock cycles in 8051?", opts: ["1 clock cycle", "6 clock cycles", "12 clock cycles", "24 clock cycles"], ans: 2,
+   exp: "1 Machine Cycle = 12 clock cycles. At 12 MHz crystal, 1 MC = 1 microsecond."},
+  {q: "What is Timer Mode 2?", opts: ["13-bit timer", "16-bit timer", "8-bit auto-reload", "Split timer"], ans: 2,
+   exp: "Mode 2 = 8-bit auto-reload. TL counts, and when it overflows, TH value is automatically loaded into TL."},
+
+  // Interrupts
+  {q: "How many interrupt sources does the 8051 have?", opts: ["3", "5", "6", "8"], ans: 1,
+   exp: "5 interrupt sources: INT0, Timer0, INT1, Timer1, Serial (TI/RI)."},
+  {q: "What is the vector address for Timer 0 interrupt?", opts: ["0003H", "000BH", "0013H", "001BH"], ans: 1,
+   exp: "Timer 0 interrupt vector = 000BH. The vectors are: INT0=0003H, T0=000BH, INT1=0013H, T1=001BH, Serial=0023H."},
+  {q: "Which SFR controls interrupt enable?", opts: ["IP", "IE", "TCON", "SCON"], ans: 1,
+   exp: "IE (Interrupt Enable) register at A8H. EA (bit 7) is the global enable - must be set to 1 for any interrupt."},
+
+  // Serial Communication
+  {q: "What does SBUF stand for?", opts: ["Serial Buffer", "System Buffer", "Stack Buffer", "Status Buffer"], ans: 0,
+   exp: "SBUF = Serial Buffer (address 99H). Writing to SBUF starts transmission, reading SBUF gets received data."},
+  {q: "In Serial Mode 1, how many data bits are transmitted?", opts: ["8 bits synchronous", "8 bits UART", "9 bits UART", "Shift register"], ans: 1,
+   exp: "Mode 1 = 8-bit UART with variable baud rate. Frame: 1 start + 8 data + 1 stop = 10 bits."},
+  {q: "Which timer is typically used for baud rate generation?", opts: ["Timer 0", "Timer 1", "Timer 2", "Either Timer 0 or 1"], ans: 1,
+   exp: "Timer 1 in Mode 2 (8-bit auto-reload) is typically used for baud rate generation."},
+  {q: "What is SM2 used for?", opts: ["Speed Mode 2", "Serial Mode 2", "Multiprocessor communication", "Synchronous Mode 2"], ans: 2,
+   exp: "SM2 enables multiprocessor communication. When SM2=1, RI is set only if the 9th bit (RB8) is 1."},
+
+  // MIPS
+  {q: "How many registers does MIPS have?", opts: ["8", "16", "32", "64"], ans: 2,
+   exp: "MIPS has 32 general-purpose registers ($0-$31), each 32 bits wide."},
+  {q: "What does 'jal' stand for in MIPS?", opts: ["Jump and Loop", "Jump and Link", "Jump and Load", "Jump After Label"], ans: 1,
+   exp: "jal = Jump and Link. Stores return address (PC+4) in $ra ($31), then jumps to target."},
+  {q: "Which MIPS instruction format has opcode, rs, rt, rd, shamt, funct?", opts: ["I-type", "R-type", "J-type", "S-type"], ans: 1,
+   exp: "R-type (Register) format: 6-bit opcode, 5-bit rs, 5-bit rt, 5-bit rd, 5-bit shamt, 6-bit funct = 32 bits."},
+  {q: "What is the MIPS pipeline stage order?", opts: ["IF, ID, EX, MEM, WB", "IF, EX, ID, MEM, WB", "IF, ID, MEM, EX, WB", "IF, MEM, ID, EX, WB"], ans: 0,
+   exp: "IF (Instruction Fetch), ID (Instruction Decode), EX (Execute), MEM (Memory Access), WB (Write Back)."},
+  {q: "In MIPS, $zero ($0) always contains?", opts: ["The last result", "0", "The stack pointer", "PC value"], ans: 1,
+   exp: "$zero ($0) is hardwired to 0. Writes to $0 are ignored. Useful for moves (add $t0, $s0, $zero) and comparisons."},
+  {q: "What type of hazard occurs when an instruction needs data from a previous instruction not yet written back?", opts: ["Structural hazard", "Data hazard", "Control hazard", "Memory hazard"], ans: 1,
+   exp: "Data hazard (RAW - Read After Write). Solution: forwarding/bypassing or stalling (inserting NOPs/bubbles)."},
+  {q: "What does 'slt' stand for in MIPS?", opts: ["Shift Left", "Set if Less Than", "Store and Load Temp", "Select"], ans: 1,
+   exp: "slt = Set if Less Than. slt $t0, $s0, $s1 sets $t0=1 if $s0 < $s1 (signed comparison), else $t0=0."},
+  {q: "What does 'lui' stand for in MIPS?", opts: ["Load Upper Integer", "Load Upper Immediate", "Load Until Interrupt", "Logical Upper Immediate"], ans: 1,
+   exp: "lui = Load Upper Immediate. Loads 16-bit immediate into upper 16 bits of register, lower 16 bits set to 0."},
+  {q: "What does 'beq' stand for?", opts: ["Branch if Equal", "Branch if Even", "Branch and Execute", "Byte Equal"], ans: 0,
+   exp: "beq = Branch if Equal. beq $s0, $s1, L jumps to label L if $s0 == $s1."},
+  {q: "What does 'bne' stand for?", opts: ["Branch if Not Even", "Branch if Not Equal", "Branch to Next", "Branch and Negate"], ans: 1,
+   exp: "bne = Branch if Not Equal. bne $s0, $s1, L jumps to label L if $s0 != $s1."},
+
+  // Cache & Performance
+  {q: "In a direct-mapped cache, how many possible locations can a block map to?", opts: ["1", "2", "4", "Any"], ans: 0,
+   exp: "Direct-mapped: each block maps to exactly 1 cache location (index = block address mod # cache blocks)."},
+  {q: "What is Amdahl's Law about?", opts: ["Power consumption", "Speedup limitation from partial optimization", "Cache hit rate", "Pipeline depth"], ans: 1,
+   exp: "Amdahl's Law: Speedup = 1 / ((1-f) + f/S), where f = fraction improved, S = speedup of that fraction."},
+  {q: "What does CPI stand for?", opts: ["Clock Per Instruction", "Cycles Per Instruction", "Clocks Per Iteration", "Count Per Instruction"], ans: 1,
+   exp: "CPI = Cycles Per Instruction. CPU Time = IC x CPI x Clock Cycle Time."},
+  {q: "Which principle explains why cache memory works?", opts: ["Moore's Law", "Amdahl's Law", "Locality of Reference", "Nyquist Theorem"], ans: 2,
+   exp: "Locality: Temporal (recently accessed data likely accessed again) and Spatial (nearby data likely accessed soon)."},
+
+  // Power
+  {q: "Dynamic power formula is:", opts: ["P = V x I", "P = C x Vdd^2 x f", "P = I^2 x R", "P = f / Vdd"], ans: 1,
+   exp: "Dynamic Power = C x Vdd^2 x f_clk. Reducing voltage (Vdd) has quadratic effect on power savings."},
+
+  // DA instruction
+  {q: "When should DA A be used?", opts: ["After any subtraction", "After MUL AB", "After adding two BCD numbers", "After logical operations"], ans: 2,
+   exp: "DA (Decimal Adjust) is used only after ADD or ADDC on BCD numbers. It does NOT work after SUBB."},
+];
+
+// Shuffle questions
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+let answered = 0, correct = 0;
+
+function renderQuiz() {
+  const container = document.getElementById('quiz-container');
+  const shuffled = shuffle([...quizData]);
+  container.innerHTML = shuffled.map((q, i) => {
+    const optLetters = ['A', 'B', 'C', 'D'];
+    return `
+    <div class="quiz-q" id="qq-${i}" style="background:var(--card); border-radius:12px; padding:20px; margin-bottom:16px; border-left:4px solid var(--cyan);">
+      <p style="color:var(--yellow); font-weight:bold; margin-bottom:12px;">Q${i+1}. ${q.q}</p>
+      <div class="quiz-opts">
+        ${q.opts.map((o, j) => `
+          <div class="quiz-opt" id="opt-${i}-${j}" onclick="checkAnswer(${i},${j},${shuffled.indexOf(quizData[shuffled.indexOf(q)])})"
+            style="padding:10px 16px; margin:6px 0; background:var(--card2); border:1px solid #444; border-radius:8px; cursor:pointer; transition:all 0.3s;">
+            <strong style="color:var(--cyan);">${optLetters[j]}.</strong> ${o}
+          </div>
+        `).join('')}
+      </div>
+      <div id="exp-${i}" style="display:none; margin-top:12px; padding:12px; background:#1a2a1a; border-radius:8px; border-left:3px solid var(--green); color:var(--green);"></div>
+    </div>`;
+  }).join('');
+  // Store shuffled data for answer checking
+  window._quizShuffled = shuffled;
+}
+
+function checkAnswer(qIdx, optIdx) {
+  const q = window._quizShuffled[qIdx];
+  const qDiv = document.getElementById(`qq-${qIdx}`);
+  if (qDiv.dataset.answered) return;
+  qDiv.dataset.answered = 'true';
+  answered++;
+
+  const isCorrect = optIdx === q.ans;
+  if (isCorrect) correct++;
+
+  // Color all options
+  for (let j = 0; j < q.opts.length; j++) {
+    const el = document.getElementById(`opt-${qIdx}-${j}`);
+    if (j === q.ans) {
+      el.style.background = '#1a3a1a';
+      el.style.borderColor = 'var(--green)';
+      el.style.color = 'var(--green)';
+    } else if (j === optIdx && !isCorrect) {
+      el.style.background = '#3a1a1a';
+      el.style.borderColor = 'var(--accent1)';
+      el.style.color = 'var(--accent1)';
+    }
+    el.style.cursor = 'default';
+  }
+
+  // Show explanation
+  const expDiv = document.getElementById(`exp-${qIdx}`);
+  expDiv.style.display = 'block';
+  if (!isCorrect) {
+    expDiv.style.background = '#2a1a1a';
+    expDiv.style.borderColor = 'var(--accent1)';
+    expDiv.style.color = 'var(--accent1)';
+  }
+  expDiv.innerHTML = (isCorrect ? '&#10004; Correct! ' : '&#10008; Wrong! ') + q.exp;
+
+  // Update score
+  document.getElementById('score-correct').textContent = correct;
+  document.getElementById('score-total').textContent = answered;
+  const pct = Math.round(correct / answered * 100);
+  document.getElementById('score-pct').textContent = `(${pct}%)`;
+}
+
+function resetQuiz() {
+  answered = 0;
+  correct = 0;
+  document.getElementById('score-correct').textContent = '0';
+  document.getElementById('score-total').textContent = '0';
+  document.getElementById('score-pct').textContent = '';
+  renderQuiz();
+}
+
+renderQuiz();
+</script>
 
 <p style="text-align:center; color: var(--muted); margin-top: 40px; padding: 20px;">
   EE 309 Complete Study Guide - 8051 + MIPS + Computer Architecture<br>
