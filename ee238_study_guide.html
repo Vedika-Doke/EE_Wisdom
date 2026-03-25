@@ -1394,6 +1394,244 @@
     <div class="q-explanation">Z<sub>c</sub> = &radic;(L'/C') depends on per-unit-length parameters only, NOT on total length. Series connection doesn't change L' or C', so Z<sub>c</sub> remains Z<sub>o</sub>.</div>
     <div class="q-toggle">Click to show solution</div>
   </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q19</div>
+    <div class="q-text">Lossless OTL: L' = 1 mH/km, C' = 11.1 nF/km, f = 50 Hz. Find phase constant &beta;.</div>
+    <ul class="q-options">
+      <li class="correct">1.05 &times; 10<sup>-3</sup> rad/km</li>
+      <li>3.14 &times; 10<sup>-3</sup> rad/km</li>
+      <li>3.33 &times; 10<sup>-3</sup> rad/km</li>
+      <li>0.31 &times; 10<sup>-3</sup> rad/km</li>
+    </ul>
+    <div class="q-explanation">
+      <div class="eq">&beta; = &omega;&radic;(L'C') = 2&pi;&times;50 &times; &radic;(10<sup>-3</sup> &times; 11.1&times;10<sup>-9</sup>) = 314.16 &times; 3.33&times;10<sup>-6</sup> = <span class="ans">1.05&times;10<sup>-3</sup> rad/km</span></div>
+      <p>This is the line from Review Q4 &amp; Q5 (600 km, 400 kV). &beta;l = 1.05&times;10<sup>-3</sup> &times; 600 = 0.63 rad &asymp; 36&deg;. Also: Z<sub>c</sub> = &radic;(L'/C') = &radic;(10<sup>-3</sup>/11.1&times;10<sup>-9</sup>) &asymp; 300 &Omega;.</p>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q20</div>
+    <div class="q-text">300 km lossless line (&beta; = 0.0013 rad/km) open-circuited at receiving end. |V<sub>s</sub>| = 1.0 p.u. Find |V<sub>r</sub>|.</div>
+    <ul class="q-options">
+      <li>1.0 p.u.</li>
+      <li>1.035 p.u.</li>
+      <li class="correct">1.082 p.u.</li>
+      <li>0.925 p.u.</li>
+    </ul>
+    <div class="q-explanation">
+      <p>Open circuit: I<sub>r</sub> = 0. From ABCD: V<sub>s</sub> = cos(&beta;l) &middot; V<sub>r</sub></p>
+      <div class="eq">&beta;l = 0.0013 &times; 300 = 0.39 rad<br>|V<sub>r</sub>| = |V<sub>s</sub>| / cos(0.39) = 1.0 / 0.9247 = <span class="ans">1.082 p.u.</span></div>
+      <p>Q16 had 400 km with both ends connected at 1 p.u. &rarr; midpoint rose to 1.035 (Ferranti). Here the line is open at V<sub>r</sub>, so the full rise appears at the receiving end.</p>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q21</div>
+    <div class="q-text">A lossless line carries exactly the Surge Impedance Loading (SIL). Which is TRUE?</div>
+    <ul class="q-options">
+      <li>Line absorbs reactive power from both ends</li>
+      <li>Line generates reactive power; voltage rises at midpoint</li>
+      <li class="correct">Voltage magnitude is constant along the line; no reactive power exchange with the external system</li>
+      <li>Receiving end voltage is higher than sending end voltage</li>
+    </ul>
+    <div class="q-explanation">
+      <p>At SIL (P = V&sup2;/Z<sub>c</sub>, &delta; = &beta;l): distributed capacitive Q and inductive Q exactly cancel &rarr; <strong>flat voltage profile</strong>, zero net Q.</p>
+      <p>Below SIL: capacitance dominates &rarr; line generates Q &rarr; Ferranti-like voltage rise.<br>Above SIL: inductance dominates &rarr; line absorbs Q &rarr; voltage sags.</p>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q22</div>
+    <div class="q-text">Two similar 50 km lines (Z<sub>c</sub> = Z<sub>o</sub>) connected in <strong>parallel</strong>. Z<sub>c</sub> of the combined system?</div>
+    <ul class="q-options">
+      <li>Z<sub>o</sub></li>
+      <li class="correct">Z<sub>o</sub>/2</li>
+      <li>2Z<sub>o</sub></li>
+      <li>Z<sub>o</sub>/&radic;2</li>
+    </ul>
+    <div class="q-explanation">
+      <p>Parallel lines: series impedance per unit length halves (z' = z/2), shunt admittance per unit length doubles (y' = 2y).</p>
+      <div class="eq">Z<sub>c,parallel</sub> = &radic;(z'/y') = &radic;(z/2 &divide; 2y) = &radic;(z/y) / 2 = <span class="ans">Z<sub>o</sub>/2</span></div>
+      <p>Contrast with Q18 (series): series connection leaves Z<sub>c</sub> unchanged. Parallel halves it.</p>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q23</div>
+    <div class="q-text">A 3-phase, 400 kV line has Z<sub>c</sub> = 300 &Omega;. What is the Surge Impedance Loading (SIL)?</div>
+    <ul class="q-options">
+      <li>133 MW</li>
+      <li>300 MW</li>
+      <li class="correct">533 MW</li>
+      <li>1200 MW</li>
+    </ul>
+    <div class="q-explanation">
+      <div class="eq">SIL = V<sub>LL</sub>&sup2; / Z<sub>c</sub> = (400&times;10<sup>3</sup>)&sup2; / 300 = <span class="ans">533 MW</span></div>
+      <p>V<sub>LL</sub> is the line-to-line voltage. This 3-phase formula works because: 3 &times; (V<sub>LL</sub>/&radic;3)&sup2;/Z<sub>c</sub> = V<sub>LL</sub>&sup2;/Z<sub>c</sub>. At SIL, voltage profile is flat and Q exchange is zero.</p>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q24</div>
+    <div class="q-text">Long two-wire system (D &gg; r). Spacing D is doubled. Inductance per unit length L':</div>
+    <ul class="q-options">
+      <li>Doubles</li>
+      <li>Halves</li>
+      <li>Marginally decreases</li>
+      <li class="correct">Marginally increases</li>
+    </ul>
+    <div class="q-explanation">
+      <div class="eq">L' = (&mu;<sub>0</sub>/&pi;) ln(D/r). When D &rarr; 2D: &Delta;L' = (&mu;<sub>0</sub>/&pi;) ln(2) &mdash; small fixed addition to a large ln(D/r).</div>
+      <p>Logarithmic dependence: marginal increase. Compare with Q15 (capacitance): C' = &pi;&epsilon;<sub>0</sub>/ln(D/r) &rarr; marginally <strong>decreases</strong> when D doubles. The two effects are complementary: more separation &rarr; more flux linkage (L&uarr;), weaker electric coupling (C&darr;). Note: Z<sub>c</sub> = &radic;(L'/C') increases as D increases.</div>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q25</div>
+    <div class="q-text">For a <strong>short</strong> transmission line (&lt;80 km), the ABCD matrix simplifies to: (Weedy 3.10)</div>
+    <ul class="q-options">
+      <li>[cos(&beta;l), jZ<sub>c</sub>sin(&beta;l); jsin(&beta;l)/Z<sub>c</sub>, cos(&beta;l)] &mdash; exact long line</li>
+      <li>[1, Z; Y, 1+ZY/2] &mdash; nominal &pi;</li>
+      <li class="correct">[1, Z; 0, 1] &mdash; short line</li>
+      <li>[1, 0; Y, 1]</li>
+    </ul>
+    <div class="q-explanation">
+      <p>Short line: shunt capacitance C' is negligible &rarr; <strong>A = D = 1, B = Z<sub>total</sub> = R + jX, C = 0</strong>.</p>
+      <p>As line length increases: use nominal &pi; (medium line, add C as lumped shunt halves at each end). For &gt;300 km: use exact distributed-parameter ABCD with cosh/sinh.</p>
+      <div class="eq">Weedy 3.10: 83 km, 275 kV line &rarr; A = 0.989 + j0.003 &asymp; 1 (confirms short-line approximation is reasonable but not exact at 83 km)</div>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q26</div>
+    <div class="q-text">A cable has x<sub>l</sub> = 0.34 &Omega;/km, b<sub>c</sub> = 246 &mu;S/km. What is Z<sub>c</sub>? (Weedy 3.9 / Review Q3 data)</div>
+    <ul class="q-options">
+      <li class="correct">~37 &Omega;</li>
+      <li>~191 &Omega;</li>
+      <li>~380 &Omega;</li>
+      <li>~1200 &Omega;</li>
+    </ul>
+    <div class="q-explanation">
+      <div class="eq">Z<sub>c</sub> = &radic;(x<sub>l</sub>/b<sub>c</sub>) = &radic;(0.34 / 246&times;10<sup>-6</sup>) = &radic;(1382) &asymp; <span class="ans">37 &Omega;</span></div>
+      <p>This is a <strong>cable</strong> &mdash; very high b<sub>c</sub> (capacitance) compared to OTL gives a much lower Z<sub>c</sub>. Compare with OTL (Q10): Z<sub>c</sub> &asymp; 230&ndash;400 &Omega; vs cable &asymp; 30&ndash;50 &Omega;.</p>
+      <p>Formula: for a lossless line, Z<sub>c</sub> = &radic;(L'/C') = &radic;(&omega;L'/&omega;C') = &radic;(x<sub>l</sub>/b<sub>c</sub>) where x<sub>l</sub> and b<sub>c</sub> are total for the line.</p>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q27</div>
+    <div class="q-text">For a line with R = 0, X = 20 &Omega;, using &Delta;V &asymp; (RP + XQ)/V: if the load is purely capacitive (Q &lt; 0), the receiving-end voltage compared to sending-end is: (Weedy 5.10)</div>
+    <ul class="q-options">
+      <li>Lower (voltage drop)</li>
+      <li class="correct">Higher (voltage rise)</li>
+      <li>Unchanged</li>
+      <li>Zero</li>
+    </ul>
+    <div class="q-explanation">
+      <p>With R=0: &Delta;V = XQ/V. If Q &lt; 0 (capacitive load injects reactive power) &rarr; &Delta;V &lt; 0 &rarr; V<sub>r</sub> &gt; V<sub>s</sub>.</p>
+      <div class="eq">V<sub>s</sub> = V<sub>r</sub> + &Delta;V &rarr; if &Delta;V &lt; 0, then V<sub>r</sub> = V<sub>s</sub> - &Delta;V &gt; V<sub>s</sub></div>
+      <p>This is consistent with Ferranti: distributed capacitance of a lightly loaded line acts as a Q source (Q &lt; 0 from the line's perspective) &rarr; voltage rises at receiving end.</p>
+      <p><strong>Rule:</strong> Reactive power injection raises voltage; absorption lowers it. (&Delta;V &asymp; XQ/V for inductive lines)</p>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q28</div>
+    <div class="q-text">For a <strong>medium-length</strong> line (80&ndash;240 km), the nominal-&pi; ABCD constants are: (Weedy 3.7.2.2)</div>
+    <ul class="q-options">
+      <li>[1, Z; Y, 1] &mdash; ignores ZY cross-term</li>
+      <li class="correct">[1+ZY/2, Z; (1+ZY/4)Y, 1+ZY/2] &mdash; nominal &pi;</li>
+      <li>[cosh&radic;(ZY), &radic;(Z/Y)sinh&radic;(ZY); &radic;(Y/Z)sinh&radic;(ZY), cosh&radic;(ZY)] &mdash; exact long line</li>
+      <li>[1+ZY/2, (1+ZY/4)Z; Y, 1+ZY/2] &mdash; nominal T</li>
+    </ul>
+    <div class="q-explanation">
+      <p>Nominal-&pi; model: shunt Y/2 at each end, full Z in series. Applying KVL/KCL:</p>
+      <div class="eq">A = D = 1 + ZY/2 &nbsp;&nbsp; B = Z &nbsp;&nbsp; C = (1 + ZY/4)Y</div>
+      <p>Nominal-T model (shunt Y in middle, Z/2 each side) gives <em>same</em> A=D but swapped B and C. In practice, <strong>&pi; is preferred</strong> for medium lines. Reducing to Y=0 recovers the short-line A=D=1, B=Z, C=0.</p>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q29</div>
+    <div class="q-text">For a <strong>long</strong> transmission line (&gt;240 km), the exact ABCD parameter A = D equals: (Weedy 3.7.2.3 / Eq. 3.8)</div>
+    <ul class="q-options">
+      <li>1 + ZY/2</li>
+      <li>cos(&beta;l) &mdash; lossless approximation only</li>
+      <li class="correct">cosh&radic;(ZY) &mdash; exact distributed-parameter result</li>
+      <li>1 + ZY/2 + Y&sup2;Z&sup2;/24</li>
+    </ul>
+    <div class="q-explanation">
+      <div class="eq">A = D = cosh&radic;(ZY) &nbsp; B = &radic;(Z/Y) sinh&radic;(ZY) &nbsp; C = &radic;(Y/Z) sinh&radic;(ZY)</div>
+      <p>Z = total series impedance of line, Y = total shunt admittance. For a <strong>lossless</strong> line (R=G=0): &radic;(ZY) = j&beta;l, so cosh(j&beta;l) = cos(&beta;l) and sinh(j&beta;l) = j&nbsp;sin(&beta;l). The medium-line expression 1+ZY/2 is just the first two terms of the cosh series.</p>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q30</div>
+    <div class="q-text">Voltage <em>regulation</em> of a transmission line is defined as: (Weedy 3.7.2.1)</div>
+    <ul class="q-options">
+      <li>(V<sub>S</sub> &minus; V<sub>R</sub>) / V<sub>S</sub> &times; 100%</li>
+      <li>(V<sub>S</sub> &minus; V<sub>R</sub>) / V<sub>R</sub> &times; 100%</li>
+      <li class="correct">(V<sub>R,no-load</sub> &minus; V<sub>R,full-load</sub>) / V<sub>R,full-load</sub> &times; 100%</li>
+      <li>Active power loss / active power delivered &times; 100%</li>
+    </ul>
+    <div class="q-explanation">
+      <p>Regulation measures how much the receiving-end voltage <em>rises</em> when load is removed, relative to full-load voltage:</p>
+      <div class="eq">VR = (V<sub>R(NL)</sub> &minus; V<sub>R(FL)</sub>) / V<sub>R(FL)</sub> &times; 100%</div>
+      <p>For a <strong>capacitive / leading-p.f.</strong> load V<sub>R</sub> can exceed V<sub>S</sub>, giving <em>negative</em> regulation. Short line with R=0 and purely capacitive load: V<sub>R(NL)</sub> &lt; V<sub>R(FL)</sub> &rarr; VR &lt; 0.</p>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q31</div>
+    <div class="q-text">From Weedy Table 3.2a: a 275 kV OTL has natural load (SIL) &asymp; 47&ndash;255 MW; a 400 kV line has SIL &asymp; 540&ndash;620 MW. SIL scales with voltage as:</div>
+    <ul class="q-options">
+      <li>V (linear &mdash; doubles when V doubles)</li>
+      <li class="correct">V&sup2; (quadratic &mdash; quadruples when V doubles)</li>
+      <li>V<sup>1/2</sup> (square-root)</li>
+      <li>Independent of voltage level</li>
+    </ul>
+    <div class="q-explanation">
+      <div class="eq">SIL = V&sup2; / Z<sub>c</sub></div>
+      <p>Z<sub>c</sub> depends only on line geometry (roughly constant for a given conductor type), so SIL &prop; V&sup2;. This is why upgrading from 275 kV to 400 kV raises the natural load by &asymp; (400/275)&sup2; &asymp; 2.1&times;. It also explains why high-voltage transmission is economically advantageous for bulk power transfer.</p>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q-num">Q32</div>
+    <div class="q-text">Bundled conductors on EHV lines (e.g. 4&times;258 mm&sup2; at 400 kV, Weedy Table 3.2a) primarily: (Weedy 3.7.1.1)</div>
+    <ul class="q-options">
+      <li>Increase L' and C' equally, leaving Z<sub>c</sub> unchanged</li>
+      <li>Increase R, decrease L' and C'</li>
+      <li class="correct">Decrease L' and increase C', thus reducing Z<sub>c</sub> and raising SIL</li>
+      <li>Only reduce corona; have no effect on L' or C'</li>
+    </ul>
+    <div class="q-explanation">
+      <p>Bundling several subconductors increases the <strong>effective conductor radius</strong> r<sub>eq</sub>:</p>
+      <ul style="margin-left:1.2em;margin-top:0.3em">
+        <li>Inductance: L' = (&mu;<sub>0</sub>/2&pi;) ln(D<sub>eq</sub>/r<sub>eq</sub>) &mdash; larger r<sub>eq</sub> &rarr; <strong>smaller L'</strong></li>
+        <li>Capacitance: C' = 2&pi;&epsilon;<sub>0</sub>/ln(D<sub>eq</sub>/r<sub>eq</sub>) &mdash; larger r<sub>eq</sub> &rarr; <strong>larger C'</strong></li>
+      </ul>
+      <div class="eq">Z<sub>c</sub> = &radic;(L'/C') &darr;&nbsp;&nbsp;&nbsp; SIL = V&sup2;/Z<sub>c</sub> &uarr;</div>
+      <p>From Table 3.2a: 400 kV, 1&times;258 mm&sup2; &rarr; Z<sub>c</sub>=296 &Omega;, SIL=540 MW; 4&times;258 mm&sup2; &rarr; Z<sub>c</sub>=258 &Omega;, SIL=620 MW. Bundling also reduces electric-field gradients, suppressing corona.</p>
+    </div>
+    <div class="q-toggle">Click to show solution</div>
+  </div>
+
 </section>
 
 <div class="sep"></div>
