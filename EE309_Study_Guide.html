@@ -2494,10 +2494,17 @@ ori $s0, $s0, 40   ; Load lower 16 bits: $s0 = 0x00610028</pre>
 
   <h3>Multi-Cycle Execution: Cycle by Cycle</h3>
 
+  <div class="key-box concept">
+    <div class="label">The Big Idea</div>
+    <p>In a <strong>single-cycle</strong> design, every instruction finishes in 1 long clock cycle &mdash; wasting time because simple instructions (like <code>add</code>) wait as long as complex ones (like <code>lw</code>).</p>
+    <p><strong>Multi-cycle breaks each instruction into smaller steps</strong>, using 1 clock cycle per step. Simpler instructions use fewer steps and finish faster. Think of it like an assembly line where not every product goes through every station.</p>
+  </div>
+
   <div class="key-box formula">
     <div class="label">Cycle 1: Instruction Fetch (ALL instructions)</div>
     <pre>IR &larr; Memory[PC]     ; Fetch instruction, store in IR
 PC &larr; PC + 4          ; Increment PC</pre>
+    <p style="color:var(--green); margin-top:8px;"><strong>In plain English:</strong> Go to the address stored in PC, grab the instruction from memory, and save it in the Instruction Register (IR). Then move PC forward by 4 bytes so it points to the next instruction.</p>
   </div>
 
   <div class="key-box formula">
@@ -2505,6 +2512,8 @@ PC &larr; PC + 4          ; Increment PC</pre>
     <pre>X &larr; Reg[IR[25:21]]   ; Read register rs
 Y &larr; Reg[IR[20:16]]   ; Read register rt (even if not needed)
 Z &larr; PC + SE(IR[15:0]) &lt;&lt; 2   ; Compute branch target (speculative)</pre>
+    <p style="color:var(--green); margin-top:8px;"><strong>In plain English:</strong> Decode the instruction to figure out what it does. Read the two source registers (rs and rt) from the register file and store their values in temporary registers X and Y. Meanwhile, <em>speculatively</em> calculate the branch target address (just in case this turns out to be a branch instruction &mdash; saves time if it is).</p>
+    <p style="color:var(--muted); margin-top:4px;"><strong>SE</strong> = Sign-Extend (expand 16-bit immediate to 32 bits). <strong>&lt;&lt; 2</strong> = shift left by 2 (multiply by 4, because addresses are word-aligned).</p>
   </div>
 
   <div class="key-box formula">
@@ -2513,6 +2522,13 @@ Z &larr; PC + SE(IR[15:0]) &lt;&lt; 2   ; Compute branch target (speculative)</p
 ALU (R-type):              Z &larr; X op Y               ; Perform operation
 Branch (beq/bne):          if(X == Y) PC &larr; Z        ; Conditional branch
 Jump (j):                  PC &larr; {PC[31:28], IR[25:0], 00}</pre>
+    <p style="color:var(--green); margin-top:8px;"><strong>In plain English:</strong> The ALU finally does the real work, but what it does depends on the instruction type:</p>
+    <ul style="margin-top:6px;">
+      <li><strong>lw/sw:</strong> ALU adds the base register (X) and the offset to calculate the memory address. Example: for <code>lw $t0, 40($s3)</code>, it computes $s3 + 40.</li>
+      <li><strong>R-type (add, sub, and, etc.):</strong> ALU performs the arithmetic/logic operation on X and Y. Example: for <code>add $t0, $s0, $s1</code>, it computes $s0 + $s1.</li>
+      <li><strong>beq/bne:</strong> ALU compares X and Y. If they're equal (for beq), PC is updated to the branch target Z that was pre-computed in cycle 2. <span class="red">Branch is DONE after this cycle (3 cycles total).</span></li>
+      <li><strong>j (jump):</strong> PC is constructed by taking the upper 4 bits of current PC, concatenating the 26-bit target from the instruction, and appending 00. <span class="red">Jump is DONE after this cycle (3 cycles total).</span></li>
+    </ul>
   </div>
 
   <div class="key-box formula">
@@ -2520,22 +2536,58 @@ Jump (j):                  PC &larr; {PC[31:28], IR[25:0], 00}</pre>
     <pre>lw:      MDR &larr; Memory[Z]        ; Read from data memory
 sw:      Memory[Z] &larr; Y            ; Write rt to data memory
 R-type:  Reg[IR[15:11]] &larr; Z      ; Write ALU result to rd</pre>
+    <p style="color:var(--green); margin-top:8px;"><strong>In plain English:</strong> Different instructions do different things here:</p>
+    <ul style="margin-top:6px;">
+      <li><strong>lw (load word):</strong> Uses the address calculated in cycle 3 (stored in Z) to go to data memory and <em>read</em> the value. The value is stored in a temporary register called MDR (Memory Data Register). lw still needs one more cycle!</li>
+      <li><strong>sw (store word):</strong> Takes the value from register rt (stored in Y from cycle 2) and <em>writes</em> it into data memory at address Z. <span class="red">sw is DONE here (4 cycles total).</span> No need to write back to any register.</li>
+      <li><strong>R-type:</strong> The ALU result (stored in Z) is written into the destination register rd. <code>IR[15:11]</code> is the rd field of the instruction. <span class="red">R-type is DONE here (4 cycles total).</span></li>
+    </ul>
   </div>
 
   <div class="key-box formula">
-    <div class="label">Cycle 5: Write Back (lw only)</div>
+    <div class="label">Cycle 5: Write Back (lw only!)</div>
     <pre>lw:      Reg[IR[20:16]] &larr; MDR   ; Write memory data to rt</pre>
+    <p style="color:var(--green); margin-top:8px;"><strong>In plain English:</strong> Only <code>lw</code> reaches this cycle. Take the data that was read from memory (now sitting in MDR) and write it into the destination register rt. <code>IR[20:16]</code> is the rt field &mdash; this is where the loaded data goes.</p>
+    <p style="color:var(--yellow); margin-top:6px;"><strong>Why does lw need 5 cycles?</strong> Because it has to do TWO heavy operations that can't happen in the same cycle: (1) read from data memory (cycle 4), then (2) write to a register (cycle 5). Other instructions only do one or the other.</p>
+  </div>
+
+  <div class="key-box important">
+    <div class="label">Key Notation Decoder</div>
+    <table>
+      <tr><th>Symbol</th><th>What It Means</th></tr>
+      <tr><td><code>IR</code></td><td><strong>Instruction Register</strong> &mdash; holds the fetched instruction</td></tr>
+      <tr><td><code>X, Y</code></td><td>Temporary registers holding values read from rs and rt</td></tr>
+      <tr><td><code>Z</code></td><td>Temporary register holding the ALU output / computed address</td></tr>
+      <tr><td><code>MDR</code></td><td><strong>Memory Data Register</strong> &mdash; holds data read from memory</td></tr>
+      <tr><td><code>IR[25:21]</code></td><td>Bits 25-21 of the instruction = <strong>rs</strong> (first source register)</td></tr>
+      <tr><td><code>IR[20:16]</code></td><td>Bits 20-16 of the instruction = <strong>rt</strong> (second register / destination for lw)</td></tr>
+      <tr><td><code>IR[15:11]</code></td><td>Bits 15-11 of the instruction = <strong>rd</strong> (destination register for R-type)</td></tr>
+      <tr><td><code>IR[15:0]</code></td><td>Lower 16 bits = <strong>immediate / offset</strong> (for I-type instructions)</td></tr>
+      <tr><td><code>IR[25:0]</code></td><td>Lower 26 bits = <strong>target address</strong> (for J-type instructions)</td></tr>
+      <tr><td><code>SE(...)</code></td><td><strong>Sign-Extend</strong> &mdash; expand 16-bit value to 32 bits preserving sign</td></tr>
+      <tr><td><code>&lt;&lt; 2</code></td><td>Shift left 2 = multiply by 4 (word alignment)</td></tr>
+    </table>
   </div>
 
   <h3>Cycles Per Instruction Type</h3>
   <table>
-    <tr><th>Instruction</th><th>Cycles</th><th>Stages Used</th></tr>
-    <tr><td><code>R-type</code> (add, sub, and, etc.)</td><td><strong>4</strong></td><td>IF &rarr; ID &rarr; EX &rarr; WB</td></tr>
-    <tr><td><code>lw</code> (load word)</td><td><strong>5</strong></td><td>IF &rarr; ID &rarr; EX &rarr; MEM &rarr; WB</td></tr>
-    <tr><td><code>sw</code> (store word)</td><td><strong>4</strong></td><td>IF &rarr; ID &rarr; EX &rarr; MEM</td></tr>
-    <tr><td><code>beq/bne</code> (branch)</td><td><strong>3</strong></td><td>IF &rarr; ID &rarr; EX</td></tr>
-    <tr><td><code>j</code> (jump)</td><td><strong>3</strong></td><td>IF &rarr; ID &rarr; EX</td></tr>
+    <tr><th>Instruction</th><th>Cycles</th><th>Stages Used</th><th>Why This Many?</th></tr>
+    <tr><td><code>R-type</code> (add, sub, and, etc.)</td><td><strong>4</strong></td><td>IF &rarr; ID &rarr; EX &rarr; WB</td><td>Fetch &rarr; Decode &rarr; ALU computes &rarr; Write result to register</td></tr>
+    <tr><td><code>lw</code> (load word)</td><td><strong>5</strong></td><td>IF &rarr; ID &rarr; EX &rarr; MEM &rarr; WB</td><td>Fetch &rarr; Decode &rarr; Calc address &rarr; Read memory &rarr; Write to register (extra memory step!)</td></tr>
+    <tr><td><code>sw</code> (store word)</td><td><strong>4</strong></td><td>IF &rarr; ID &rarr; EX &rarr; MEM</td><td>Fetch &rarr; Decode &rarr; Calc address &rarr; Write to memory (no register write-back needed)</td></tr>
+    <tr><td><code>beq/bne</code> (branch)</td><td><strong>3</strong></td><td>IF &rarr; ID &rarr; EX</td><td>Fetch &rarr; Decode &rarr; Compare registers &amp; update PC (very simple)</td></tr>
+    <tr><td><code>j</code> (jump)</td><td><strong>3</strong></td><td>IF &rarr; ID &rarr; EX</td><td>Fetch &rarr; Decode &rarr; Just set PC to new address</td></tr>
   </table>
+
+  <div class="key-box">
+    <h4>Why lw is the Slowest (5 Cycles)</h4>
+    <p><code>lw</code> is the <strong>only instruction that needs to both access memory AND write back to a register</strong>. These are two separate operations that can't happen simultaneously in multi-cycle design:</p>
+    <ul>
+      <li>Cycle 4: Go to memory, read the data &rarr; store in MDR</li>
+      <li>Cycle 5: Take data from MDR, write it into the destination register</li>
+    </ul>
+    <p>This is also why <code>lw</code> was the bottleneck in single-cycle design &mdash; it determined the (long) clock period for ALL instructions.</p>
+  </div>
 
   <div class="key-box exam">
     <div class="label">Single-Cycle vs Multi-Cycle Comparison</div>
