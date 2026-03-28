@@ -590,6 +590,7 @@
   <a class="nav-tab" href="#s16">Cache</a>
   <a class="nav-tab" href="#s17">MMU/VM</a>
   <a class="nav-tab" href="#s18" style="border-color: #ff6b35; color: #ff6b35;">Power & EDP</a>
+  <a class="nav-tab" href="#s19" style="border-color: #ff6b35; color: #ff6b35;">Practice Qs</a>
   <a class="nav-tab" href="#quick">Recall</a>
   <a class="nav-tab" href="#quiz">Quiz</a>
 </div>
@@ -626,6 +627,7 @@
       <li><a href="#s16">Cache Memory: Hierarchy, Mapping & Performance</a></li>
       <li><a href="#s17">Virtual Memory & MMU (TLB, Page Tables, Page Faults)</a></li>
       <li><a href="#s18">CMOS Power, Voltage Scaling & Energy-Delay Product (Tutorial 3)</a></li>
+      <li><a href="#s19">Power & EDP Practice Problems (with Solutions)</a></li>
     </ol>
   </div>
 
@@ -4763,6 +4765,319 @@ Example: TLB hit rate=98%, TLB=1ns, Memory=100ns, Page table=100ns
     <div class="title">Memory Aid: Optimal VDD</div>
     <div class="content">EDP &rarr; 3V<sub>t</sub> &nbsp; | &nbsp; E&sup2;D &rarr; 5V<sub>t</sub>/3 &nbsp; | &nbsp; ED&sup2; &rarr; Max V<sub>DD</sub></div>
     <div style="color: var(--muted); margin-top:4px; font-size:0.85rem;">"Three-T for balance, Five-thirds-T for efficiency, Max for speed"</div>
+  </div>
+
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 19: PRACTICE PROBLEMS -->
+<!-- ============================================ -->
+<div class="section-divider">
+  <span>Power & EDP Practice Problems</span>
+</div>
+
+<div class="section arch-section" id="s19">
+  <h2>19. Power & EDP Practice Problems (with Solutions)</h2>
+
+  <p>These problems cover <strong>DVFS, voltage scaling, energy optimization, EDP, and parallel execution</strong> &mdash; the key topics from Tutorial 3 and exams. Each has a full worked solution you can reveal.</p>
+
+  <!-- ===== PROBLEM 1 ===== -->
+  <h3 style="color: var(--yellow);">Problem 1: Basic DVFS Optimization (Tutorial 3 Style)</h3>
+  <div class="key-box">
+    <div class="label">Problem Statement</div>
+    <p>A microprocessor consumes <strong>30W</strong> at its maximum performance (frequency) level for supply voltage V<sub>DD</sub> = 1V. It uses <strong>120 joules</strong> to accomplish a task under these conditions. The maximum frequency of operation is proportional to <strong>(V<sub>DD</sub> &minus; 0.3)&sup2; / V<sub>DD</sub></strong>, where V<sub>DD</sub> is in volts. Assume that most of the energy is dissipated in charging/discharging capacitors.</p>
+    <ol style="margin-top:10px;">
+      <li>The energy consumed for the same task for V<sub>DD</sub> = 0.9V will be _____ joules.</li>
+      <li>The power consumption at maximum performance level at V<sub>DD</sub> = 0.8V is _____ watts.</li>
+      <li>The minimum time required to accomplish the task at V<sub>DD</sub> = 0.8V is _____ seconds.</li>
+      <li>The best-case energy-delay product for this processor is at V<sub>DD</sub> = _____ volts.</li>
+      <li>What metric would you optimize for a highly energy-efficient processor? What V<sub>DD</sub>?</li>
+      <li>What metric would you use for a high-performance processor? What V<sub>DD</sub>?</li>
+    </ol>
+  </div>
+
+  <details style="margin: 12px 0 30px 0;">
+    <summary style="cursor:pointer; color: var(--green); font-weight:bold; padding:8px 0;">Show Solution</summary>
+    <div class="key-box" style="border-color: var(--green); margin-top:8px;">
+      <p><strong>Given:</strong> P<sub>ref</sub> = 30W at V<sub>DD</sub> = 1V, E<sub>ref</sub> = 120J, V<sub>t</sub> = 0.3V</p>
+      <p>f<sub>max</sub> = k &middot; (V<sub>DD</sub> &minus; 0.3)&sup2; / V<sub>DD</sub>, &nbsp; P = C &middot; V<sub>DD</sub>&sup2; &middot; f</p>
+      <p><strong>Find k and C:</strong> At V<sub>DD</sub> = 1V: f<sub>ref</sub> = k &middot; (0.7)&sup2;/1 = 0.49k. P<sub>ref</sub> = C &middot; 1&sup2; &middot; 0.49k = 30 &rArr; Ck = 30/0.49 = 61.22</p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(i) Energy at V<sub>DD</sub> = 0.9V:</strong></p>
+      <p>Since energy for a fixed task depends only on switching: E = C &middot; V<sub>DD</sub>&sup2; &middot; N (N = number of clock cycles = constant)</p>
+      <p>E(0.9) / E(1.0) = (0.9)&sup2; / (1.0)&sup2; = 0.81 &rArr; E = 120 &times; 0.81 = <strong style="color:var(--yellow);">97.2 J</strong></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(ii) Power at V<sub>DD</sub> = 0.8V:</strong></p>
+      <p>P(0.8) = C &middot; (0.8)&sup2; &middot; k &middot; (0.5)&sup2;/0.8 = Ck &middot; 0.64 &middot; 0.3125 = 61.22 &times; 0.2 = <strong style="color:var(--yellow);">12.24 W</strong></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(iii) Time at V<sub>DD</sub> = 0.8V:</strong></p>
+      <p>T = E / P. E(0.8) = 120 &times; 0.64 = 76.8J. T = 76.8 / 12.24 = <strong style="color:var(--yellow);">6.27 s</strong></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(iv) Best EDP at V<sub>DD</sub> = ?</strong></p>
+      <p>EDP &prop; V<sub>DD</sub>&sup3; / (V<sub>DD</sub> &minus; V<sub>t</sub>)&sup2;. Differentiate and set to 0: V<sub>DD</sub> = 3V<sub>t</sub> = <strong style="color:var(--yellow);">0.9V</strong></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(v)</strong> Optimize <strong>E&sup2;D</strong> for energy efficiency &rArr; V<sub>DD</sub> = 5V<sub>t</sub>/3 = <strong style="color:var(--yellow);">0.5V</strong></p>
+      <p><strong>(vi)</strong> Optimize <strong>ED&sup2;</strong> for performance &rArr; V<sub>DD</sub> = <strong style="color:var(--yellow);">max allowed</strong> (run as fast as possible)</p>
+    </div>
+  </details>
+
+  <!-- ===== PROBLEM 2 ===== -->
+  <h3 style="color: var(--yellow);">Problem 2: DVFS with Static Power + Parallel Execution (Exam Style)</h3>
+  <div class="key-box">
+    <div class="label">Problem Statement [6 marks]</div>
+    <p>A microprocessor has V<sub>DD</sub> range <strong>[0.7V, 1.2V]</strong> and max clock frequency f<sub>max</sub> = <strong>5(V<sub>DD</sub> &minus; 0.4)&sup2; / V<sub>DD</sub></strong> GHz. Power consumption at max V<sub>DD</sub> and f<sub>max</sub> is <strong>250W</strong>. Power at a given frequency f is proportional to <strong>V<sub>DD</sub>&sup2; &middot; f + 0.1 &middot; V<sub>DD</sub></strong>. The task requires <strong>10&sup9; clock cycles</strong>.</p>
+    <ol type="a" style="margin-top:10px;">
+      <li>Energy and time for most energy-efficient execution?</li>
+      <li>Energy and time for least delay (fastest execution)?</li>
+      <li>Lowest energy-delay product (in J&middot;s)?</li>
+      <li>Least energy to complete the task within 1 second?</li>
+      <li>With <strong>two identical processors</strong> in parallel (no overhead):
+        <ol type="i" style="margin-top:6px;">
+          <li>Least energy to complete in &le;1 second?</li>
+          <li>Least time to execute the task?</li>
+          <li>Least energy to complete the task (no time constraint)?</li>
+          <li>Does parallelism help in saving energy and/or execution time? Why?</li>
+        </ol>
+      </li>
+    </ol>
+  </div>
+
+  <details style="margin: 12px 0 30px 0;">
+    <summary style="cursor:pointer; color: var(--green); font-weight:bold; padding:8px 0;">Show Solution</summary>
+    <div class="key-box" style="border-color: var(--green); margin-top:8px;">
+      <p><strong>Given:</strong> V<sub>DD</sub> &isin; [0.7V, 1.2V], V<sub>t</sub> = 0.4V, N = 10&sup9; cycles</p>
+      <p>f<sub>max</sub> = 5(V<sub>DD</sub> &minus; 0.4)&sup2;/V<sub>DD</sub> GHz, &nbsp; P = &alpha;(V<sub>DD</sub>&sup2; &middot; f + 0.1 &middot; V<sub>DD</sub>)</p>
+
+      <p><strong>Find &alpha;:</strong> At V<sub>DD</sub> = 1.2V: f<sub>max</sub> = 5(0.8)&sup2;/1.2 = 2.667 GHz</p>
+      <p>250 = &alpha;(1.44 &times; 2.667 + 0.12) = &alpha; &times; 3.96 &rArr; &alpha; = 63.13</p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>Key formulas for any V<sub>DD</sub>:</strong></p>
+      <p>f(V) = 5(V &minus; 0.4)&sup2;/V GHz &nbsp;&nbsp;|&nbsp;&nbsp; T(V) = N/f = 10&sup9; / (5(V&minus;0.4)&sup2;/V &times; 10&sup9;) = V / (5(V&minus;0.4)&sup2;) seconds</p>
+      <p>P(V) = 63.13 &times; (V&sup2; &times; 5(V&minus;0.4)&sup2;/V + 0.1V) = 63.13 &times; (5V(V&minus;0.4)&sup2; + 0.1V)</p>
+      <p>E(V) = P &times; T = 63.13 &times; (5V(V&minus;0.4)&sup2; + 0.1V) &times; V/(5(V&minus;0.4)&sup2;)</p>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;= 63.13 &times; (V&sup2; + 0.1V&sup2;/(5(V&minus;0.4)&sup2;)) = 63.13 &times; V&sup2; &times; (1 + 0.02/(V&minus;0.4)&sup2;)</p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <table>
+        <tr><th>V<sub>DD</sub></th><th>f<sub>max</sub> (GHz)</th><th>T (s)</th><th>P (W)</th><th>E (J)</th><th>EDP (J&middot;s)</th></tr>
+        <tr><td>0.7V</td><td>0.643</td><td>1.556</td><td>21.3</td><td>33.1</td><td>51.5</td></tr>
+        <tr><td>0.8V</td><td>1.0</td><td>1.0</td><td>46.1</td><td>46.1</td><td>46.1</td></tr>
+        <tr><td>0.9V</td><td>1.389</td><td>0.72</td><td>79.1</td><td>57.0</td><td>41.0</td></tr>
+        <tr><td>1.0V</td><td>1.8</td><td>0.556</td><td>120.5</td><td>66.9</td><td>37.2</td></tr>
+        <tr><td>1.1V</td><td>2.227</td><td>0.449</td><td>170.4</td><td>76.5</td><td>34.3</td></tr>
+        <tr><td>1.2V</td><td>2.667</td><td>0.375</td><td>250.0</td><td>93.7</td><td>35.2</td></tr>
+      </table>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(a) Most energy-efficient:</strong> Minimize E &rArr; use <strong>V<sub>DD</sub> = 0.7V</strong> (lowest allowed)</p>
+      <p>E = <strong style="color:var(--yellow);">33.1 J</strong>, T = <strong style="color:var(--yellow);">1.556 s</strong></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(b) Least delay:</strong> Use <strong>V<sub>DD</sub> = 1.2V</strong> (maximum)</p>
+      <p>E = <strong style="color:var(--yellow);">93.7 J</strong>, T = <strong style="color:var(--yellow);">0.375 s</strong></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(c) Lowest EDP:</strong> From table, minimum EDP is at <strong>V<sub>DD</sub> &asymp; 1.1V</strong></p>
+      <p>EDP = <strong style="color:var(--yellow);">&asymp; 34.3 J&middot;s</strong></p>
+      <p><em>Note: With static power, the optimal EDP voltage is higher than the pure-dynamic 3V<sub>t</sub> = 1.2V result.</em></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(d) Least energy in &le;1s:</strong> Need T &le; 1s &rArr; f &ge; 1 GHz &rArr; V<sub>DD</sub> &ge; 0.8V</p>
+      <p>At V<sub>DD</sub> = 0.8V: T = 1.0s exactly. E = <strong style="color:var(--yellow);">46.1 J</strong></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(e) Two parallel processors (each runs N/2 = 5&times;10&sup8; cycles):</strong></p>
+      <p>Each processor: T<sub>each</sub> = (N/2)/f = T<sub>single</sub>/2, &nbsp; P<sub>total</sub> = 2 &times; P(V)</p>
+      <p>E<sub>total</sub> = 2 &times; P(V) &times; T/2 = P(V) &times; T = same energy expression but at potentially lower V<sub>DD</sub></p>
+
+      <p><strong>(e.i) Least energy in &le;1s:</strong> Each needs T/2 &le; 1s &rArr; T &le; 2s. Even V<sub>DD</sub> = 0.7V gives T<sub>each</sub> = 0.778s &lt; 1s.</p>
+      <p>Use V<sub>DD</sub> = 0.7V: E = 2 &times; P(0.7) &times; 0.778 = 2 &times; 21.3 &times; 0.778 = <strong style="color:var(--yellow);">33.1 J</strong></p>
+
+      <p><strong>(e.ii) Least time:</strong> V<sub>DD</sub> = 1.2V, T = 0.375/2 = <strong style="color:var(--yellow);">0.1875 s</strong></p>
+
+      <p><strong>(e.iii) Least energy (no time constraint):</strong> Use V<sub>DD</sub> = 0.7V. But can we go lower? No, 0.7V is the minimum allowed. With static power, running slower actually <em>increases</em> leakage energy. So E = <strong style="color:var(--yellow);">33.1 J</strong> (same as single processor at 0.7V)</p>
+
+      <p><strong>(e.iv) Does parallelism help?</strong></p>
+      <p><strong style="color:var(--green);">YES for time</strong> &mdash; execution time halves (0.375s &rarr; 0.1875s at max V<sub>DD</sub>).</p>
+      <p><strong style="color:var(--green);">YES for energy under time constraint</strong> &mdash; for part (d), single processor needed 0.8V/46.1J; with 2 processors we can use 0.7V/33.1J.</p>
+      <p><strong style="color:var(--accent1);">NO for minimum energy without constraint</strong> &mdash; both cases use 0.7V and consume ~33.1J.</p>
+    </div>
+  </details>
+
+  <!-- ===== PROBLEM 3 ===== -->
+  <h3 style="color: var(--yellow);">Problem 3: Pipelining for Low Power (Tutorial 3 Q2 Style)</h3>
+  <div class="key-box">
+    <div class="label">Problem Statement</div>
+    <p>Consider the processor from Problem 1 (V<sub>t</sub> = 0.3V, pure dynamic power). Assume we can pipeline the processor into <strong>two equal stages</strong>. Before pipelining, 90% of the time is spent in combinational logic and 10% in sequential logic (flip-flops). Pipelining adds a <strong>10% capacitance overhead</strong>.</p>
+    <p>What would be the best energy-delay product of the pipelined processor?</p>
+  </div>
+
+  <details style="margin: 12px 0 30px 0;">
+    <summary style="cursor:pointer; color: var(--green); font-weight:bold; padding:8px 0;">Show Solution</summary>
+    <div class="key-box" style="border-color: var(--green); margin-top:8px;">
+      <p><strong>Step 1: New critical path after pipelining</strong></p>
+      <p>Original: T<sub>comb</sub> = 0.9T, T<sub>seq</sub> = 0.1T</p>
+      <p>After 2-stage pipeline: each stage has T<sub>comb</sub>/2 = 0.45T of combinational logic + full sequential overhead 0.1T</p>
+      <p>New clock period = 0.45T + 0.1T = <strong>0.55T</strong></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>Step 2: Frequency improvement</strong></p>
+      <p>f<sub>new</sub> = 1/0.55T = 1.818 &times; f<sub>old</sub></p>
+      <p>Since same V<sub>DD</sub> now gives 1.818&times; more throughput, we can <strong>reduce V<sub>DD</sub></strong> to match original throughput.</p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>Step 3: Capacitance</strong></p>
+      <p>C<sub>new</sub> = 1.1 &times; C<sub>old</sub> (10% overhead from extra pipeline register)</p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>Step 4: Best EDP</strong></p>
+      <p>EDP &prop; C &times; V<sub>DD</sub>&sup3; / (V<sub>DD</sub> &minus; V<sub>t</sub>)&sup2;</p>
+      <p>At optimal V<sub>DD</sub> = 3V<sub>t</sub> = 0.9V, EDP &prop; C &times; (0.9)&sup3;/(0.6)&sup2; = C &times; 2.025</p>
+      <p>But with pipelining, we can achieve the same throughput at a lower V<sub>DD</sub>, and the relevant metric is:</p>
+      <p>EDP<sub>pipe</sub> = 1.1 &times; 0.55 &times; EDP<sub>original at optimal</sub> = <strong style="color:var(--yellow);">0.605 &times; EDP<sub>original</sub></strong></p>
+      <p>Pipelining achieves a <strong style="color:var(--green);">~40% improvement</strong> in energy-delay product!</p>
+    </div>
+  </details>
+
+  <!-- ===== PROBLEM 4 ===== -->
+  <h3 style="color: var(--yellow);">Problem 4: Voltage Selection Under Constraints (Patterson &amp; Hennessy Style)</h3>
+  <div class="key-box">
+    <div class="label">Problem Statement</div>
+    <p>Two processor designs are being compared:</p>
+    <table>
+      <tr><th>Processor</th><th>V<sub>DD</sub></th><th>Capacitive Load</th><th>Clock Rate</th></tr>
+      <tr><td>A</td><td>1.0V</td><td>C</td><td>4 GHz</td></tr>
+      <tr><td>B</td><td>0.75V</td><td>0.8C</td><td>3 GHz</td></tr>
+    </table>
+    <ol type="a" style="margin-top:10px;">
+      <li>What is the dynamic power ratio P<sub>B</sub>/P<sub>A</sub>?</li>
+      <li>If static power is 40% of total for Processor A (I<sub>leak</sub> = 0.5A), what is the total power for each?</li>
+      <li>If a task takes 10&sup9; instructions and Processor A has CPI = 1.0 while Processor B has CPI = 1.2, which is more energy efficient for this task?</li>
+    </ol>
+  </div>
+
+  <details style="margin: 12px 0 30px 0;">
+    <summary style="cursor:pointer; color: var(--green); font-weight:bold; padding:8px 0;">Show Solution</summary>
+    <div class="key-box" style="border-color: var(--green); margin-top:8px;">
+      <p><strong>(a) Dynamic power ratio:</strong></p>
+      <p>P<sub>dyn</sub> = C<sub>load</sub> &times; V&sup2; &times; f</p>
+      <p>P<sub>A</sub> = C &times; 1&sup2; &times; 4 = 4C</p>
+      <p>P<sub>B</sub> = 0.8C &times; 0.75&sup2; &times; 3 = 0.8 &times; 0.5625 &times; 3C = 1.35C</p>
+      <p>P<sub>B</sub>/P<sub>A</sub> = 1.35/4 = <strong style="color:var(--yellow);">0.3375 (66% reduction!)</strong></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(b) Total power with static:</strong></p>
+      <p>P<sub>A,dyn</sub> = 60% of P<sub>A,total</sub>, so P<sub>A,total</sub> = P<sub>A,dyn</sub>/0.6</p>
+      <p>P<sub>A,static</sub> = V &times; I<sub>leak</sub> = 1.0 &times; 0.5 = 0.5W &rArr; this is 40% &rArr; P<sub>A,total</sub> = 0.5/0.4 = <strong>1.25W</strong>, P<sub>A,dyn</sub> = 0.75W</p>
+      <p>P<sub>B,static</sub> = 0.75 &times; 0.5 = 0.375W (same I<sub>leak</sub>)</p>
+      <p>P<sub>B,dyn</sub> = 0.3375 &times; 0.75 = 0.253W</p>
+      <p>P<sub>B,total</sub> = 0.253 + 0.375 = <strong style="color:var(--yellow);">0.628W (vs 1.25W for A)</strong></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(c) Energy efficiency for task:</strong></p>
+      <p>T<sub>A</sub> = 10&sup9; &times; 1.0 / (4 &times; 10&sup9;) = 0.25s &rArr; E<sub>A</sub> = 1.25 &times; 0.25 = <strong>0.3125 J</strong></p>
+      <p>T<sub>B</sub> = 10&sup9; &times; 1.2 / (3 &times; 10&sup9;) = 0.4s &rArr; E<sub>B</sub> = 0.628 &times; 0.4 = <strong>0.251 J</strong></p>
+      <p><strong style="color:var(--yellow);">Processor B is more energy efficient</strong> (20% less energy), despite being slower.</p>
+    </div>
+  </details>
+
+  <!-- ===== PROBLEM 5 ===== -->
+  <h3 style="color: var(--yellow);">Problem 5: Optimizing for Different Metrics</h3>
+  <div class="key-box">
+    <div class="label">Problem Statement</div>
+    <p>A chip has V<sub>DD</sub> &isin; [0.5V, 1.5V], V<sub>t</sub> = 0.3V. Only dynamic power (P = CV&sup2;f, f &prop; (V&minus;V<sub>t</sub>)&sup2;/V).</p>
+    <ol type="a" style="margin-top:10px;">
+      <li>Derive the V<sub>DD</sub> that minimizes EDP (Energy &times; Delay).</li>
+      <li>Derive the V<sub>DD</sub> that minimizes E&sup2;D (energy-squared-delay).</li>
+      <li>At what V<sub>DD</sub> is ED&sup2; (energy-delay-squared) minimized?</li>
+      <li>If V<sub>t</sub> could be reduced to 0.2V (at the cost of 10&times; more leakage), which metric improves most from this change? Compute the EDP improvement factor.</li>
+    </ol>
+  </div>
+
+  <details style="margin: 12px 0 30px 0;">
+    <summary style="cursor:pointer; color: var(--green); font-weight:bold; padding:8px 0;">Show Solution</summary>
+    <div class="key-box" style="border-color: var(--green); margin-top:8px;">
+      <p><strong>Setup:</strong> E &prop; V&sup2;, T &prop; V/(V&minus;V<sub>t</sub>)&sup2;</p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(a) EDP = E &times; T &prop; V&sup3;/(V&minus;V<sub>t</sub>)&sup2;</strong></p>
+      <p>d(EDP)/dV = 0 &rArr; 3V&sup2;(V&minus;V<sub>t</sub>)&sup2; &minus; V&sup3; &times; 2(V&minus;V<sub>t</sub>) = 0</p>
+      <p>3(V&minus;V<sub>t</sub>) &minus; 2V = 0 &rArr; V &minus; 3V<sub>t</sub> = 0 &rArr; <strong style="color:var(--yellow);">V<sub>DD</sub> = 3V<sub>t</sub> = 0.9V</strong></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(b) E&sup2;D &prop; V&sup5;/(V&minus;V<sub>t</sub>)&sup2;</strong></p>
+      <p>d(E&sup2;D)/dV = 0 &rArr; 5(V&minus;V<sub>t</sub>) &minus; 2V = 0 &rArr; 3V = 5V<sub>t</sub></p>
+      <p><strong style="color:var(--yellow);">V<sub>DD</sub> = 5V<sub>t</sub>/3 = 0.5V</strong></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(c) ED&sup2; &prop; V&sup4;/(V&minus;V<sub>t</sub>)&sup4;</strong></p>
+      <p>d(ED&sup2;)/dV = 0 &rArr; 4(V&minus;V<sub>t</sub>) &minus; 4V = 0 &rArr; V<sub>t</sub> = 0 (never satisfied for V<sub>t</sub> &gt; 0)</p>
+      <p>So ED&sup2; is monotonically decreasing &rArr; minimized at <strong style="color:var(--yellow);">V<sub>DD</sub> = max = 1.5V</strong></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(d) Reducing V<sub>t</sub> from 0.3V to 0.2V:</strong></p>
+      <p>Old optimal EDP at V = 0.9V: EDP &prop; (0.9)&sup3;/(0.6)&sup2; = 0.729/0.36 = 2.025</p>
+      <p>New optimal EDP at V = 3&times;0.2 = 0.6V: EDP &prop; (0.6)&sup3;/(0.4)&sup2; = 0.216/0.16 = 1.35</p>
+      <p>Improvement = 2.025/1.35 = <strong style="color:var(--yellow);">1.5&times; (33% better EDP)</strong></p>
+      <p><em>But beware: 10&times; more leakage may negate this for low-activity workloads!</em></p>
+    </div>
+  </details>
+
+  <!-- ===== PROBLEM 6 ===== -->
+  <h3 style="color: var(--yellow);">Problem 6: Power Gating &amp; Leakage (Conceptual)</h3>
+  <div class="key-box">
+    <div class="label">Problem Statement</div>
+    <p>A system-on-chip has 4 cores, each consuming 2W dynamic + 0.5W leakage when active, and 0.5W leakage when idle (no clock gating). The workload uses 1 core for 80% of the time and all 4 cores for 20%.</p>
+    <ol type="a" style="margin-top:10px;">
+      <li>What is the average power without any power management?</li>
+      <li>What is the average power with clock gating (eliminates dynamic power for idle cores)?</li>
+      <li>What is the average power with power gating (eliminates both dynamic and leakage for idle cores)?</li>
+      <li>If power gating has a 0.1W overhead per gated core (for retention), what is the actual savings?</li>
+    </ol>
+  </div>
+
+  <details style="margin: 12px 0 30px 0;">
+    <summary style="cursor:pointer; color: var(--green); font-weight:bold; padding:8px 0;">Show Solution</summary>
+    <div class="key-box" style="border-color: var(--green); margin-top:8px;">
+      <p><strong>(a) No power management:</strong> All 4 cores always fully powered.</p>
+      <p>P = 4 &times; (2 + 0.5) = <strong style="color:var(--yellow);">10W always</strong></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(b) Clock gating:</strong></p>
+      <p>80% time: 1 active (2.5W) + 3 idle (0.5W each) = 2.5 + 1.5 = 4.0W</p>
+      <p>20% time: 4 active = 10W</p>
+      <p>Average = 0.8 &times; 4.0 + 0.2 &times; 10 = 3.2 + 2.0 = <strong style="color:var(--yellow);">5.2W</strong></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(c) Power gating:</strong></p>
+      <p>80% time: 1 active (2.5W) + 3 gated (0W) = 2.5W</p>
+      <p>20% time: 4 active = 10W</p>
+      <p>Average = 0.8 &times; 2.5 + 0.2 &times; 10 = 2.0 + 2.0 = <strong style="color:var(--yellow);">4.0W</strong></p>
+      <hr style="border-color:#333; margin:10px 0;">
+
+      <p><strong>(d) With retention overhead:</strong></p>
+      <p>80% time: 1 active (2.5W) + 3 gated with retention (3 &times; 0.1 = 0.3W) = 2.8W</p>
+      <p>Average = 0.8 &times; 2.8 + 0.2 &times; 10 = 2.24 + 2.0 = <strong style="color:var(--yellow);">4.24W</strong></p>
+      <p>Savings vs no management: 10 &minus; 4.24 = <strong style="color:var(--green);">5.76W (57.6% reduction)</strong></p>
+      <p>Savings vs clock gating only: 5.2 &minus; 4.24 = <strong style="color:var(--green);">0.96W extra from power gating</strong></p>
+    </div>
+  </details>
+
+  <div class="mnemonic">
+    <div class="title">Exam Strategy: Power/EDP Problems</div>
+    <div class="content">
+      1. Write down f(V), P(V), T(V), E(V), EDP(V) symbolically first<br>
+      2. Find proportionality constant from given conditions<br>
+      3. Build a table for all allowed V<sub>DD</sub> values<br>
+      4. For optimization: differentiate or compare table values<br>
+      5. For parallel: each processor does N/k cycles, time halves, check if lower V<sub>DD</sub> becomes feasible
+    </div>
   </div>
 
 </div>
