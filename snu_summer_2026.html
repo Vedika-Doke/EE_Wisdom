@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SNU ISP 2026 — Complete Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0b0b0f;
+    --surface: #13131a;
+    --surface2: #1a1a24;
+    --surface3: #20202c;
+    --border: #272738;
+    --text: #e4e4f0;
+    --text-dim: #72728a;
+    --text-mid: #a0a0bc;
+    --accent: #4e7cff;
+    --accent-light: #8aaaff;
+    --green: #22d3a0;
+    --green-bg: #22d3a015;
+    --yellow: #fbbf24;
+    --yellow-bg: #fbbf2415;
+    --pink: #f472b6;
+    --pink-bg: #f472b615;
+    --red: #f87171;
+    --red-bg: #f8717115;
+    --teal: #2dd4bf;
+    --orange: #fb923c;
+    --purple: #a78bfa;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: linear-gradient(135deg, #0b0b0f 0%, #111128 50%, #0b0b0f 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse, #4e7cff18 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero .flag { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .hero h1 {
+    font-size: 2.6rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-light), var(--teal), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 0.4rem;
+  }
+  .hero .subtitle { color: var(--text-mid); font-size: 1rem; margin-bottom: 1.5rem; }
+  .hero-tags { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.5rem; }
+  .hero-tag {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 999px; padding: 0.3rem 0.9rem;
+    font-size: 0.75rem; font-weight: 600; color: var(--text-mid);
+  }
+
+  /* ─── STICKY NAV ─── */
+  .sticky-nav {
+    position: sticky; top: 0; z-index: 100;
+    background: #0b0b0fcc; backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 1rem;
+    display: flex; gap: 0.4rem; flex-wrap: wrap; justify-content: center;
+  }
+  .nav-link {
+    color: var(--text-dim); font-size: 0.75rem; font-weight: 600;
+    padding: 0.3rem 0.8rem; border-radius: 6px;
+    text-decoration: none; transition: all 0.15s;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .nav-link:hover { background: var(--surface2); color: var(--accent-light); }
+
+  /* ─── LAYOUT ─── */
+  .page { max-width: 1020px; margin: 0 auto; padding: 2rem 1.2rem 4rem; }
+
+  /* ─── SECTION HEADERS ─── */
+  .sec-header {
+    display: flex; align-items: center; gap: 0.8rem;
+    margin-bottom: 1.4rem; padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+    scroll-margin-top: 60px;
+  }
+  .sec-icon { font-size: 1.3rem; }
+  .sec-header h2 { font-size: 1.25rem; font-weight: 700; }
+  .sec-badge {
+    font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; padding: 3px 8px; border-radius: 5px;
+    margin-left: auto;
+  }
+
+  .section-block { margin-bottom: 3rem; }
+
+  /* ─── ALERT BOX ─── */
+  .alert {
+    display: flex; gap: 0.8rem; align-items: flex-start;
+    border-radius: 10px; padding: 0.9rem 1.1rem;
+    font-size: 0.83rem; line-height: 1.6; margin-bottom: 1rem;
+  }
+  .alert .al-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+  .alert.warn  { background: var(--yellow-bg); border: 1px solid #fbbf2435; color: var(--yellow); }
+  .alert.info  { background: #4e7cff12; border: 1px solid #4e7cff30; color: var(--accent-light); }
+  .alert.good  { background: var(--green-bg); border: 1px solid #22d3a030; color: var(--green); }
+  .alert.bad   { background: var(--red-bg); border: 1px solid #f8717130; color: var(--red); }
+  .alert strong { color: inherit; }
+
+  /* ─── TIMELINE ─── */
+  .timeline { position: relative; padding-left: 1.6rem; }
+  .timeline::before {
+    content: ''; position: absolute; left: 5px; top: 6px; bottom: 6px;
+    width: 2px; background: var(--border); border-radius: 2px;
+  }
+  .tl-item { position: relative; margin-bottom: 1.2rem; }
+  .tl-item::before {
+    content: ''; position: absolute; left: -1.3rem; top: 5px;
+    width: 10px; height: 10px; border-radius: 50%;
+    border: 2px solid var(--border); background: var(--bg);
+  }
+  .tl-item.deadline::before { border-color: var(--red); background: var(--red); }
+  .tl-item.open::before { border-color: var(--green); background: var(--green); }
+  .tl-item.event::before { border-color: var(--accent); background: var(--accent); }
+  .tl-item.warn::before { border-color: var(--yellow); background: var(--yellow); }
+
+  .tl-date {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+    color: var(--text-dim); margin-bottom: 0.15rem;
+  }
+  .tl-title { font-size: 0.9rem; font-weight: 600; }
+  .tl-note { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; line-height: 1.5; }
+  .tl-tag {
+    display: inline-block; font-size: 0.65rem; font-weight: 700;
+    padding: 1px 7px; border-radius: 4px; margin-left: 0.4rem;
+    vertical-align: middle; text-transform: uppercase;
+  }
+
+  /* ─── INFO GRID ─── */
+  .info-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.8rem; }
+  .info-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1rem 1.2rem;
+  }
+  .info-card .ic-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 0.3rem; }
+  .info-card .ic-value { font-size: 0.95rem; font-weight: 600; line-height: 1.4; }
+  .info-card .ic-note  { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem; line-height: 1.4; }
+
+  /* ─── TABLE ─── */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin-bottom: 1rem; }
+  .data-table th {
+    background: var(--surface2); color: var(--accent-light);
+    padding: 0.55rem 0.9rem; text-align: left; font-weight: 600;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td {
+    padding: 0.5rem 0.9rem; border-bottom: 1px solid var(--border);
+    vertical-align: top; line-height: 1.5; color: var(--text-mid);
+  }
+  .data-table td strong { color: var(--text); }
+  .data-table tr:hover td { background: var(--surface2); }
+  .data-table td.highlight { color: var(--yellow); font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+  .data-table td.green { color: var(--green); font-weight: 600; }
+  .data-table td.red { color: var(--red); }
+  .data-table td.mono { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+
+  /* ─── CHECKLIST ─── */
+  .checklist { display: flex; flex-direction: column; gap: 0.5rem; }
+  .check-item {
+    display: flex; align-items: flex-start; gap: 0.8rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.75rem 1rem; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .check-item:hover { border-color: var(--accent); }
+  .check-item.done { background: var(--green-bg); border-color: #22d3a030; }
+  .check-item input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--green); flex-shrink: 0; margin-top: 2px; cursor: pointer; }
+  .check-item .ci-text { flex: 1; }
+  .check-item .ci-title { font-size: 0.85rem; font-weight: 600; line-height: 1.4; }
+  .check-item .ci-note  { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.2rem; line-height: 1.45; }
+  .check-item .ci-badge {
+    font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 4px; flex-shrink: 0; margin-top: 1px;
+  }
+
+  /* ─── BUDGET CALCULATOR ─── */
+  .budget-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+  }
+  .budget-header {
+    background: var(--surface2); padding: 1rem 1.3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 0.5rem;
+  }
+  .budget-header h3 { font-size: 0.9rem; font-weight: 700; }
+  .budget-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .bud-btn {
+    background: var(--surface3); border: 1px solid var(--border);
+    border-radius: 7px; padding: 0.3rem 0.8rem; font-size: 0.75rem;
+    font-weight: 600; color: var(--text-mid); cursor: pointer;
+    font-family: 'Inter', sans-serif; transition: all 0.15s;
+  }
+  .bud-btn:hover, .bud-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .budget-body { padding: 0; }
+  .bud-row {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 0; align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 1.3rem;
+    transition: background 0.1s;
+  }
+  .bud-row:hover { background: var(--surface2); }
+  .bud-row.header { background: var(--surface2); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-dim); }
+  .bud-row.section-label { background: #4e7cff0a; padding: 0.4rem 1.3rem; }
+  .bud-row.section-label span { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent-light); }
+  .bud-row.total-row { background: var(--surface2); border-top: 2px solid var(--border); }
+  .bud-row.total-row .bud-label { font-weight: 700; color: var(--text); }
+
+  .bud-label { font-size: 0.82rem; color: var(--text-mid); }
+  .bud-label strong { color: var(--text); }
+  .bud-label small { display: block; font-size: 0.7rem; color: var(--text-dim); margin-top: 0.1rem; }
+  .bud-krw, .bud-inr, .bud-note {
+    font-size: 0.8rem; text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .bud-krw { color: var(--text-dim); }
+  .bud-inr { color: var(--yellow); font-weight: 600; }
+  .bud-note { font-family: 'Inter', sans-serif; font-size: 0.7rem; color: var(--text-dim); text-align: left; padding-left: 0.5rem; }
+
+  .bud-row input[type=range] { width: 80px; accent-color: var(--accent); }
+  .budget-total-box {
+    background: linear-gradient(135deg, #4e7cff15, #2dd4bf10);
+    border-top: 1px solid var(--accent);
+    padding: 1.2rem 1.3rem;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;
+  }
+  .bt-label { font-size: 0.85rem; color: var(--text-mid); }
+  .bt-label strong { display: block; font-size: 1.3rem; color: var(--yellow); font-family: 'JetBrains Mono', monospace; margin-top: 0.1rem; }
+  .bt-sub { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.2rem; }
+
+  /* ─── VISA STEPS ─── */
+  .steps { display: flex; flex-direction: column; gap: 0.6rem; }
+  .step-item {
+    display: flex; gap: 1rem; align-items: flex-start;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.9rem 1rem;
+  }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.78rem; font-weight: 700;
+    background: var(--accent); color: #fff;
+  }
+  .step-text .st-title { font-size: 0.88rem; font-weight: 600; margin-bottom: 0.2rem; }
+  .step-text .st-note  { font-size: 0.76rem; color: var(--text-dim); line-height: 1.5; }
+
+  /* ─── COURSE CARDS ─── */
+  .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 0.7rem; }
+  .course-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.9rem 1rem;
+  }
+  .course-card .cc-track { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.4rem; }
+  .course-card .cc-count { font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; line-height: 1; margin-bottom: 0.3rem; }
+  .course-card .cc-examples { font-size: 0.74rem; color: var(--text-dim); line-height: 1.5; }
+
+  /* ─── TIPS ─── */
+  .tip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.8rem; }
+  .tip-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1rem 1.1rem;
+  }
+  .tip-card .tip-icon { font-size: 1.4rem; margin-bottom: 0.4rem; }
+  .tip-card h4 { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.4rem; }
+  .tip-card p  { font-size: 0.78rem; color: var(--text-dim); line-height: 1.55; }
+  .tip-card p strong { color: var(--text); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.8rem; }
+    .bud-row { grid-template-columns: 1.5fr 1fr 1fr; }
+    .bud-note { display: none; }
+    .info-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 0.82em; background: var(--surface2); padding: 1px 5px; border-radius: 4px; color: var(--accent-light); }
+
+  /* ─── PRINT / PDF FIXES ─── */
+  @media print {
+    /* Kill the gradient text — Chrome headless can't clip it, leaves a box */
+    .hero h1 {
+      background: none !important;
+      -webkit-background-clip: unset !important;
+      -webkit-text-fill-color: #8aaaff !important;
+      color: #8aaaff !important;
+    }
+    /* Kill the radial-gradient pseudo-element that renders as a solid box */
+    .hero::before { display: none !important; }
+    /* Remove sticky nav from PDF */
+    .sticky-nav { display: none !important; }
+    /* Ensure full-width page rendering */
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    /* Avoid page breaks inside cards */
+    .info-card, .mcq-card, .step-item, .check-item, .tip-card, .tl-item { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── HERO ─── -->
+<div class="hero">
+  <div class="flag">🇰🇷</div>
+  <h1>SNU International Summer Program 2026</h1>
+  <p class="subtitle">Seoul National University · Gwanak Campus · Complete Guide for Indian Students</p>
+  <div class="hero-tags">
+    <span class="hero-tag">Jun 22 – Jul 25, 2026</span>
+    <span class="hero-tag">5 Weeks</span>
+    <span class="hero-tag">71 Courses</span>
+    <span class="hero-tag">All in English</span>
+    <span class="hero-tag">summer@snu.ac.kr</span>
+  </div>
+</div>
+
+<!-- ─── STICKY NAV ─── -->
+<nav class="sticky-nav">
+  <a class="nav-link" href="#dates">Dates</a>
+  <a class="nav-link" href="#eligibility">Eligibility</a>
+  <a class="nav-link" href="#documents">Documents</a>
+  <a class="nav-link" href="#budget">Budget</a>
+  <a class="nav-link" href="#housing">Housing</a>
+  <a class="nav-link" href="#visa">Visa</a>
+  <a class="nav-link" href="#courses">Courses</a>
+  <a class="nav-link" href="#discounts">Discounts</a>
+  <a class="nav-link" href="#checklist">Checklist</a>
+  <a class="nav-link" href="#tips">Tips</a>
+</nav>
+
+<div class="page">
+
+  <!-- ─── TOP ALERT ─── -->
+  <div class="alert warn" style="margin-top:1.5rem">
+    <span class="al-icon">⚡</span>
+    <div><strong>Apply before April 5, 2026</strong> — Early Bird deadline gives you an automatic 20% tuition discount. For Indian students this saves approximately ₹35,000–₹40,000. Visa processing for India takes 10–12 business days minimum; apply for your C-3-9 visa <em>immediately</em> after receiving the acceptance letter.</div>
+  </div>
+
+  <!-- ══════════ SECTION: DATES ══════════ -->
+  <div class="section-block" id="dates">
+    <div class="sec-header">
+      <span class="sec-icon">📅</span>
+      <h2>Key Dates & Timeline</h2>
+      <span class="sec-badge" style="background:#4e7cff15;color:var(--accent-light)">2026 Calendar</span>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-item open">
+        <div class="tl-date">January 5, 2026</div>
+        <div class="tl-title">Applications Open <span class="tl-tag" style="background:var(--green-bg);color:var(--green)">START</span></div>
+        <div class="tl-note">Online portal opens at summer.snu.ac.kr</div>
+      </div>
+      <div class="tl-item warn">
+        <div class="tl-date">April 5, 2026</div>
+        <div class="tl-title">Early Bird Deadline <span class="tl-tag" style="background:var(--yellow-bg);color:var(--yellow)">20% OFF</span></div>
+        <div class="tl-note">Apply AND register for courses by this date to get 20% tuition discount automatically. This is your most important deadline.</div>
+      </div>
+      <div class="tl-item deadline">
+        <div class="tl-date">May 8, 2026</div>
+        <div class="tl-title">Final Application & Course Registration Deadline <span class="tl-tag" style="background:var(--red-bg);color:var(--red)">HARD DEADLINE</span></div>
+        <div class="tl-note">No applications accepted after this date.</div>
+      </div>
+      <div class="tl-item deadline">
+        <div class="tl-date">May 13, 2026</div>
+        <div class="tl-title">Program Fee Payment Due</div>
+        <div class="tl-note">Full payment must be completed online. Late payment = registration cancelled.</div>
+      </div>
+      <div class="tl-item event">
+        <div class="tl-date">June 22–23, 2026</div>
+        <div class="tl-title">Dormitory Check-in</div>
+        <div class="tl-note">Gwanak Residence Hall. Bring TB screening result and vaccination records.</div>
+      </div>
+      <div class="tl-item event">
+        <div class="tl-date">June 24–25, 2026</div>
+        <div class="tl-title">Orientation & Opening Ceremony</div>
+        <div class="tl-note">Attendance strongly recommended — important logistics, campus tour, meet your cohort.</div>
+      </div>
+      <div class="tl-item event">
+        <div class="tl-date">June 26, 2026</div>
+        <div class="tl-title">First Field Trip</div>
+        <div class="tl-note">Included if you paid the 300,000 KRW field trip fee. 4 trips total (June 26, July 3, 10, 17).</div>
+      </div>
+      <div class="tl-item event">
+        <div class="tl-date">June 29, 2026</div>
+        <div class="tl-title">Classes Begin</div>
+        <div class="tl-note">Mon–Thu schedule. Type A (9am–12pm), Type B (1pm–4pm), Type C (4pm–7pm).</div>
+      </div>
+      <div class="tl-item deadline">
+        <div class="tl-date">July 22, 2026</div>
+        <div class="tl-title">Last Day of Classes & Final Exams</div>
+      </div>
+      <div class="tl-item event">
+        <div class="tl-date">July 24, 2026</div>
+        <div class="tl-title">Closing Ceremony</div>
+      </div>
+      <div class="tl-item event">
+        <div class="tl-date">July 25, 2026</div>
+        <div class="tl-title">Dormitory Check-out</div>
+        <div class="tl-note">Book your return flight for July 25 or later.</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════ SECTION: ELIGIBILITY ══════════ -->
+  <div class="section-block" id="eligibility">
+    <div class="sec-header">
+      <span class="sec-icon">✅</span>
+      <h2>Eligibility Requirements</h2>
+      <span class="sec-badge" style="background:var(--green-bg);color:var(--green)">Who Can Apply</span>
+    </div>
+
+    <div class="info-grid" style="margin-bottom:1rem">
+      <div class="info-card">
+        <div class="ic-label">Student Status</div>
+        <div class="ic-value">Current undergrad or grad student</div>
+        <div class="ic-note">Enrolled at any university outside Korea. All years welcome.</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Incoming Freshmen</div>
+        <div class="ic-value">Accepted for Fall 2026</div>
+        <div class="ic-note">High school graduates with a university acceptance letter for Fall 2026 may apply.</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">GPA Requirement</div>
+        <div class="ic-value" style="color:var(--green)">None stated</div>
+        <div class="ic-note">No minimum GPA cutoff on official SNU ISP page.</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Language</div>
+        <div class="ic-value">No TOEFL/IELTS required</div>
+        <div class="ic-note">All courses taught in English. No test score needed to apply.</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Nationality</div>
+        <div class="ic-value">Open to all</div>
+        <div class="ic-note">Including Korean nationals enrolled at overseas universities.</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Exclusion</div>
+        <div class="ic-value" style="color:var(--red)">Degree completed before program</div>
+        <div class="ic-note">Students who graduate before Jun 22, 2026 are ineligible.</div>
+      </div>
+    </div>
+
+    <div class="alert good">
+      <span class="al-icon">👍</span>
+      <div><strong>Good news for IITB students:</strong> No GPA cutoff, no language test, and all engineering/science disciplines qualify. Any year of study (1st–4th year UG, PG) is eligible.</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════ SECTION: DOCUMENTS ══════════ -->
+  <div class="section-block" id="documents">
+    <div class="sec-header">
+      <span class="sec-icon">📁</span>
+      <h2>Required Application Documents</h2>
+      <span class="sec-badge" style="background:var(--pink-bg);color:var(--pink)">Upload to Portal</span>
+    </div>
+
+    <div class="checklist" id="doc-checklist">
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Valid Passport (scanned copy)</div>
+          <div class="ci-note">Must be valid for at least 6 months beyond July 25, 2026. 2 blank pages required for Korea visa stamp. JPEG/PDF format.</div>
+        </div>
+        <span class="ci-badge" style="background:#4e7cff15;color:var(--accent-light)">Required</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Passport-size Profile Photo</div>
+          <div class="ci-note">JPEG/JPG only. Front-facing, plain white background. Recent (within 6 months).</div>
+        </div>
+        <span class="ci-badge" style="background:#4e7cff15;color:var(--accent-light)">Required</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Official Academic Transcript</div>
+          <div class="ci-note">Issued by your university registrar. English version or with certified English translation. Get this from IITB's Academic Office — they usually take a few days.</div>
+        </div>
+        <span class="ci-badge" style="background:#4e7cff15;color:var(--accent-light)">Required</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Health Insurance Policy Document</div>
+          <div class="ci-note">MANDATORY. Coverage must include sickness, accident, and death for the full program period (Jun 22 – Jul 25, 2026). Must be in English or notarized. Purchase from Bajaj Allianz / HDFC Ergo / Tata AIG (₹3,000–₹8,000 for ~5 weeks).</div>
+        </div>
+        <span class="ci-badge" style="background:var(--red-bg);color:var(--red)">Mandatory</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Measles Vaccination Proof</div>
+          <div class="ci-note">Required for dormitory applicants. Get from your doctor or vaccination records (MMR vaccine). Submit as part of dorm application separately.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--yellow-bg);color:var(--yellow)">Dorm Only</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">TB (Tuberculosis) Screening</div>
+          <div class="ci-note">Required for dormitory. Must be done within 6 months of check-in. PPD skin test or chest X-ray from a certified hospital. India is a high-TB-incidence country — SNU will require this.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--yellow-bg);color:var(--yellow)">Dorm Only</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">SNU Acceptance/Admission Letter</div>
+          <div class="ci-note">Issued by SNU after your application is approved. You will need this for your Korean visa application. Request it from summer@snu.ac.kr if not provided automatically.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--green-bg);color:var(--green)">After Acceptance</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Scholarship Supporting Documents (if applicable)</div>
+          <div class="ci-note">Only needed if claiming a scholarship/discount beyond Early Bird. E.g., proof of partner university affiliation, SNU alumni parent document, etc.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--surface3);color:var(--text-dim)">If Applicable</span>
+      </div>
+
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════ SECTION: BUDGET ══════════ -->
+  <div class="section-block" id="budget">
+    <div class="sec-header">
+      <span class="sec-icon">💰</span>
+      <h2>Budget Sheet</h2>
+      <span class="sec-badge" style="background:var(--yellow-bg);color:var(--yellow)">INR Estimates · 2026</span>
+    </div>
+
+    <div class="alert info" style="margin-bottom:1rem">
+      <span class="al-icon">ℹ️</span>
+      <div>Exchange rate used: <strong>1 KRW ≈ ₹0.060</strong> (₹1 = ~16.7 KRW). Rate as of early 2026. All INR values are approximate and fluctuate with FX rates. Toggle below to see with/without Early Bird discount.</div>
+    </div>
+
+    <div class="budget-wrap">
+      <div class="budget-header">
+        <h3>Total Cost Breakdown — Indian Student (2 courses, on-campus dorm)</h3>
+        <div class="budget-controls">
+          <button class="bud-btn active" id="btn-earlybird" onclick="setDiscount(true)">With 20% Early Bird</button>
+          <button class="bud-btn" id="btn-nodiscount" onclick="setDiscount(false)">No Discount</button>
+        </div>
+      </div>
+
+      <div class="budget-body">
+        <!-- Header row -->
+        <div class="bud-row header">
+          <div>Item</div>
+          <div style="text-align:right">KRW</div>
+          <div style="text-align:right">INR (approx.)</div>
+          <div>Notes</div>
+        </div>
+
+        <!-- MANDATORY PROGRAM FEES -->
+        <div class="bud-row section-label"><span>Mandatory Program Fees</span></div>
+
+        <div class="bud-row">
+          <div class="bud-label"><strong>Application Fee</strong></div>
+          <div class="bud-krw">200,000</div>
+          <div class="bud-inr">₹12,000</div>
+          <div class="bud-note">One-time, non-refundable</div>
+        </div>
+
+        <div class="bud-row">
+          <div class="bud-label">
+            <strong>Tuition — 2 courses (~6 credits)</strong>
+            <small id="tuition-note">Early Bird: 20% off → 2,678,400 KRW</small>
+          </div>
+          <div class="bud-krw" id="tuition-krw">2,678,400</div>
+          <div class="bud-inr" id="tuition-inr">₹1,60,700</div>
+          <div class="bud-note">Full rate: 3,348,000 KRW. Most students take 2 courses (5–6 credits).</div>
+        </div>
+
+        <!-- OPTIONAL PROGRAM FEES -->
+        <div class="bud-row section-label"><span>Optional Program Fees</span></div>
+
+        <div class="bud-row">
+          <div class="bud-label"><strong>On-Campus Dormitory</strong><small>Gwanak-sa, double occupancy</small></div>
+          <div class="bud-krw">1,100,000</div>
+          <div class="bud-inr">₹66,000</div>
+          <div class="bud-note">Recommended. Limited spots — apply early. Includes bed, AC, WiFi.</div>
+        </div>
+
+        <div class="bud-row">
+          <div class="bud-label"><strong>Field Trips (4 trips)</strong></div>
+          <div class="bud-krw">300,000</div>
+          <div class="bud-inr">₹18,000</div>
+          <div class="bud-note">Jun 26, Jul 3, 10, 17. Worth it for cultural exposure.</div>
+        </div>
+
+        <!-- PRE-DEPARTURE COSTS -->
+        <div class="bud-row section-label"><span>Pre-Departure Costs</span></div>
+
+        <div class="bud-row">
+          <div class="bud-label"><strong>Roundtrip Flight</strong><small>Mumbai/Delhi ↔ Seoul Incheon (ICN)</small></div>
+          <div class="bud-krw">—</div>
+          <div class="bud-inr">₹35,000–₹60,000</div>
+          <div class="bud-note">Book 3–4 months early. Air India, Korean Air, Asiana, Singapore Air.</div>
+        </div>
+
+        <div class="bud-row">
+          <div class="bud-label"><strong>Korean Visa (C-3-9)</strong></div>
+          <div class="bud-krw">—</div>
+          <div class="bud-inr">₹4,500</div>
+          <div class="bud-note">₹3,400 fee + ₹1,100 service. BLS International / VFS Global.</div>
+        </div>
+
+        <div class="bud-row">
+          <div class="bud-label"><strong>Travel Insurance (5–6 weeks)</strong></div>
+          <div class="bud-krw">—</div>
+          <div class="bud-inr">₹3,000–₹8,000</div>
+          <div class="bud-note">Mandatory for SNU ISP. Bajaj Allianz / HDFC Ergo / Tata AIG.</div>
+        </div>
+
+        <div class="bud-row">
+          <div class="bud-label"><strong>TB Screening + Medical</strong><small>Required for dorm application</small></div>
+          <div class="bud-krw">—</div>
+          <div class="bud-inr">₹1,500–₹3,000</div>
+          <div class="bud-note">Chest X-ray or PPD test + measles vaccination verification</div>
+        </div>
+
+        <!-- LIVING COSTS IN SEOUL -->
+        <div class="bud-row section-label"><span>Living Costs in Seoul (5 Weeks)</span></div>
+
+        <div class="bud-row">
+          <div class="bud-label"><strong>Food</strong><small>Campus cafeteria + street food + occasional restaurant</small></div>
+          <div class="bud-krw">~450,000</div>
+          <div class="bud-inr">₹24,000–₹32,000</div>
+          <div class="bud-note">~15,000–20,000 KRW/day. Campus meals: 4,500–6,000 KRW each.</div>
+        </div>
+
+        <div class="bud-row">
+          <div class="bud-label"><strong>Local Transport</strong><small>Seoul Metro (T-money card)</small></div>
+          <div class="bud-krw">~60,000</div>
+          <div class="bud-inr">₹3,600</div>
+          <div class="bud-note">1,400 KRW/ride. Monthly pass: ~55,000 KRW. Dorm is walkable to class.</div>
+        </div>
+
+        <div class="bud-row">
+          <div class="bud-label"><strong>Toiletries, Laundry, Stationery</strong></div>
+          <div class="bud-krw">~80,000</div>
+          <div class="bud-inr">₹4,800</div>
+          <div class="bud-note">Laundry pay-per-use in dorm. Daiso (₩1000 store) is your best friend.</div>
+        </div>
+
+        <div class="bud-row">
+          <div class="bud-label"><strong>Leisure / Shopping / Sightseeing</strong><small>Hongdae, Myeongdong, Han River, Gyeongbokgung…</small></div>
+          <div class="bud-krw">~250,000</div>
+          <div class="bud-inr">₹12,000–₹25,000</div>
+          <div class="bud-note">Completely up to you. Seoul is very walkable and many sights are free.</div>
+        </div>
+
+        <div class="bud-row">
+          <div class="bud-label"><strong>SIM Card / Mobile Data</strong></div>
+          <div class="bud-krw">~30,000</div>
+          <div class="bud-inr">₹1,800</div>
+          <div class="bud-note">Buy at Incheon airport: unlimited data 30-day SIM for ~25,000–35,000 KRW.</div>
+        </div>
+      </div>
+
+      <!-- TOTAL -->
+      <div class="budget-total-box">
+        <div class="bt-label">
+          Estimated Total
+          <strong id="total-display">₹3,47,900 – ₹3,95,600</strong>
+          <div class="bt-sub" id="total-sub">With 20% Early Bird discount on tuition</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:0.3rem">Without discount</div>
+          <div id="nodiscount-display" style="font-family:'JetBrains Mono',monospace;font-size:1rem;color:var(--text-mid)">₹3,83,200 – ₹4,30,900</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- What's included vs not -->
+    <div style="margin-top:1.2rem;display:grid;grid-template-columns:1fr 1fr;gap:0.8rem">
+      <div class="info-card">
+        <div class="ic-label" style="color:var(--green);margin-bottom:0.5rem">✓ Included in Tuition</div>
+        <ul style="font-size:0.78rem;color:var(--text-dim);padding-left:1.1rem;line-height:1.8">
+          <li>Instruction by SNU faculty</li>
+          <li>Campus facilities (library, sports)</li>
+          <li>SNU student ID (cafeteria rates)</li>
+          <li>Academic credit (transferable)</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <div class="ic-label" style="color:var(--red);margin-bottom:0.5rem">✗ NOT Included</div>
+        <ul style="font-size:0.78rem;color:var(--text-dim);padding-left:1.1rem;line-height:1.8">
+          <li>Meals (pay separately at cafeteria)</li>
+          <li>Airfare and visa</li>
+          <li>Health/travel insurance</li>
+          <li>Textbooks (some courses)</li>
+          <li>Dorm laundry (coin-operated)</li>
+          <li>Personal expenses</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════ SECTION: HOUSING ══════════ -->
+  <div class="section-block" id="housing">
+    <div class="sec-header">
+      <span class="sec-icon">🏠</span>
+      <h2>Housing Options</h2>
+      <span class="sec-badge" style="background:var(--purple)20;color:var(--purple)">Accommodation</span>
+    </div>
+
+    <div class="alert warn">
+      <span class="al-icon">⚠️</span>
+      <div><strong>On-campus dorm is NOT guaranteed</strong> — spots are first-come, first-served and limited. Apply as early as possible. If dorm is full, budget for off-campus housing (~₹8,500–₹17,000/month for a sharehouse).</div>
+    </div>
+
+    <table class="data-table">
+      <tr>
+        <th>Option</th><th>Cost (KRW)</th><th>Cost (INR)</th><th>Notes</th>
+      </tr>
+      <tr>
+        <td><strong>On-Campus: Gwanak-sa</strong> (recommended)</td>
+        <td class="highlight">1,100,000</td>
+        <td class="highlight">~₹66,000</td>
+        <td>Double room, AC, WiFi, mini-fridge, shared kitchen. 5-week all-in. Must apply separately and provide TB screening + vaccination records.</td>
+      </tr>
+      <tr>
+        <td><strong>Sharehouse</strong> (off-campus)</td>
+        <td class="mono">140,000–280,000/mo</td>
+        <td class="highlight">₹8,400–₹16,800</td>
+        <td>Popular with international students. Enkor Stay, Avengershouse. Short stays available.</td>
+      </tr>
+      <tr>
+        <td><strong>Goshiwon</strong> (tiny private room)</td>
+        <td class="mono">200,000–600,000/mo</td>
+        <td class="highlight">₹12,000–₹36,000</td>
+        <td>No deposit, private room, shared bathroom. Very affordable. Near many subway lines.</td>
+      </tr>
+      <tr>
+        <td><strong>Studio apartment</strong></td>
+        <td class="mono">300,000–600,000/mo</td>
+        <td class="highlight">₹18,000–₹36,000</td>
+        <td>Requires large key money deposit (~₹3–6 lakhs). Not practical for 5 weeks.</td>
+      </tr>
+    </table>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="ic-label">Dorm address</div>
+        <div class="ic-value" style="font-size:0.82rem">1 Gwanak-ro, Gwanak-gu, Seoul</div>
+        <div class="ic-note">Walking distance to all ISP classrooms</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Dorm includes</div>
+        <div class="ic-value" style="font-size:0.82rem">Bed, desk, AC, WiFi, bedding</div>
+        <div class="ic-note">Shared mini-fridge, microwave, single burner, coin laundry</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Meals</div>
+        <div class="ic-value" style="font-size:0.82rem;color:var(--red)">NOT included</div>
+        <div class="ic-note">Campus cafeteria: 4,500–6,000 KRW/meal with student ID. Multiple options on campus.</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Medical requirement</div>
+        <div class="ic-value" style="font-size:0.82rem">TB screen + measles vaccine</div>
+        <div class="ic-note">TB within 6 months of check-in. India is high-incidence country — definitely required.</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════ SECTION: VISA ══════════ -->
+  <div class="section-block" id="visa">
+    <div class="sec-header">
+      <span class="sec-icon">🛂</span>
+      <h2>Visa Requirements for Indian Students</h2>
+      <span class="sec-badge" style="background:var(--red-bg);color:var(--red)">C-3-9 Short-Term</span>
+    </div>
+
+    <div class="alert bad">
+      <span class="al-icon">🚨</span>
+      <div><strong>India does NOT have visa-free access to South Korea.</strong> You need a C-3-9 (Short-Term General) visa. Processing takes 10–12 business days (standard) or 5–7 days (express). SNU recommends applying up to 1 month in advance. <strong>Apply immediately after receiving your SNU acceptance letter.</strong></div>
+    </div>
+
+    <div class="info-grid" style="margin-bottom:1.2rem">
+      <div class="info-card">
+        <div class="ic-label">Visa Type</div>
+        <div class="ic-value">C-3-9 (Short-term General)</div>
+        <div class="ic-note">For study programs under 90 days. SNU ISP is ~34 days.</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Maximum Stay</div>
+        <div class="ic-value">90 days</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Visa Fee</div>
+        <div class="ic-value" style="color:var(--yellow)">₹3,400 + ₹1,100 = ₹4,500</div>
+        <div class="ic-note">Application fee + BLS/VFS service charge</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Processing Time</div>
+        <div class="ic-value">10–12 working days</div>
+        <div class="ic-note">Standard. Express: 5–7 days. Apply by late April at the latest.</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Application Centers</div>
+        <div class="ic-value" style="font-size:0.82rem">BLS International / VFS Global</div>
+        <div class="ic-note">Mumbai, Hyderabad (BLS) · New Delhi, Kolkata (VFS)</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Group Discount</div>
+        <div class="ic-value" style="color:var(--green)">Fee waived (5+ people)</div>
+        <div class="ic-note">Valid through Jun 30, 2026 for groups of 5+ traveling together from India.</div>
+      </div>
+    </div>
+
+    <p style="font-size:0.82rem;font-weight:700;color:var(--text-mid);margin-bottom:0.7rem;text-transform:uppercase;letter-spacing:0.06em">Documents Required for C-3-9 Visa</p>
+    <div class="steps">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-text">
+          <div class="st-title">Valid Passport</div>
+          <div class="st-note">6+ months validity beyond July 25, 2026. At least 2 blank pages for Korea entry/exit stamps.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-text">
+          <div class="st-title">Completed Visa Application Form</div>
+          <div class="st-note">Download from BLS International or Korean Embassy India website. Fill accurately.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-text">
+          <div class="st-title">Bank Statements (6 months)</div>
+          <div class="st-note">Recommended balance: ₹5,00,000+ to demonstrate financial ability to fund the trip. Get from your bank with official letterhead/stamp.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-text">
+          <div class="st-title">Income Tax Returns (2 years)</div>
+          <div class="st-note">Your parents' ITR if you are a student. Download from the Income Tax e-filing portal.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-text">
+          <div class="st-title">University Enrollment Certificate</div>
+          <div class="st-note">Bonafide/enrollment letter from IITB Academic Office confirming you are a currently enrolled student. Get well in advance.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">6</div>
+        <div class="step-text">
+          <div class="st-title">SNU Acceptance Letter</div>
+          <div class="st-note">Official admission letter from SNU ISP. Request from summer@snu.ac.kr after your application is approved. Most critical document for the visa.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">7</div>
+        <div class="step-text">
+          <div class="st-title">Confirmed Return Flight Tickets</div>
+          <div class="st-note">Both onward (around June 21–22) and return (July 25 or later). Book flexible/refundable if visa is uncertain.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">8</div>
+        <div class="step-text">
+          <div class="st-title">Accommodation Booking Confirmation</div>
+          <div class="st-note">SNU dorm confirmation letter, or off-campus booking confirmation. Must cover the entire program duration.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">9</div>
+        <div class="step-text">
+          <div class="st-title">Travel Insurance Policy</div>
+          <div class="st-note">Cover dates must span Jun 22 – Jul 25, 2026. Must include sickness, accident, and death coverage. In English or notarized.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">10</div>
+        <div class="step-text">
+          <div class="st-title">Cover Letter (Purpose of Visit)</div>
+          <div class="st-note">Brief letter explaining you are attending the SNU International Summer Program 2026 as a student. Mention program dates, institution, and that you will return to India after July 25.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">11</div>
+        <div class="step-text">
+          <div class="st-title">Passport-size Photographs</div>
+          <div class="st-note">2 recent photos (white background, front-facing). Check exact specs at BLS/VFS website.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════ SECTION: COURSES ══════════ -->
+  <div class="section-block" id="courses">
+    <div class="sec-header">
+      <span class="sec-icon">📚</span>
+      <h2>Courses & Tracks (2026)</h2>
+      <span class="sec-badge" style="background:var(--teal)20;color:var(--teal)">71 Courses · All in English</span>
+    </div>
+
+    <div class="info-grid" style="margin-bottom:1.2rem">
+      <div class="info-card">
+        <div class="ic-label">Total Courses</div>
+        <div class="ic-value">71 courses</div>
+        <div class="ic-note">~2× more than previous year</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Class Schedule</div>
+        <div class="ic-value">Mon – Thu only</div>
+        <div class="ic-note">Type A: 9am–12pm · Type B: 1pm–4pm · Type C: 4pm–7pm</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Credits</div>
+        <div class="ic-value">2 or 3 credits/course</div>
+        <div class="ic-note">Max 9 credits (up to 3 courses). Most students take 2 courses.</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-label">Grading</div>
+        <div class="ic-value">Letter grade or S/U</div>
+        <div class="ic-note">Transferability depends on home university. Confirm with IITB before enrolling.</div>
+      </div>
+    </div>
+
+    <div class="course-grid">
+      <div class="course-card">
+        <div class="cc-track" style="color:var(--accent-light)">Business & Economics</div>
+        <div class="cc-count" style="color:var(--accent-light)">17</div>
+        <div class="cc-examples">Finance, entrepreneurship, management, digital commerce, marketing strategy</div>
+      </div>
+      <div class="course-card">
+        <div class="cc-track" style="color:var(--pink)">Social Sciences</div>
+        <div class="cc-count" style="color:var(--pink)">16</div>
+        <div class="cc-examples">Political science, international relations, public policy, development economics</div>
+      </div>
+      <div class="course-card">
+        <div class="cc-track" style="color:var(--orange)">K-Culture & Korean Studies</div>
+        <div class="cc-count" style="color:var(--orange)">10</div>
+        <div class="cc-examples">Korean Language (Levels 1–5), K-pop, ceramics, art history, media culture</div>
+      </div>
+      <div class="course-card">
+        <div class="cc-track" style="color:var(--purple)">Psychology & Education</div>
+        <div class="cc-count" style="color:var(--purple)">8</div>
+        <div class="cc-examples">Child development, learning sciences, mental health, cognitive psychology</div>
+      </div>
+      <div class="course-card">
+        <div class="cc-track" style="color:var(--green)">Engineering, Sciences & AI</div>
+        <div class="cc-count" style="color:var(--green)">5</div>
+        <div class="cc-examples">Programming, physics, computer science, machine learning, data science</div>
+      </div>
+      <div class="course-card">
+        <div class="cc-track" style="color:var(--teal)">Health & Life Sciences</div>
+        <div class="cc-count" style="color:var(--teal)">5</div>
+        <div class="cc-examples">Exercise science, healthcare innovation, aerobiology, biomedical topics</div>
+      </div>
+      <div class="course-card">
+        <div class="cc-track" style="color:var(--yellow)">Arts & Media</div>
+        <div class="cc-count" style="color:var(--yellow)">4</div>
+        <div class="cc-examples">Design, metalwork, digital storytelling, creative media</div>
+      </div>
+      <div class="course-card">
+        <div class="cc-track" style="color:var(--text-mid)">Humanities</div>
+        <div class="cc-count" style="color:var(--text-mid)">4</div>
+        <div class="cc-examples">Cultural communication, East Asian film, Vietnamese history, Scandinavian studies</div>
+      </div>
+    </div>
+
+    <div class="alert info" style="margin-top:1rem">
+      <span class="al-icon">💡</span>
+      <div><strong>For EE/Engineering students:</strong> The Engineering, Sciences & AI track (5 courses) is the most relevant. You can also mix tracks — e.g., one Engineering course + one Korean Language course. Course details at <code>summer.snu.ac.kr/program/courses</code></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════ SECTION: DISCOUNTS ══════════ -->
+  <div class="section-block" id="discounts">
+    <div class="sec-header">
+      <span class="sec-icon">🏷️</span>
+      <h2>Scholarships & Discounts</h2>
+      <span class="sec-badge" style="background:var(--green-bg);color:var(--green)">Only 1 can be applied</span>
+    </div>
+
+    <div class="alert warn">
+      <span class="al-icon">⚠️</span>
+      <div><strong>Only one discount/scholarship applies at a time</strong> — choose whichever gives the highest saving. For most Indian students, the 20% Early Bird is the most accessible.</div>
+    </div>
+
+    <table class="data-table">
+      <tr><th>Discount</th><th>% Off Tuition</th><th>Requirement</th><th>Accessible for IITB?</th></tr>
+      <tr>
+        <td><strong>Early Bird</strong></td>
+        <td class="green">20% off</td>
+        <td>Apply AND register for courses by <strong>April 5, 2026</strong></td>
+        <td class="green">✓ Yes — easiest to get</td>
+      </tr>
+      <tr>
+        <td><strong>Korean/East Asian Studies</strong></td>
+        <td class="green">20% off</td>
+        <td>Currently enrolled in Korean/East Asian Studies major</td>
+        <td class="red">✗ Not applicable</td>
+      </tr>
+      <tr>
+        <td><strong>Returnee / Alumni</strong></td>
+        <td class="green">20% off</td>
+        <td>Previously completed SNU ISP</td>
+        <td class="red">✗ First-time only</td>
+      </tr>
+      <tr>
+        <td><strong>Sibling</strong></td>
+        <td class="green">20% off</td>
+        <td>Sibling attending together, or one is an SNU alumnus</td>
+        <td class="red">✗ Conditional</td>
+      </tr>
+      <tr>
+        <td><strong>SNU Alumni Child</strong></td>
+        <td class="green">20% off</td>
+        <td>A parent graduated from SNU</td>
+        <td class="red">✗ Conditional</td>
+      </tr>
+      <tr>
+        <td><strong>Partner University</strong></td>
+        <td class="green" style="color:var(--teal)">10% off</td>
+        <td>Enrolled at an SNU partner, APRU, AEARU, AUA, or AUF member institution</td>
+        <td class="highlight">Check if IITB is listed</td>
+      </tr>
+      <tr>
+        <td><strong>High Credit Load</strong></td>
+        <td class="green" style="color:var(--teal)">7% off</td>
+        <td>Enrolling in more than 5 credits</td>
+        <td class="green">✓ Auto-applied at checkout</td>
+      </tr>
+    </table>
+
+    <div class="alert info">
+      <span class="al-icon">🔍</span>
+      <div><strong>Check IITB's partner status:</strong> If IIT Bombay is a member of APRU (Association of Pacific Rim Universities), AEARU, or is listed as an SNU exchange partner, you get 10% off regardless of timing — and if stacked rules allowed this could combine, but officially only one discount applies. Check <code>summer.snu.ac.kr/program/scholarships</code></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════ SECTION: MASTER CHECKLIST ══════════ -->
+  <div class="section-block" id="checklist">
+    <div class="sec-header">
+      <span class="sec-icon">☑️</span>
+      <h2>Master To-Do Checklist</h2>
+      <span class="sec-badge" style="background:var(--surface2);color:var(--text-mid)">Click to Mark Done</span>
+    </div>
+
+    <div class="checklist">
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Decide on program — confirm dates don't clash with IITB exams/deadlines</div>
+          <div class="ci-note">SNU ISP: Jun 22 – Jul 25, 2026. Check IITB SEM4 end date and any make-up exams.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--surface3);color:var(--text-dim)">Planning</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Get official academic transcript from IITB Academic Office</div>
+          <div class="ci-note">Request in English. Takes 2–5 business days. Apply well before Jan 5.</div>
+        </div>
+        <span class="ci-badge" style="background:#4e7cff15;color:var(--accent-light)">Documents</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Check passport validity — renew if expiring before Jan 2027</div>
+          <div class="ci-note">Must be valid 6 months beyond July 25, 2026 = valid until at least Jan 25, 2027.</div>
+        </div>
+        <span class="ci-badge" style="background:#4e7cff15;color:var(--accent-light)">Documents</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Create account and submit application on summer.snu.ac.kr</div>
+          <div class="ci-note">Portal opens January 5, 2026. Apply BEFORE April 5 for Early Bird 20% discount.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--yellow-bg);color:var(--yellow)">Action</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Register for courses by April 5, 2026 (Early Bird deadline)</div>
+          <div class="ci-note">Both application AND course selection must be done before April 5 to qualify for 20% off.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--yellow-bg);color:var(--yellow)">High Priority</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Apply for on-campus dormitory (separate from main application)</div>
+          <div class="ci-note">First-come, first-served. Limited spots. Submit TB screening and measles vaccination proof.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--yellow-bg);color:var(--yellow)">High Priority</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Get TB screening done (chest X-ray or PPD test)</div>
+          <div class="ci-note">Valid within 6 months of June 22. Must be done at a certified hospital. Allow 1–2 weeks for appointment + results.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--pink-bg);color:var(--pink)">Medical</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Confirm measles vaccination record (MMR vaccine)</div>
+          <div class="ci-note">Required for dorm. Get document from your doctor or college health centre.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--pink-bg);color:var(--pink)">Medical</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Pay program fee by May 13, 2026</div>
+          <div class="ci-note">Full payment online. Application fee (200,000 KRW) + tuition + optional dorm + optional field trips.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--red-bg);color:var(--red)">Deadline</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Request SNU acceptance letter from summer@snu.ac.kr</div>
+          <div class="ci-note">Needed for Korean visa application. Get this as soon as your application is confirmed.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--green-bg);color:var(--green)">Post-Acceptance</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Buy travel insurance (must cover Jun 22 – Jul 25, 2026)</div>
+          <div class="ci-note">Required by SNU. Bajaj Allianz / HDFC Ergo / Tata AIG student travel policies ~₹3,000–₹8,000.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--pink-bg);color:var(--pink)">Insurance</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Collect visa documents (bank statements, ITR, enrollment letter, etc.)</div>
+          <div class="ci-note">See full visa checklist above. Bank statements need official stamp/letterhead.</div>
+        </div>
+        <span class="ci-badge" style="background:#4e7cff15;color:var(--accent-light)">Visa Prep</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Book flights (roundtrip, Mumbai/Delhi ↔ Incheon ICN)</div>
+          <div class="ci-note">Book 3–4 months early for best prices. Arrive June 21–22, depart July 25 or later. Aim for ₹35,000–₹50,000 roundtrip.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--yellow-bg);color:var(--yellow)">Travel</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Apply for C-3-9 visa at BLS International / VFS Global</div>
+          <div class="ci-note">Apply immediately after getting SNU acceptance letter. Standard processing: 10–12 working days. Center: BLS Mumbai/Hyderabad or VFS Delhi/Kolkata.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--red-bg);color:var(--red)">Critical</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Set up international banking (Forex card or Wise card)</div>
+          <div class="ci-note">Get a multi-currency forex card (HDFC Regalia, Niyo Global, or Wise) before departure. Load KRW or USD. Avoid airport money exchange — terrible rates.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--surface3);color:var(--text-dim)">Finance</span>
+      </div>
+
+      <div class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="ci-text">
+          <div class="ci-title">Buy Korean SIM card at Incheon Airport on arrival</div>
+          <div class="ci-note">Unlimited data 30-day SIM: ~25,000–35,000 KRW (~₹1,500–₹2,100). Available immediately at ICN arrivals. Much cheaper than Indian roaming plans.</div>
+        </div>
+        <span class="ci-badge" style="background:var(--surface3);color:var(--text-dim)">On Arrival</span>
+      </div>
+
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════ SECTION: TIPS ══════════ -->
+  <div class="section-block" id="tips">
+    <div class="sec-header">
+      <span class="sec-icon">💡</span>
+      <h2>Tips & Practical Advice</h2>
+      <span class="sec-badge" style="background:var(--surface2);color:var(--text-mid)">India → Seoul</span>
+    </div>
+
+    <div class="tip-grid">
+      <div class="tip-card">
+        <div class="tip-icon">💸</div>
+        <h4>Money in Seoul</h4>
+        <p>Get a <strong>Niyo Global or Wise card</strong> — zero forex markup. Load KRW before leaving India or withdraw from Seoul ATMs. Cash is still widely used. Never exchange at airports.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">🚇</div>
+        <h4>Getting Around</h4>
+        <p>Pick up a <strong>T-money card</strong> at any convenience store (GS25, CU, 7-Eleven) on arrival. Works on all subway, bus, and some taxis. Single ride: 1,400 KRW. Seoul Metro is clean, fast, and covers everywhere.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">✈️</div>
+        <h4>Flights</h4>
+        <p>Book <strong>3–4 months early</strong> — June/July is peak season from India. <strong>Air India</strong> has direct BOM–ICN and DEL–ICN. Korean Air and Asiana are premium alternatives. Use Google Flights price tracker.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">🍱</div>
+        <h4>Food</h4>
+        <p>Campus cafeteria meals cost 4,500–6,000 KRW (~₹270–₹360). Many vegetarian options are limited in Korean cuisine — convenience store triangle kimbap (~₹60) is a lifesaver. GS25 and CU have great cheap meals.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">📱</div>
+        <h4>SIM Card</h4>
+        <p>Buy at <strong>Incheon Airport arrivals hall</strong> immediately — KT, SKT, LG U+ all sell unlimited data SIMs. ~25,000–35,000 KRW for 30 days. Far cheaper and better than Indian roaming.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">🏥</div>
+        <h4>Health Insurance</h4>
+        <p>SNU requires it. Buy a <strong>student travel insurance</strong> from Bajaj Allianz / HDFC Ergo before leaving. Get the full PDF policy — you'll need to upload it to the SNU portal and present it at dorm check-in.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">📋</div>
+        <h4>Visa Tip</h4>
+        <p>Apply for the C-3-9 visa <strong>as soon as you get the SNU acceptance letter</strong>. BLS Mumbai/Hyderabad or VFS Delhi — book the appointment slot in advance online. Bring all originals + self-attested copies.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">🗺️</div>
+        <h4>Seoul Must-Dos (Free)</h4>
+        <p><strong>Gyeongbokgung Palace</strong> (free Sundays in hanbok), Han River parks, Bukchon Hanok Village, Namsan Seoul Tower (hike up free), Hongdae street art, Insadong market.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">🌡️</div>
+        <h4>Weather in June–July</h4>
+        <p>Seoul in late June/July is <strong>hot and humid</strong> (28–34°C) with monsoon rains. Pack light summer clothes, a compact umbrella, and sunscreen. Dorm has AC.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">🔌</div>
+        <h4>Power Adapters</h4>
+        <p>Korea uses <strong>Type C/F plugs, 220V</strong>. Indian plugs don't fit directly. Bring a universal adapter or buy one cheaply at Daiso in Seoul (₹100 equivalent).</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">📚</div>
+        <h4>Course Credits</h4>
+        <p>Confirm with IITB Academic Office whether SNU ISP credits are transferable <strong>before</strong> enrolling. Get it in writing. This varies by program and professor.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">🤝</div>
+        <h4>Networking</h4>
+        <p>SNU ISP attracts students from 60+ countries. Go to orientation, join WhatsApp/KakaoTalk groups. The connections you make are often as valuable as the coursework.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <div style="border-top:1px solid var(--border);padding-top:1.5rem;margin-top:1rem;display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;align-items:flex-start">
+    <div>
+      <div style="font-size:0.72rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.3rem">Official Resources</div>
+      <div style="display:flex;flex-direction:column;gap:0.2rem;font-size:0.78rem">
+        <span style="color:var(--accent-light)">🌐 summer.snu.ac.kr</span>
+        <span style="color:var(--accent-light)">📧 summer@snu.ac.kr</span>
+        <span style="color:var(--accent-light)">📞 +82-2-880-4449</span>
+      </div>
+    </div>
+    <div style="font-size:0.72rem;color:var(--text-dim);text-align:right;max-width:300px;line-height:1.6">
+      Information compiled March 2026. Fees, dates, and requirements subject to change. Always verify current details at the official SNU ISP website before applying.
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleCheck(item) {
+  const cb = item.querySelector('input[type=checkbox]');
+  cb.checked = !cb.checked;
+  item.classList.toggle('done', cb.checked);
+}
+
+let earlyBird = true;
+
+function setDiscount(eb) {
+  earlyBird = eb;
+  document.getElementById('btn-earlybird').classList.toggle('active', eb);
+  document.getElementById('btn-nodiscount').classList.toggle('active', !eb);
+
+  const fullTuition = 3348000;
+  const discountedTuition = Math.round(fullTuition * 0.80);
+  const krw = eb ? discountedTuition : fullTuition;
+  const inr = Math.round(krw * 0.060);
+
+  document.getElementById('tuition-krw').textContent = krw.toLocaleString();
+  document.getElementById('tuition-inr').textContent = '₹' + inr.toLocaleString();
+  document.getElementById('tuition-note').textContent = eb
+    ? 'Early Bird: 20% off → ' + krw.toLocaleString() + ' KRW'
+    : 'Full rate (no discount)';
+
+  // Recalculate totals
+  // Fixed costs: appFee(12000) + dorm(66000) + fieldtrip(18000) + visa(4500)
+  // Variable: tuition, flights(35k-60k), insurance(3k-8k), food(24k-32k), transport(3600), personal(12k-25k), medical(1500-3000), sim(1800)
+  const fixed = 12000 + 66000 + 18000 + 4500;
+  const varLow  = 35000 + 3000 + 24000 + 3600 + 12000 + 1500 + 1800;
+  const varHigh = 60000 + 8000 + 32000 + 3600 + 25000 + 3000 + 1800;
+  const totalLow  = fixed + inr + varLow;
+  const totalHigh = fixed + inr + varHigh;
+
+  const fullINR = Math.round(fullTuition * 0.060);
+  const totalLowFull  = fixed + fullINR + varLow;
+  const totalHighFull = fixed + fullINR + varHigh;
+
+  document.getElementById('total-display').textContent =
+    '₹' + totalLow.toLocaleString() + ' – ₹' + totalHigh.toLocaleString();
+  document.getElementById('total-sub').textContent = eb
+    ? 'With 20% Early Bird discount on tuition'
+    : 'Without any discount';
+  document.getElementById('nodiscount-display').textContent = eb
+    ? '₹' + totalLowFull.toLocaleString() + ' – ₹' + totalHighFull.toLocaleString()
+    : '(current view)';
+}
+
+// Init
+setDiscount(true);
+</script>
+</body>
+</html>

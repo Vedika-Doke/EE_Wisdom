@@ -593,63 +593,62 @@
 </div><!-- /quiz -->
 
 <div class="btn-row">
-  <button id="submitBtn" onclick="submitQuiz()">Submit & Check Answers</button>
-  <button id="resetBtn" onclick="resetQuiz()">Reset</button>
+  <button id="resetBtn" onclick="resetQuiz()">Reset Quiz</button>
 </div>
 
 </div><!-- /container -->
 
 <script>
-let submitted = false;
+let score = 0;
+let answered = 0;
+const total = document.querySelectorAll('.question-card').length;
 
 document.querySelectorAll('.options li').forEach(li => {
   li.addEventListener('click', function() {
-    if (submitted) return;
-    const siblings = this.parentElement.querySelectorAll('li');
-    siblings.forEach(s => s.classList.remove('selected'));
-    this.classList.add('selected');
+    const card = this.closest('.question-card');
+    if (card.dataset.answered) return;          // already answered — lock it
+    card.dataset.answered = 'true';
+
+    const correct = parseInt(card.dataset.answer);
+    const clicked = parseInt(this.dataset.idx);
+    const correctLi = card.querySelectorAll('.options li')[correct];
+
+    // Always reveal the correct answer in green
+    correctLi.classList.add('reveal-correct');
+
+    if (clicked === correct) {
+      card.classList.add('correct');
+      score++;
+    } else {
+      this.classList.add('reveal-wrong');       // clicked wrong option in red
+      card.classList.add('wrong');
+    }
+
+    // Disable all options in this card
+    card.querySelectorAll('.options li').forEach(o => o.style.pointerEvents = 'none');
+
+    // Show explanation
+    card.querySelector('.explanation').classList.add('show');
+
+    // Update score display
+    answered++;
+    document.getElementById('scoreDisplay').textContent = score + ' / ' + answered + ' answered';
   });
 });
 
-function submitQuiz() {
-  if (submitted) return;
-  submitted = true;
-  let score = 0;
-  const cards = document.querySelectorAll('.question-card');
-  cards.forEach(card => {
-    const correct = parseInt(card.dataset.answer);
-    const selected = card.querySelector('.options li.selected');
-    const correctLi = card.querySelectorAll('.options li')[correct];
-
-    correctLi.classList.add('reveal-correct');
-
-    if (selected) {
-      const idx = parseInt(selected.dataset.idx);
-      if (idx === correct) {
-        score++;
-        card.classList.add('correct');
-      } else {
-        selected.classList.add('reveal-wrong');
-        card.classList.add('wrong');
-      }
-    } else {
-      card.classList.add('wrong');
-    }
-    card.querySelector('.explanation').classList.add('show');
-  });
-  document.getElementById('scoreDisplay').textContent = score + ' / ' + cards.length;
-}
-
 function resetQuiz() {
-  submitted = false;
+  score = 0;
+  answered = 0;
   document.querySelectorAll('.question-card').forEach(card => {
+    delete card.dataset.answered;
     card.classList.remove('correct', 'wrong');
     card.querySelectorAll('.options li').forEach(li => {
       li.classList.remove('selected', 'reveal-correct', 'reveal-wrong');
+      li.style.pointerEvents = '';
     });
     card.querySelector('.explanation').classList.remove('show');
   });
-  document.getElementById('scoreDisplay').textContent = '-- / 20';
+  document.getElementById('scoreDisplay').textContent = '-- / ' + total;
 }
 </script>
 </body>
