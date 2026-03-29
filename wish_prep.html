@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TI WiSH 2025 - Test Prep</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a24;
+    --surface2: #22222e;
+    --border: #2a2a3a;
+    --text: #e8e8f0;
+    --text-dim: #8888a0;
+    --accent: #6c5ce7;
+    --accent-light: #a29bfe;
+    --correct: #00b894;
+    --correct-bg: #00b89415;
+    --wrong: #e74c3c;
+    --wrong-bg: #e74c3c15;
+    --math: #fd79a8;
+    --ee: #00cec9;
+    --sw: #fdcb6e;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Landing Page ── */
+  .landing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .landing h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-light), var(--math), var(--ee));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+  }
+
+  .landing .subtitle {
+    color: var(--text-dim);
+    font-size: 1.1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .mode-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.2rem;
+    max-width: 900px;
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .mode-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.8rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: left;
+  }
+
+  .mode-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px #6c5ce720;
+  }
+
+  .mode-card .tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 0.8rem;
+  }
+
+  .mode-card .tag.math { background: #fd79a825; color: var(--math); }
+  .mode-card .tag.ee { background: #00cec925; color: var(--ee); }
+  .mode-card .tag.sw { background: #fdcb6e25; color: var(--sw); }
+  .mode-card .tag.all { background: #6c5ce725; color: var(--accent-light); }
+  .mode-card .tag.pyq { background: #e74c3c25; color: var(--wrong); }
+
+  .mode-card h3 { font-size: 1.15rem; margin-bottom: 0.4rem; }
+  .mode-card p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; }
+
+  .q-count {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-top: 0.8rem;
+  }
+
+  /* ── Quiz Page ── */
+  .quiz-page { display: none; max-width: 820px; margin: 0 auto; padding: 1.5rem; }
+
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .back-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: 0.2s;
+  }
+
+  .back-btn:hover { border-color: var(--accent); }
+
+  .progress-wrap {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .progress-bar {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    border-radius: 10px;
+    transition: width 0.4s ease;
+  }
+
+  .progress-text {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-top: 4px;
+    text-align: right;
+  }
+
+  .score-display {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent-light);
+    white-space: nowrap;
+  }
+
+  .timer-display {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Question Card ── */
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .q-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .q-num {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent-light);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .q-tag {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 5px;
+  }
+
+  .q-tag.math { background: #fd79a820; color: var(--math); }
+  .q-tag.ee { background: #00cec920; color: var(--ee); }
+  .q-tag.sw { background: #fdcb6e20; color: var(--sw); }
+
+  .q-text {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+
+  .q-text code {
+    background: var(--surface2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-family: 'Courier New', monospace;
+  }
+
+  .q-text pre {
+    background: #12121a;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+
+  /* ── Options ── */
+  .options { display: flex; flex-direction: column; gap: 0.6rem; }
+
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 1rem 1.2rem;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+  }
+
+  .option:hover:not(.disabled) {
+    border-color: var(--accent);
+    background: #6c5ce708;
+  }
+
+  .option.selected {
+    border-color: var(--accent);
+    background: #6c5ce712;
+  }
+
+  .option.correct {
+    border-color: var(--correct) !important;
+    background: var(--correct-bg) !important;
+  }
+
+  .option.wrong {
+    border-color: var(--wrong) !important;
+    background: var(--wrong-bg) !important;
+  }
+
+  .option.disabled { cursor: default; }
+
+  .option-letter {
+    font-weight: 700;
+    font-size: 0.85rem;
+    min-width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--surface2);
+    flex-shrink: 0;
+  }
+
+  .option.correct .option-letter { background: var(--correct); color: #fff; }
+  .option.wrong .option-letter { background: var(--wrong); color: #fff; }
+
+  .option-text {
+    font-size: 0.92rem;
+    line-height: 1.5;
+    padding-top: 2px;
+  }
+
+  .option-text code {
+    background: var(--surface2);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+  }
+
+  /* ── Explanation ── */
+  .explanation {
+    display: none;
+    margin-top: 1.2rem;
+    padding: 1.2rem;
+    background: var(--surface2);
+    border-radius: 12px;
+    border-left: 3px solid var(--accent);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+
+  .explanation.show { display: block; animation: fadeIn 0.3s; }
+
+  .explanation strong { color: var(--accent-light); }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── Nav Buttons ── */
+  .nav-btns {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+  }
+
+  .nav-btn {
+    padding: 10px 24px;
+    border-radius: 10px;
+    border: none;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .nav-btn.primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .nav-btn.primary:hover { background: #5a4bd6; }
+
+  .nav-btn.secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .nav-btn.secondary:hover { border-color: var(--accent); }
+
+  /* ── Results ── */
+  .results-page {
+    display: none;
+    max-width: 650px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    text-align: center;
+  }
+
+  .results-page h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .results-score {
+    font-size: 4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-light), var(--correct));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 1rem 0;
+  }
+
+  .results-breakdown {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  .result-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+  }
+
+  .result-stat .num {
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+
+  .result-stat .label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  .review-list {
+    text-align: left;
+    margin-top: 2rem;
+  }
+
+  .review-list h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: var(--text-dim);
+  }
+
+  .review-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .review-item.was-correct { border-left: 3px solid var(--correct); }
+  .review-item.was-wrong { border-left: 3px solid var(--wrong); }
+
+  .review-q { font-size: 0.88rem; margin-bottom: 0.5rem; line-height: 1.5; }
+  .review-a { font-size: 0.8rem; color: var(--text-dim); }
+  .review-a span.c { color: var(--correct); font-weight: 600; }
+  .review-a span.w { color: var(--wrong); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .landing h1 { font-size: 2rem; }
+    .mode-cards { grid-template-columns: 1fr; }
+    .question-card { padding: 1.2rem; }
+    .results-breakdown { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════ LANDING ═══════ -->
+<div class="landing" id="landing">
+  <h1>TI WiSH 2025 Prep</h1>
+  <p class="subtitle">Interactive practice for the Texas Instruments selection test</p>
+
+  <div class="mode-cards">
+    <div class="mode-card" onclick="startQuiz('pyq')">
+      <span class="tag pyq">Past Year</span>
+      <h3>WiSH 2024 Questions</h3>
+      <p>Practice with actual questions from last year's TI WiSH test.</p>
+      <div class="q-count">7 questions</div>
+    </div>
+    <div class="mode-card" onclick="startQuiz('math')">
+      <span class="tag math">Mathematics</span>
+      <h3>Math Practice</h3>
+      <p>Probability, Permutations & Combinations, Number Theory, Geometry, Algebra.</p>
+      <div class="q-count">10 questions</div>
+    </div>
+    <div class="mode-card" onclick="startQuiz('ee')">
+      <span class="tag ee">Electronics</span>
+      <h3>Basic Electronics</h3>
+      <p>Op-Amps (CMRR, Slew Rate, Virtual Ground), MOSFET/CMOS, RC/RL Transients, KVL/KCL, Thevenin/Norton, Boolean Algebra, Diodes.</p>
+      <div class="q-count">36 questions</div>
+    </div>
+    <div class="mode-card" onclick="startQuiz('sw')">
+      <span class="tag sw">Software</span>
+      <h3>Programming (Tricky)</h3>
+      <p>Pointer arithmetic, bitwise ops, recursion output, structs/unions, linked lists, trees, time complexity, OOP, memory management.</p>
+      <div class="q-count">20 questions</div>
+    </div>
+    <div class="mode-card" onclick="startQuiz('all')">
+      <span class="tag all">Full Test</span>
+      <h3>Mixed Mock Test</h3>
+      <p>Randomized questions from all sections. Simulates the real test experience.</p>
+      <div class="q-count">20 questions &middot; Timed</div>
+    </div>
+    <div class="mode-card" onclick="window.open('math_aptitude_mcq.html','_self')">
+      <span class="tag math">Advanced</span>
+      <h3>Advanced Math Bank</h3>
+      <p>Bayes' Theorem, Derangements, Pigeonhole, Inclusion-Exclusion, Modular Arithmetic, Eigenvalues, Geometric Probability.</p>
+      <div class="q-count">20 questions &middot; Separate quiz</div>
+    </div>
+    <div class="mode-card" onclick="window.open('theory_revision.html','_self')" style="border-color:#6c5ce740;">
+      <span class="tag" style="background:#6c5ce720;color:#b0a6ff;">Theory</span>
+      <h3>Theory Revision Sheet</h3>
+      <p>Probability formulas, Profit &amp; Loss tricks, C++ syntax FAQs, and 45+ new TI-style MCQs with explanations.</p>
+      <div class="q-count">45+ questions &middot; Formula sheets</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ QUIZ ═══════ -->
+<div class="quiz-page" id="quizPage">
+  <div class="top-bar">
+    <button class="back-btn" onclick="goHome()">&#8592; Back</button>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-text" id="progressText"></div>
+    </div>
+    <div class="score-display" id="scoreDisplay">0 / 0</div>
+    <div class="timer-display" id="timerDisplay"></div>
+  </div>
+  <div id="questionContainer"></div>
+  <div class="nav-btns">
+    <button class="nav-btn secondary" id="skipBtn" onclick="skipQuestion()">Skip</button>
+    <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()" style="display:none;">Next &rarr;</button>
+    <button class="nav-btn primary" id="finishBtn" onclick="showResults()" style="display:none;">See Results</button>
+  </div>
+</div>
+
+<!-- ═══════ RESULTS ═══════ -->
+<div class="results-page" id="resultsPage">
+  <h2>Quiz Complete!</h2>
+  <div class="results-score" id="finalScore"></div>
+  <div class="results-breakdown" id="resultsBreakdown"></div>
+  <div class="review-list" id="reviewList"></div>
+  <div class="nav-btns" style="justify-content:center; margin-top:2rem;">
+    <button class="nav-btn secondary" onclick="goHome()">Home</button>
+    <button class="nav-btn primary" onclick="retryWrong()">Retry Wrong Answers</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  QUESTION BANK
+// ══════════════════════════════════════════
+
+const questions = {
+
+pyq: [
+  {
+    cat: "math", q: `Suma must win <strong>two consecutive matches</strong> to win the tournament. She plays at most 3 matches.<br><br>
+    <b>Option A:</b> Ashwini &rarr; Rama &rarr; Ashwini<br>
+    <b>Option B:</b> Rama &rarr; Ashwini &rarr; Rama<br><br>
+    P(win vs Ashwini) = 15%, P(win vs Rama) = 90%.<br><br>
+    Which option should Suma choose to <b>maximize</b> her probability of winning?`,
+    options: [
+      "Option A, increase of ~10.1%",
+      "Option B, increase of ~10.1%",
+      "Option A, increase of ~5%",
+      "Both give same probability"
+    ],
+    answer: 0,
+    explanation: `<strong>Option A:</strong> P = 0.15*0.90 + 0.85*0.90*0.15 = 0.135 + 0.11475 = <strong>0.24975</strong><br>
+    <strong>Option B:</strong> P = 0.90*0.15 + 0.10*0.15*0.90 = 0.135 + 0.0135 = <strong>0.1485</strong><br>
+    Difference = 0.10125 ≈ 10.1%. Key insight: play the <em>weaker</em> opponent twice — sandwich the stronger one in the middle.`
+  },
+  {
+    cat: "ee", q: `Let p(t) and q(t) be possible input signals. Which could represent the output of a <strong>linear time-invariant (LTI)</strong> system?<br><br>
+    A) a*p(t) + b*q(t) + c<br>
+    B) p(τ₁)*p(t + τ₁) + q(τ₂)*q(t - τ₂)<br>
+    C) d*p(t) + e*q(t - τ)<br>
+    D) f*p(t²) + g*q(t + τ)`,
+    options: [
+      "A) a*p(t) + b*q(t) + c",
+      "C) d*p(t) + e*q(t - τ)",
+      "D) f*p(t²) + g*q(t + τ)",
+      "A and D"
+    ],
+    answer: 1,
+    explanation: `An LTI system must be <strong>linear</strong> (superposition) and <strong>time-invariant</strong>.<br>
+    A: The constant <code>+c</code> violates linearity (zero input ≠ zero output).<br>
+    C: Scaled inputs + time-shifted input — both are valid LTI operations. <strong>Valid!</strong><br>
+    D: <code>p(t²)</code> is time-scaling, which breaks time-invariance.`
+  },
+  {
+    cat: "ee", q: `Choose the correct statement about the <strong>s-domain ROC</strong> of a Laplace transform for a <strong>causal LTI system</strong> that is stable and non-oscillating.`,
+    options: [
+      "ROC lies to the left of the imaginary axis",
+      "ROC lies to the right of the imaginary axis",
+      "ROC lies to the left, excluding the imaginary axis",
+      "ROC lies to the right, excluding the imaginary axis"
+    ],
+    answer: 1,
+    explanation: `For a <strong>causal</strong> system, ROC is to the right of the rightmost pole.<br>
+    For <strong>stability</strong>, the ROC must include the jω axis → all poles in left half-plane.<br>
+    For <strong>non-oscillating</strong>, poles must be real (no imaginary component).<br>
+    So ROC lies to the <strong>right</strong> of the imaginary axis.`
+  },
+  {
+    cat: "sw", q: `What will be the output?<pre>#include &lt;stdio.h&gt;
+int main() {
+    short i;
+    for (i = 1; i >= 0; i++)
+        printf("%d\\n", i);
+    return 0;
+}</pre>`,
+    options: [
+      "Continuously prints increasing values (1 to 32767), then stops",
+      "The program will not compile",
+      "Prints 1 and 0 then terminates",
+      "Runs infinitely printing values due to overflow"
+    ],
+    answer: 0,
+    explanation: `<code>short</code> is 16-bit signed: range -32768 to 32767.<br>
+    Loop prints 1, 2, 3, ... 32767. Then i overflows to -32768 which is < 0, so the condition <code>i >= 0</code> fails and the loop ends.<br>
+    (Note: signed overflow is technically undefined in C, but this is the expected practical behavior.)`
+  },
+  {
+    cat: "sw", q: `What will be the output?<pre>#include &lt;stdio.h&gt;
+int main() {
+    char orange[7] = {'o','r','a','n','g','e','\\0'};
+    char *p = orange;
+    printf("%c", *p);
+    *(p + 3) = 'k';
+    *(++p) = 'm';
+    printf("%s", orange);
+    return 0;
+}</pre>`,
+    options: [
+      "The program will not compile",
+      "oorkge",
+      "oomakge",
+      "The program causes a runtime error"
+    ],
+    answer: 2,
+    explanation: `Step by step:<br>
+    1. <code>printf("%c", *p)</code> → prints <strong>'o'</strong> (p points to index 0)<br>
+    2. <code>*(p+3) = 'k'</code> → p is still at 0, so p+3 = index 3. orange[3] = 'k' → array: "or<strong>a</strong>kge"<br>
+    3. <code>*(++p) = 'm'</code> → p increments to index 1, then sets orange[1] = 'm' → array: "o<strong>m</strong>akge"<br>
+    4. <code>printf("%s", orange)</code> → prints "omakge"<br>
+    First printf outputs 'o', second printf outputs "omakge" → full output: <strong>"oomakge"</strong><br>
+    (Verified by compiling. The original PDF option C "oomkge" was wrong — the PDF warned about errors in options.)`
+  },
+  {
+    cat: "sw", q: `What will be the output?<pre>#include &lt;stdio.h&gt;
+int main() {
+    short i;
+    for (i = 1; i < 0; i++)
+        printf("%d\\n", i);
+    return 0;
+}</pre>`,
+    options: [
+      "Continuously prints values from 1 until overflow",
+      "Infinite loop printing numbers",
+      "The for loop will never be entered",
+      "Prints 1 to 32767 then wraps around"
+    ],
+    answer: 2,
+    explanation: `i starts at 1. Condition <code>i < 0</code> is <strong>false immediately</strong> (1 is not less than 0).<br>
+    The loop body never executes. <strong>Nothing is printed.</strong>`
+  },
+  {
+    cat: "sw", q: `What does this program print?<pre>#include &lt;stdio.h&gt;
+float CALC(float a, float b, int n) {
+    if (n >= 1)
+        return (a * b * CALC(a, b, n - 1));
+    else
+        return (n == 0) ? 1 : (b / a) * CALC(a, b, n + 1);
+}
+int main() {
+    float ans1, ans2;
+    ans1 = CALC(1, 2, 3);
+    ans2 = CALC(0.25, 0.5, -2);
+    printf("%.4f %.3f", ans1, ans2);
+    return 0;
+}</pre>`,
+    options: [
+      "8.0000 8.000",
+      "6.0000 4.000",
+      "8.0000 4.000",
+      "6.0000 8.000"
+    ],
+    answer: 2,
+    explanation: `<strong>CALC(1, 2, 3):</strong> (n >= 1 branch: return a*b*CALC(a,b,n-1))<br>
+    n=3: 1*2*CALC(1,2,2) = 2 * CALC(1,2,2)<br>
+    n=2: 1*2*CALC(1,2,1) = 2 * CALC(1,2,1)<br>
+    n=1: 1*2*CALC(1,2,0) = 2 * CALC(1,2,0)<br>
+    n=0: returns 1 (ternary: n==0 ? 1)<br>
+    So: 2 * 2 * 2 * 1 = <strong>8.0000</strong><br><br>
+    <strong>CALC(0.25, 0.5, -2):</strong> (else branch: (b/a)*CALC(a,b,n+1))<br>
+    n=-2: (0.5/0.25)*CALC(0.25,0.5,-1) = 2 * CALC(0.25,0.5,-1)<br>
+    n=-1: (0.5/0.25)*CALC(0.25,0.5,0) = 2 * CALC(0.25,0.5,0)<br>
+    n=0: returns 1<br>
+    So: 2 * 2 * 1 = <strong>4.000</strong><br><br>
+    Output: <strong>8.0000 4.000</strong> → Answer C. (Verified by compiling.)`
+  }
+],
+
+math: [
+  {
+    cat: "math", q: `A bag contains 5 red balls and 3 blue balls. Two balls are drawn without replacement. What is the probability that both are red?`,
+    options: ["5/14", "5/28", "25/64", "10/28"],
+    answer: 0,
+    explanation: `P(both red) = (5/8) × (4/7) = 20/56 = <strong>5/14</strong>`
+  },
+  {
+    cat: "math", q: `In how many ways can 8 people be seated around a circular table?`,
+    options: ["8!", "7!", "8!/2", "6!"],
+    answer: 1,
+    explanation: `Circular permutation of n objects = <strong>(n-1)!</strong> = 7! = 5040`
+  },
+  {
+    cat: "math", q: `What is the remainder when 2^100 is divided by 7?`,
+    options: ["1", "2", "4", "3"],
+    answer: 1,
+    explanation: `Powers of 2 mod 7 cycle with period 3:<br>
+    2^1 ≡ 2, 2^2 ≡ 4, 2^3 ≡ 8 ≡ 1 (mod 7), then repeats.<br>
+    100 = 33 × 3 + 1, so 2^100 = (2^3)^33 × 2^1 ≡ 1^33 × 2 = <strong>2</strong> (mod 7).`
+  },
+  {
+    cat: "math", q: `If nC2 = 45, what is n?`,
+    options: ["9", "10", "8", "12"],
+    answer: 1,
+    explanation: `nC2 = n(n-1)/2 = 45 → n(n-1) = 90 → n = <strong>10</strong>`
+  },
+  {
+    cat: "math", q: `A shopkeeper marks a product 25% above cost price and gives a 10% discount. What is the profit percentage?`,
+    options: ["15%", "12.5%", "10%", "17.5%"],
+    answer: 1,
+    explanation: `Let CP = 100. MP = 125. SP = 125 × 0.9 = 112.5. Profit = 12.5%.`
+  },
+  {
+    cat: "math", q: `What is the determinant of the matrix [[1, 2], [3, 4]]?`,
+    options: ["-2", "2", "-1", "10"],
+    answer: 0,
+    explanation: `det = (1)(4) - (2)(3) = 4 - 6 = <strong>-2</strong>`
+  },
+  {
+    cat: "math", q: `If A and B are independent events with P(A) = 0.3 and P(B) = 0.5, what is P(A ∪ B)?`,
+    options: ["0.65", "0.80", "0.15", "0.50"],
+    answer: 0,
+    explanation: `P(A ∪ B) = P(A) + P(B) - P(A ∩ B) = 0.3 + 0.5 - (0.3)(0.5) = 0.8 - 0.15 = <strong>0.65</strong>`
+  },
+  {
+    cat: "math", q: `How many 3-digit numbers are divisible by 6?`,
+    options: ["149", "150", "151", "148"],
+    answer: 1,
+    explanation: `First 3-digit number divisible by 6: 102. Last: 996.<br>
+    Count = (996-102)/6 + 1 = 894/6 + 1 = 149 + 1 = <strong>150</strong>`
+  },
+  {
+    cat: "math", q: `The eigenvalues of a 2×2 matrix with trace = 5 and determinant = 6 are:`,
+    options: ["2 and 3", "1 and 6", "1 and 5", "3 and 3"],
+    answer: 0,
+    explanation: `Eigenvalues satisfy: λ₁ + λ₂ = trace = 5, λ₁ × λ₂ = det = 6.<br>
+    λ² - 5λ + 6 = 0 → (λ-2)(λ-3) = 0 → <strong>λ = 2 and 3</strong>`
+  },
+  {
+    cat: "math", q: `In a committee of 5 to be formed from 6 men and 4 women, how many committees have at least 2 women?`,
+    options: ["186", "120", "60", "246"],
+    answer: 0,
+    explanation: `At least 2 women = Total - (0 women) - (1 woman)<br>
+    Total = 10C5 = 252<br>
+    0 women: 6C5 = 6<br>
+    1 woman: 4C1 × 6C4 = 4 × 15 = 60<br>
+    Answer = 252 - 6 - 60 = <strong>186</strong>`
+  }
+],
+
+ee: [
+  {
+    cat: "ee", q: `In an ideal Op-Amp configured as an inverting amplifier with Rf = 10kΩ and Rin = 2kΩ, what is the voltage gain?`,
+    options: ["-5", "5", "-2", "0.2"],
+    answer: 0,
+    explanation: `Gain = -Rf/Rin = -10k/2k = <strong>-5</strong>`
+  },
+  {
+    cat: "ee", q: `What is the time constant of a series RC circuit with R = 4kΩ and C = 25μF?`,
+    options: ["0.1 s", "100 ms", "1 s", "0.01 s"],
+    answer: 0,
+    explanation: `τ = RC = 4000 × 25×10⁻⁶ = 0.1 s = 100 ms.<br>Options A and B are both correct (same value). <strong>τ = 0.1 s</strong>`
+  },
+  {
+    cat: "ee", q: `Simplify the Boolean expression: A'B + AB' + AB`,
+    options: ["A + B", "A ⊕ B", "AB", "1"],
+    answer: 0,
+    explanation: `A'B + AB' + AB = A'B + A(B' + B) = A'B + A = A + B (by absorption/expansion)`
+  },
+  {
+    cat: "ee", q: `A silicon PN junction diode has a forward voltage drop of approximately:`,
+    options: ["0.7 V", "0.3 V", "1.1 V", "0.5 V"],
+    answer: 0,
+    explanation: `Silicon diode forward voltage ≈ <strong>0.7 V</strong>. Germanium ≈ 0.3 V.`
+  },
+  {
+    cat: "ee", q: `What is the total capacitance of three capacitors (2μF, 3μF, 6μF) connected in series?`,
+    options: ["1 μF", "11 μF", "0.5 μF", "2 μF"],
+    answer: 0,
+    explanation: `1/C = 1/2 + 1/3 + 1/6 = 3/6 + 2/6 + 1/6 = 6/6 = 1 → C = <strong>1 μF</strong>`
+  },
+  {
+    cat: "ee", q: `In a MOSFET, the channel is formed by:`,
+    options: [
+      "Applying voltage to the gate",
+      "Forward biasing the drain",
+      "Heating the substrate",
+      "Applying voltage to the source"
+    ],
+    answer: 0,
+    explanation: `A MOSFET creates an inversion layer (channel) by applying sufficient <strong>gate voltage</strong> (above threshold voltage Vth).`
+  },
+  {
+    cat: "ee", q: `The Thevenin equivalent voltage across terminals A-B of a circuit is found by:`,
+    options: [
+      "Open-circuit voltage across A-B",
+      "Short-circuit current through A-B",
+      "Removing all sources",
+      "Measuring the current with load connected"
+    ],
+    answer: 0,
+    explanation: `Vth = <strong>open-circuit voltage</strong> across the terminals. Rth is found by deactivating sources.`
+  },
+  {
+    cat: "ee", q: `The output of an XOR gate with inputs A=1, B=1 is:`,
+    options: ["0", "1", "Undefined", "High impedance"],
+    answer: 0,
+    explanation: `XOR: output is 1 when inputs <em>differ</em>. 1 ⊕ 1 = <strong>0</strong>`
+  },
+  {
+    cat: "ee", q: `An ideal Op-Amp has:`,
+    options: [
+      "Infinite input impedance, zero output impedance",
+      "Zero input impedance, infinite output impedance",
+      "Infinite input and output impedance",
+      "Zero input and output impedance"
+    ],
+    answer: 0,
+    explanation: `Ideal Op-Amp: <strong>infinite input impedance</strong> (draws no current) and <strong>zero output impedance</strong> (perfect voltage source).`
+  },
+  {
+    cat: "ee", q: `In reverse bias, the depletion region of a PN junction:`,
+    options: ["Widens", "Narrows", "Stays the same", "Disappears"],
+    answer: 0,
+    explanation: `Reverse bias pulls majority carriers away from the junction → depletion region <strong>widens</strong>.`
+  },
+  {
+    cat: "ee", q: `The CMRR (Common Mode Rejection Ratio) of an ideal op-amp is:`,
+    options: ["Infinity", "Zero", "Unity", "80 dB"],
+    answer: 0,
+    explanation: `CMRR = A<sub>d</sub> / A<sub>cm</sub>. For an ideal op-amp, differential gain A<sub>d</sub> = ∞ and common-mode gain A<sub>cm</sub> = 0, giving <strong>CMRR = ∞</strong>. In practice, values of 80-120 dB are typical. High CMRR means the op-amp rejects noise common to both inputs.`
+  },
+  {
+    cat: "ee", q: `The slew rate of an op-amp is defined as:`,
+    options: [
+      "Maximum rate of change of output voltage per unit time",
+      "Maximum input voltage the op-amp can handle",
+      "Rate at which input offset voltage drifts with temperature",
+      "Rate of change of open-loop gain with frequency"
+    ],
+    answer: 0,
+    explanation: `Slew rate = (dV<sub>out</sub>/dt)<sub>max</sub>, measured in V/μs. If the input signal demands a faster rate of change than the slew rate allows, <strong>slew-rate distortion</strong> occurs. For a sine wave V<sub>p</sub>sin(ωt), the max rate is V<sub>p</sub>ω, so the power bandwidth f<sub>max</sub> = SR / (2πV<sub>p</sub>).`
+  },
+  {
+    cat: "ee", q: `In an inverting op-amp configuration, the concept of "virtual ground" means:`,
+    options: [
+      "The inverting input is at ~0V because negative feedback forces both inputs to the same voltage",
+      "The inverting input is physically connected to ground",
+      "The output terminal is at ground potential",
+      "The non-inverting input floats at high impedance"
+    ],
+    answer: 0,
+    explanation: `With the non-inverting input grounded and high open-loop gain, negative feedback forces the inverting input to be at the same potential (~0V). It is not physically connected to ground — hence <strong>"virtual" ground</strong>. This is the key to analyzing inverting amplifier, summing amplifier, and integrator circuits.`
+  },
+  {
+    cat: "ee", q: `An op-amp non-inverting amplifier has R<sub>f</sub> = 9kΩ and R<sub>1</sub> = 1kΩ. The closed-loop voltage gain is:`,
+    options: ["+10", "+9", "-9", "-10"],
+    answer: 0,
+    explanation: `Non-inverting gain A<sub>v</sub> = 1 + R<sub>f</sub>/R<sub>1</sub> = 1 + 9k/1k = <strong>+10</strong>.<br>Note: The gain is always ≥ 1 and positive for the non-inverting configuration, unlike the inverting configuration where gain = -R<sub>f</sub>/R<sub>1</sub>.`
+  },
+  {
+    cat: "ee", q: `A voltage follower (unity-gain buffer) using an ideal op-amp has:<br>Input impedance = ?, Output impedance = ?`,
+    options: [
+      "Infinite input impedance, Zero output impedance",
+      "Zero input impedance, Infinite output impedance",
+      "Infinite input impedance, Infinite output impedance",
+      "Zero input impedance, Zero output impedance"
+    ],
+    answer: 0,
+    explanation: `A voltage follower has 100% negative feedback (output connected directly to inverting input). This gives it <strong>infinite input impedance</strong> (draws no current from source) and <strong>zero output impedance</strong> (can drive any load without voltage drop). This makes it ideal for impedance matching / buffering between stages.`
+  },
+  {
+    cat: "ee", q: `If an op-amp has a differential-mode gain A<sub>d</sub> = 10,000 and CMRR = 80 dB, what is the common-mode gain A<sub>cm</sub>?`,
+    options: ["1", "0.1", "10", "100"],
+    answer: 0,
+    explanation: `CMRR(dB) = 20 log₁₀(A<sub>d</sub>/A<sub>cm</sub>)<br>80 = 20 log₁₀(10000/A<sub>cm</sub>)<br>10000/A<sub>cm</sub> = 10<sup>4</sup> = 10000 → wait: 80/20 = 4, so A<sub>d</sub>/A<sub>cm</sub> = 10<sup>4</sup> = 10000.<br>A<sub>cm</sub> = 10000/10000 = <strong>1</strong>.`
+  },
+  {
+    cat: "ee", q: `An NMOS transistor operates in the <strong>saturation</strong> region when:`,
+    options: [
+      "V_GS > V_th and V_DS ≥ V_GS - V_th",
+      "V_GS > V_th and V_DS < V_GS - V_th",
+      "V_GS < V_th",
+      "V_DS = 0"
+    ],
+    answer: 0,
+    explanation: `MOSFET regions:<br>
+    <strong>Cutoff:</strong> V<sub>GS</sub> < V<sub>th</sub> (no channel)<br>
+    <strong>Linear/Triode:</strong> V<sub>GS</sub> > V<sub>th</sub> AND V<sub>DS</sub> < V<sub>GS</sub> - V<sub>th</sub> (channel exists, not pinched off)<br>
+    <strong>Saturation:</strong> V<sub>GS</sub> > V<sub>th</sub> AND V<sub>DS</sub> ≥ V<sub>GS</sub> - V<sub>th</sub> (channel pinched off at drain end, I<sub>D</sub> ≈ ½k'(W/L)(V<sub>GS</sub>-V<sub>th</sub>)²)`
+  },
+  {
+    cat: "ee", q: `In a CMOS inverter, when the input is LOW (logic 0):`,
+    options: [
+      "PMOS is ON, NMOS is OFF, output is HIGH",
+      "PMOS is OFF, NMOS is ON, output is LOW",
+      "Both PMOS and NMOS are ON",
+      "Both PMOS and NMOS are OFF"
+    ],
+    answer: 0,
+    explanation: `CMOS inverter operation:<br>
+    <strong>Input LOW:</strong> V<sub>GS,P</sub> = -V<sub>DD</sub> (PMOS ON), V<sub>GS,N</sub> = 0 (NMOS OFF) → output pulled to V<sub>DD</sub> (HIGH)<br>
+    <strong>Input HIGH:</strong> V<sub>GS,P</sub> = 0 (PMOS OFF), V<sub>GS,N</sub> = V<sub>DD</sub> (NMOS ON) → output pulled to GND (LOW)<br>
+    Key advantage: in steady state, one transistor is always OFF → <strong>zero static power dissipation</strong>.`
+  },
+  {
+    cat: "ee", q: `A MOSFET is a _______ device:`,
+    options: [
+      "Voltage-controlled current source",
+      "Current-controlled current source",
+      "Voltage-controlled voltage source",
+      "Current-controlled voltage source"
+    ],
+    answer: 0,
+    explanation: `A MOSFET gate draws essentially <strong>zero DC current</strong> (insulated gate). The drain current I<sub>D</sub> is controlled by the gate-to-source voltage V<sub>GS</sub>. So it is a <strong>voltage-controlled current source</strong>. In contrast, a BJT is a current-controlled current source (I<sub>C</sub> = βI<sub>B</sub>).`
+  },
+  {
+    cat: "ee", q: `In a CMOS NAND gate with 2 inputs A and B, how are the transistors arranged?`,
+    options: [
+      "2 NMOS in series + 2 PMOS in parallel",
+      "2 NMOS in parallel + 2 PMOS in series",
+      "2 NMOS in series + 2 PMOS in series",
+      "2 NMOS in parallel + 2 PMOS in parallel"
+    ],
+    answer: 0,
+    explanation: `For CMOS NAND:<br>
+    <strong>Pull-down network (NMOS):</strong> in <strong>series</strong> — both must be ON (both inputs HIGH) to pull output LOW.<br>
+    <strong>Pull-up network (PMOS):</strong> in <strong>parallel</strong> — either input LOW turns on a PMOS to pull output HIGH.<br>
+    For CMOS NOR, it is the dual: NMOS in parallel, PMOS in series.`
+  },
+  {
+    cat: "ee", q: `In an RC series circuit, the voltage across the capacitor after one time constant (τ = RC) of charging from 0V with a step input V₀ is approximately:`,
+    options: ["0.632 × V₀", "0.368 × V₀", "0.5 × V₀", "0.865 × V₀"],
+    answer: 0,
+    explanation: `V<sub>C</sub>(t) = V₀(1 - e<sup>-t/RC</sup>). At t = τ = RC:<br>
+    V<sub>C</sub> = V₀(1 - e<sup>-1</sup>) = V₀(1 - 0.368) = <strong>0.632 V₀</strong> (63.2%).<br>
+    After 5τ, the capacitor reaches ~99.3% — considered fully charged.`
+  },
+  {
+    cat: "ee", q: `At t = 0⁺ (just after switching), an uncharged capacitor behaves as:`,
+    options: [
+      "A short circuit (zero voltage, allowing current to flow)",
+      "An open circuit (blocks all current)",
+      "A constant voltage source",
+      "A constant current source"
+    ],
+    answer: 0,
+    explanation: `An uncharged capacitor (V<sub>C</sub> = 0) cannot change its voltage instantaneously (V<sub>C</sub>(0⁺) = V<sub>C</sub>(0⁻) = 0). With 0V across it, it acts like a <strong>short circuit</strong>.<br>
+    Conversely, a fully charged capacitor in DC steady state acts as an <strong>open circuit</strong> (I = C dV/dt = 0 since V is constant).`
+  },
+  {
+    cat: "ee", q: `At t = 0⁺ (just after switching), a current-carrying inductor behaves as:`,
+    options: [
+      "A constant current source (maintains its current)",
+      "A short circuit",
+      "An open circuit",
+      "A voltage source equal to L × di/dt"
+    ],
+    answer: 0,
+    explanation: `Inductor current cannot change instantaneously: I<sub>L</sub>(0⁺) = I<sub>L</sub>(0⁻). The inductor acts like a <strong>constant current source</strong> at the moment of switching.<br>
+    If the inductor had zero current before switching, it acts as an <strong>open circuit</strong> at t = 0⁺.`
+  },
+  {
+    cat: "ee", q: `The impedance of a capacitor C at angular frequency ω is:`,
+    options: ["1/(jωC)", "jωC", "jωL", "1/(jωL)"],
+    answer: 0,
+    explanation: `Z<sub>C</sub> = 1/(jωC) = -j/(ωC).<br>
+    <strong>At DC (ω=0):</strong> |Z<sub>C</sub>| → ∞ (open circuit — capacitor blocks DC).<br>
+    <strong>At high frequency:</strong> |Z<sub>C</sub>| → 0 (short circuit — capacitor passes AC).<br>
+    Inductor is opposite: Z<sub>L</sub> = jωL (short at DC, open at high freq).`
+  },
+  {
+    cat: "ee", q: `According to KVL, the algebraic sum of all voltages around any closed loop is:`,
+    options: ["Zero", "Equal to the source voltage", "Equal to the total current × total resistance", "Infinity"],
+    answer: 0,
+    explanation: `<strong>Kirchhoff's Voltage Law (KVL)</strong> states that the sum of voltage rises and drops around any closed loop equals zero. This follows from <strong>conservation of energy</strong>. In practice: ΣV<sub>sources</sub> = ΣV<sub>drops</sub> around any loop.`
+  },
+  {
+    cat: "ee", q: `KCL (Kirchhoff's Current Law) is based on the principle of:`,
+    options: [
+      "Conservation of charge",
+      "Conservation of energy",
+      "Conservation of momentum",
+      "Superposition"
+    ],
+    answer: 0,
+    explanation: `<strong>KCL</strong>: Algebraic sum of currents at any node = 0 (ΣI<sub>in</sub> = ΣI<sub>out</sub>). This is based on <strong>conservation of charge</strong> — charge cannot accumulate at a node.<br>
+    <strong>KVL</strong> is based on conservation of energy.`
+  },
+  {
+    cat: "ee", q: `To find the Thevenin equivalent resistance R<sub>th</sub> of a linear circuit:`,
+    options: [
+      "Deactivate all independent sources and find resistance seen from the terminals",
+      "Short-circuit the terminals and measure current",
+      "Measure the open-circuit voltage across the terminals",
+      "Replace all resistors with their Norton equivalent"
+    ],
+    answer: 0,
+    explanation: `Steps for Thevenin equivalent:<br>
+    1. <strong>V<sub>th</sub></strong> = open-circuit voltage across terminals<br>
+    2. <strong>R<sub>th</sub></strong> = resistance seen from terminals with all <em>independent</em> sources deactivated (voltage sources → short, current sources → open)<br>
+    Alternatively: R<sub>th</sub> = V<sub>th</sub>/I<sub>sc</sub> where I<sub>sc</sub> is the short-circuit current.<br>
+    Norton: I<sub>N</sub> = I<sub>sc</sub>, R<sub>N</sub> = R<sub>th</sub>.`
+  },
+  {
+    cat: "ee", q: `Norton's theorem states that any linear two-terminal network can be replaced by:`,
+    options: [
+      "A current source in parallel with a resistance",
+      "A voltage source in series with a resistance",
+      "A current source in series with a resistance",
+      "A voltage source in parallel with a resistance"
+    ],
+    answer: 0,
+    explanation: `<strong>Norton:</strong> I<sub>N</sub> (current source) in <strong>parallel</strong> with R<sub>N</sub>.<br>
+    <strong>Thevenin:</strong> V<sub>th</sub> (voltage source) in <strong>series</strong> with R<sub>th</sub>.<br>
+    They are duals: V<sub>th</sub> = I<sub>N</sub> × R<sub>th</sub>, and R<sub>th</sub> = R<sub>N</sub>.`
+  },
+  {
+    cat: "ee", q: `Simplify using De Morgan's theorem: (A·B)' = ?`,
+    options: ["A' + B'", "A' · B'", "A + B", "(A + B)'"],
+    answer: 0,
+    explanation: `<strong>De Morgan's Theorems:</strong><br>
+    (A·B)' = A' + B' (NOR of ANDs → OR of complements)<br>
+    (A+B)' = A'·B' (NAND of ORs → AND of complements)<br>
+    These are fundamental for converting between NAND/NOR implementations and simplifying Boolean expressions.`
+  },
+  {
+    cat: "ee", q: `The Boolean expression for a 2-input XOR gate is:`,
+    options: ["A'B + AB'", "AB + A'B'", "A + B", "A'B'"],
+    answer: 0,
+    explanation: `XOR (A ⊕ B) = A'B + AB'. Output is 1 only when inputs <em>differ</em>.<br>
+    XNOR (A ⊙ B) = AB + A'B'. Output is 1 when inputs are the <em>same</em>.<br>
+    XOR is used in parity generators, adders, and comparators.`
+  },
+  {
+    cat: "ee", q: `In a forward-biased PN junction, the width of the depletion region:`,
+    options: [
+      "Decreases",
+      "Increases",
+      "Remains unchanged",
+      "Becomes zero immediately"
+    ],
+    answer: 0,
+    explanation: `Forward bias opposes the built-in potential, reducing the electric field across the junction → depletion region <strong>narrows</strong>.<br>
+    This allows majority carriers to cross the junction, producing forward current.<br>
+    At exactly V<sub>bi</sub> (built-in potential), the depletion region would theoretically vanish, but large current flows well before that.`
+  },
+  {
+    cat: "ee", q: `A Zener diode is used for:`,
+    options: [
+      "Voltage regulation (operated in reverse breakdown)",
+      "Rectification (operated in forward bias)",
+      "Amplification",
+      "Switching at high frequencies"
+    ],
+    answer: 0,
+    explanation: `A Zener diode is designed to operate in <strong>reverse breakdown</strong> at a specified Zener voltage V<sub>Z</sub>. In this region, it maintains a nearly constant voltage across it despite changes in current → used as a <strong>voltage regulator</strong>.<br>
+    The breakdown mechanism is Zener effect (< 5V, heavy doping) or avalanche effect (> 7V).`
+  },
+  {
+    cat: "ee", q: `An ideal op-amp integrator has a capacitor C in the feedback and resistor R at the input. If a constant voltage V<sub>in</sub> is applied, the output will be:`,
+    options: [
+      "A ramp (linearly increasing/decreasing) with slope -V_in/(RC)",
+      "A constant voltage -V_in",
+      "A sine wave",
+      "Zero"
+    ],
+    answer: 0,
+    explanation: `For an op-amp integrator: V<sub>out</sub>(t) = -1/(RC) ∫V<sub>in</sub> dt.<br>
+    For constant V<sub>in</sub>: V<sub>out</sub>(t) = <strong>-(V<sub>in</sub>/RC) × t</strong> — a linearly increasing (or decreasing) ramp.<br>
+    Square wave input → triangle wave output. This is a key TI interview concept.`
+  },
+  {
+    cat: "ee", q: `For maximum power transfer from a source with internal impedance Z<sub>s</sub> = R + jX to a load, the load impedance Z<sub>L</sub> should be:`,
+    options: [
+      "Z_L = R - jX (complex conjugate of Z_s)",
+      "Z_L = R + jX (same as Z_s)",
+      "Z_L = R (purely resistive, equal to |Z_s|)",
+      "Z_L = 0 (short circuit)"
+    ],
+    answer: 0,
+    explanation: `<strong>Maximum power transfer theorem:</strong> Z<sub>L</sub> = Z<sub>s</sub>* (complex conjugate).<br>
+    If Z<sub>s</sub> = R + jX, then Z<sub>L</sub> = R - jX. The reactive parts cancel, leaving purely resistive matched circuit.<br>
+    For purely resistive source: Z<sub>L</sub> = R<sub>s</sub>.`
+  },
+  {
+    cat: "ee", q: `The time constant of an RL series circuit is:`,
+    options: ["L/R", "R/L", "R × L", "1/(R × L)"],
+    answer: 0,
+    explanation: `RL time constant: <strong>τ = L/R</strong> (seconds).<br>
+    RC time constant: τ = R × C.<br>
+    In an RL circuit, current rises as I(t) = (V/R)(1 - e<sup>-tR/L</sup>) during energizing. After 5τ, the current reaches ~99.3% of its steady-state value V/R.`
+  },
+  {
+    cat: "ee", q: `A differential amplifier has a differential gain A<sub>d</sub> = 100 and a common-mode gain A<sub>cm</sub> = 0.01. What is the CMRR in dB?`,
+    options: ["80 dB", "60 dB", "40 dB", "100 dB"],
+    answer: 0,
+    explanation: `CMRR = A<sub>d</sub>/A<sub>cm</sub> = 100/0.01 = 10,000<br>
+    CMRR(dB) = 20 log₁₀(10000) = 20 × 4 = <strong>80 dB</strong>.<br>
+    TI commonly asks CMRR calculations — remember: 20 dB per decade.`
+  }
+],
+
+sw: [
+  // ── Q1: Pointer Arithmetic (Tricky) ──
+  {
+    cat: "sw", q: `What is the output?<pre>#include &lt;stdio.h&gt;
+int main() {
+    int arr[] = {10, 20, 30, 40, 50};
+    int *p = arr;
+    int *q = arr + 4;
+    printf("%d", (q - p));
+    return 0;
+}</pre>`,
+    options: ["4", "16", "8", "Undefined behavior"],
+    answer: 0,
+    explanation: `Pointer subtraction yields the <strong>number of elements</strong> between two pointers, not the byte difference. q points to arr[4], p points to arr[0]. So q - p = <strong>4</strong>.<br>Common trap: students multiply by sizeof(int).`
+  },
+  // ── Q2: Pointer to Array vs Array of Pointers ──
+  {
+    cat: "sw", q: `What is the output?<pre>#include &lt;stdio.h&gt;
+int main() {
+    int arr[3] = {1, 2, 3};
+    int (*p)[3] = &amp;arr;
+    printf("%d %d", (*p)[1], *(*p + 2));
+    return 0;
+}</pre>`,
+    options: ["2 3", "1 2", "Compilation error", "Garbage values"],
+    answer: 0,
+    explanation: `<code>p</code> is a <strong>pointer to an array of 3 ints</strong>. <code>*p</code> gives the array itself.<br><code>(*p)[1]</code> = arr[1] = <strong>2</strong>.<br><code>*(*p + 2)</code> = *(arr + 2) = arr[2] = <strong>3</strong>.<br>Output: <strong>2 3</strong>`
+  },
+  // ── Q3: String Manipulation Trap ──
+  {
+    cat: "sw", q: `What is the output?<pre>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+int main() {
+    char str[] = "Hello";
+    str[0] = 'M';
+    printf("%s %lu", str, strlen(str));
+    return 0;
+}</pre>
+What if <code>char *str = "Hello";</code> was used instead?`,
+    options: [
+      "Mello 5; Segfault with char*",
+      "Mello 5; Mello 5",
+      "Compilation error in both",
+      "Hello 5; Hello 5"
+    ],
+    answer: 0,
+    explanation: `<code>char str[]</code> creates a <strong>modifiable array</strong> on the stack, so str[0]='M' works fine, output: "Mello 5".<br>
+    <code>char *str = "Hello"</code> points to a <strong>string literal</strong> stored in read-only memory. Modifying it causes a <strong>segmentation fault</strong> (undefined behavior).<br>This is one of the most common placement test traps.`
+  },
+  // ── Q4: Struct Size and Padding ──
+  {
+    cat: "sw", q: `What is the output on a 64-bit system with typical alignment rules?<pre>#include &lt;stdio.h&gt;
+struct A { char c; int i; char d; };
+struct B { char c; char d; int i; };
+int main() {
+    printf("%lu %lu", sizeof(struct A), sizeof(struct B));
+    return 0;
+}</pre>`,
+    options: ["12 8", "6 6", "9 6", "12 12"],
+    answer: 0,
+    explanation: `<strong>Struct padding</strong> aligns each member to its natural alignment boundary.<br>
+    <strong>struct A:</strong> char(1) + 3 padding + int(4) + char(1) + 3 padding = <strong>12 bytes</strong><br>
+    <strong>struct B:</strong> char(1) + char(1) + 2 padding + int(4) = <strong>8 bytes</strong><br>
+    Reordering members to minimize padding is a common optimization technique and frequent interview question.`
+  },
+  // ── Q5: Union Size ──
+  {
+    cat: "sw", q: `What is the output?<pre>#include &lt;stdio.h&gt;
+union Data {
+    int i;
+    float f;
+    char str[20];
+};
+int main() {
+    printf("%lu", sizeof(union Data));
+    return 0;
+}</pre>`,
+    options: ["24", "4", "28", "20"],
+    answer: 3,
+    explanation: `A <strong>union</strong> allocates memory equal to its <strong>largest member</strong>. The largest member is <code>char str[20]</code> = 20 bytes. Unlike a struct, all members <strong>share the same memory</strong>. So sizeof(union Data) = <strong>20</strong>.<br>
+    Key difference: struct size = sum of all members (+ padding); union size = size of largest member.`
+  },
+  // ── Q6: Bitwise Operations ──
+  {
+    cat: "sw", q: `What is the output?<pre>#include &lt;stdio.h&gt;
+int main() {
+    int x = 10;     // binary: 1010
+    int y = x &amp; ~(1 &lt;&lt; 1);
+    int z = x ^ x;
+    int w = x | (1 &lt;&lt; 2);
+    printf("%d %d %d", y, z, w);
+    return 0;
+}</pre>`,
+    options: ["8 0 14", "8 0 10", "10 0 14", "2 0 14"],
+    answer: 0,
+    explanation: `<code>x = 10</code> = 1010 in binary.<br>
+    <code>y = x & ~(1&lt;&lt;1)</code> = 1010 & 1101 = 1000 = <strong>8</strong> (clears bit 1)<br>
+    <code>z = x ^ x</code> = 0 (XOR of any number with itself = <strong>0</strong>)<br>
+    <code>w = x | (1&lt;&lt;2)</code> = 1010 | 0100 = 1110 = <strong>14</strong> (sets bit 2)<br>
+    These are fundamental bit manipulation tricks: AND+NOT to clear, XOR-self to zero, OR to set.`
+  },
+  // ── Q7: Bitwise Swap ──
+  {
+    cat: "sw", q: `Which of the following correctly swaps two integers <code>a</code> and <code>b</code> without using a temporary variable?`,
+    options: [
+      "a ^= b; b ^= a; a ^= b;",
+      "a &= b; b &= a; a &= b;",
+      "a |= b; b |= a; a |= b;",
+      "a += b; b += a; a += b;"
+    ],
+    answer: 0,
+    explanation: `The <strong>XOR swap</strong> trick works because XOR is its own inverse:<br>
+    a ^= b -> a = a^b<br>
+    b ^= a -> b = b^(a^b) = a<br>
+    a ^= b -> a = (a^b)^a = b<br>
+    Option D (a+=b; b+=a; a+=b) is <strong>incorrect</strong>. The correct add/subtract swap would be: a+=b; b=a-b; a=a-b.`
+  },
+  // ── Q8: Recursion Output (Tricky) ──
+  {
+    cat: "sw", q: `What is the output?<pre>#include &lt;stdio.h&gt;
+void fun(int n) {
+    if (n == 0) return;
+    printf("%d ", n % 2);
+    fun(n / 2);
+}
+int main() {
+    fun(12);
+    return 0;
+}</pre>`,
+    options: ["0 0 1 1", "1 1 0 0", "1 0 1 1", "0 1 1 0"],
+    answer: 0,
+    explanation: `This function prints the <strong>binary representation</strong> of n in <strong>reverse order</strong> (LSB first).<br>
+    12 in binary = 1100.<br>
+    fun(12): prints 12%2=<strong>0</strong>, calls fun(6)<br>
+    fun(6): prints 6%2=<strong>0</strong>, calls fun(3)<br>
+    fun(3): prints 3%2=<strong>1</strong>, calls fun(1)<br>
+    fun(1): prints 1%2=<strong>1</strong>, calls fun(0)<br>
+    fun(0): returns.<br>
+    Output: <strong>0 0 1 1</strong> (reverse of 1100)`
+  },
+  // ── Q9: Recursion — Sum of Digits ──
+  {
+    cat: "sw", q: `What is the output?<pre>#include &lt;stdio.h&gt;
+int rec(int num) {
+    return (num) ? num % 10 + rec(num / 10) : 0;
+}
+int main() {
+    printf("%d", rec(4567));
+    return 0;
+}</pre>`,
+    options: ["22", "4", "7", "10"],
+    answer: 0,
+    explanation: `This recursively computes the <strong>sum of digits</strong>:<br>
+    rec(4567) = 7 + rec(456)<br>
+    rec(456) = 6 + rec(45)<br>
+    rec(45) = 5 + rec(4)<br>
+    rec(4) = 4 + rec(0)<br>
+    rec(0) = 0<br>
+    Total = 7 + 6 + 5 + 4 = <strong>22</strong>`
+  },
+  // ── Q10: Linked List — Time Complexity ──
+  {
+    cat: "sw", q: `In a singly linked list where only a pointer to the <strong>head</strong> is given, what are the time complexities for: (i) inserting at the beginning, (ii) inserting at the end, (iii) searching for an element?`,
+    options: [
+      "O(1), O(n), O(n)",
+      "O(1), O(1), O(n)",
+      "O(n), O(n), O(n)",
+      "O(1), O(n), O(log n)"
+    ],
+    answer: 0,
+    explanation: `(i) <strong>Insert at beginning: O(1)</strong> — create node, point to current head, update head.<br>
+    (ii) <strong>Insert at end: O(n)</strong> — must traverse entire list to find the last node.<br>
+    (iii) <strong>Search: O(n)</strong> — must traverse sequentially. Binary search is <strong>not feasible</strong> on linked lists since random access is not possible.<br>
+    Note: If a <strong>tail pointer</strong> is also maintained, insert-at-end becomes O(1).`
+  },
+  // ── Q11: Stack — Postfix Evaluation ──
+  {
+    cat: "sw", q: `What is the result of evaluating the postfix expression <code>5 3 + 8 2 - *</code> using a stack?`,
+    options: ["48", "18", "16", "56"],
+    answer: 0,
+    explanation: `Postfix evaluation using a stack:<br>
+    Push 5, Push 3 -> Pop 3,5 -> 5+3=<strong>8</strong> -> Push 8<br>
+    Push 8, Push 2 -> Pop 2,8 -> 8-2=<strong>6</strong> -> Push 6<br>
+    Pop 6,8 -> 8*6 = <strong>48</strong><br>
+    Stack-based postfix evaluation is a classic data structure question.`
+  },
+  // ── Q12: Tree Traversal ──
+  {
+    cat: "sw", q: `Given the binary tree:<pre>        1
+       / \\
+      2   3
+     / \\   \\
+    4   5   6</pre>
+What is the <strong>inorder</strong> traversal?`,
+    options: ["4 2 5 1 3 6", "1 2 4 5 3 6", "4 5 2 6 3 1", "1 2 3 4 5 6"],
+    answer: 0,
+    explanation: `Inorder traversal = <strong>Left, Root, Right</strong>:<br>
+    Left subtree of 1: inorder(2) = inorder(4), 2, inorder(5) = 4, 2, 5<br>
+    Root: 1<br>
+    Right subtree of 1: inorder(3) = inorder(NULL), 3, inorder(6) = 3, 6<br>
+    Full: <strong>4 2 5 1 3 6</strong><br><br>
+    Remember: Inorder of a <strong>BST</strong> always gives sorted order.`
+  },
+  // ── Q13: Time Complexity — Tricky Loop ──
+  {
+    cat: "sw", q: `What is the time complexity?<pre>int i = 1;
+while (i &lt; n) {
+    i = i * 2;
+}</pre>`,
+    options: ["O(log n)", "O(n)", "O(n log n)", "O(sqrt(n))"],
+    answer: 0,
+    explanation: `The variable i doubles each iteration: 1, 2, 4, 8, 16, ..., until i >= n.<br>
+    After k iterations: i = 2^k. Loop ends when 2^k >= n, so k = log2(n).<br>
+    Time complexity: <strong>O(log n)</strong>.<br>
+    Trap: many students see a single loop and assume O(n).`
+  },
+  // ── Q14: Time Complexity — Two-Pointer Trap ──
+  {
+    cat: "sw", q: `What is the time complexity?<pre>int i = 0, j = 0;
+for (i = 0; i &lt; n; i++) {
+    while (j &lt; n &amp;&amp; arr[i] + arr[j] &lt; target)
+        j++;
+}</pre>`,
+    options: ["O(n)", "O(n^2)", "O(n log n)", "O(2n)"],
+    answer: 0,
+    explanation: `This <strong>looks</strong> like O(n^2) because of nested loops, but <code>j</code> <strong>never resets</strong> — it only increases across all iterations of the outer loop.<br>
+    The inner while loop runs at most n times <em>total</em> (not per outer iteration).<br>
+    Total work: O(n) for outer + O(n) for inner = <strong>O(n)</strong>.<br>
+    This is the classic <strong>two-pointer / amortized analysis</strong> trap in placement tests.`
+  },
+  // ── Q15: OOP — Virtual Functions and Object Slicing ──
+  {
+    cat: "sw", q: `What is the output? (C++)<pre>#include &lt;iostream&gt;
+using namespace std;
+class Base {
+public:
+    virtual void show() { cout &lt;&lt; "Base "; }
+};
+class Derived : public Base {
+public:
+    void show() override { cout &lt;&lt; "Derived "; }
+};
+int main() {
+    Base *ptr = new Derived();
+    ptr-&gt;show();
+    Base obj = Derived();
+    obj.show();
+    return 0;
+}</pre>`,
+    options: ["Derived Base", "Derived Derived", "Base Base", "Base Derived"],
+    answer: 0,
+    explanation: `<code>ptr->show()</code>: ptr is a Base pointer to a Derived object. Since show() is <strong>virtual</strong>, runtime polymorphism applies, calls <strong>Derived::show()</strong>.<br>
+    <code>obj.show()</code>: <code>Base obj = Derived()</code> causes <strong>object slicing</strong> — the Derived part is sliced off, and obj is purely a Base object, calls <strong>Base::show()</strong>.<br>
+    Output: <strong>Derived Base</strong>. Object slicing is a very common interview trap.`
+  },
+  // ── Q16: OOP — Abstract Class ──
+  {
+    cat: "sw", q: `Which of the following statements about C++ abstract classes is <strong>FALSE</strong>?`,
+    options: [
+      "An abstract class can have constructors",
+      "An abstract class cannot be instantiated",
+      "A class with at least one pure virtual function is abstract",
+      "An abstract class cannot have any non-virtual member functions"
+    ],
+    answer: 3,
+    explanation: `The <strong>FALSE</strong> statement is D. An abstract class <strong>can</strong> have non-virtual member functions, data members, and even constructors.<br>
+    A: True — abstract classes can have constructors (called when derived objects are created).<br>
+    B: True — you cannot create objects of an abstract class directly.<br>
+    C: True — a class with even one pure virtual function (= 0) becomes abstract.<br>
+    D: <strong>False</strong> — abstract classes can have any mix of pure virtual, virtual, and non-virtual members.`
+  },
+  // ── Q17: Memory Management — Double Free ──
+  {
+    cat: "sw", q: `What happens when this code runs?<pre>#include &lt;stdlib.h&gt;
+int main() {
+    char *ptr = (char *)malloc(100);
+    free(ptr);
+    free(ptr);
+    return 0;
+}</pre>`,
+    options: [
+      "Undefined behavior (likely crash)",
+      "Memory is freed twice, no issue",
+      "Compilation error",
+      "Memory leak"
+    ],
+    answer: 0,
+    explanation: `<strong>Double free</strong> is <strong>undefined behavior</strong> in C. It typically causes a runtime crash or heap corruption.<br>
+    After the first <code>free(ptr)</code>, ptr becomes a <strong>dangling pointer</strong>. Calling free() on it again corrupts the heap allocator's metadata.<br>
+    <strong>Safe pattern:</strong> Always set <code>ptr = NULL</code> after free(). Calling <code>free(NULL)</code> is safe and does nothing.`
+  },
+  // ── Q18: Memory Leak Detection ──
+  {
+    cat: "sw", q: `Which of the following causes a <strong>memory leak</strong>?<pre>// Option A:
+char *p = malloc(100);
+p = malloc(200);
+free(p);
+
+// Option B:
+char *p = malloc(100);
+free(p);
+p = NULL;
+
+// Option C:
+char *p = malloc(100);
+free(p);
+
+// Option D:
+char *p = NULL;
+free(p);</pre>`,
+    options: [
+      "Option A — first 100-byte block is leaked",
+      "Option B — setting NULL causes leak",
+      "Option C — normal, no leak",
+      "Option D — freeing NULL crashes"
+    ],
+    answer: 0,
+    explanation: `<strong>Option A</strong> causes a memory leak: the first malloc(100) allocates a block, then p is reassigned to malloc(200). The original 100-byte block has <strong>no pointer referencing it</strong> and can never be freed.<br>
+    B: Correct pattern — free then NULL.<br>
+    C: Normal usage, no leak.<br>
+    D: <code>free(NULL)</code> is defined by the C standard to do nothing — it is <strong>safe</strong>.`
+  },
+  // ── Q19: Operator Precedence with Pointers ──
+  {
+    cat: "sw", q: `What does <code>*p++</code> do in C (where p is an <code>int*</code>)?`,
+    options: [
+      "Dereferences p, then increments the pointer p",
+      "Increments the value pointed to by p",
+      "Increments p, then dereferences",
+      "Compilation error — ambiguous expression"
+    ],
+    answer: 0,
+    explanation: `Postfix <code>++</code> has <strong>higher precedence</strong> than dereference <code>*</code>.<br>
+    So <code>*p++</code> is parsed as <code>*(p++)</code>.<br>
+    But since ++ is <strong>postfix</strong>, the original value of p is used for dereference first, then p is incremented.<br>
+    Effect: returns *p (current value), then advances p to next element.<br>
+    To increment the value: use <code>(*p)++</code>.<br>
+    This is one of the most frequently tested pointer precedence questions.`
+  },
+  // ── Q20: Endianness and Type Casting ──
+  {
+    cat: "sw", q: `On a <strong>little-endian</strong> system, what is the output?<pre>#include &lt;stdio.h&gt;
+int main() {
+    short a = 0x0140;  // 320 in decimal
+    char *ptr = (char *)&amp;a;
+    printf("%d", *ptr);
+    return 0;
+}</pre>`,
+    options: ["64", "1", "320", "0"],
+    answer: 0,
+    explanation: `<code>short a = 0x0140</code> (320 decimal). In memory on a <strong>little-endian</strong> system, the least significant byte comes first:<br>
+    Address: [0x40] [0x01]<br>
+    <code>char *ptr = (char *)&a</code> points to the first byte = 0x40 = <strong>64</strong> in decimal.<br>
+    On a <strong>big-endian</strong> system, the answer would be 0x01 = 1.<br>
+    This tests understanding of endianness — critical for embedded systems (TI frequently asks this).`
+  }
+]
+
+};
+
+// ══════════════════════════════════════════
+//  QUIZ ENGINE
+// ══════════════════════════════════════════
+
+let currentQuiz = [];
+let currentIndex = 0;
+let score = 0;
+let answered = [];
+let timerInterval = null;
+let seconds = 0;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz(mode) {
+  if (mode === 'all') {
+    let pool = [];
+    ['math','ee','sw'].forEach(k => pool.push(...questions[k]));
+    pool.push(...questions.pyq);
+    currentQuiz = shuffle(pool).slice(0, 20);
+  } else if (mode === 'retry') {
+    // currentQuiz already set
+  } else {
+    currentQuiz = shuffle(questions[mode]);
+  }
+  currentIndex = 0;
+  score = 0;
+  answered = new Array(currentQuiz.length).fill(null);
+
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('resultsPage').style.display = 'none';
+  document.getElementById('quizPage').style.display = 'block';
+
+  if (mode === 'all') {
+    seconds = 0;
+    document.getElementById('timerDisplay').style.display = 'block';
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      seconds++;
+      const m = Math.floor(seconds/60).toString().padStart(2,'0');
+      const s = (seconds%60).toString().padStart(2,'0');
+      document.getElementById('timerDisplay').textContent = m + ':' + s;
+    }, 1000);
+  } else {
+    document.getElementById('timerDisplay').style.display = 'none';
+    clearInterval(timerInterval);
+  }
+
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = currentQuiz[currentIndex];
+  const total = currentQuiz.length;
+  const pct = ((currentIndex) / total) * 100;
+
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = (currentIndex + 1) + ' of ' + total;
+  document.getElementById('scoreDisplay').textContent = score + ' / ' + total;
+
+  const catLabel = {math:'Math', ee:'Electronics', sw:'Software'}[q.cat] || q.cat;
+  const isAnswered = answered[currentIndex] !== null;
+
+  let html = `<div class="question-card">
+    <div class="q-header">
+      <span class="q-num">Question ${currentIndex + 1}</span>
+      <span class="q-tag ${q.cat}">${catLabel}</span>
+    </div>
+    <div class="q-text">${q.q}</div>
+    <div class="options">`;
+
+  q.options.forEach((opt, i) => {
+    let cls = 'option';
+    if (isAnswered) {
+      cls += ' disabled';
+      if (i === q.answer) cls += ' correct';
+      else if (i === answered[currentIndex] && i !== q.answer) cls += ' wrong';
+    }
+    html += `<div class="${cls}" ${!isAnswered ? `onclick="selectAnswer(${i})"` : ''}>
+      <span class="option-letter">${String.fromCharCode(65+i)}</span>
+      <span class="option-text">${opt}</span>
+    </div>`;
+  });
+
+  html += `</div>
+    <div class="explanation ${isAnswered ? 'show' : ''}" id="explanation">${q.explanation}</div>
+  </div>`;
+
+  document.getElementById('questionContainer').innerHTML = html;
+
+  // buttons
+  document.getElementById('skipBtn').style.display = isAnswered ? 'none' : 'inline-block';
+  const isLast = currentIndex === currentQuiz.length - 1;
+  document.getElementById('nextBtn').style.display = (!isLast && isAnswered) ? 'inline-block' : 'none';
+  document.getElementById('finishBtn').style.display = (isLast && isAnswered) ? 'inline-block' : 'none';
+}
+
+function selectAnswer(idx) {
+  if (answered[currentIndex] !== null) return;
+  answered[currentIndex] = idx;
+  const q = currentQuiz[currentIndex];
+  if (idx === q.answer) score++;
+  renderQuestion();
+}
+
+function skipQuestion() {
+  answered[currentIndex] = -1; // skipped
+  renderQuestion();
+  // auto-advance after brief pause
+  setTimeout(() => {
+    if (currentIndex < currentQuiz.length - 1) {
+      currentIndex++;
+      renderQuestion();
+    } else {
+      showResults();
+    }
+  }, 300);
+}
+
+function nextQuestion() {
+  if (currentIndex < currentQuiz.length - 1) {
+    currentIndex++;
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  clearInterval(timerInterval);
+  document.getElementById('quizPage').style.display = 'none';
+  document.getElementById('resultsPage').style.display = 'block';
+
+  const total = currentQuiz.length;
+  const pct = Math.round((score / total) * 100);
+  document.getElementById('finalScore').textContent = score + ' / ' + total + ' (' + pct + '%)';
+
+  let correct = 0, wrong = 0, skipped = 0;
+  answered.forEach((a, i) => {
+    if (a === -1 || a === null) skipped++;
+    else if (a === currentQuiz[i].answer) correct++;
+    else wrong++;
+  });
+
+  document.getElementById('resultsBreakdown').innerHTML = `
+    <div class="result-stat"><div class="num" style="color:var(--correct)">${correct}</div><div class="label">Correct</div></div>
+    <div class="result-stat"><div class="num" style="color:var(--wrong)">${wrong}</div><div class="label">Wrong</div></div>
+    <div class="result-stat"><div class="num" style="color:var(--text-dim)">${skipped}</div><div class="label">Skipped</div></div>
+  `;
+
+  let reviewHTML = '<h3>Review Answers</h3>';
+  currentQuiz.forEach((q, i) => {
+    const a = answered[i];
+    const wasCorrect = a === q.answer;
+    const wasSkipped = a === -1 || a === null;
+    const cls = wasSkipped ? 'was-wrong' : (wasCorrect ? 'was-correct' : 'was-wrong');
+    const shortQ = q.q.replace(/<pre>[\s\S]*?<\/pre>/g, ' [code] ').replace(/<[^>]*>/g, '').substring(0, 120);
+
+    reviewHTML += `<div class="review-item ${cls}">
+      <div class="review-q"><strong>Q${i+1}:</strong> ${shortQ}...</div>
+      <div class="review-a">
+        Your answer: ${wasSkipped ? '<span class="w">Skipped</span>' : (wasCorrect ? `<span class="c">${q.options[a]}</span>` : `<span class="w">${q.options[a]}</span>`)}
+        ${!wasCorrect ? `<br>Correct: <span class="c">${q.options[q.answer]}</span>` : ''}
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('reviewList').innerHTML = reviewHTML;
+}
+
+function retryWrong() {
+  const wrongQs = currentQuiz.filter((q, i) => answered[i] !== q.answer);
+  if (wrongQs.length === 0) { goHome(); return; }
+  currentQuiz = shuffle(wrongQs);
+  answered = new Array(currentQuiz.length).fill(null);
+  currentIndex = 0;
+  score = 0;
+
+  document.getElementById('resultsPage').style.display = 'none';
+  document.getElementById('quizPage').style.display = 'block';
+  document.getElementById('timerDisplay').style.display = 'none';
+  renderQuestion();
+}
+
+function goHome() {
+  clearInterval(timerInterval);
+  document.getElementById('quizPage').style.display = 'none';
+  document.getElementById('resultsPage').style.display = 'none';
+  document.getElementById('landing').style.display = 'flex';
+}
+</script>
+</body>
+</html>
