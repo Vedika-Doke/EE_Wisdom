@@ -462,7 +462,10 @@
   .pipeline-table .stage-mem { background: #1a3525; color: var(--green); font-weight: bold; }
   .pipeline-table .stage-wb { background: #1e1535; color: var(--purple); font-weight: bold; }
   .pipeline-table .empty { background: #0a0a0a; }
-  .pipeline-table .hazard { background: #4a1515; color: var(--accent1); }
+  .pipeline-table .hazard { background: #4a1515; color: var(--accent1); font-weight:bold; }
+  .pipeline-table .stall-dh { background: #3a1010; color: #ff6b6b; font-weight:bold; font-size:0.75rem; }
+  .pipeline-table .stall-sh { background: #1a1a40; color: #7b7bff; font-weight:bold; font-size:0.75rem; }
+  .pipeline-table .blocked { background: #111; color: #555; font-size:0.7rem; }
 
   /* Animated elements */
   @keyframes pulse {
@@ -1978,6 +1981,130 @@ RETI</pre>
     </table>
   </div>
 
+  <div class="viz-container" style="margin-top:16px;">
+    <div class="viz-title">ISA Architecture Types — Visual Comparison</div>
+    <svg width="700" height="260" viewBox="0 0 700 260">
+
+      <!-- ===== STACK ===== -->
+      <text x="87" y="18" fill="#f5c518" font-size="11" font-weight="bold" text-anchor="middle">(a) Stack</text>
+      <!-- Stack box -->
+      <rect x="52" y="25" width="70" height="12" rx="2" fill="#2a2515" stroke="#f5c518" stroke-width="1.5"/>
+      <text x="87" y="35" fill="#f5c518" font-size="9" text-anchor="middle">TOS</text>
+      <rect x="52" y="38" width="70" height="10" rx="2" fill="#1a1a2e" stroke="#555" stroke-width="1"/>
+      <rect x="52" y="49" width="70" height="10" rx="2" fill="#1a1a2e" stroke="#555" stroke-width="1"/>
+      <rect x="52" y="60" width="70" height="10" rx="2" fill="#1a1a2e" stroke="#555" stroke-width="1"/>
+      <text x="87" y="82" fill="#9e9e9e" font-size="8" text-anchor="middle">Stack</text>
+      <!-- ALU -->
+      <polygon points="72,95 102,95 97,115 77,115" fill="#1a2a35" stroke="#00e5ff" stroke-width="1.5"/>
+      <text x="87" y="109" fill="#00e5ff" font-size="9" text-anchor="middle">ALU</text>
+      <!-- arrows in/out -->
+      <line x1="87" y1="70" x2="87" y2="93" stroke="#f5c518" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="87" y1="115" x2="87" y2="130" stroke="#f5c518" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="87" y="142" fill="#9e9e9e" font-size="8" text-anchor="middle">→ back to stack</text>
+      <!-- label -->
+      <rect x="30" y="155" width="115" height="30" rx="4" fill="#1e1535" stroke="#b388ff" stroke-width="1"/>
+      <text x="87" y="168" fill="#b388ff" font-size="8" text-anchor="middle">Java bytecode</text>
+      <text x="87" y="179" fill="#9e9e9e" font-size="7.5" text-anchor="middle">Compact, hard to pipeline</text>
+
+      <!-- ===== ACCUMULATOR ===== -->
+      <text x="262" y="18" fill="#e94560" font-size="11" font-weight="bold" text-anchor="middle">(b) Accumulator</text>
+      <!-- ACC register -->
+      <rect x="220" y="25" width="84" height="22" rx="4" fill="#2a1525" stroke="#e94560" stroke-width="2"/>
+      <text x="262" y="40" fill="#e94560" font-size="10" text-anchor="middle" font-weight="bold">ACC</text>
+      <!-- ALU -->
+      <polygon points="242,60 282,60 277,82 247,82" fill="#1a2a35" stroke="#00e5ff" stroke-width="1.5"/>
+      <text x="262" y="75" fill="#00e5ff" font-size="9" text-anchor="middle">ALU</text>
+      <!-- ACC → ALU -->
+      <line x1="262" y1="47" x2="262" y2="58" stroke="#e94560" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- ACC feedback loop -->
+      <path d="M 220,36 Q 200,36 200,71 Q 200,82 242,82" fill="none" stroke="#e94560" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#arr)"/>
+      <!-- Memory → ALU (2nd operand) -->
+      <rect x="290" y="60" width="55" height="22" rx="4" fill="#1a3525" stroke="#00e676" stroke-width="1.5"/>
+      <text x="317" y="75" fill="#00e676" font-size="9" text-anchor="middle">Memory</text>
+      <line x1="290" y1="71" x2="283" y2="71" stroke="#00e676" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- Result → ACC -->
+      <line x1="262" y1="82" x2="262" y2="100" stroke="#f5c518" stroke-width="1.5"/>
+      <line x1="262" y1="100" x2="220" y2="100" stroke="#f5c518" stroke-width="1.5"/>
+      <line x1="220" y1="100" x2="220" y2="36" stroke="#f5c518" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- label -->
+      <rect x="200" y="110" width="124" height="30" rx="4" fill="#1e1535" stroke="#e94560" stroke-width="1"/>
+      <text x="262" y="123" fill="#e94560" font-size="8" text-anchor="middle">8051 (ACC), old CPUs</text>
+      <text x="262" y="134" fill="#9e9e9e" font-size="7.5" text-anchor="middle">ACC always involved → bottleneck</text>
+
+      <!-- ===== REGISTER-MEMORY ===== -->
+      <text x="462" y="18" fill="#ff9100" font-size="11" font-weight="bold" text-anchor="middle">(c) Register-Memory</text>
+      <!-- Register file -->
+      <rect x="400" y="25" width="60" height="50" rx="4" fill="#2a2515" stroke="#ff9100" stroke-width="1.5"/>
+      <text x="430" y="40" fill="#ff9100" font-size="8" text-anchor="middle">Regs</text>
+      <rect x="408" y="44" width="44" height="8" rx="2" fill="#1a1a2e" stroke="#555"/>
+      <rect x="408" y="54" width="44" height="8" rx="2" fill="#2a2515" stroke="#ff9100" stroke-width="1"/>
+      <text x="430" y="62" fill="#ff9100" font-size="7" text-anchor="middle">src/dst</text>
+      <!-- ALU -->
+      <polygon points="432,90 472,90 467,112 437,112" fill="#1a2a35" stroke="#00e5ff" stroke-width="1.5"/>
+      <text x="452" y="105" fill="#00e5ff" font-size="9" text-anchor="middle">ALU</text>
+      <!-- Reg → ALU -->
+      <line x1="440" y1="75" x2="446" y2="88" stroke="#ff9100" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- Memory → ALU -->
+      <rect x="478" y="90" width="55" height="22" rx="4" fill="#1a3525" stroke="#00e676" stroke-width="1.5"/>
+      <text x="505" y="105" fill="#00e676" font-size="9" text-anchor="middle">Memory</text>
+      <line x1="478" y1="101" x2="473" y2="101" stroke="#00e676" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- Result → Reg -->
+      <line x1="452" y1="112" x2="452" y2="125" stroke="#f5c518" stroke-width="1.5"/>
+      <line x1="452" y1="125" x2="420" y2="125" stroke="#f5c518" stroke-width="1.5"/>
+      <line x1="420" y1="125" x2="420" y2="75" stroke="#f5c518" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- label -->
+      <rect x="395" y="135" width="135" height="30" rx="4" fill="#1e1535" stroke="#ff9100" stroke-width="1"/>
+      <text x="462" y="148" fill="#ff9100" font-size="8" text-anchor="middle">x86 (80x86), Motorola 68000</text>
+      <text x="462" y="159" fill="#9e9e9e" font-size="7.5" text-anchor="middle">Flexible but variable CPI</text>
+
+      <!-- ===== LOAD-STORE ===== -->
+      <text x="618" y="18" fill="#00e676" font-size="11" font-weight="bold" text-anchor="middle">(d) Load-Store</text>
+      <!-- Register file (large) -->
+      <rect x="568" y="25" width="70" height="55" rx="4" fill="#1a3525" stroke="#00e676" stroke-width="2"/>
+      <text x="603" y="40" fill="#00e676" font-size="8" text-anchor="middle">32 Regs</text>
+      <rect x="576" y="44" width="54" height="7" rx="2" fill="#1a1a2e" stroke="#555"/>
+      <rect x="576" y="53" width="54" height="7" rx="2" fill="#1a1a2e" stroke="#555"/>
+      <rect x="576" y="62" width="54" height="7" rx="2" fill="#1a1a2e" stroke="#555"/>
+      <text x="603" y="78" fill="#9e9e9e" font-size="7" text-anchor="middle">rs1, rs2 → ALU</text>
+      <!-- ALU -->
+      <polygon points="583,95 623,95 618,117 588,117" fill="#1a2a35" stroke="#00e5ff" stroke-width="1.5"/>
+      <text x="603" y="110" fill="#00e5ff" font-size="9" text-anchor="middle">ALU</text>
+      <!-- Reg → ALU (2 inputs) -->
+      <line x1="592" y1="80" x2="592" y2="93" stroke="#00e676" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="612" y1="80" x2="612" y2="93" stroke="#00e676" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- Result → Reg -->
+      <line x1="603" y1="117" x2="603" y2="130" stroke="#f5c518" stroke-width="1.5"/>
+      <line x1="603" y1="130" x2="568" y2="130" stroke="#f5c518" stroke-width="1.5"/>
+      <line x1="568" y1="130" x2="568" y2="75" stroke="#f5c518" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- Memory separate -->
+      <rect x="645" y="60" width="48" height="22" rx="4" fill="#2a1525" stroke="#9e9e9e" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="669" y="74" fill="#9e9e9e" font-size="8" text-anchor="middle">Memory</text>
+      <text x="669" y="90" fill="#9e9e9e" font-size="7" text-anchor="middle">lw/sw only</text>
+      <!-- label -->
+      <rect x="555" y="135" width="130" height="30" rx="4" fill="#1e1535" stroke="#00e676" stroke-width="1"/>
+      <text x="618" y="148" fill="#00e676" font-size="8" text-anchor="middle">MIPS, ARM, RISC-V</text>
+      <text x="618" y="159" fill="#9e9e9e" font-size="7.5" text-anchor="middle">Best for pipelining, fixed CPI</text>
+
+      <!-- Arrow marker -->
+      <defs>
+        <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="#888"/>
+        </marker>
+      </defs>
+
+      <!-- Dividers -->
+      <line x1="175" y1="10" x2="175" y2="200" stroke="#333" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="350" y1="10" x2="350" y2="200" stroke="#333" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="540" y1="10" x2="540" y2="200" stroke="#333" stroke-width="1" stroke-dasharray="3,3"/>
+
+      <!-- Memory access note -->
+      <text x="350" y="215" fill="#9e9e9e" font-size="9" text-anchor="middle">← More memory accesses per instr · More complex · Variable CPI</text>
+      <text x="350" y="228" fill="#9e9e9e" font-size="9" text-anchor="middle">Fewer memory accesses · Simpler pipeline · Fixed CPI →</text>
+      <line x1="30" y1="220" x2="340" y2="220" stroke="#e94560" stroke-width="1" marker-end="url(#arr)"/>
+      <line x1="670" y1="220" x2="360" y2="220" stroke="#00e676" stroke-width="1" marker-end="url(#arr)"/>
+    </svg>
+  </div>
+
   <h4 style="color:var(--orange); margin-top:16px;">ISA Classification by Memory Addresses in ALU Instructions</h4>
   <table>
     <tr><th># Memory Addresses</th><th>Max Operands</th><th>Architecture Type</th><th>Examples</th></tr>
@@ -2108,6 +2235,31 @@ Example: 80% of code is parallelizable, 4x speedup on that part:
       <text x="100" y="190" fill="#e94560" font-size="9" text-anchor="middle">Serial (20%)</text>
       <text x="200" y="190" fill="#ff4081" font-size="11" font-weight="bold">Max Speedup = 1/0.2 = 5x only!</text>
     </svg>
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">Amdahl's Law — Textbook Worked Examples</div>
+    <p><strong>Example 1: Web server with network I/O bottleneck</strong></p>
+    <pre>Program spends 40% of time on I/O (f = 0.40), rest on computation.
+New network card makes I/O 10× faster (S = 10).
+
+Speedup = 1 / [(1 - 0.40) + 0.40/10]
+        = 1 / [0.60 + 0.04]
+        = 1 / 0.64 ≈ <strong>1.56×</strong>
+
+Even though I/O is 10× faster, overall speedup is only 1.56× because
+60% of time (computation) is unchanged — Amdahl's Law at work!</pre>
+    <p style="margin-top:12px;"><strong>Example 2: Improving FSQRT instruction (FP-heavy code)</strong></p>
+    <pre>FP instructions = 20% of execution time, FSQRT = 10% of all FP time.
+→ FSQRT fraction of total = 0.20 × 0.10 = 0.02 (f = 0.02)
+Make FSQRT 10× faster (S = 10).
+
+Speedup = 1 / [(1 - 0.02) + 0.02/10]
+        = 1 / [0.98 + 0.002]
+        = 1 / 0.982 ≈ <strong>1.02×</strong>
+
+Takeaway: Optimising a rarely-executed operation has negligible overall effect.
+Always optimise the common case (<em>Make the common case fast</em>)!</pre>
   </div>
 
   <h3>Power, Energy & V<sub>dd</sub> Tradeoffs</h3>
@@ -2473,6 +2625,37 @@ ED^2P = Energy x Delay^2
     <p><strong>Sign-extend:</strong> Copy bit 15 into bits 16-31. E.g., <code>FFFC</code> (16-bit) &rarr; <code>FFFFFFFC</code> (32-bit) = -4</p>
     <p><strong>Zero-extend:</strong> Fill bits 16-31 with 0s. E.g., <code>FFFC</code> (16-bit) &rarr; <code>0000FFFC</code> (32-bit) = 65532</p>
     <p>Using <code>addi</code> instead of <code>ori</code> to load a constant with bit 15 = 1 would give a <strong>wrong negative value</strong> due to sign extension!</p>
+
+    <h4 style="color:var(--yellow); margin-top:14px;">Worked Example: Loading 0x8000</h4>
+    <p>Goal: load the value <strong>0x00008000</strong> (= 32768) into <code>$t0</code> (starting from <code>$zero</code>).</p>
+    <pre style="margin:10px 0;">16-bit immediate in binary: <strong>1000 0000 0000 0000</strong>
+                                ↑ bit 15 = 1  ← this is the problem bit
+
+<span style="color:var(--green);">✓  ori  $t0, $zero, 0x8000</span>
+   Zero-extension: bits 31–16 filled with 0s
+   $t0 = 0000 0000 0000 0000  <strong>1000 0000 0000 0000</strong>
+       = 0x00008000 = <strong>+32768</strong>  ← correct!
+
+<span style="color:var(--accent1);">✗  addi $t0, $zero, 0x8000</span>
+   Sign-extension: bit 15 = 1, so bits 31–16 filled with 1s
+   $t0 = 1111 1111 1111 1111  <strong>1000 0000 0000 0000</strong>
+       = 0xFFFF8000 = <strong>−32768</strong>  ← WRONG! negative value</pre>
+
+    <h4 style="color:var(--yellow); margin-top:14px;">Another Example: lui + ori vs lui + addi for 0x12348765</h4>
+    <pre style="margin:10px 0;">Goal: load 0x12348765 into $s0.
+
+Step 1:  lui $s0, 0x1234      ; $s0 = 0x12340000
+
+<span style="color:var(--green);">✓ Step 2:  ori $s0, $s0, 0x8765</span>
+   0x8765 zero-extended = 0x00008765
+   $s0 = 0x12340000 + 0x00008765
+       = <strong>0x12348765</strong>  ← correct!
+
+<span style="color:var(--accent1);">✗ Step 2:  addi $s0, $s0, 0x8765</span>
+   bit 15 of 0x8765 = 1, so sign-extended = 0xFFFF8765
+   $s0 = 0x12340000 + 0xFFFF8765
+       = <strong>0x12338765</strong>  ← WRONG! upper half corrupted (carry destroyed 0x1234)</pre>
+    <p style="color:var(--cyan);">Rule: <strong>Always use <code>ori</code></strong> to fill the lower 16 bits after <code>lui</code>. <code>ori</code> zero-extends, so it never corrupts the upper half.</p>
   </div>
 
   <h4>J-Type (Jump)</h4>
@@ -2494,6 +2677,59 @@ ED^2P = Energy x Delay^2
       <li><code>jal</code> also saves return address: <code>$ra = PC + 4</code> before jumping</li>
       <li>To jump <em>anywhere</em> in 32-bit space, use <code>jr $rs</code> (R-type, full 32-bit register)</li>
     </ul>
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">J-Type Worked Example — Encoding &amp; Decoding</div>
+
+    <h4 style="color:var(--yellow);">Step 1: Given the instruction</h4>
+    <pre>Instruction at address 0x00400000:
+    j  0x00401000        ; jump to subroutine at 0x00401000</pre>
+
+    <h4 style="color:var(--cyan); margin-top:12px;">Step 2: Compute the 26-bit target field</h4>
+    <pre>Target byte address = 0x00401000
+
+Why only 26 bits fit in the instruction:
+  Bits [1:0]   → always 00 (MIPS word-aligned, address always ÷4). DON'T store.
+  Bits [31:28] → borrowed from PC+4 at runtime. DON'T store.
+  Bits [27:2]  → the 26 bits actually stored in the instruction.
+
+Getting bits [27:2] = just divide address by 4:
+  0x00401000 ÷ 4 = <strong>0x00100400</strong>  ← the 26-bit target field
+
+Verify in binary:
+  0x00401000 = 0000 0000 0100 0000 0001 0000 0000 0000
+                ↑↑↑↑ ←from PC  bits [27:2] →  ↑↑ ←always 00
+  bits [27:2] = 0000 0000 0001 0000 0000 0100 0000 0000 (shifted right 2)
+              = 0x00100400  (top 6 bits are 0, so 26 significant bits = 0x100400)</pre>
+
+    <h4 style="color:var(--green); margin-top:12px;">Step 3: Encode into 32-bit machine word</h4>
+    <pre>| opcode (6) | target (26 bits)                          |
+|  000010    | 00 0001 0000 0000 0100 0000 0000           |
+
+Hex: <strong>0x08100400</strong>
+
+Breakdown:
+  0000 10 | 00 0001 0000 0000 0100 0000 0000
+  opcode=2   target = 26-bit word-address of destination</pre>
+
+    <h4 style="color:var(--pink); margin-top:12px;">Step 4: How CPU reconstructs the full jump address</h4>
+    <pre>PC of next instruction (PC+4) = 0x00400004
+Top 4 bits of PC+4 = 0x0 → 0000
+
+Full jump address = { 0000 } + { 26-bit target } + { 00 }
+                  = 0000  +  00 0001 0000 0000 0100 0000 0000  +  00
+                  = 0000 0000 0100 0000 0001 0000 0000 0000 00
+                  = <strong>0x00401000</strong>  ✓  matches original target!</pre>
+
+    <h4 style="color:var(--yellow); margin-top:12px;">jal — same encoding, also saves return address</h4>
+    <pre>jal  0x00401000      ; call subroutine
+
+Same 32-bit encoding but opcode = 000011 (3) instead of 000010 (2)
+Before jumping, hardware sets:  $ra = PC + 4  (return address saved)
+To return:  jr $ra            ; R-type, not J-type</pre>
+
+    <p style="margin-top:8px; color:var(--muted);">Note: opcode for <code>j</code> = 2, for <code>jal</code> = 3. All other opcodes are used by I-type and R-type (R-type opcode = 0, function field distinguishes them).</p>
   </div>
 
   <h3>Complete MIPS Instruction Reference (All Instructions with Full Forms)</h3>
@@ -3742,6 +3978,466 @@ sub:                       IF   <span style="color:var(--green);">ID</span>    E
       <tr><td>4+ apart</td><td style="color:var(--green);">No hazard at all</td><td>WB finishes before ID starts</td></tr>
     </table>
   </div>
+
+  <h3>Load-Use Hazard (Special Case — Forwarding NOT Possible)</h3>
+  <div class="key-box important">
+    <div class="label">Load-Use: Must Stall — Cannot Forward</div>
+    <p>When a <code>lw</code> is immediately followed by an instruction that uses the loaded value, <strong>data forwarding alone cannot fix this</strong>. The load result is only available after the MEM stage, but the next instruction needs it in EX — which happens <em>before</em> MEM finishes.</p>
+    <pre>lw  $t1, 0($t0)      ; MEM reads value in cycle 4
+and $s0, $t1, $t2    ; EX needs $t1 in cycle 4 → IMPOSSIBLE!</pre>
+    <p><strong>Only fix: stall 1 cycle</strong> (insert a bubble). Hardware detects this and stalls automatically (pipeline interlock).</p>
+    <table class="pipeline-table">
+      <tr><th>Cycle</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th></tr>
+      <tr><td><code>lw $t1</code></td><td class="stage-if">IF</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td><td class="empty"></td><td class="empty"></td></tr>
+      <tr><td><code>and $s0</code></td><td class="empty"></td><td class="stage-if">IF</td><td class="stage-id">ID</td><td class="hazard">stall</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td></tr>
+    </table>
+    <p style="margin-top:8px; color:var(--yellow);">Compiler/assembler fix: reorder instructions to put an independent instruction between <code>lw</code> and its use — avoids the stall entirely.</p>
+  </div>
+
+  <h3>Branch Hazard & Delay Slots</h3>
+  <div class="key-box concept">
+    <div class="label">Control Hazard — Branch Not Resolved Until ID Stage</div>
+    <p>For an <strong>unconditional branch</strong> (J-type): the branch address is known only at the <strong>ID stage</strong>. Meanwhile, the instruction after the branch has already been fetched (IF). This fetched instruction may be wrong.</p>
+    <pre>Branch inst:  IF → ID → EX → MEM → WB
+                   ↑ branch addr resolved here
+Next inst:         IF → (may be wrong path!)</pre>
+    <p><strong>Solutions:</strong></p>
+    <ul>
+      <li><strong>Flush</strong>: Discard the wrongly-fetched instruction (1 cycle wasted)</li>
+      <li><strong>Delay slot</strong>: Always execute the instruction immediately after a branch — the compiler fills this slot with a useful instruction that doesn't depend on the branch outcome. If nothing useful, fill with a <code>NOP</code>.</li>
+    </ul>
+    <pre>; Delay slot example (MIPS)
+inst 0: load  $t0, ...
+inst 1: ADD   $s0, $t1, $t2
+inst 2: Branch target_label         ; branch resolved at ID
+inst 3: [delay slot — always runs]  ; compiler tries to fill with useful instr
+</pre>
+    <p>Original MIPS uses delay slots. The instruction in the delay slot <strong>always executes</strong> regardless of branch outcome.</p>
+  </div>
+
+  <h3>Pipelining Speedup with Stalls</h3>
+  <div class="key-box formula">
+    <div class="label">Speedup Formula (from notes)</div>
+    <pre>Speedup = CPI(unpipelined) / CPI(pipelined) × 1 / (1 + stalls/instruction)
+
+Where:
+  CPI(unpipelined) = average CPI without pipelining
+  CPI(pipelined)   = ideal pipelined CPI (= 1 for 5-stage)
+  stalls/instr     = average pipeline stall cycles per instruction</pre>
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">MIPS ISA Mix Example (from class notes)</div>
+    <p>Typical MIPS workload breakdown:</p>
+    <table>
+      <tr><th>Instruction Type</th><th>Frequency</th><th>Cycles (unpipelined)</th></tr>
+      <tr><td>ALU (R-type)</td><td><strong>40%</strong></td><td>4 cc</td></tr>
+      <tr><td>Branch</td><td><strong>20%</strong></td><td>4 cc</td></tr>
+      <tr><td>Memory (lw/sw)</td><td><strong>40%</strong></td><td>5 cc</td></tr>
+    </table>
+    <pre>Avg CPI (unpipelined) = 0.4×4 + 0.2×4 + 0.4×5 = 1.6 + 0.8 + 2.0 = <strong>4.4 CPI</strong>
+
+Pipelining overhead (pipeline registers): C_cp = 1.2
+→ Pipelined clock period = 1.2 × (CC of slowest stage)
+
+Speedup = 4.4 / 1.2 ≈ <strong>3.67×</strong>
+
+If ALU units (excluding IF & ID) take 2 ns → CC_p = 2.2 ns
+→ Speedup = 4.4/2.2 × 1ns ≈ <strong>2×</strong></pre>
+  </div>
+
+  <h3>Ideal CPI = 1 with Pipelining</h3>
+  <div class="key-box concept">
+    <div class="label">Why Pipelining Gives Ideal CPI = 1</div>
+    <p>In a perfect pipeline (no hazards, no stalls), one instruction <strong>completes every clock cycle</strong> once the pipeline is full. Even though each instruction takes 5 cycles (latency), the <strong>throughput</strong> is 1 instruction/cycle because 5 instructions are in-flight simultaneously.</p>
+    <pre>Cycle:  1    2    3    4    5    6    7    ...
+I1:    IF   ID   EX  MEM   WB
+I2:         IF   ID   EX  MEM   WB
+I3:              IF   ID   EX  MEM   WB
+I4:                   IF   ID   EX  MEM   WB
+I5:                        IF   ID   EX  MEM   WB
+                                          ↑
+                            From cycle 5 onwards: 1 inst completes per cycle → CPI = 1</pre>
+  </div>
+
+  <div class="key-box formula">
+    <div class="label">Actual CPI with Stalls (from textbook Appendix C)</div>
+    <pre>Actual CPI = Ideal CPI + Pipeline stall cycles per instruction
+           = 1 + stalls/instruction      (for 5-stage MIPS)
+
+Where stall cycles come from:
+  • Load-use hazards (1 stall cycle each)
+  • Branch hazards (1 stall cycle if branch resolved at ID)
+  • Cache misses (many stall cycles — Miss Rate × Miss Penalty)
+
+CPU Time = IC × CPI_actual × Clock cycle time
+         = IC × (1 + stalls/instr) × T_clock
+
+Pipelined Speedup (vs multi-cycle unpipelined):
+  Speedup = CPI_unpipelined / (1 + stalls/instr) × T_unpipelined/T_pipelined</pre>
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">Why Ideal Is Hard to Achieve</div>
+    <ul>
+      <li><strong>Data hazards (load-use):</strong> <code>lw</code> followed immediately by use → forced 1-cycle stall</li>
+      <li><strong>Control hazards (branches):</strong> branch outcome not known until ID → 1 cycle wasted (or use delay slot)</li>
+      <li><strong>Cache misses:</strong> instruction or data not in cache → pipeline stalls for tens of cycles</li>
+      <li><strong>Pipeline start-up:</strong> first 4 cycles the pipeline is not full (negligible for long programs)</li>
+    </ul>
+    <p style="margin-top:8px; color:var(--green);">MIPS pipeline design minimises these: fixed-length instructions, load-store architecture, branch resolved early at ID, separate I$ and D$ caches.</p>
+  </div>
+
+  <div class="key-box formula">
+    <div class="label">Stall Cycles per Hazard — Quick Reference</div>
+    <table>
+      <tr><th>Hazard</th><th>Stalls</th><th>Condition</th></tr>
+      <tr><td>Load-use</td><td><strong style="color:var(--accent1);">1</strong></td><td><code>lw</code> immediately before dependent instr — forwarding cannot fix</td></tr>
+      <tr><td>Branch (resolved at ID)</td><td><strong style="color:var(--accent1);">1</strong></td><td>per branch, no prediction</td></tr>
+      <tr><td>Branch (resolved at EX)</td><td><strong style="color:var(--accent1);">2</strong></td><td>per branch, no prediction</td></tr>
+      <tr><td>Branch misprediction</td><td><strong style="color:var(--accent1);">1 or 2</strong></td><td>depends on which stage resolves branch</td></tr>
+      <tr><td>No forwarding, 1-apart</td><td><strong style="color:var(--accent1);">2</strong></td><td>EX hazard — result needed next cycle</td></tr>
+      <tr><td>No forwarding, 2-apart</td><td><strong style="color:var(--accent1);">1</strong></td><td>MEM hazard — result needed in 2 cycles</td></tr>
+    </table>
+  </div>
+
+  <h3>CPI Practice Problems</h3>
+
+  <!-- PROBLEM 1 -->
+  <div class="key-box exam">
+    <div class="label">Problem 1 — Load-Use Hazards Only</div>
+    <p><strong>Given:</strong> Instruction mix: 25% loads, 10% stores, 45% ALU, 15% branch, 5% jump. Forwarding implemented. 40% of loads are immediately followed by a dependent instruction. Ignore branch hazards.</p>
+    <p><strong>Find:</strong> Average CPI.</p>
+    <details style="margin-top:12px;">
+      <summary style="cursor:pointer; color:var(--cyan); font-weight:bold;">Show Solution</summary>
+      <pre style="margin-top:10px;">Load-use stalls/instr = fraction of loads × hazard fraction × stalls/occurrence
+                      = 0.25 × 0.40 × 1
+                      = 0.10
+
+CPI = 1 + 0.10 = <strong>1.10</strong></pre>
+    </details>
+  </div>
+
+  <!-- PROBLEM 2 -->
+  <div class="key-box exam">
+    <div class="label">Problem 2 — Branch Hazards, Two Cases</div>
+    <p><strong>Given:</strong> 20% of instructions are branches. Branch resolved at ID stage → 1 stall cycle. Ignore load-use hazards.</p>
+    <p><strong>Case A:</strong> Always stall (no prediction).<br>
+       <strong>Case B:</strong> Predict not-taken. 60% of branches are actually <em>taken</em>.</p>
+    <p><strong>Find:</strong> CPI for each case.</p>
+    <details style="margin-top:12px;">
+      <summary style="cursor:pointer; color:var(--cyan); font-weight:bold;">Show Solution</summary>
+      <pre style="margin-top:10px;">Case A — always stall 1 cycle per branch:
+  Stalls/instr = 0.20 × 1 = 0.20
+  CPI = 1 + 0.20 = <strong>1.20</strong>
+
+Case B — predict not-taken (wrong when branch IS taken = 60%):
+  Stalls/instr = 0.20 × 0.60 × 1 = 0.12
+  CPI = 1 + 0.12 = <strong>1.12</strong>
+
+Speedup of prediction over always-stall = 1.20 / 1.12 = <strong>1.07×</strong></pre>
+    </details>
+  </div>
+
+  <!-- PROBLEM 3 -->
+  <div class="key-box exam">
+    <div class="label">Problem 3 — Combined Load-Use + Branch Stalls</div>
+    <p><strong>Given:</strong></p>
+    <ul>
+      <li>25% loads, 40% of loads cause a load-use hazard (1 stall each)</li>
+      <li>20% branches, resolved at ID, no prediction (1 stall each)</li>
+    </ul>
+    <p><strong>Find:</strong> Combined CPI.</p>
+    <details style="margin-top:12px;">
+      <summary style="cursor:pointer; color:var(--cyan); font-weight:bold;">Show Solution</summary>
+      <pre style="margin-top:10px;">Load-use stalls/instr = 0.25 × 0.40 × 1 = 0.10
+Branch stalls/instr   = 0.20 × 1         = 0.20
+
+Total stalls/instr    = 0.10 + 0.20 = 0.30
+
+CPI = 1 + 0.30 = <strong>1.30</strong></pre>
+    </details>
+  </div>
+
+  <!-- PROBLEM 4 -->
+  <div class="key-box exam">
+    <div class="label">Problem 4 — Speedup From Forwarding</div>
+    <p><strong>Given:</strong></p>
+    <ul>
+      <li>30% of instructions depend on the immediately preceding instruction (1-apart → 2 stalls <em>without</em> forwarding)</li>
+      <li>15% depend on 2-back instruction (2-apart → 1 stall <em>without</em> forwarding)</li>
+      <li>10% are load-use (1 stall <em>even with</em> forwarding)</li>
+      <li>Ignore branch stalls</li>
+    </ul>
+    <p><strong>Find:</strong> CPI with and without forwarding. Speedup?</p>
+    <details style="margin-top:12px;">
+      <summary style="cursor:pointer; color:var(--cyan); font-weight:bold;">Show Solution</summary>
+      <pre style="margin-top:10px;">WITHOUT forwarding (all data hazards stall):
+  1-apart: 0.30 × 2 = 0.60
+  2-apart: 0.15 × 1 = 0.15
+  Total stalls = 0.75
+  CPI = 1 + 0.75 = <strong>1.75</strong>
+
+WITH forwarding (only load-use still stalls):
+  Load-use: 0.10 × 1 = 0.10
+  (1-apart and 2-apart: forwarded → 0 stalls)
+  CPI = 1 + 0.10 = <strong>1.10</strong>
+
+Speedup from forwarding = 1.75 / 1.10 = <strong>1.59×</strong></pre>
+    </details>
+  </div>
+
+  <!-- PROBLEM 5 -->
+  <div class="key-box exam">
+    <div class="label">Problem 5 — Branch Prediction Accuracy</div>
+    <p><strong>Given:</strong> 20% of instructions are branches. Branch resolved at EX stage → <strong>2 stall cycles</strong> on flush. Compare:</p>
+    <table>
+      <tr><th>Scheme</th><th>Description</th></tr>
+      <tr><td>A</td><td>No prediction — always flush 2 cycles</td></tr>
+      <tr><td>B</td><td>Predict not-taken. 65% of branches are not-taken</td></tr>
+      <tr><td>C</td><td>Dynamic predictor, 92% accuracy</td></tr>
+    </table>
+    <p><strong>Find:</strong> CPI for each.</p>
+    <details style="margin-top:12px;">
+      <summary style="cursor:pointer; color:var(--cyan); font-weight:bold;">Show Solution</summary>
+      <pre style="margin-top:10px;">Scheme A — always 2 stalls per branch:
+  Stalls/instr = 0.20 × 2 = 0.40
+  CPI = 1 + 0.40 = <strong>1.40</strong>
+
+Scheme B — predict not-taken (wrong 35% of time = taken branches):
+  Stalls/instr = 0.20 × 0.35 × 2 = 0.14
+  CPI = 1 + 0.14 = <strong>1.14</strong>
+
+Scheme C — dynamic, 8% misprediction rate:
+  Stalls/instr = 0.20 × 0.08 × 2 = 0.032
+  CPI = 1 + 0.032 = <strong>1.032</strong>
+
+Ranking: C (1.032) &gt; B (1.14) &gt; A (1.40)
+Speedup of C over A = 1.40 / 1.032 = <strong>1.36×</strong></pre>
+    </details>
+  </div>
+
+  <!-- PROBLEM 6 -->
+  <div class="key-box exam">
+    <div class="label">Problem 6 — Full Speedup vs Unpipelined (Textbook Style)</div>
+    <p><strong>Given:</strong></p>
+    <ul>
+      <li>Instruction mix: 40% ALU (4 cc), 20% branch (4 cc), 40% memory (5 cc) — unpipelined cycle counts</li>
+      <li>Pipelined stalls: 10% load-use hazards (1 stall each), 20% branches with 1 stall each</li>
+      <li>Pipeline register overhead: pipelined clock is <strong>1.2×</strong> slower than ideal</li>
+    </ul>
+    <p><strong>Find:</strong> (1) Unpipelined CPI, (2) Pipelined actual CPI, (3) Overall speedup.</p>
+    <details style="margin-top:12px;">
+      <summary style="cursor:pointer; color:var(--cyan); font-weight:bold;">Show Solution</summary>
+      <pre style="margin-top:10px;">1. Unpipelined CPI:
+   = 0.40×4 + 0.20×4 + 0.40×5
+   = 1.6 + 0.8 + 2.0 = <strong>4.4</strong>
+
+2. Pipelined actual CPI:
+   Load-use stalls  = 0.10 × 1 = 0.10
+   Branch stalls    = 0.20 × 1 = 0.20
+   Actual CPI       = 1 + 0.30 = <strong>1.30</strong>
+
+3. Speedup (with 1.2× clock overhead):
+   Speedup = CPI_unpipelined / (CPI_pipelined × clock_overhead)
+           = 4.4 / (1.30 × 1.2)
+           = 4.4 / 1.56
+           = <strong>2.82×</strong>
+
+   Without clock overhead: 4.4 / 1.30 = 3.38×
+   → Pipeline register overhead costs 3.38 − 2.82 = 0.56× of potential speedup</pre>
+    </details>
+  </div>
+
+  <!-- ===================== TUTORIAL Q ===================== -->
+  <h3>Tutorial Problem — Full Pipeline Trace (No Forwarding)</h3>
+
+  <div class="key-box concept">
+    <div class="label">Problem Setup</div>
+    <table>
+      <tr><th>Instruction</th><th>Operation</th><th>Reads</th><th>Writes</th></tr>
+      <tr><td><strong>i1</strong></td><td>Load R1</td><td>—</td><td>R1</td></tr>
+      <tr><td><strong>i2</strong></td><td>R3 = R1 + R5</td><td>R1 (from i1 ⚠), R5 (valid)</td><td>R3</td></tr>
+      <tr><td><strong>i3</strong></td><td>Load R2</td><td>—</td><td>R2</td></tr>
+      <tr><td><strong>i4</strong></td><td>R4 = R3 + R2</td><td>R3 (from i2 ⚠), R2 (from i3 ⚠)</td><td>R4</td></tr>
+      <tr><td><strong>i5</strong></td><td>Jump &lt;label&gt;</td><td>— (target known at ID)</td><td>—</td></tr>
+      <tr><td><strong>ix</strong></td><td>R6 = R5 + R4</td><td>R5 (valid), R4 (from i4 ⚠)</td><td>R6</td></tr>
+    </table>
+    <p style="margin-top:10px;"><strong>Key rule (no forwarding + concurrent R/W):</strong> a register written in WB at cycle N can be read in ID at cycle N (same cycle). So: <code>ID of consumer ≥ WB of producer</code>.</p>
+  </div>
+
+  <!-- PART A -->
+  <div class="key-box important">
+    <div class="label">Part (a) — No Forwarding, SHARED Memory (DH + SH stalls)</div>
+
+    <p style="margin-bottom:6px;"><strong>Extra rule:</strong> IF and MEM use the same memory → cannot happen in the same cycle → structural hazard (SH).</p>
+    <p style="margin-bottom:6px;"><strong>Key insight:</strong> Independent instructions (no data dependency) <strong>can pass</strong> stalling instructions — but SH from shared memory blocks even independent instructions.</p>
+
+    <p style="margin-bottom:4px; color:var(--accent1);">i1 in MEM at CC4 → blocks fetch at CC4 + blocks i3 from advancing</p>
+    <p style="margin-bottom:10px; color:var(--accent1);">i2 in MEM at CC7 → blocks i5 from advancing</p>
+
+    <table class="pipeline-table">
+      <tr>
+        <th>Instr</th><th>CC1</th><th>CC2</th><th>CC3</th><th>CC4</th><th>CC5</th><th>CC6</th><th>CC7</th><th>CC8</th><th>CC9</th><th>CC10</th><th>CC11</th><th>CC12</th><th>CC13</th><th>CC14</th><th>CC15</th>
+      </tr>
+      <tr>
+        <td><strong>i1</strong> lw R1</td>
+        <td class="stage-if">IF</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td>
+      </tr>
+      <tr>
+        <td><strong>i2</strong> R3=R1+R5</td>
+        <td class="empty"></td><td class="stage-if">IF</td><td class="stall-dh">DH</td><td class="stall-dh">DH</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td>
+      </tr>
+      <tr>
+        <td><strong>i3</strong> lw R2</td>
+        <td class="empty"></td><td class="empty"></td><td class="stage-if">IF</td><td class="stall-sh">SH</td><td class="stall-sh">SH</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td>
+      </tr>
+      <tr>
+        <td><strong>i4</strong> R4=R3+R2</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="blocked">×SH</td><td class="stage-if">IF</td><td class="stall-dh">DH</td><td class="stall-dh">DH</td><td class="stall-dh">DH</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td>
+      </tr>
+      <tr>
+        <td><strong>i5</strong> Jump</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="stage-if">IF</td><td class="stall-sh">SH</td><td class="stage-id">ID</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td>
+      </tr>
+      <tr>
+        <td><strong>ix</strong> R6=R5+R4</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="stage-if">IF</td><td class="stall-dh">DH</td><td class="stall-dh">DH</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+      </tr>
+    </table>
+
+    <p style="margin-top:4px; font-size:0.8rem; color:var(--muted);">×SH = fetch blocked — i1 in MEM at CC4 uses shared memory, so no fetch possible at CC4</p>
+
+    <table style="margin-top:14px; font-size:0.88rem;">
+      <tr><th>Instr</th><th>Stalls</th><th>Type</th><th>Why</th></tr>
+      <tr><td>i2</td><td>2 (CC3,CC4)</td><td style="color:#ff6b6b;"><strong>DH</strong></td><td>Needs R1. i1 WB=CC5. i2 ID must be ≥ CC5 → 2 cycles late.</td></tr>
+      <tr><td>i3</td><td>2 (CC4,CC5)</td><td style="color:#7b7bff;"><strong>SH</strong></td><td>No data hazard. CC4: i1 in MEM (SH). CC5: i2 occupies ID stage.</td></tr>
+      <tr><td>i4</td><td>fetch blocked CC4 + 3 (CC6–8)</td><td style="color:#ff6b6b;"><strong>SH+DH</strong></td><td>Can't fetch CC4 (i1 MEM). Needs R3 (i2 WB=CC8) &amp; R2 (i3 WB=CC9) → ID at CC9.</td></tr>
+      <tr><td>i5</td><td>1 (CC7)</td><td style="color:#7b7bff;"><strong>SH</strong></td><td>Structural stall at CC7. Jump resolved at ID=CC8 → ix fetches CC9.</td></tr>
+      <tr><td>ix</td><td>2 (CC10,CC11)</td><td style="color:#ff6b6b;"><strong>DH</strong></td><td>Needs R4. i4 WB=CC12. ix fetches CC9 → ID must be CC12 → 2 DH stalls.</td></tr>
+    </table>
+  </div>
+
+  <!-- PART B -->
+  <div class="key-box concept">
+    <div class="label">Part (b) — No Forwarding, SEPARATE Memory (DH stalls only)</div>
+
+    <p style="margin-bottom:10px;">No structural hazard — IF and MEM can happen simultaneously. <strong>Key difference:</strong> independent instructions (i3, i5) <strong>pass</strong> stalling instructions (i2, i4) since they have no data dependency and no SH blocks them.</p>
+
+    <table class="pipeline-table">
+      <tr>
+        <th>Instr</th><th>CC1</th><th>CC2</th><th>CC3</th><th>CC4</th><th>CC5</th><th>CC6</th><th>CC7</th><th>CC8</th><th>CC9</th><th>CC10</th><th>CC11</th><th>CC12</th><th>CC13</th><th>CC14</th>
+      </tr>
+      <tr>
+        <td><strong>i1</strong> lw R1</td>
+        <td class="stage-if">IF</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td>
+      </tr>
+      <tr>
+        <td><strong>i2</strong> R3=R1+R5</td>
+        <td class="empty"></td><td class="stage-if">IF</td><td class="stall-dh">DH</td><td class="stall-dh">DH</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td>
+      </tr>
+      <tr>
+        <td><strong>i3</strong> lw R2</td>
+        <td class="empty"></td><td class="empty"></td><td class="stage-if">IF</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td>
+      </tr>
+      <tr>
+        <td><strong>i4</strong> R4=R3+R2</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="stage-if">IF</td><td class="stall-dh">DH</td><td class="stall-dh">DH</td><td class="stall-dh">DH</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td>
+      </tr>
+      <tr>
+        <td><strong>i5</strong> Jump</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="stage-if">IF</td><td class="stage-id">ID</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td>
+      </tr>
+      <tr>
+        <td><strong>ix</strong> R6=R5+R4</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="stage-if">IF</td><td class="stall-dh">DH</td><td class="stall-dh">DH</td><td class="stall-dh">DH</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+      </tr>
+    </table>
+
+    <table style="margin-top:14px; font-size:0.88rem;">
+      <tr><th>Instr</th><th>Stalls</th><th>Type</th><th>Why</th></tr>
+      <tr><td>i2</td><td>2 (CC3,CC4)</td><td style="color:#ff6b6b;"><strong>DH</strong></td><td>Same as Part (a). Needs R1, i1 WB=CC5.</td></tr>
+      <tr><td>i3</td><td style="color:var(--green);">0</td><td style="color:var(--green);">none</td><td>No dependency! Passes i2 (which is stalling). ID at CC4 freely.</td></tr>
+      <tr><td>i4</td><td>3 (CC5–CC7)</td><td style="color:#ff6b6b;"><strong>DH</strong></td><td>Needs R3 (i2 WB=CC8). Binding constraint → ID at CC8.</td></tr>
+      <tr><td>i5</td><td style="color:var(--green);">0</td><td style="color:var(--green);">none</td><td>No dependency! Passes i4 (which is stalling). Jump resolved at ID=CC6 → ix fetches CC7.</td></tr>
+      <tr><td>ix</td><td>3 (CC8–CC10)</td><td style="color:#ff6b6b;"><strong>DH</strong></td><td>Needs R4 (i4 WB=CC11). Concurrent R/W: ID at CC11. Fetches CC7 → 3 DH stalls.</td></tr>
+    </table>
+  </div>
+
+  <!-- PART III -->
+  <div class="key-box formula">
+    <div class="label">Part (iii) — WITH Forwarding, SHARED Memory</div>
+
+    <p style="margin-bottom:6px;">Forwarding eliminates most DH stalls. Only structural hazards (SH) from shared memory remain + rare load-use situations.</p>
+    <p style="margin-bottom:4px; color:var(--accent1);">i1 MEM at CC4 → SH. i2 MEM at CC5 → SH. i3 MEM at CC8 → SH. i4 MEM at CC9 → SH.</p>
+
+    <table class="pipeline-table">
+      <tr>
+        <th>Instr</th><th>CC1</th><th>CC2</th><th>CC3</th><th>CC4</th><th>CC5</th><th>CC6</th><th>CC7</th><th>CC8</th><th>CC9</th><th>CC10</th><th>CC11</th><th>CC12</th><th>CC13</th><th>CC14</th>
+      </tr>
+      <tr>
+        <td><strong>i1</strong> lw R1</td>
+        <td class="stage-if">IF</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td>
+      </tr>
+      <tr>
+        <td><strong>i2</strong> R3=R1+R5</td>
+        <td class="empty"></td><td class="stage-if">IF</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td>
+      </tr>
+      <tr>
+        <td><strong>i3</strong> lw R2</td>
+        <td class="empty"></td><td class="empty"></td><td class="stage-if">IF</td><td class="stall-sh">SH</td><td class="stall-sh">SH</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td>
+      </tr>
+      <tr>
+        <td><strong>i4</strong> R4=R3+R2</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="stage-if">IF</td><td class="stall-sh">SH</td><td class="stall-dh">DH</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td>
+      </tr>
+      <tr>
+        <td><strong>i5</strong> Jump</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="stage-if">IF</td><td class="stall-sh">SH</td><td class="stall-sh">SH</td><td class="stage-id">ID</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td>
+      </tr>
+      <tr>
+        <td><strong>ix</strong> R6=R5+R4</td>
+        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="blocked">×SH</td><td class="stage-if">IF</td><td class="stage-id">ID</td><td class="stage-ex">EX</td><td class="stage-mem">MEM</td><td class="stage-wb">WB</td>
+      </tr>
+    </table>
+
+    <table style="margin-top:14px; font-size:0.88rem;">
+      <tr><th>Instr</th><th>Stalls</th><th>Type</th><th>Why</th></tr>
+      <tr><td>i2</td><td style="color:var(--green);">0</td><td style="color:var(--green);">none</td><td>Forwarding: R1 forwarded from i1 MEM→i2 EX. No stall needed.</td></tr>
+      <tr><td>i3</td><td>2 (CC4,CC5)</td><td style="color:#7b7bff;"><strong>SH</strong></td><td>CC4: i1 in MEM (SH). CC5: i2 in MEM (SH). No data hazard.</td></tr>
+      <tr><td>i4</td><td>1 SH (CC5) + 1 DH (CC6)</td><td style="color:#7b7bff;"><strong>SH+DH</strong></td><td>CC5: i2 in MEM (SH). CC6: load-use from i3 (R2 forwarded from MEM→EX).</td></tr>
+      <tr><td>i5</td><td>2 (CC6,CC7)</td><td style="color:#7b7bff;"><strong>SH</strong></td><td>CC6: cascade from i4's stalls. CC7: i2 in MEM... no — i3 EX at CC7, so pipeline cascade.</td></tr>
+      <tr><td>ix</td><td>fetch blocked CC9</td><td style="color:#7b7bff;"><strong>SH</strong></td><td>i4 in MEM at CC9 → can't fetch. Fetches CC10. R4 forwarded from i4 → no DH.</td></tr>
+    </table>
+    <p style="margin-top:8px; color:var(--green);"><strong>Result: with forwarding, ix finishes at CC14</strong> (vs CC15 without forwarding). Forwarding saved many DH stalls.</p>
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">Part (a) vs Part (b) vs Part (iii) Comparison</div>
+    <table>
+      <tr><th></th><th>(a) No fwd, shared mem</th><th>(b) No fwd, separate mem</th><th>(iii) Fwd, shared mem</th></tr>
+      <tr><td>ix WB finishes at</td><td>CC15</td><td>CC14</td><td><strong>CC14</strong></td></tr>
+      <tr><td>i2 stalls</td><td>2 DH</td><td>2 DH</td><td><strong>0</strong></td></tr>
+      <tr><td>i3 stalls</td><td>2 SH</td><td>0</td><td>2 SH</td></tr>
+      <tr><td>i5 stalls</td><td>1 SH</td><td>0</td><td>2 SH</td></tr>
+    </table>
+    <p style="margin-top:8px; color:var(--yellow);">Forwarding eliminates data hazard stalls but <strong>cannot fix structural hazards</strong> from shared memory.</p>
+  </div>
 </div>
 
 <!-- ============================================ -->
@@ -3986,6 +4682,97 @@ Example: 128B cache, 16B blocks, 2-way set-associative
 
   <div class="key-box">
     <p>Storage occupies a lot of space and it is difficult to manage addresses &mdash; that's why we have a <strong>hierarchy</strong>: small-fast memory close to CPU, large-slow memory farther away. Caches use <strong>address mapping</strong> to store frequently used data from lower levels.</p>
+  </div>
+
+  <h3>The Three Cs of Cache Misses</h3>
+  <div class="three-col">
+    <div class="key-box important">
+      <h4 style="color:var(--accent1);">Compulsory (Cold)</h4>
+      <p>First access to a block — it was <strong>never in cache before</strong>. Unavoidable on the first access.</p>
+      <p>Also called <em>cold-start misses</em>.</p>
+      <p><strong>Fix:</strong> Larger block size (prefetch more data at once).</p>
+    </div>
+    <div class="key-box important">
+      <h4 style="color:var(--yellow);">Capacity</h4>
+      <p>Cache is <strong>too small</strong> to hold all the data the program needs. Even a fully-associative cache of the same size would miss.</p>
+      <p><strong>Fix:</strong> Bigger cache (more sets/ways).</p>
+    </div>
+    <div class="key-box important">
+      <h4 style="color:var(--cyan);">Conflict (Collision)</h4>
+      <p>Two blocks <strong>map to the same cache set</strong> and keep evicting each other, even though the cache has free space elsewhere.</p>
+      <p><strong>Fix:</strong> Higher associativity.</p>
+    </div>
+  </div>
+
+  <div class="key-box formula">
+    <div class="label">Multilevel Cache AMAT (from textbook Ch. 2)</div>
+    <pre>For a two-level cache (L1 + L2):
+
+AMAT = Hit_time_L1 + MR_L1 × (Hit_time_L2 + MR_L2 × Miss_penalty_main)
+
+Example:
+  L1 hit time = 1 cycle,   L1 miss rate = 5%
+  L2 hit time = 10 cycles, L2 miss rate = 50%
+  Main memory penalty = 200 cycles
+
+AMAT = 1 + 0.05 × (10 + 0.50 × 200)
+     = 1 + 0.05 × (10 + 100)
+     = 1 + 0.05 × 110
+     = 1 + 5.5 = <strong>6.5 cycles</strong>
+
+Note: Local miss rate = misses in that cache / accesses to that cache
+      Global miss rate = misses in that cache / total CPU memory accesses</pre>
+  </div>
+
+  <h3>6 Basic Cache Optimisations (textbook Ch. 2 / Appendix B)</h3>
+  <table>
+    <tr><th>#</th><th>Technique</th><th>What it reduces</th><th>Trade-off</th></tr>
+    <tr><td>1</td><td><strong>Larger block size</strong></td><td>Compulsory misses (spatial locality)</td><td>Increases miss penalty &amp; conflict misses</td></tr>
+    <tr><td>2</td><td><strong>Bigger cache</strong></td><td>Capacity misses</td><td>Longer hit time, more power</td></tr>
+    <tr><td>3</td><td><strong>Higher associativity</strong></td><td>Conflict misses</td><td>Longer hit time, complex hardware</td></tr>
+    <tr><td>4</td><td><strong>Multilevel caches</strong></td><td>Miss penalty (L2 serves many L1 misses)</td><td>Extra area and power</td></tr>
+    <tr><td>5</td><td><strong>Read priority over writes</strong></td><td>Miss penalty (reads not blocked by write buffer)</td><td>Needs write buffer</td></tr>
+    <tr><td>6</td><td><strong>Avoid address translation during indexing</strong></td><td>Hit time (index cache with page offset bits)</td><td>Cache size limited to page size × associativity</td></tr>
+  </table>
+
+  <h3>SRAM vs DRAM Technology</h3>
+  <div class="two-col">
+    <div class="key-box">
+      <h4 style="color:var(--cyan);">SRAM (Static RAM) — Cache</h4>
+      <ul>
+        <li><strong>6 transistors per bit</strong> (cross-coupled inverters)</li>
+        <li><strong>No refresh needed</strong> — holds state as long as power is on</li>
+        <li>Access time: <strong>~0.5–2.5 ns</strong></li>
+        <li>Expensive: ~$500–$1000/GB</li>
+        <li>Used for <strong>L1, L2, L3 caches</strong></li>
+      </ul>
+    </div>
+    <div class="key-box">
+      <h4 style="color:var(--green);">DRAM (Dynamic RAM) — Main Memory</h4>
+      <ul>
+        <li><strong>1 transistor + 1 capacitor per bit</strong></li>
+        <li><strong>Needs refresh every ~64 ms</strong> (charge leaks)</li>
+        <li>Access time: <strong>~50–70 ns</strong></li>
+        <li>Cheap: ~$2–$5/GB</li>
+        <li>Row/Column address strobe: <strong>RAS → CAS</strong></li>
+        <li>DDR4 = Double Data Rate, transfers on both clock edges</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="key-box exam">
+    <div class="label">Memory Technology at a Glance (textbook Figure 2.1 context)</div>
+    <table>
+      <tr><th>Level</th><th>Technology</th><th>Typical size</th><th>Latency</th><th>Bandwidth</th></tr>
+      <tr><td>Registers</td><td>Custom SRAM</td><td>~1 KB</td><td>&lt;1 ns</td><td>Very high</td></tr>
+      <tr><td>L1 Cache</td><td>SRAM</td><td>16–64 KB</td><td>~1 ns</td><td>High</td></tr>
+      <tr><td>L2 Cache</td><td>SRAM</td><td>256 KB–8 MB</td><td>~5 ns</td><td>Moderate-high</td></tr>
+      <tr><td>L3 Cache</td><td>SRAM</td><td>8–64 MB</td><td>~20 ns</td><td>Moderate</td></tr>
+      <tr><td>Main Memory</td><td>DRAM (DDR4)</td><td>4–128 GB</td><td>~60 ns</td><td>~50 GB/s</td></tr>
+      <tr><td>Flash/SSD</td><td>NAND Flash</td><td>256 GB–8 TB</td><td>~100 µs</td><td>~5 GB/s</td></tr>
+      <tr><td>HDD</td><td>Magnetic disk</td><td>1–20 TB</td><td>~5 ms</td><td>~200 MB/s</td></tr>
+    </table>
+    <p style="margin-top:8px; color:var(--yellow);">Key stat from textbook: Processor speed increased ~60%/year (1986–2003) while DRAM latency improved only ~9%/year — this is the <strong>processor-DRAM performance gap</strong> that makes caches necessary.</p>
   </div>
 </div>
 
@@ -4850,7 +5637,7 @@ Example: TLB hit rate=98%, TLB=1ns, Memory=100ns, Page table=100ns
   <details style="margin: 12px 0 30px 0;">
     <summary style="cursor:pointer; color: var(--green); font-weight:bold; padding:8px 0;">Show Solution</summary>
     <div class="key-box" style="border-color: var(--green); margin-top:8px;">
-      <p><strong>Given:</strong> V<sub>DD</sub> &isin; [0.7V, 1.2V], V<sub>t</sub> = 0.4V, N = 10&sup9; cycles</p>
+      <p><strong>Given:</strong> V<sub>DD</sub> &isin; [0.7V, 1.2V], V<sub>t</sub> = 0.4V, N = 10<sup>9</sup> cycles</p>
       <p>f<sub>max</sub> = 5(V<sub>DD</sub> &minus; 0.4)&sup2;/V<sub>DD</sub> GHz, &nbsp; P = &alpha;(V<sub>DD</sub>&sup2; &middot; f + 0.1 &middot; V<sub>DD</sub>)</p>
 
       <p><strong>Find &alpha;:</strong> At V<sub>DD</sub> = 1.2V: f<sub>max</sub> = 5(0.8)&sup2;/1.2 = 2.667 GHz</p>
@@ -4892,7 +5679,7 @@ Example: TLB hit rate=98%, TLB=1ns, Memory=100ns, Page table=100ns
       <p>At V<sub>DD</sub> = 0.8V: T = 1.0s exactly. E = <strong style="color:var(--yellow);">46.1 J</strong></p>
       <hr style="border-color:#333; margin:10px 0;">
 
-      <p><strong>(e) Two parallel processors (each runs N/2 = 5&times;10&sup8; cycles):</strong></p>
+      <p><strong>(e) Two parallel processors (each runs N/2 = 5&times;10<sup>8</sup> cycles):</strong></p>
       <p>Each processor: T<sub>each</sub> = (N/2)/f = T<sub>single</sub>/2, &nbsp; P<sub>total</sub> = 2 &times; P(V)</p>
       <p>E<sub>total</sub> = 2 &times; P(V) &times; T/2 = P(V) &times; T = same energy expression but at potentially lower V<sub>DD</sub></p>
 
@@ -4958,7 +5745,7 @@ Example: TLB hit rate=98%, TLB=1ns, Memory=100ns, Page table=100ns
     <ol type="a" style="margin-top:10px;">
       <li>What is the dynamic power ratio P<sub>B</sub>/P<sub>A</sub>?</li>
       <li>If static power is 40% of total for Processor A (I<sub>leak</sub> = 0.5A), what is the total power for each?</li>
-      <li>If a task takes 10&sup9; instructions and Processor A has CPI = 1.0 while Processor B has CPI = 1.2, which is more energy efficient for this task?</li>
+      <li>If a task takes 10<sup>9</sup> instructions and Processor A has CPI = 1.0 while Processor B has CPI = 1.2, which is more energy efficient for this task?</li>
     </ol>
   </div>
 
@@ -4981,8 +5768,8 @@ Example: TLB hit rate=98%, TLB=1ns, Memory=100ns, Page table=100ns
       <hr style="border-color:#333; margin:10px 0;">
 
       <p><strong>(c) Energy efficiency for task:</strong></p>
-      <p>T<sub>A</sub> = 10&sup9; &times; 1.0 / (4 &times; 10&sup9;) = 0.25s &rArr; E<sub>A</sub> = 1.25 &times; 0.25 = <strong>0.3125 J</strong></p>
-      <p>T<sub>B</sub> = 10&sup9; &times; 1.2 / (3 &times; 10&sup9;) = 0.4s &rArr; E<sub>B</sub> = 0.628 &times; 0.4 = <strong>0.251 J</strong></p>
+      <p>T<sub>A</sub> = 10<sup>9</sup> &times; 1.0 / (4 &times; 10<sup>9</sup>) = 0.25s &rArr; E<sub>A</sub> = 1.25 &times; 0.25 = <strong>0.3125 J</strong></p>
+      <p>T<sub>B</sub> = 10<sup>9</sup> &times; 1.2 / (3 &times; 10<sup>9</sup>) = 0.4s &rArr; E<sub>B</sub> = 0.628 &times; 0.4 = <strong>0.251 J</strong></p>
       <p><strong style="color:var(--yellow);">Processor B is more energy efficient</strong> (20% less energy), despite being slower.</p>
     </div>
   </details>
