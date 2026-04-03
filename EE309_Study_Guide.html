@@ -2955,89 +2955,56 @@ ori $s0, $s0, 40   ; Load lower 16 bits: $s0 = 0x00610028</pre>
     <p>The assembler uses register <code>$at</code> (<code>$1</code>) as a temporary register for these translations &mdash; that's why <code>$at</code> is reserved and you should never use it directly.</p>
   </div>
 
+  <h4 style="color:var(--cyan);">Data Movement</h4>
   <table>
-    <tr><th>Pseudo Instruction</th><th>Meaning</th><th>Translates To (Real Instructions)</th></tr>
-    <tr>
-      <td><code>move $t0, $t1</code></td>
-      <td>Copy $t1 into $t0</td>
-      <td><code>add $t0, $zero, $t1</code></td>
-    </tr>
-    <tr>
-      <td><code>li $t0, imm</code></td>
-      <td><strong>Load Immediate</strong> &mdash; load a constant into register</td>
-      <td>If imm fits in 16 bits: <code>addi $t0, $zero, imm</code><br>
-          If 32-bit: <code>lui $at, upper16</code> then <code>ori $t0, $at, lower16</code></td>
-    </tr>
-    <tr>
-      <td><code>la $t0, label</code></td>
-      <td><strong>Load Address</strong> &mdash; load a memory address into register</td>
-      <td><code>lui $at, upper16(label)</code> then <code>ori $t0, $at, lower16(label)</code></td>
-    </tr>
-    <tr>
-      <td><code>nop</code></td>
-      <td><strong>No Operation</strong> &mdash; do nothing</td>
-      <td><code>sll $zero, $zero, 0</code></td>
-    </tr>
-    <tr>
-      <td><code>blt $s0, $s1, L</code></td>
-      <td><strong>Branch if Less Than</strong></td>
-      <td><code>slt $at, $s0, $s1</code> then <code>bne $at, $zero, L</code></td>
-    </tr>
-    <tr>
-      <td><code>ble $s0, $s1, L</code></td>
-      <td><strong>Branch if Less or Equal</strong></td>
-      <td><code>slt $at, $s1, $s0</code> then <code>beq $at, $zero, L</code></td>
-    </tr>
-    <tr>
-      <td><code>bgt $s0, $s1, L</code></td>
-      <td><strong>Branch if Greater Than</strong></td>
-      <td><code>slt $at, $s1, $s0</code> then <code>bne $at, $zero, L</code></td>
-    </tr>
-    <tr>
-      <td><code>bge $s0, $s1, L</code></td>
-      <td><strong>Branch if Greater or Equal</strong></td>
-      <td><code>slt $at, $s0, $s1</code> then <code>beq $at, $zero, L</code></td>
-    </tr>
-    <tr>
-      <td><code>not $t0, $t1</code></td>
-      <td><strong>Bitwise NOT</strong></td>
-      <td><code>nor $t0, $t1, $zero</code></td>
-    </tr>
-    <tr>
-      <td><code>neg $t0, $t1</code></td>
-      <td><strong>Negate</strong> (2's complement)</td>
-      <td><code>sub $t0, $zero, $t1</code></td>
-    </tr>
-    <tr>
-      <td><code>abs $t0, $t1</code></td>
-      <td><strong>Absolute Value</strong></td>
-      <td><code>slt $at, $t1, $zero</code> &rarr; <code>beq $at, $zero, +1</code> &rarr; <code>sub $t0, $zero, $t1</code></td>
-    </tr>
-    <tr>
-      <td><code>mul $t0, $s0, $s1</code></td>
-      <td><strong>Multiply</strong> (result in register)</td>
-      <td><code>mult $s0, $s1</code> then <code>mflo $t0</code></td>
-    </tr>
-    <tr>
-      <td><code>div $t0, $s0, $s1</code></td>
-      <td><strong>Divide</strong> (quotient in register)</td>
-      <td><code>div $s0, $s1</code> then <code>mflo $t0</code></td>
-    </tr>
-    <tr>
-      <td><code>rem $t0, $s0, $s1</code></td>
-      <td><strong>Remainder</strong></td>
-      <td><code>div $s0, $s1</code> then <code>mfhi $t0</code></td>
-    </tr>
-    <tr>
-      <td><code>lw $t0, addr32</code></td>
-      <td><strong>Load Word</strong> from 32-bit address</td>
-      <td><code>lui $at, upper16(addr)</code> then <code>lw $t0, lower16(addr)($at)</code></td>
-    </tr>
-    <tr>
-      <td><code>sw $t0, addr32</code></td>
-      <td><strong>Store Word</strong> to 32-bit address</td>
-      <td><code>lui $at, upper16(addr)</code> then <code>sw $t0, lower16(addr)($at)</code></td>
-    </tr>
+    <tr><th>Pseudo</th><th>Meaning</th><th>#</th><th>Decomposition (Real Instructions)</th></tr>
+    <tr><td><code>move $t0, $t1</code></td><td>Copy register</td><td>1</td><td><code>addu $t0, $zero, $t1</code></td></tr>
+    <tr><td><code>li $t0, small</code></td><td>Load small imm (fits 16 bits)</td><td>1</td><td><code>addiu $t0, $zero, small</code></td></tr>
+    <tr><td><code>li $t0, big</code></td><td>Load 32-bit constant</td><td>2</td><td><code>lui $at, upper16</code><br><code>ori $t0, $at, lower16</code></td></tr>
+    <tr><td><code>la $t0, label</code></td><td>Load 32-bit address</td><td>2</td><td><code>lui $at, upper16(label)</code><br><code>ori $t0, $at, lower16(label)</code></td></tr>
+    <tr><td><code>lw $t0, addr32</code></td><td>Load word (32-bit addr)</td><td>2</td><td><code>lui $at, upper16(addr)</code><br><code>lw $t0, lower16(addr)($at)</code></td></tr>
+    <tr><td><code>sw $t0, addr32</code></td><td>Store word (32-bit addr)</td><td>2</td><td><code>lui $at, upper16(addr)</code><br><code>sw $t0, lower16(addr)($at)</code></td></tr>
+    <tr><td><code>nop</code></td><td>No operation</td><td>1</td><td><code>sll $zero, $zero, 0</code> (= 0x00000000)</td></tr>
+  </table>
+
+  <h4 style="color:var(--cyan); margin-top:16px;">Arithmetic &amp; Logic</h4>
+  <table>
+    <tr><th>Pseudo</th><th>Meaning</th><th>#</th><th>Decomposition</th></tr>
+    <tr><td><code>not $t0, $t1</code></td><td>Bitwise NOT</td><td>1</td><td><code>nor $t0, $t1, $zero</code></td></tr>
+    <tr><td><code>neg $t0, $t1</code></td><td>Negate (2's complement)</td><td>1</td><td><code>sub $t0, $zero, $t1</code></td></tr>
+    <tr><td><code>negu $t0, $t1</code></td><td>Negate unsigned</td><td>1</td><td><code>subu $t0, $zero, $t1</code></td></tr>
+    <tr><td><code>abs $t0, $t1</code></td><td>Absolute value</td><td>3</td><td><code>slt $at, $t1, $zero</code><br><code>beq $at, $zero, +1</code><br><code>sub $t0, $zero, $t1</code></td></tr>
+    <tr><td><code>mul $t0, $s0, $s1</code></td><td>Multiply (low 32 bits)</td><td>2</td><td><code>mult $s0, $s1</code><br><code>mflo $t0</code></td></tr>
+    <tr><td><code>div $t0, $s0, $s1</code></td><td>Divide (quotient)</td><td>2</td><td><code>div $s0, $s1</code><br><code>mflo $t0</code></td></tr>
+    <tr><td><code>rem $t0, $s0, $s1</code></td><td>Remainder</td><td>2</td><td><code>div $s0, $s1</code><br><code>mfhi $t0</code></td></tr>
+    <tr><td><code>subi $t0, $s0, imm</code></td><td>Subtract immediate</td><td>1</td><td><code>addi $t0, $s0, -imm</code></td></tr>
+  </table>
+
+  <h4 style="color:var(--cyan); margin-top:16px;">Branch Pseudos (MIPS only has <code>beq</code>, <code>bne</code> in hardware)</h4>
+  <table>
+    <tr><th>Pseudo</th><th>Condition</th><th>#</th><th>Decomposition</th><th>Logic</th></tr>
+    <tr><td><code>blt $s, $t, L</code></td><td>s &lt; t</td><td>2</td><td><code>slt $at, $s, $t</code><br><code>bne $at, $zero, L</code></td><td>at=1 if s&lt;t, branch if at≠0</td></tr>
+    <tr><td><code>ble $s, $t, L</code></td><td>s ≤ t</td><td>2</td><td><code>slt $at, $t, $s</code><br><code>beq $at, $zero, L</code></td><td>at=1 if t&lt;s (i.e. s&gt;t). Branch if NOT s&gt;t → s≤t</td></tr>
+    <tr><td><code>bgt $s, $t, L</code></td><td>s &gt; t</td><td>2</td><td><code>slt $at, $t, $s</code><br><code>bne $at, $zero, L</code></td><td>at=1 if t&lt;s (i.e. s&gt;t), branch if at≠0</td></tr>
+    <tr><td><code>bge $s, $t, L</code></td><td>s ≥ t</td><td>2</td><td><code>slt $at, $s, $t</code><br><code>beq $at, $zero, L</code></td><td>at=1 if s&lt;t. Branch if NOT s&lt;t → s≥t</td></tr>
+    <tr><td><code>bltu $s, $t, L</code></td><td>s &lt; t (unsigned)</td><td>2</td><td><code>sltu $at, $s, $t</code><br><code>bne $at, $zero, L</code></td><td>Same as blt but unsigned compare</td></tr>
+    <tr><td><code>bleu $s, $t, L</code></td><td>s ≤ t (unsigned)</td><td>2</td><td><code>sltu $at, $t, $s</code><br><code>beq $at, $zero, L</code></td><td>Same as ble but unsigned compare</td></tr>
+    <tr><td><code>bgtu $s, $t, L</code></td><td>s &gt; t (unsigned)</td><td>2</td><td><code>sltu $at, $t, $s</code><br><code>bne $at, $zero, L</code></td><td>Same as bgt but unsigned compare</td></tr>
+    <tr><td><code>bgeu $s, $t, L</code></td><td>s ≥ t (unsigned)</td><td>2</td><td><code>sltu $at, $s, $t</code><br><code>beq $at, $zero, L</code></td><td>Same as bge but unsigned compare</td></tr>
+    <tr><td><code>beqz $s, L</code></td><td>s == 0</td><td>1</td><td><code>beq $s, $zero, L</code></td><td></td></tr>
+    <tr><td><code>bnez $s, L</code></td><td>s ≠ 0</td><td>1</td><td><code>bne $s, $zero, L</code></td><td></td></tr>
+    <tr><td><code>bgez $s, L</code></td><td>s ≥ 0</td><td>1</td><td><code>bgez $s, L</code> (real instruction in MIPS!)</td><td>Hardware supported</td></tr>
+    <tr><td><code>bltz $s, L</code></td><td>s &lt; 0</td><td>1</td><td><code>bltz $s, L</code> (real instruction in MIPS!)</td><td>Hardware supported</td></tr>
+  </table>
+
+  <h4 style="color:var(--cyan); margin-top:16px;">Set Pseudos (MIPS only has <code>slt</code>, <code>slti</code>, <code>sltu</code>, <code>sltiu</code> in hardware)</h4>
+  <table>
+    <tr><th>Pseudo</th><th>Condition</th><th>#</th><th>Decomposition</th></tr>
+    <tr><td><code>seq $d, $s, $t</code></td><td>d = (s == t)</td><td>2</td><td><code>subu $at, $s, $t</code><br><code>sltiu $d, $at, 1</code> &nbsp;(d=1 if diff&lt;1, i.e. diff==0)</td></tr>
+    <tr><td><code>sne $d, $s, $t</code></td><td>d = (s ≠ t)</td><td>3</td><td><code>subu $at, $s, $t</code><br><code>sltu $d, $zero, $at</code> &nbsp;(d=1 if 0&lt;diff, i.e. diff≠0)</td></tr>
+    <tr><td><code>sge $d, $s, $t</code></td><td>d = (s ≥ t)</td><td>2</td><td><code>slt $at, $s, $t</code><br><code>xori $d, $at, 1</code> &nbsp;(flip: NOT less-than = greater-or-equal)</td></tr>
+    <tr><td><code>sgt $d, $s, $t</code></td><td>d = (s &gt; t)</td><td>1</td><td><code>slt $d, $t, $s</code> &nbsp;(swap operands: t&lt;s means s&gt;t)</td></tr>
+    <tr><td><code>sle $d, $s, $t</code></td><td>d = (s ≤ t)</td><td>2</td><td><code>slt $at, $t, $s</code><br><code>xori $d, $at, 1</code> &nbsp;(NOT greater-than = less-or-equal)</td></tr>
   </table>
 
   <div class="key-box exam">
@@ -3065,21 +3032,19 @@ ori $s0, $s0, 40   ; Load lower 16 bits: $s0 = 0x00610028</pre>
           <li><code>la</code> &mdash; <strong>Load Address</strong></li>
           <li><code>move</code> &mdash; <strong>Move (copy register)</strong></li>
           <li><code>nop</code> &mdash; <strong>No Operation</strong></li>
-          <li><code>blt</code> &mdash; <strong>Branch if Less Than</strong></li>
-          <li><code>ble</code> &mdash; <strong>Branch if Less or Equal</strong></li>
-          <li><code>bgt</code> &mdash; <strong>Branch if Greater Than</strong></li>
+          <li><code>blt/ble/bgt/bge</code> &mdash; <strong>Branch comparisons (signed)</strong></li>
+          <li><code>bltu/bleu/bgtu/bgeu</code> &mdash; <strong>Branch comparisons (unsigned)</strong></li>
+          <li><code>beqz/bnez</code> &mdash; <strong>Branch if (not) zero</strong></li>
           <li><code>bge</code> &mdash; <strong>Branch if Greater or Equal</strong></li>
         </ul>
       </div>
       <div>
         <ul>
-          <li><code>not</code> &mdash; <strong>Bitwise NOT</strong></li>
-          <li><code>neg</code> &mdash; <strong>Negate</strong></li>
-          <li><code>abs</code> &mdash; <strong>Absolute Value</strong></li>
-          <li><code>mul</code> &mdash; <strong>Multiply (to register)</strong></li>
-          <li><code>div</code> &mdash; <strong>Divide (quotient to register)</strong></li>
-          <li><code>rem</code> &mdash; <strong>Remainder</strong></li>
-          <li><code>$at</code> &mdash; <strong>Assembler Temporary ($1)</strong></li>
+          <li><code>not/neg/negu/abs</code> &mdash; <strong>NOT, Negate, Abs</strong></li>
+          <li><code>mul/div/rem</code> &mdash; <strong>Multiply, Divide, Remainder</strong></li>
+          <li><code>subi</code> &mdash; <strong>Subtract Immediate</strong></li>
+          <li><code>seq/sne/sge/sgt/sle</code> &mdash; <strong>Set on condition</strong></li>
+          <li><code>$at</code> &mdash; <strong>Assembler Temporary ($1) — reserved</strong></li>
         </ul>
       </div>
     </div>
