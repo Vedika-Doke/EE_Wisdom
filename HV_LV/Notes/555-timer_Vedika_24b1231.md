@@ -9,7 +9,7 @@ The basic 555 timer gets its name from the fact that there are three internally 
 - Pin 3 is the output
 
 ## Key points
-- Vcc voltage is divided using resistors and a voltage of (2/3)Vcc is applied at the inverting termina of the upper comparator and a voltage of (1/3) Vcc is applied at the non-inverting terminal of the lower comparator.
+- Vcc voltage is divided using resistors and a voltage of (2/3)Vcc is applied at the inverting terminal of the upper comparator and a voltage of (1/3) Vcc is applied at the non-inverting terminal of the lower comparator.
   - A comparator gives HIGH output if the voltage at non-inverting terminal surpasses the voltage at the inverting terminal of the comparator.
 - The output from the comparator goes as input to the RS flip-flop attached.
   - ![TTforRS](https://drive.google.com/uc?export=view&id=1wm2tee6MkKIdn_jQ-iHMQoeVoQ4rHN4M)
@@ -40,7 +40,7 @@ When trigger signal is applied, the output signal changes, which further initiat
 ![MonoGraph](https://drive.google.com/uc?export=view&id=1CVJ84kkuEfTKlLk3yw-7k2RK3wU6Fna7)
 - The time duration of this pulse (T) is given as T = 1.1 * R1 * C1
 - A Monostable Multivibrator using 555 Timer can be used for frequency division.
-  - It is important to note that the time period between two trigger signals must be greater than the time period of the output pulse.
+  - It is important to note that the time period between two trigger signals must be less than the time period of the output pulse.
   - ![FrequencyDivision](https://drive.google.com/uc?export=view&id=1N-5myDXvdzHkf1HqA4G5-tybZJ1L_VkT)
 
 ### Bistable Multivibrator:
