@@ -872,50 +872,268 @@ index = ((<span class="kw">unsigned char</span>)(phase &gt;&gt; <span class="num
   messy signal. This is what the FFT does on the scope &mdash; but we need to do it
   digitally on the 8051 using ADC samples.</p>
 
-  <h3>The Solution: I/Q Coherent Detection</h3>
-  <p>This is essentially a <strong>digital lock-in amplifier</strong> or a <strong>single-bin DFT</strong>.
-  For each frequency we care about, we multiply the signal by cos and sin at that frequency,
-  then sum over many samples. If the signal contains that frequency, the sum grows large.
-  If not, it averages to zero.</p>
+  <h3>The Core Idea: Correlation</h3>
 
   <div class="card explain">
-    <strong>Step by step for one frequency f<sub>k</sub>:</strong>
+    <strong>Intuition with a physical analogy:</strong>
+    <br><br>
+    Imagine you're in a noisy room and you want to know if someone is clapping at exactly 2 claps per second.
+    You can't just listen &mdash; there's too much noise. But you CAN do this:
     <ol>
-      <li>Sample the signal N times at rate F<sub>s</sub></li>
-      <li>For each sample x[n], multiply by cos(2&pi;f<sub>k</sub>n/F<sub>s</sub>) and accumulate &rarr; <strong>I<sub>k</sub></strong></li>
-      <li>For each sample x[n], multiply by sin(2&pi;f<sub>k</sub>n/F<sub>s</sub>) and accumulate &rarr; <strong>Q<sub>k</sub></strong></li>
-      <li>Amplitude = (2/N) &times; &radic;(I<sub>k</sub><sup>2</sup> + Q<sub>k</sub><sup>2</sup>)</li>
+      <li>Start a metronome at exactly 2 beats per second.</li>
+      <li>Every time the metronome ticks, check if you hear a clap at that exact moment.</li>
+      <li>If yes, add +1 to your score. If no, add 0.</li>
+      <li>After 100 metronome ticks, if your score is high, someone IS clapping at 2/sec.</li>
+      <li>If your score is near zero, the clapping (if any) is at a different rate.</li>
     </ol>
-    <strong>Why both cos and sin?</strong> Because the signal's phase is unknown.
-    If the signal happens to be sin-aligned, the cosine correlation gives zero and vice versa.
-    Using both and combining with &radic;(I&sup2;+Q&sup2;) gives the amplitude regardless of phase.
+    This is <strong>correlation</strong> &mdash; comparing your signal against a known reference pattern.
+    If they match, the score accumulates. If they don't, positive and negative contributions cancel out.
+    <br><br>
+    <strong>Our version:</strong> instead of a metronome, we use cos and sin waves at the target frequency.
+    Instead of claps, we use ADC samples. The "score" is the accumulated product.
+  </div>
+
+  <h3>The Math: I/Q Coherent Detection</h3>
+
+  <p>This technique is also called a <strong>digital lock-in amplifier</strong> or <strong>single-bin DFT</strong>.
+  For each frequency f<sub>k</sub> we want to measure:</p>
+
+  <div class="math">
+    <strong>Step 1: Correlate with cosine</strong>
+    <br>
+    <span class="var">I<sub>k</sub></span> <span class="eq">=</span> x[0]&middot;cos(0) + x[1]&middot;cos(2&pi;f<sub>k</sub>/F<sub>s</sub>) + x[2]&middot;cos(4&pi;f<sub>k</sub>/F<sub>s</sub>) + &hellip; + x[N-1]&middot;cos(2&pi;f<sub>k</sub>(N-1)/F<sub>s</sub>)
+    <br><br>
+    <strong>Step 2: Correlate with sine</strong>
+    <br>
+    <span class="var">Q<sub>k</sub></span> <span class="eq">=</span> x[0]&middot;sin(0) + x[1]&middot;sin(2&pi;f<sub>k</sub>/F<sub>s</sub>) + x[2]&middot;sin(4&pi;f<sub>k</sub>/F<sub>s</sub>) + &hellip; + x[N-1]&middot;sin(2&pi;f<sub>k</sub>(N-1)/F<sub>s</sub>)
+    <br><br>
+    <strong>Step 3: Combine</strong>
+    <br>
+    <span class="var">A<sub>k</sub></span> <span class="eq">=</span> (2/N) &middot; &radic;(I<sub>k</sub><sup>2</sup> + Q<sub>k</sub><sup>2</sup>)
+  </div>
+
+  <h3>Why We Need Both I and Q</h3>
+
+  <div class="card explain">
+    <strong>The phase problem:</strong> After the signal goes through the diode, wires, and ADC, we don't
+    know its exact phase. Consider two cases:
+    <br><br>
+    <strong>Case 1:</strong> Signal is cos(2&pi;&middot;410&middot;t). Correlating with cos gives a large I.
+    Correlating with sin gives Q &asymp; 0 (cos and sin are orthogonal). Amplitude = &radic;(I<sup>2</sup>+0) = |I|. Correct.
+    <br><br>
+    <strong>Case 2:</strong> Signal is sin(2&pi;&middot;410&middot;t) (90&deg; phase shifted). Correlating with cos
+    gives I &asymp; 0. Correlating with sin gives a large Q. Amplitude = &radic;(0+Q<sup>2</sup>) = |Q|. Still correct.
+    <br><br>
+    <strong>Case 3:</strong> Signal is 0.7&middot;cos + 0.7&middot;sin (45&deg; shifted). I = 0.7, Q = 0.7.
+    Amplitude = &radic;(0.49+0.49) = 1.0. Correct again!
+    <br><br>
+    By computing <strong>both</strong> correlations and combining with &radic;(I<sup>2</sup>+Q<sup>2</sup>),
+    we get the amplitude <strong>regardless of phase</strong>. This is the key insight.
+  </div>
+
+  <h3>Why Other Frequencies Don't Interfere (Orthogonality)</h3>
+
+  <div class="card explain">
+    <strong>The magic:</strong> If the signal contains a tone at 470 Hz and we correlate with a 410 Hz
+    reference, the products sometimes positive, sometimes negative, and they <strong>cancel out to zero</strong>
+    over a complete window &mdash; as long as the window contains an integer number of cycles of BOTH frequencies.
+    <br><br>
+    This is the <strong>orthogonality of sinusoids</strong>:
+    <br>
+    &Sigma; cos(2&pi;&middot;f<sub>1</sub>&middot;n/F<sub>s</sub>) &middot; cos(2&pi;&middot;f<sub>2</sub>&middot;n/F<sub>s</sub>) = 0 &ensp; when f<sub>1</sub> &ne; f<sub>2</sub> and both fit integer cycles in N samples.
+    <br><br>
+    This is why our measurement is <strong>selective</strong>: each correlation only "sees" its own frequency
+    and is blind to all others. It's like having a radio tuner that only picks up one station.
+  </div>
+
+  <h3>Concrete Example: Measuring the 60 Hz Tone</h3>
+
+  <p>Suppose our ADC samples the signal at 4800 Hz. We want to find the amplitude of the 60 Hz component
+  (the f<sub>2</sub>&minus;f<sub>1</sub> intermodulation product).</p>
+
+  <table>
+    <tr><th>Step</th><th>What Happens</th><th>Numbers</th></tr>
+    <tr>
+      <td><span class="step-num">1</span></td>
+      <td>Precompute a cosine reference table at 60 Hz, sampled at 4800 Hz.
+      One cycle of 60 Hz = 4800/60 = 80 samples. Over 480 samples, we get exactly 6 complete cycles.</td>
+      <td>cos_ref[n] = cos(2&pi;&middot;60&middot;n/4800) for n = 0..479</td>
+    </tr>
+    <tr>
+      <td><span class="step-num">2</span></td>
+      <td>Precompute a sine reference table at 60 Hz, same rate.</td>
+      <td>sin_ref[n] = sin(2&pi;&middot;60&middot;n/4800) for n = 0..479</td>
+    </tr>
+    <tr>
+      <td><span class="step-num">3</span></td>
+      <td>For each ADC sample x[n], multiply by cos_ref[n] and accumulate into I.</td>
+      <td>I += x[n] &times; cos_ref[n]</td>
+    </tr>
+    <tr>
+      <td><span class="step-num">4</span></td>
+      <td>For each ADC sample x[n], multiply by sin_ref[n] and accumulate into Q.</td>
+      <td>Q += x[n] &times; sin_ref[n]</td>
+    </tr>
+    <tr>
+      <td><span class="step-num">5</span></td>
+      <td>After 480 samples, compute magnitude.</td>
+      <td>A<sub>60</sub> = (2/480) &times; &radic;(I<sup>2</sup> + Q<sup>2</sup>)</td>
+    </tr>
+  </table>
+
+  <p>Repeat the same process with reference tables at 350, 410, and 470 Hz to get all four amplitudes.</p>
+
+  <h3>The Simpler Special Case (From the Problem Statement)</h3>
+
+  <div class="card explain">
+    <strong>The problem statement's shortcut:</strong> "If you sample cos(2&pi;f<sub>m</sub>t) at 1.2 kHz where
+    f<sub>m</sub> = 600 Hz, multiply alternate samples with +1 and -1, add and average them, you can find
+    the amplitude of the 600 Hz tone."
+    <br><br>
+    <strong>Why this works:</strong> When F<sub>s</sub> = 2 &times; f<sub>target</sub> (exactly twice the target frequency),
+    the cosine reference simplifies to just +1, -1, +1, -1, &hellip; The sine reference is always 0. So you
+    don't need a LUT at all &mdash; just alternate the sign of each sample and sum.
+    <br><br>
+    <strong>Limitation:</strong> This trick only works for ONE frequency at a time (you need F<sub>s</sub> = 2&times;f).
+    Since we have 4 different frequencies (60, 350, 410, 470), we'd need to change F<sub>s</sub> four times
+    and take four separate measurements. The I/Q approach with a single higher F<sub>s</sub> measures all
+    four in one pass.
+    <br><br>
+    <strong>Phase alignment:</strong> The +1/-1 trick assumes you start sampling at the peak of the cosine
+    (phase = 0). If the phase is unknown (which it is after the non-linear circuit), you need to sample
+    at 4 &times; f<sub>target</sub> instead of 2&times;, and compute both I and Q:
+    <br>
+    &emsp; Samples at 4&times;f: s0, s1, s2, s3, s4, s5, s6, s7, &hellip;
+    <br>
+    &emsp; I = (s0 - s2 + s4 - s6 + &hellip;) &ensp; &larr; multiply by +1, 0, -1, 0, +1, 0, -1, 0, &hellip;
+    <br>
+    &emsp; Q = (s1 - s3 + s5 - s7 + &hellip;) &ensp; &larr; multiply by 0, +1, 0, -1, 0, +1, 0, -1, &hellip;
+    <br>
+    &emsp; A = (2/N) &times; &radic;(I<sup>2</sup> + Q<sup>2</sup>)
   </div>
 
   <h3>Measurement Parameters</h3>
   <table>
     <tr><th>Parameter</th><th>Value</th><th>Why This Value</th></tr>
     <tr>
-      <td>F<sub>s</sub> (ADC rate)</td>
+      <td>F<sub>s</sub> (ADC sample rate)</td>
       <td>4,800 Hz</td>
-      <td>Well above Nyquist for 470 Hz. All 4 target frequencies fit integer cycles in the window (critical for accuracy).</td>
+      <td>Well above Nyquist for 470 Hz (need &gt; 940 Hz). Chosen so all 4 target frequencies
+      fit integer cycles in the measurement window. Also feasible on 8051 with hardware SPI
+      (ADC read takes ~15 &mu;s, budget is 208 &mu;s per sample).</td>
     </tr>
     <tr>
-      <td>N (window)</td>
+      <td>N (window length)</td>
       <td>480 samples</td>
-      <td>Window duration = 100 ms. Integer cycles: 60&times;100ms=6, 350&times;100ms=35, 410&times;100ms=41, 470&times;100ms=47.</td>
+      <td>Window = 480/4800 = <strong>100 ms</strong>. Check integer cycles for each target:</td>
     </tr>
   </table>
 
+  <table>
+    <tr><th>Target Frequency</th><th>Cycles in 100 ms</th><th>Integer?</th><th>Calc: f &times; 0.1s</th></tr>
+    <tr><td>60 Hz</td><td>6</td><td style="color:var(--ok);">Yes</td><td>60 &times; 0.1 = 6.0</td></tr>
+    <tr><td>350 Hz</td><td>35</td><td style="color:var(--ok);">Yes</td><td>350 &times; 0.1 = 35.0</td></tr>
+    <tr><td>410 Hz</td><td>41</td><td style="color:var(--ok);">Yes</td><td>410 &times; 0.1 = 41.0</td></tr>
+    <tr><td>470 Hz</td><td>47</td><td style="color:var(--ok);">Yes</td><td>470 &times; 0.1 = 47.0</td></tr>
+  </table>
+
   <div class="card info">
-    <strong>Why integer cycles matter:</strong> If the window doesn't contain an exact integer number of cycles
-    of f<sub>k</sub>, the correlation "leaks" &mdash; a non-zero result appears even when the tone isn't present.
-    With integer cycles, the orthogonality of sines guarantees clean separation between frequencies.
+    <strong>Why integer cycles are critical:</strong> If f<sub>k</sub> &times; (N/F<sub>s</sub>) is NOT an integer,
+    the correlator "leaks" &mdash; it reports a non-zero amplitude even when that frequency isn't present.
+    This is called <strong>spectral leakage</strong>. By choosing F<sub>s</sub> = 4800 and N = 480 (giving
+    a 100 ms window), ALL four target frequencies fit exact integer cycles, so each measurement bin is
+    perfectly selective with zero leakage. This is the same principle behind <strong>coherent sampling</strong>
+    in ADC testing.
   </div>
 
-  <div class="card">
-    <strong>Phase 5 code will be added here once Phases 1&ndash;3 are verified on the scope.</strong>
-    The implementation uses precomputed 8-bit cos/sin tables (one per target frequency),
-    16-bit multiply-accumulate in the ISR, and 32-bit magnitude computation in main().
+  <h3>Implementation on the 8051</h3>
+
+  <p>The cos/sin reference values are precomputed and stored in flash (<code>code</code> memory).
+  For each target frequency, we need a table of 480 values &mdash; but since the pattern repeats every
+  cycle, we only store one cycle and wrap the index:</p>
+
+  <table>
+    <tr><th>Frequency</th><th>Samples per cycle</th><th>LUT size needed</th></tr>
+    <tr><td>60 Hz</td><td>4800/60 = 80</td><td>80 entries &times; 2 (cos+sin) = 160 bytes</td></tr>
+    <tr><td>350 Hz</td><td>4800/350 &asymp; 13.7</td><td>480 entries (no clean repeat) &times; 2 = 960 bytes</td></tr>
+    <tr><td>410 Hz</td><td>4800/410 &asymp; 11.7</td><td>480 entries &times; 2 = 960 bytes</td></tr>
+    <tr><td>470 Hz</td><td>4800/470 &asymp; 10.2</td><td>480 entries &times; 2 = 960 bytes</td></tr>
+  </table>
+
+  <p>Alternative: use the same NCO trick as the signal generator &mdash; a single 32-entry sine LUT with
+  per-frequency phase accumulators. Each tick, advance the phase and look up cos/sin. This reduces
+  memory to just 32 bytes for the shared LUT, at the cost of a few extra cycles per sample.</p>
+
+  <h3>Pseudocode</h3>
+  <pre><span class="cm">/* Measurement state */</span>
+<span class="kw">long</span> I[<span class="num">4</span>] = {<span class="num">0</span>};     <span class="cm">/* cosine accumulators for 60, 350, 410, 470 Hz */</span>
+<span class="kw">long</span> Q[<span class="num">4</span>] = {<span class="num">0</span>};     <span class="cm">/* sine accumulators */</span>
+<span class="kw">unsigned int</span> meas_phase[<span class="num">4</span>] = {<span class="num">0</span>};   <span class="cm">/* NCO phase per target freq */</span>
+<span class="kw">unsigned int</span> sample_count = <span class="num">0</span>;
+
+<span class="cm">/* Phase increments for measurement NCO at Fs=4800 Hz:
+   delta = round(65536 * f / 4800)
+   60 Hz  -> 819
+   350 Hz -> 4779
+   410 Hz -> 5598
+   470 Hz -> 6417 */</span>
+<span class="kw">code unsigned int</span> meas_inc[<span class="num">4</span>] = { <span class="num">819</span>, <span class="num">4779</span>, <span class="num">5598</span>, <span class="num">6417</span> };
+
+<span class="cm">/* Called from ADC Timer ISR every 208 us (4800 Hz) */</span>
+<span class="kw">void</span> <span class="fn">process_sample</span>(<span class="kw">unsigned int</span> adc_val) {
+    <span class="kw">signed int</span> x = (<span class="kw">signed int</span>)adc_val - <span class="num">512</span>;   <span class="cm">/* remove DC offset */</span>
+    <span class="kw">signed char</span> cos_val, sin_val;
+    <span class="kw">unsigned char</span> idx;
+    <span class="kw">int</span> i;
+
+    <span class="kw">for</span> (i = <span class="num">0</span>; i &lt; <span class="num">4</span>; i++) {
+        meas_phase[i] += meas_inc[i];
+        idx = ((<span class="kw">unsigned char</span>)(meas_phase[i] &gt;&gt; <span class="num">8</span>)) &gt;&gt; <span class="num">3</span>;
+
+        <span class="cm">/* cos = sine shifted by 8 entries (90 degrees in 32-entry table) */</span>
+        cos_val = (<span class="kw">signed char</span>)(sine32[(idx + <span class="num">8</span>) &amp; <span class="num">31</span>]) - <span class="num">128</span>;
+        sin_val = (<span class="kw">signed char</span>)(sine32[idx]) - <span class="num">128</span>;
+
+        I[i] += (<span class="kw">long</span>)x * cos_val;   <span class="cm">/* multiply-accumulate */</span>
+        Q[i] += (<span class="kw">long</span>)x * sin_val;
+    }
+
+    <span class="kw">if</span> (++sample_count &gt;= <span class="num">480</span>) {
+        <span class="cm">/* Window complete. Compute magnitudes in main loop.
+           Set a flag, main() reads I[], Q[], computes sqrt(I^2+Q^2). */</span>
+        measurement_ready = <span class="num">1</span>;
+        sample_count = <span class="num">0</span>;
+        <span class="cm">/* Reset accumulators for next window */</span>
+    }
+}</pre>
+
+  <div class="card info">
+    <strong>The cos trick:</strong> cos(&theta;) = sin(&theta; + 90&deg;). In our 32-entry LUT,
+    90&deg; = 8 entries. So <code>sine32[(idx + 8) &amp; 31]</code> gives us the cosine value
+    without needing a separate cosine table. One 32-byte LUT serves both sin and cos for
+    all four frequencies.
+  </div>
+
+  <h3>Timing Budget for Measurement ISR</h3>
+  <table>
+    <tr><th>Operation</th><th>Est. Cycles</th></tr>
+    <tr><td>ADC read (3 SPI bytes at 3 MHz + CS toggle)</td><td>~30</td></tr>
+    <tr><td>DC offset removal (subtract 512)</td><td>~6</td></tr>
+    <tr><td>Per-frequency loop (4 iterations): phase add + LUT + 2 multiplies + 2 long accumulates</td><td>4 &times; ~60 = ~240</td></tr>
+    <tr><td>Sample count + compare</td><td>~8</td></tr>
+    <tr><td>ISR entry/exit overhead</td><td>~12</td></tr>
+    <tr style="color:var(--accent)"><td><strong>Total</strong></td><td><strong>~296 cycles</strong></td></tr>
+    <tr><td>Budget at 4800 Hz (2 MHz machine clock)</td><td>416 cycles</td></tr>
+    <tr style="color:var(--ok)"><td><strong>Margin</strong></td><td><strong>~120 cycles (29%)</strong></td></tr>
+  </table>
+
+  <div class="card warn">
+    <strong>Can we run DAC generation AND ADC measurement simultaneously?</strong>
+    The DAC ISR (Timer 0, 16384 Hz) and ADC measurement ISR (Timer 1, 4800 Hz) would need to
+    share the SPI bus. Since Timer 0 has higher natural priority, the DAC write always completes.
+    The ADC ISR must check that DAC_CS is HIGH before starting its own SPI transaction.
+    Alternatively, do the ADC read inside the same Timer 0 ISR using a sample-rate divider
+    (every 3rd or 4th tick). This avoids bus contention entirely.
   </div>
 </section>
 
