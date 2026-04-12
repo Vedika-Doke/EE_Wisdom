@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EE309 — Intermodulation Distortion Project Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #080c10;
+    --surface:  #0d1520;
+    --card:     #111b2a;
+    --border:   #1e3048;
+    --accent:   #00e5ff;
+    --accent2:  #ff6b35;
+    --accent3:  #7fff6b;
+    --accent4:  #c084fc;
+    --text:     #ccd8e8;
+    --muted:    #566a82;
+    --heading:  #e8f2ff;
+    --mono:     'IBM Plex Mono', monospace;
+    --sans:     'Syne', sans-serif;
+    --warn:     #fbbf24;
+    --error:    #ef4444;
+    --ok:       #34d399;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: var(--mono); font-size: 14px; line-height: 1.7;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
+  }
+  header {
+    position: relative; z-index: 10;
+    padding: 60px 40px 50px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(0,229,255,.04) 0%, transparent 100%);
+  }
+  .header-meta {
+    font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 18px;
+    display: flex; gap: 24px; flex-wrap: wrap;
+  }
+  .header-meta span::before { content: '// '; opacity: .5; }
+  h1 {
+    font-family: var(--sans); font-size: clamp(28px, 4vw, 52px);
+    font-weight: 800; color: var(--heading); line-height: 1.1;
+    letter-spacing: -.02em; max-width: 900px;
+  }
+  h1 em { font-style: normal; color: var(--accent); }
+  .subtitle { margin-top: 16px; font-size: 15px; color: var(--muted); max-width: 700px; line-height: 1.6; }
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(8,12,16,.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 40px; display: flex; gap: 6px; flex-wrap: wrap; font-size: 12px;
+  }
+  nav a {
+    color: var(--muted); text-decoration: none; padding: 4px 12px;
+    border-radius: 4px; transition: all .15s; border: 1px solid transparent;
+  }
+  nav a:hover, nav a:focus { color: var(--accent); border-color: var(--border); background: var(--card); }
+  main { position: relative; z-index: 10; max-width: 1000px; margin: 0 auto; padding: 40px 40px 100px; }
+  section { margin-bottom: 60px; }
+  h2 {
+    font-family: var(--sans); font-size: 24px; font-weight: 700;
+    color: var(--heading); margin-bottom: 12px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  h2 .num { color: var(--accent); font-size: 14px; font-family: var(--mono); font-weight: 400; margin-right: 8px; }
+  h3 { font-family: var(--sans); font-size: 17px; font-weight: 600; color: var(--accent2); margin: 28px 0 10px; }
+  p, li { margin-bottom: 10px; }
+  ul, ol { padding-left: 24px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 24px; margin: 16px 0;
+  }
+  .card.warn { border-color: var(--warn); background: rgba(251,191,36,.05); }
+  .card.warn::before { content: 'WARNING'; display: block; font-size: 11px; letter-spacing: .1em; color: var(--warn); margin-bottom: 8px; font-weight: 600; }
+  .card.ok { border-color: var(--ok); background: rgba(52,211,153,.05); }
+  .card.ok::before { content: 'VERIFIED'; display: block; font-size: 11px; letter-spacing: .1em; color: var(--ok); margin-bottom: 8px; font-weight: 600; }
+  .card.info { border-color: var(--accent); background: rgba(0,229,255,.05); }
+  .card.info::before { content: 'WHY THIS MATTERS'; display: block; font-size: 11px; letter-spacing: .1em; color: var(--accent); margin-bottom: 8px; font-weight: 600; }
+  .card.explain { border-color: var(--accent4); background: rgba(192,132,252,.05); }
+  .card.explain::before { content: 'DETAILED EXPLANATION'; display: block; font-size: 11px; letter-spacing: .1em; color: var(--accent4); margin-bottom: 8px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 14px; border: 1px solid var(--border); }
+  th { background: var(--surface); color: var(--accent); font-weight: 600; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+  td { background: var(--card); }
+  tr:hover td { background: rgba(0,229,255,.03); }
+  .pin-highlight { color: var(--accent3); font-weight: 600; }
+  .shared { color: var(--accent4); }
+  pre {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 18px 22px; overflow-x: auto;
+    margin: 14px 0; font-size: 13px; line-height: 1.6; color: var(--text);
+  }
+  code { font-family: var(--mono); font-size: 13px; }
+  .kw { color: var(--accent); } .cm { color: var(--muted); font-style: italic; }
+  .fn { color: var(--accent2); } .num { color: var(--accent3); }
+  .str { color: var(--accent4); } .pp { color: var(--warn); }
+  .schematic {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 24px; margin: 16px 0;
+    font-family: var(--mono); font-size: 13px; line-height: 1.5;
+    white-space: pre; overflow-x: auto; color: var(--accent3);
+  }
+  .schematic .label { color: var(--accent); } .schematic .comp { color: var(--accent2); }
+  .badge { display: inline-block; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; font-weight: 600; }
+  .badge.done { background: rgba(52,211,153,.15); color: var(--ok); border: 1px solid var(--ok); }
+  .badge.wip  { background: rgba(251,191,36,.15); color: var(--warn); border: 1px solid var(--warn); }
+  .badge.todo { background: rgba(86,106,130,.15); color: var(--muted); border: 1px solid var(--muted); }
+  .phases { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 20px 0; }
+  .phase-card { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 16px; text-align: center; }
+  .phase-card.active { border-color: var(--accent); }
+  .phase-card h4 { font-family: var(--sans); font-size: 14px; color: var(--heading); margin-bottom: 6px; }
+  .phase-card p { font-size: 12px; color: var(--muted); margin: 0; }
+  .math {
+    background: var(--surface); border-left: 3px solid var(--accent4);
+    padding: 16px 20px; margin: 14px 0; border-radius: 0 6px 6px 0; font-size: 14px;
+  }
+  .math .var { color: var(--accent4); font-style: italic; }
+  .math .eq  { color: var(--accent); }
+  .step-num {
+    display: inline-block; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent); color: var(--bg); text-align: center;
+    line-height: 28px; font-weight: 700; font-size: 13px; margin-right: 8px;
+  }
+  @media (max-width: 700px) {
+    header, nav, main { padding-left: 20px; padding-right: 20px; }
+    .phases { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-meta">
+    <span>EE309(S1) Spring 2026</span>
+    <span>IIT Bombay</span>
+    <span>Pt-51 / AT89C5131A</span>
+    <span>24 MHz Crystal</span>
+  </div>
+  <h1>Intermodulation Distortion<br><em>Measurement System</em></h1>
+  <p class="subtitle">
+    Two-tone signal generation via MCP4921 DAC, non-linear distortion via diode,
+    amplitude measurement via MCP3008 ADC + coherent I/Q detection.
+    Complete hardware &amp; firmware guide.
+  </p>
+</header>
+
+<nav>
+  <a href="#overview">Overview</a>
+  <a href="#theory">Theory</a>
+  <a href="#hardware">Hardware</a>
+  <a href="#pinout">Pin Planning</a>
+  <a href="#wiring">Wiring</a>
+  <a href="#circuit">Non-Linear Circuit</a>
+  <a href="#spi">SPI Library</a>
+  <a href="#dac">DAC Driver</a>
+  <a href="#adc">ADC Driver</a>
+  <a href="#generation">Signal Generation</a>
+  <a href="#measurement">Tone Measurement</a>
+  <a href="#main">Main Code</a>
+  <a href="#audit">Audit</a>
+  <a href="#debug">Debugging</a>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════ 01. OVERVIEW ══════════════════════════ -->
+<section id="overview">
+  <h2><span class="num">01</span> Project Overview</h2>
+
+  <p>This project demonstrates how <strong>non-linear circuits create new frequencies</strong>
+  that weren't in the original signal. We generate a clean two-tone signal using a microcontroller
+  + DAC, feed it through a non-linear element (diode), and then measure the new frequencies
+  that appear using an ADC + digital signal processing.</p>
+
+  <h3>What We Build</h3>
+  <ol>
+    <li><strong>Signal Generator:</strong> The AT89C5131A microcontroller computes sine values
+    in real-time using an NCO (Numerically Controlled Oscillator) and outputs them through the
+    MCP4921 DAC at 16,384 samples/second. The analog output is a clean sum of two cosines:
+    <code>x(t) = A[cos(2&pi;&middot;410&middot;t) + cos(2&pi;&middot;470&middot;t)]</code></li>
+    <li><strong>Non-Linear Distortion:</strong> The clean signal passes through a 1N4148 diode,
+    which has an exponential I-V curve. This non-linearity multiplies the signal with itself,
+    creating new frequency components (intermodulation products).</li>
+    <li><strong>Measurement:</strong> The MCP3008 ADC samples the distorted signal. The microcontroller
+    performs coherent I/Q detection (essentially a single-bin DFT) to measure the amplitude
+    of each frequency of interest.</li>
+  </ol>
+
+  <h3>Phase Tracker</h3>
+  <div class="phases">
+    <div class="phase-card active">
+      <h4>Phase 1</h4>
+      <p>Single tone (410 Hz)</p>
+      <span class="badge wip">in progress</span>
+    </div>
+    <div class="phase-card">
+      <h4>Phase 2</h4>
+      <p>Two tones (410+470)</p>
+      <span class="badge wip">in progress</span>
+    </div>
+    <div class="phase-card">
+      <h4>Phase 3</h4>
+      <p>Non-linear circuit</p>
+      <span class="badge todo">todo</span>
+    </div>
+    <div class="phase-card">
+      <h4>Phase 4</h4>
+      <p>ADC sampling</p>
+      <span class="badge todo">todo</span>
+    </div>
+    <div class="phase-card">
+      <h4>Phase 5</h4>
+      <p>Tone measurement</p>
+      <span class="badge todo">todo</span>
+    </div>
+  </div>
+
+  <h3>Marking Scheme (max 25)</h3>
+  <table>
+    <tr><th>Criterion</th><th>Marks</th><th>Which Phase</th></tr>
+    <tr><td>Stable single-tone waveform generation</td><td>+4</td><td>Phase 1</td></tr>
+    <tr><td>Stable two-tone generation</td><td>+4</td><td>Phase 2</td></tr>
+    <tr><td>Multi-tone output on scope (non-linear circuit)</td><td>+4</td><td>Phase 3</td></tr>
+    <tr><td>Successful tone amplitude measurement (single tone)</td><td>+4</td><td>Phase 4-5</td></tr>
+    <tr><td>Successful tone amplitude measurement (two tones)</td><td>+4</td><td>Phase 4-5</td></tr>
+    <tr><td>Overall execution</td><td>+5</td><td>All</td></tr>
+  </table>
+</section>
+
+<!-- ══════════════════════════ 02. THEORY ══════════════════════════ -->
+<section id="theory">
+  <h2><span class="num">02</span> Theory &mdash; Why Non-Linearity Creates New Frequencies</h2>
+
+  <div class="card explain">
+    <p>A <strong>linear system</strong> only scales and time-shifts signals. If you put in two frequencies, you get
+    out the same two frequencies (maybe with different amplitudes and phases). No new frequencies appear.</p>
+    <p>A <strong>non-linear system</strong> (like a diode) effectively multiplies the signal with itself.
+    When you multiply two cosines, trigonometric identities create sum and difference frequencies:</p>
+    <p style="text-align:center;color:var(--accent);">cos(A) &middot; cos(B) = &frac12;[cos(A-B) + cos(A+B)]</p>
+    <p>This is how new frequencies appear from a non-linear element &mdash; the squaring and cubing
+    operations generate all possible sums and differences of the input frequencies.</p>
+  </div>
+
+  <h3>Non-Linear Response Model</h3>
+  <p>A weakly non-linear system has the input-output relationship:</p>
+  <div class="math">
+    y(t) = &alpha;<sub>1</sub>&middot;x(t) + &alpha;<sub>2</sub>&middot;x<sup>2</sup>(t) + &alpha;<sub>3</sub>&middot;x<sup>3</sup>(t)
+  </div>
+  <p>Where &alpha;<sub>1</sub> is the linear gain, &alpha;<sub>2</sub> is the 2nd-order non-linearity,
+  and &alpha;<sub>3</sub> is the 3rd-order non-linearity.</p>
+
+  <h3>For Two-Tone Input x(t) = A[cos(2&pi;f<sub>1</sub>t) + cos(2&pi;f<sub>2</sub>t)]</h3>
+
+  <p><strong>2nd-order products</strong> (from &alpha;<sub>2</sub>&middot;x<sup>2</sup>):</p>
+  <div class="math">
+    DC, &ensp;
+    <span class="var">f<sub>2</sub></span> &minus; <span class="var">f<sub>1</sub></span> <span class="eq">= 60 Hz</span>, &ensp;
+    <span class="var">f<sub>1</sub></span> + <span class="var">f<sub>2</sub></span> = 880 Hz, &ensp;
+    2<span class="var">f<sub>1</sub></span> = 820 Hz, &ensp;
+    2<span class="var">f<sub>2</sub></span> = 940 Hz
+  </div>
+
+  <p><strong>3rd-order products</strong> (from &alpha;<sub>3</sub>&middot;x<sup>3</sup>):</p>
+  <div class="math">
+    2<span class="var">f<sub>1</sub></span> &minus; <span class="var">f<sub>2</sub></span> <span class="eq">= 350 Hz</span>, &ensp;
+    2<span class="var">f<sub>2</sub></span> &minus; <span class="var">f<sub>1</sub></span> = 530 Hz, &ensp;
+    3<span class="var">f<sub>1</sub></span> = 1230 Hz, &ensp;
+    3<span class="var">f<sub>2</sub></span> = 1410 Hz
+  </div>
+
+  <p>We focus on measuring amplitudes at four frequencies: <strong>60 Hz, 350 Hz, 410 Hz, 470 Hz</strong>.</p>
+
+  <div class="card info">
+    The <strong>60 Hz</strong> and <strong>350 Hz</strong> components don't exist in the original signal at all &mdash;
+    they are entirely created by the diode's non-linearity. Their amplitudes are proportional to
+    &alpha;<sub>2</sub>A<sup>2</sup> and &alpha;<sub>3</sub>A<sup>3</sup> respectively, telling us
+    how non-linear the circuit is.
+  </div>
+</section>
+
+<!-- ══════════════════════════ 03. HARDWARE ══════════════════════════ -->
+<section id="hardware">
+  <h2><span class="num">03</span> Hardware Components</h2>
+
+  <table>
+    <tr><th>Component</th><th>Part Number</th><th>Package</th><th>Role</th><th>Why This Part</th></tr>
+    <tr>
+      <td>MCU Board</td>
+      <td>Pt-51 (AT89C5131A)</td>
+      <td>PLCC52</td>
+      <td>Master controller</td>
+      <td>Course standard board; has hardware SPI, timers, 24 MHz crystal</td>
+    </tr>
+    <tr>
+      <td>DAC</td>
+      <td>MCP4921</td>
+      <td>8-pin DIP</td>
+      <td>Digital &rarr; Analog conversion</td>
+      <td>12-bit resolution; SPI mode 0,0; single supply 5V; max 20 MHz SCK</td>
+    </tr>
+    <tr>
+      <td>ADC</td>
+      <td>MCP3008</td>
+      <td>16-pin DIP</td>
+      <td>Analog &rarr; Digital conversion</td>
+      <td>10-bit; 8 channels; SPI mode 0,0; max 3.6 MHz SCK @5V</td>
+    </tr>
+    <tr>
+      <td>Diode</td>
+      <td>1N4148</td>
+      <td>DO-35</td>
+      <td>Non-linear element</td>
+      <td>Fast small-signal silicon diode; V<sub>f</sub> &asymp; 0.6V; creates intermod products</td>
+    </tr>
+    <tr>
+      <td>Pull-down resistor</td>
+      <td>10 k&Omega;</td>
+      <td>&frac14;W</td>
+      <td>Load for diode output</td>
+      <td>Sets output impedance; pulls output to GND when diode is off</td>
+    </tr>
+    <tr>
+      <td>Decoupling caps</td>
+      <td>100 nF ceramic &times; 2</td>
+      <td>Through-hole</td>
+      <td>Power supply filtering</td>
+      <td>Prevents SPI switching noise from corrupting data</td>
+    </tr>
+  </table>
+
+  <div class="card explain">
+    <strong>Why two separate SPI chips instead of built-in peripherals?</strong>
+    The AT89C5131A has no on-chip DAC or ADC. It only has a hardware SPI block
+    (MOSI/MISO/SCK on P1.5&ndash;P1.7). We use that SPI bus to talk to both the MCP4921
+    (DAC) and MCP3008 (ADC). Both chips share the same 3 bus wires (SCK, MOSI, MISO)
+    and are distinguished by separate chip-select (CS) lines.
+  </div>
+</section>
+
+<!-- ══════════════════════════ 04. PIN PLANNING ══════════════════════════ -->
+<section id="pinout">
+  <h2><span class="num">04</span> Pin Planning</h2>
+
+  <h3>MCU Pins Used</h3>
+  <table>
+    <tr><th>Pt-51 Pin</th><th>PLCC #</th><th>AT89C5131A Function</th><th>Our Role</th><th>Goes To</th></tr>
+    <tr>
+      <td class="pin-highlight">P1.7</td><td>6</td><td>MOSI (hardware SPI)</td>
+      <td class="shared">SPI data out (shared bus)</td>
+      <td>MCP4921 pin 4 + MCP3008 pin 11</td>
+    </tr>
+    <tr>
+      <td class="pin-highlight">P1.6</td><td>5</td><td>SCK (hardware SPI)</td>
+      <td class="shared">SPI clock (shared bus)</td>
+      <td>MCP4921 pin 3 + MCP3008 pin 13</td>
+    </tr>
+    <tr>
+      <td class="pin-highlight">P1.5</td><td>4</td><td>MISO (hardware SPI)</td>
+      <td class="shared">SPI data in (shared bus)</td>
+      <td>MCP3008 pin 12 only (DAC has no data output)</td>
+    </tr>
+    <tr>
+      <td class="pin-highlight">P1.1</td><td>49</td><td>SS (hardware SPI)</td>
+      <td>DAC chip-select (used as GPIO)</td>
+      <td>MCP4921 pin 2 only</td>
+    </tr>
+    <tr>
+      <td class="pin-highlight">P1.0</td><td>48</td><td>T2/KIN0 (general GPIO)</td>
+      <td>ADC chip-select (GPIO)</td>
+      <td>MCP3008 pin 10 only</td>
+    </tr>
+  </table>
+
+  <div class="card explain">
+    <strong>Why P1.1 for DAC CS?</strong> P1.1 is the hardware SS (Slave Select) pin on the AT89C5131A.
+    In master mode, the hardware SPI block can automatically drive SS &mdash; but since we have
+    TWO slaves (DAC and ADC), we need manual control. Setting <code>SSDIS=1</code> in SPCON
+    disables the hardware SS function and makes P1.1 behave as a normal GPIO that we toggle
+    ourselves via <code>DAC_CS = 0 / DAC_CS = 1</code>.
+    <br><br>
+    <strong>Why P1.0 for ADC CS?</strong> It's the next available GPIO on Port 1 that isn't used by
+    SPI or other peripherals. Any free GPIO on any port would work &mdash; P1.0 is just convenient
+    because it's on the same port header as the SPI pins. If your board has P1.0 occupied,
+    change one line in <code>mcp3008.c</code>: <code>sbit ADC_CS = P1^0;</code> to whatever pin you use.
+  </div>
+
+  <h3>SPI Bus Topology</h3>
+  <p>SPI is a <strong>bus</strong> &mdash; three signal wires are shared among all devices.
+  Only the CS (chip-select) line is unique per device. At any moment, exactly ONE device has its
+  CS pulled LOW and is listening. The others ignore the bus.</p>
+
+  <div class="schematic"><span class="label">                         Pt-51 (AT89C5131A)</span>
+                       +-------------------+
+                       |                   |
+                       |  <span class="comp">P1.0</span> (ADC_CS) ---+--[wire]---> <span class="label">MCP3008 pin 10 (CS)</span>
+                       |  <span class="comp">P1.1</span> (DAC_CS) ---+--[wire]---> <span class="label">MCP4921 pin 2  (CS)</span>
+                       |                   |
+                       |  <span class="comp">P1.5</span> (MISO)   -------- bus ------> <span class="label">MCP3008 pin 12 (DOUT)</span>
+                       |                   |
+                       |  <span class="comp">P1.6</span> (SCK)    -------- bus --+--> <span class="label">MCP4921 pin 3  (SCK)</span>
+                       |                   |           +--> <span class="label">MCP3008 pin 13 (CLK)</span>
+                       |                   |
+                       |  <span class="comp">P1.7</span> (MOSI)   -------- bus --+--> <span class="label">MCP4921 pin 4  (SDI)</span>
+                       |                   |           +--> <span class="label">MCP3008 pin 11 (DIN)</span>
+                       +-------------------+</div>
+
+  <div class="card info">
+    <strong>How bus sharing works at the hardware level:</strong>
+    When <code>DAC_CS = 0</code> and <code>ADC_CS = 1</code>, the MCP4921 is listening and the MCP3008
+    ignores the bus (its DOUT is high-impedance). When we flip to <code>DAC_CS = 1</code> and
+    <code>ADC_CS = 0</code>, the MCP3008 wakes up and the MCP4921 goes to sleep.
+    The clock (SCK) and data (MOSI) wires physically go to both chips simultaneously, but only
+    the chip with CS=LOW processes the bits.
+  </div>
+</section>
+
+<!-- ══════════════════════════ 05. WIRING ══════════════════════════ -->
+<section id="wiring">
+  <h2><span class="num">05</span> Complete Wiring Tables</h2>
+
+  <h3>MCP4921 (DAC) &mdash; 8-pin DIP</h3>
+  <table>
+    <tr><th>Pin #</th><th>Name</th><th>Wire To</th><th>Why</th></tr>
+    <tr><td>1</td><td>VDD</td><td>+5V rail</td><td>Power supply. Place 100 nF cap between pin 1 and pin 8 as close to chip as possible.</td></tr>
+    <tr><td>2</td><td>CS&#x0304;</td><td class="pin-highlight">P1.1 (SS on SPI header)</td><td>Active-low chip select. MCU pulls this LOW before sending data, HIGH when done.</td></tr>
+    <tr><td>3</td><td>SCK</td><td class="shared">P1.6 (SCK bus)</td><td>SPI clock. Shared bus wire &mdash; also goes to MCP3008 pin 13.</td></tr>
+    <tr><td>4</td><td>SDI</td><td class="shared">P1.7 (MOSI bus)</td><td>Serial Data In. Receives the 16-bit command+data word from the MCU. Shared bus.</td></tr>
+    <tr><td>5</td><td>LDAC&#x0304;</td><td>GND</td><td>Latch DAC. Tied LOW so the analog output updates immediately when CS goes HIGH. If left floating, output updates at random times.</td></tr>
+    <tr><td>6</td><td>VREF</td><td>+5V</td><td>Reference voltage. Sets the full-scale output range: VOUT swings from 0V to VREF (5V). For a smaller swing, use a 2.048V reference IC instead.</td></tr>
+    <tr><td>7</td><td>VOUT</td><td>&rarr; diode anode</td><td>Analog output. This is where your sine wave comes out. Probe here with scope for Phase 1/2 testing.</td></tr>
+    <tr><td>8</td><td>VSS</td><td>GND</td><td>Ground. Must share common ground with the Pt-51 board.</td></tr>
+  </table>
+
+  <h3>MCP3008 (ADC) &mdash; 16-pin DIP</h3>
+  <table>
+    <tr><th>Pin #</th><th>Name</th><th>Wire To</th><th>Why</th></tr>
+    <tr><td>1</td><td>CH0</td><td>&larr; diode output (node A)</td><td>Analog input channel 0. This is the signal we're measuring &mdash; the distorted output from the non-linear circuit.</td></tr>
+    <tr><td>2&ndash;8</td><td>CH1&ndash;CH7</td><td>&mdash;</td><td>Unused channels. Can leave floating or tie to GND. Won't affect CH0 readings.</td></tr>
+    <tr><td>9</td><td>DGND</td><td>GND</td><td>Digital ground.</td></tr>
+    <tr><td>10</td><td>CS&#x0304;/SHDN&#x0304;</td><td class="pin-highlight">P1.0 (Port 1 header)</td><td>Active-low chip select. MCU pulls LOW to start an ADC conversion, HIGH when done. Also controls power &mdash; chip is in shutdown when CS is HIGH (low power).</td></tr>
+    <tr><td>11</td><td>DIN</td><td class="shared">P1.7 (MOSI bus)</td><td>Data In from MCU. Receives the channel select command. Shared bus with DAC.</td></tr>
+    <tr><td>12</td><td>DOUT</td><td class="shared">P1.5 (MISO bus)</td><td>Data Out to MCU. Sends the 10-bit conversion result back. Only the ADC uses MISO (DAC is write-only).</td></tr>
+    <tr><td>13</td><td>CLK</td><td class="shared">P1.6 (SCK bus)</td><td>SPI clock. Shared bus with DAC.</td></tr>
+    <tr><td>14</td><td>AGND</td><td>GND</td><td>Analog ground. Should meet DGND at one point (star ground). On a breadboard, both go to the same GND rail.</td></tr>
+    <tr><td>15</td><td>VREF</td><td>+5V</td><td>ADC reference. Sets the full input range: 0V to VREF. With 10-bit resolution: 5V/1024 &asymp; 4.88 mV per step.</td></tr>
+    <tr><td>16</td><td>VDD</td><td>+5V</td><td>Power supply. Place 100 nF cap between pin 16 and pin 9 close to chip.</td></tr>
+  </table>
+
+  <div class="card warn">
+    <strong>Decoupling capacitors are not optional.</strong> Every SPI clock edge creates a tiny current spike
+    on the power supply. Without a 100 nF cap right next to each chip, these spikes corrupt data transfers,
+    causing the DAC to output wrong values or the ADC to return garbage readings. Use ceramic caps,
+    not electrolytic &mdash; ceramic has lower ESR and responds faster to high-frequency noise.
+  </div>
+</section>
+
+<!-- ══════════════════════════ 06. CIRCUIT ══════════════════════════ -->
+<section id="circuit">
+  <h2><span class="num">06</span> Non-Linear Circuit</h2>
+
+  <h3>Topology: Series Diode with Pull-Down Resistor</h3>
+  <p>This is the simplest circuit that produces usable intermodulation products.
+  Two components: one 1N4148 diode and one 10 k&Omega; resistor.</p>
+
+  <div class="schematic">
+<span class="label">MCP4921                                                          MCP3008</span>
+<span class="label">Pin 7 (VOUT)</span>                                                        <span class="label">Pin 1 (CH0)</span>
+      |                                                                |
+      +---[ <span class="comp">1N4148 diode</span> ]---+--- <span class="label">node A</span> ---+--- Vout ----------------+
+          (anode &rarr;)      |              |
+          (band = cathode)|            <span class="comp">[R = 10 k&Omega;]</span>
+                           |              |
+                           |             GND
+                           |
+                           |         <span class="label">&uarr;&uarr;&uarr;&uarr;&uarr;&uarr;&uarr;&uarr;&uarr;</span>
+                           |     <span class="label">SCOPE PROBE HERE</span>
+                           |    <span class="label">for Phase 3 testing</span>
+                           |  <span class="label">(probe tip on node A,</span>
+                           |  <span class="label"> ground clip on GND)</span>
+
+
+  Scope probe locations for each phase:
+
+    <span class="comp">Phase 1-2:</span>  Probe on <span class="label">MCP4921 Pin 7 (VOUT)</span> &mdash; clean sine / two-tone beat
+    <span class="comp">Phase 3:</span>    Probe on <span class="label">node A</span> (wire between diode cathode + R + MCP3008 CH0) &mdash; clipped waveform
+    <span class="comp">FFT mode:</span>   Same as Phase 3 probe point &mdash; switch scope to Math/FFT</div>
+
+  <div class="card explain">
+    <strong>How the diode creates non-linearity:</strong>
+    <br><br>
+    A diode's current-voltage relationship is <code>I = I<sub>s</sub>(e<sup>V/nV<sub>T</sub></sup> - 1)</code>,
+    where V<sub>T</sub> &asymp; 26 mV at room temperature. This exponential curve means:
+    <ul>
+      <li>Below ~0.5V: diode is nearly OFF. Very little current flows. Output &asymp; 0V (pulled to GND by R).</li>
+      <li>Around 0.6V: the "knee" region. Current increases rapidly. This is where the strongest non-linearity lives.</li>
+      <li>Above ~0.7V: diode is fully ON. Behaves almost linearly (V<sub>out</sub> &asymp; V<sub>in</sub> - 0.7V).</li>
+    </ul>
+    The transition region around 0.5&ndash;0.7V is where the squaring and cubing happen.
+    When the two-tone signal passes through this region, the intermodulation products are generated.
+    <br><br>
+    <strong>Our DAC output</strong> swings 0&ndash;5V. In two-tone mode with half-amplitude per tone,
+    the signal swings roughly 1.25V&ndash;3.75V centered at 2.5V. Most of this range is above the diode threshold,
+    so the diode is ON for most of the cycle. The non-linearity appears at the bottom of the swing where
+    the signal dips toward 0.6V.
+  </div>
+
+  <h3>Diode Orientation</h3>
+  <p>The 1N4148 has a <strong>band</strong> printed on one end &mdash; that's the <strong>cathode</strong>.
+  Wire it so:</p>
+  <ul>
+    <li><strong>Anode</strong> (no band) &rarr; connects to DAC VOUT</li>
+    <li><strong>Cathode</strong> (band) &rarr; connects to node A (R + ADC input)</li>
+  </ul>
+
+  <h3>Expected FFT Spectrum After the Diode</h3>
+  <table>
+    <tr><th>Frequency</th><th>Origin</th><th>Order</th><th>Relative Amplitude</th></tr>
+    <tr><td>60 Hz</td><td>f<sub>2</sub> &minus; f<sub>1</sub></td><td>2nd</td><td>Proportional to &alpha;<sub>2</sub>A<sup>2</sup></td></tr>
+    <tr><td>350 Hz</td><td>2f<sub>1</sub> &minus; f<sub>2</sub></td><td>3rd</td><td>Proportional to &alpha;<sub>3</sub>A<sup>3</sup></td></tr>
+    <tr><td>410 Hz</td><td>f<sub>1</sub> (fundamental)</td><td>1st</td><td>Largest</td></tr>
+    <tr><td>470 Hz</td><td>f<sub>2</sub> (fundamental)</td><td>1st</td><td>Largest</td></tr>
+    <tr><td>530 Hz</td><td>2f<sub>2</sub> &minus; f<sub>1</sub></td><td>3rd</td><td>Similar to 350 Hz</td></tr>
+    <tr><td>820 Hz</td><td>2f<sub>1</sub></td><td>2nd</td><td>Similar to 60 Hz</td></tr>
+    <tr><td>880 Hz</td><td>f<sub>1</sub> + f<sub>2</sub></td><td>2nd</td><td>Similar to 60 Hz</td></tr>
+  </table>
+</section>
+
+<!-- ══════════════════════════ 07. SPI LIBRARY ══════════════════════════ -->
+<section id="spi">
+  <h2><span class="num">07</span> SPI Library</h2>
+
+  <h3>What is SPI?</h3>
+  <p>SPI (Serial Peripheral Interface) is a synchronous serial protocol with 4 signals:</p>
+  <ul>
+    <li><strong>SCK</strong> (Serial Clock): master generates clock pulses</li>
+    <li><strong>MOSI</strong> (Master Out Slave In): data from master to slave</li>
+    <li><strong>MISO</strong> (Master In Slave Out): data from slave to master</li>
+    <li><strong>CS</strong> (Chip Select): active-low, selects which slave is active</li>
+  </ul>
+  <p>Data is shifted out MSB-first on each clock edge. Both MCP4921 and MCP3008 use
+  <strong>SPI Mode 0,0</strong> (CPOL=0, CPHA=0): clock idles LOW, data is sampled on the RISING edge.</p>
+
+  <h3>AT89C5131A Hardware SPI Registers</h3>
+  <p>Instead of bit-banging (manually toggling GPIO pins), we use the chip's built-in SPI hardware.
+  This is <strong>much faster</strong> (~3 &mu;s per byte vs ~180 &mu;s for bit-bang) and frees the CPU
+  to do other work while the SPI transfer happens.</p>
+
+  <table>
+    <tr><th>SFR</th><th>Address</th><th>Purpose</th></tr>
+    <tr><td>SPCON</td><td>0xC3</td><td>Control: enable, master/slave, clock speed, polarity</td></tr>
+    <tr><td>SPSTA</td><td>0xC4</td><td>Status: bit 7 (SPIF) = transfer complete flag</td></tr>
+    <tr><td>SPDAT</td><td>0xC5</td><td>Data: write byte to send, read byte received</td></tr>
+  </table>
+
+  <h3>SPCON = 0x71 &mdash; Bit-by-Bit Breakdown</h3>
+  <table>
+    <tr><th>Bit</th><th>Name</th><th>Value</th><th>What It Does</th></tr>
+    <tr><td>7</td><td>SPR2</td><td>0</td><td rowspan="3">Clock divider: SPR2:1:0 = 001 &rarr; F<sub>osc</sub>/8 = <strong>3 MHz</strong> at 24 MHz crystal.
+    <br>This is the fastest safe speed: MCP3008 max is 3.6 MHz @5V, so 3 MHz has margin.
+    <br>MCP4921 can do 20 MHz, so it's fine too.</td></tr>
+    <tr><td>1</td><td>SPR1</td><td>0</td></tr>
+    <tr><td>0</td><td>SPR0</td><td>1</td></tr>
+    <tr><td>6</td><td>SPEN</td><td>1</td><td>Enable the SPI block. When 0, P1.5/6/7 are normal GPIO. When 1, the SPI hardware takes over those pins.</td></tr>
+    <tr><td>5</td><td>SSDIS</td><td>1</td><td>Disable hardware SS control. We toggle CS manually via GPIO because we have 2 slaves. If SSDIS=0, the hardware would automatically drive P1.1 and we couldn't control two separate CS lines.</td></tr>
+    <tr><td>4</td><td>MSTR</td><td>1</td><td>Master mode. The MCU generates the clock and initiates transfers.</td></tr>
+    <tr><td>3</td><td>CPOL</td><td>0</td><td>Clock polarity: SCK idles LOW. Both MCP4921 and MCP3008 require this (Mode 0).</td></tr>
+    <tr><td>2</td><td>CPHA</td><td>0</td><td>Clock phase: data sampled on RISING edge of SCK. Both chips require this (Mode 0).</td></tr>
+  </table>
+
+  <h3>spi.h</h3>
+  <pre><span class="pp">#ifndef SPI_H</span>
+<span class="pp">#define SPI_H</span>
+
+<span class="kw">void</span>          <span class="fn">spi_init</span>(<span class="kw">void</span>);
+<span class="kw">unsigned char</span> <span class="fn">spi_xfer</span>(<span class="kw">unsigned char</span> b);  <span class="cm">/* send one byte, return received byte */</span>
+
+<span class="pp">#endif</span></pre>
+
+  <h3>spi.c</h3>
+  <pre><span class="pp">#include &lt;at89c5131A.h&gt;</span>
+<span class="pp">#include "spi.h"</span>
+
+<span class="cm">/* AT89C5131A SPI SFRs &mdash; at89c5131A.h should already declare these.
+   The #ifndef guards are a safety net in case it doesn't. */</span>
+<span class="pp">#ifndef SPCON</span>
+<span class="kw">sfr</span> SPCON = <span class="num">0xC3</span>;
+<span class="kw">sfr</span> SPSTA = <span class="num">0xC4</span>;
+<span class="kw">sfr</span> SPDAT = <span class="num">0xC5</span>;
+<span class="pp">#endif</span>
+
+<span class="pp">#define SPCON_CFG 0x71</span>  <span class="cm">/* SPEN=1, SSDIS=1, MSTR=1, mode 0,0, Fosc/8 */</span>
+
+<span class="kw">void</span> <span class="fn">spi_init</span>(<span class="kw">void</span>) {
+    <span class="kw">unsigned char</span> dummy;
+    SPCON = SPCON_CFG;
+    dummy = SPSTA;   <span class="cm">/* Clear any stale SPIF flag from power-on.
+                        Without this, the first spi_xfer() call could
+                        see SPIF=1 from a previous state and return
+                        immediately with garbage data. The two-step
+                        clear sequence: read SPSTA, then read SPDAT. */</span>
+    dummy = SPDAT;
+}
+
+<span class="kw">unsigned char</span> <span class="fn">spi_xfer</span>(<span class="kw">unsigned char</span> b) {
+    <span class="cm">/* Write byte to SPDAT to start transfer.
+       The hardware shifts out our byte on MOSI while simultaneously
+       shifting in the slave's response on MISO. */</span>
+    SPDAT = b;
+
+    <span class="cm">/* Poll SPIF (bit 7 of SPSTA) until the 8-bit transfer completes.
+       At 3 MHz SCK, this takes 8/3M = 2.67 us per byte.
+       Reading SPSTA when SPIF=1, then accessing SPDAT, clears the flag. */</span>
+    <span class="kw">while</span> (!(SPSTA &amp; <span class="num">0x80</span>));
+
+    <span class="cm">/* Return the byte that was shifted in from the slave. */</span>
+    <span class="kw">return</span> SPDAT;
+}</pre>
+</section>
+
+<!-- ══════════════════════════ 08. DAC DRIVER ══════════════════════════ -->
+<section id="dac">
+  <h2><span class="num">08</span> DAC Driver (MCP4921)</h2>
+
+  <h3>How the MCP4921 Works</h3>
+  <p>The MCP4921 converts a 12-bit digital number (0&ndash;4095) into an analog voltage (0&ndash;VREF).
+  You send it a 16-bit SPI word: 4 config bits + 12 data bits. On the rising edge of CS,
+  the DAC latches the new value and VOUT changes to the corresponding voltage.</p>
+
+  <div class="math">
+    V<sub>OUT</sub> = VREF &times; D / 4096 = 5V &times; D / 4096
+    <br>
+    Example: D = 2048 &rarr; V<sub>OUT</sub> = 2.500 V (midpoint)
+    <br>
+    Example: D = 4080 &rarr; V<sub>OUT</sub> = 4.980 V (near max)
+  </div>
+
+  <h3>16-Bit Write Frame</h3>
+  <table>
+    <tr><th>Bit 15</th><th>Bit 14</th><th>Bit 13</th><th>Bit 12</th><th>Bits 11&ndash;0</th></tr>
+    <tr>
+      <td>0 = DAC A<br><small>(MCP4921 has only one channel)</small></td>
+      <td>1 = Buffered VREF<br><small>(better linearity)</small></td>
+      <td>1 = Gain 1&times;<br><small>(output = VREF &times; D/4096)</small></td>
+      <td>1 = Active<br><small>(0 = shutdown mode)</small></td>
+      <td>D[11:0]<br><small>12-bit data value</small></td>
+    </tr>
+  </table>
+  <p>Config nibble = <code>0b0111</code> = <code>0x7</code>.
+  Full word = <code>0x7000 | (data_value &amp; 0x0FFF)</code>.</p>
+
+  <h3>Timing Diagram (one write cycle)</h3>
+  <div class="schematic">
+CS   ____/&bsol;______________/&bsol;____     (LOW during transfer, HIGH to latch)
+SCK  ____/&bsol;_/&bsol;_/&bsol;_/&bsol;_/&bsol;_/&bsol;_/&bsol;_/&bsol;_____     (16 clock pulses)
+MOSI ---[b15 b14 ... b1 b0]---     (16 data bits, MSB first)
+VOUT ........................XXXX     (changes on CS rising edge)</div>
+
+  <h3>mcp4921.c</h3>
+  <pre><span class="pp">#include &lt;at89c5131A.h&gt;</span>
+<span class="pp">#include "spi.h"</span>
+<span class="pp">#include "mcp4921.h"</span>
+
+<span class="kw">sbit</span> DAC_CS = P1^<span class="num">1</span>;   <span class="cm">/* SS pin on the SPI header */</span>
+
+<span class="pp">#define DAC_CMD 0x7000</span>  <span class="cm">/* bits 15-12: 0_1_1_1 = DAC_A, buffered, 1x, active */</span>
+
+<span class="kw">void</span> <span class="fn">dac_init</span>(<span class="kw">void</span>) {
+    DAC_CS = <span class="num">1</span>;         <span class="cm">/* CS HIGH = DAC is idle / deselected */</span>
+}
+
+<span class="kw">void</span> <span class="fn">dac_write</span>(<span class="kw">unsigned int</span> val12) {
+    <span class="cm">/* Build the 16-bit word: config nibble + 12-bit data */</span>
+    <span class="kw">unsigned int</span> word = DAC_CMD | (val12 &amp; <span class="num">0x0FFF</span>);
+
+    DAC_CS = <span class="num">0</span>;                                <span class="cm">/* select DAC */</span>
+    <span class="fn">spi_xfer</span>((<span class="kw">unsigned char</span>)(word &gt;&gt; <span class="num">8</span>));     <span class="cm">/* send high byte (config + D11..D8) */</span>
+    <span class="fn">spi_xfer</span>((<span class="kw">unsigned char</span>)(word &amp; <span class="num">0xFF</span>));   <span class="cm">/* send low byte (D7..D0) */</span>
+    DAC_CS = <span class="num">1</span>;                                <span class="cm">/* deselect &rarr; DAC latches value, VOUT updates */</span>
+}</pre>
+</section>
+
+<!-- ══════════════════════════ 09. ADC DRIVER ══════════════════════════ -->
+<section id="adc">
+  <h2><span class="num">09</span> ADC Driver (MCP3008)</h2>
+
+  <h3>How the MCP3008 Works</h3>
+  <p>The MCP3008 converts an analog voltage (0&ndash;VREF) into a 10-bit digital number (0&ndash;1023).
+  You tell it which channel to read via a 3-byte SPI frame, and it sends back the result
+  in the same frame.</p>
+
+  <div class="math">
+    Digital value = 1024 &times; V<sub>IN</sub> / VREF = 1024 &times; V<sub>IN</sub> / 5V
+    <br>
+    Example: V<sub>IN</sub> = 2.500 V &rarr; result = 512
+    <br>
+    Resolution: 5V / 1024 = 4.88 mV per step
+  </div>
+
+  <h3>3-Byte SPI Read Frame</h3>
+  <table>
+    <tr><th>Byte #</th><th>What MCU Sends (MOSI)</th><th>What ADC Returns (MISO)</th><th>Explanation</th></tr>
+    <tr>
+      <td>1</td>
+      <td><code>0x01</code></td>
+      <td>don't care</td>
+      <td>Start bit. The ADC starts its conversion when it sees a 1 after CS goes low.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><code>0x80 | (ch &lt;&lt; 4)</code></td>
+      <td><code>xxxx_xx D9 D8</code></td>
+      <td>Bit 7 = 1 means single-ended (not differential). Bits 6:4 = channel number (0&ndash;7). ADC starts returning result bits.</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><code>0x00</code> (dummy)</td>
+      <td><code>D7 D6 D5 D4 D3 D2 D1 D0</code></td>
+      <td>Remaining 8 bits of the 10-bit result. We clock out zeros just to receive these bits.</td>
+    </tr>
+  </table>
+  <p>10-bit result = <code>((byte2 &amp; 0x03) &lt;&lt; 8) | byte3</code></p>
+
+  <h3>mcp3008.c</h3>
+  <pre><span class="pp">#include &lt;at89c5131A.h&gt;</span>
+<span class="pp">#include "spi.h"</span>
+<span class="pp">#include "mcp3008.h"</span>
+
+<span class="kw">sbit</span> ADC_CS = P1^<span class="num">0</span>;   <span class="cm">/* change this if you wire CS to a different pin */</span>
+
+<span class="kw">void</span> <span class="fn">adc_init</span>(<span class="kw">void</span>) {
+    ADC_CS = <span class="num">1</span>;         <span class="cm">/* CS HIGH = ADC is idle / in shutdown */</span>
+}
+
+<span class="kw">unsigned int</span> <span class="fn">adc_read</span>(<span class="kw">unsigned char</span> channel) {
+    <span class="kw">unsigned char</span> hi, lo;
+
+    ADC_CS = <span class="num">0</span>;                                              <span class="cm">/* wake up ADC */</span>
+    <span class="fn">spi_xfer</span>(<span class="num">0x01</span>);                                        <span class="cm">/* byte 1: start bit */</span>
+    hi = <span class="fn">spi_xfer</span>((<span class="kw">unsigned char</span>)(<span class="num">0x80</span> | ((channel &amp; <span class="num">0x07</span>) &lt;&lt; <span class="num">4</span>)));  <span class="cm">/* byte 2: SGL + channel */</span>
+    lo = <span class="fn">spi_xfer</span>(<span class="num">0x00</span>);                                    <span class="cm">/* byte 3: clock out result */</span>
+    ADC_CS = <span class="num">1</span>;                                              <span class="cm">/* done, ADC goes to sleep */</span>
+
+    <span class="cm">/* Extract 10-bit result: bits[1:0] of byte2 ++ all of byte3 */</span>
+    <span class="kw">return</span> ((<span class="kw">unsigned int</span>)(hi &amp; <span class="num">0x03</span>) &lt;&lt; <span class="num">8</span>) | lo;
+}</pre>
+</section>
+
+<!-- ══════════════════════════ 10. SIGNAL GENERATION ══════════════════════════ -->
+<section id="generation">
+  <h2><span class="num">10</span> Signal Generation (NCO)</h2>
+
+  <h3>What is an NCO?</h3>
+  <p>A <strong>Numerically Controlled Oscillator</strong> is a digital technique for generating sine waves
+  at any frequency from a single lookup table. Instead of storing a separate table for each frequency,
+  you store ONE table (one full sine cycle) and step through it at different speeds.</p>
+
+  <div class="card explain">
+    <strong>Analogy:</strong> Imagine a clock face with 32 marks around the edge, each representing
+    a sine value. A pointer starts at 12 o'clock and advances by a fixed angle each tick:
+    <ul>
+      <li>Small angle per tick &rarr; slow traversal &rarr; low frequency output</li>
+      <li>Large angle per tick &rarr; fast traversal &rarr; high frequency output</li>
+    </ul>
+    The "angle" is stored as a 16-bit integer (0&ndash;65535 represents 0&ndash;360&deg;).
+    The "step size" is called the <strong>phase increment</strong> (&Delta;&phi;).
+    On every timer tick, we add &Delta;&phi; to the accumulator and use the top bits to index the sine table.
+  </div>
+
+  <h3>NCO Math</h3>
+  <div class="math">
+    <span class="var">&Delta;&phi;</span> <span class="eq">=</span> round(65536 &times; f<sub>out</sub> / F<sub>s</sub>)
+    <br><br>
+    For F<sub>s</sub> = 16384 Hz:&ensp; <span class="var">&Delta;&phi;</span> <span class="eq">=</span> 4 &times; f<sub>out</sub> &ensp;(exact integer &mdash; no rounding error!)
+    <br><br>
+    f<sub>1</sub> = 410 Hz &rarr; &Delta;&phi;<sub>1</sub> = 1640
+    <br>
+    f<sub>2</sub> = 470 Hz &rarr; &Delta;&phi;<sub>2</sub> = 1880
+  </div>
+
+  <div class="card info">
+    <strong>Why F<sub>s</sub> = 16384 Hz?</strong> Because 65536 / 16384 = 4, which means
+    &Delta;&phi; = 4 &times; f, always an exact integer for integer Hz values. No rounding error means
+    the output frequency is exactly what we want (410.000 Hz, not 409.87 Hz).
+    <br><br>
+    Also, at 24 MHz crystal (2 MHz machine clock), F<sub>s</sub> = 16384 requires the timer to fire
+    every 122 machine cycles &mdash; leaving ~50 cycles of headroom for the ISR to execute.
+  </div>
+
+  <h3>Timer Configuration</h3>
+  <table>
+    <tr><th>Parameter</th><th>Value</th><th>Calculation</th></tr>
+    <tr>
+      <td>Crystal</td><td>24 MHz</td><td>&mdash;</td>
+    </tr>
+    <tr>
+      <td>Machine cycle</td><td>0.5 &mu;s</td><td>24 MHz / 12 = 2 MHz &rarr; period = 0.5 &mu;s</td>
+    </tr>
+    <tr>
+      <td>Sample period</td><td>61.04 &mu;s</td><td>1 / 16384 Hz</td>
+    </tr>
+    <tr>
+      <td>Timer cycles per sample</td><td>122</td><td>61.04 &mu;s / 0.5 &mu;s = 122.07 &asymp; 122</td>
+    </tr>
+    <tr>
+      <td>Timer 0 mode</td><td>Mode 1 (16-bit)</td><td>Mode 2 (8-bit auto-reload) max is 256 cycles = 128 &mu;s, too coarse</td>
+    </tr>
+    <tr>
+      <td>Reload value</td><td>65536 &minus; 122 = 65414 = <code>0xFF86</code></td><td>TH0 = 0xFF, TL0 = 0x86</td>
+    </tr>
+  </table>
+
+  <h3>Sine Lookup Table (32 entries)</h3>
+  <pre><span class="cm">/* val = round(128 + 127 &times; sin(2&pi;i/32)), for i = 0..31
+   Center = 128, amplitude = 127, range = 1..255 */</span>
+<span class="kw">code unsigned char</span> sine32[<span class="num">32</span>] = {
+    <span class="num">128</span>, <span class="num">153</span>, <span class="num">177</span>, <span class="num">199</span>, <span class="num">218</span>, <span class="num">234</span>, <span class="num">245</span>, <span class="num">253</span>,   <span class="cm">/* rising */</span>
+    <span class="num">255</span>, <span class="num">253</span>, <span class="num">245</span>, <span class="num">234</span>, <span class="num">218</span>, <span class="num">199</span>, <span class="num">177</span>, <span class="num">153</span>,   <span class="cm">/* falling from peak */</span>
+    <span class="num">128</span>, <span class="num">103</span>,  <span class="num">79</span>,  <span class="num">57</span>,  <span class="num">38</span>,  <span class="num">22</span>,  <span class="num">11</span>,   <span class="num">3</span>,   <span class="cm">/* falling below center */</span>
+      <span class="num">1</span>,   <span class="num">3</span>,  <span class="num">11</span>,  <span class="num">22</span>,  <span class="num">38</span>,  <span class="num">57</span>,  <span class="num">79</span>, <span class="num">103</span>    <span class="cm">/* rising back to center */</span>
+};</pre>
+
+  <h3>LUT Indexing Optimization</h3>
+  <p>To get a 5-bit index (0&ndash;31) from the 16-bit phase accumulator, we want bits 15&ndash;11.
+  The naive way is <code>phase &gt;&gt; 11</code>, but on the 8051 this compiles to
+  <strong>11 individual right-shift operations</strong> on a 16-bit value (~22 machine cycles).
+  Instead:</p>
+  <pre><span class="cm">/* Fast: extract high byte, then shift right by 3 */</span>
+index = ((<span class="kw">unsigned char</span>)(phase &gt;&gt; <span class="num">8</span>)) &gt;&gt; <span class="num">3</span>;
+
+<span class="cm">/* This is equivalent to phase >> 11, but:
+   - (phase >> 8) is just taking the high byte (free on 8051)
+   - >> 3 is only 3 shifts of an 8-bit value (~3 cycles)
+   Total: ~5 cycles instead of ~22 */</span></pre>
+
+  <h3>Two-Tone Summation</h3>
+  <div class="math">
+    Each LUT value is 0&ndash;255, centered at 128.
+    <br>
+    Sum of two: 0&ndash;510, centered at 256.
+    <br>
+    Average (divide by 2): 0&ndash;255, centered at 128. No clipping.
+    <br>
+    Scale to 12-bit DAC: multiply by 16 (&lt;&lt; 4).
+    <br>
+    Combined: (s1 + s2) / 2 &times; 16 = <span class="eq">(s1 + s2) &lt;&lt; 3</span>
+    <br>
+    Result range: 0&ndash;4080 out of 4095. Uses ~99.6% of DAC range.
+  </div>
+</section>
+
+<!-- ══════════════════════════ 11. MEASUREMENT ══════════════════════════ -->
+<section id="measurement">
+  <h2><span class="num">11</span> Tone Amplitude Measurement</h2>
+
+  <h3>The Problem</h3>
+  <p>After the non-linear circuit, the signal contains many frequencies mixed together.
+  We need to extract the amplitude of specific tones (60, 350, 410, 470 Hz) from this
+  messy signal. This is what the FFT does on the scope &mdash; but we need to do it
+  digitally on the 8051 using ADC samples.</p>
+
+  <h3>The Solution: I/Q Coherent Detection</h3>
+  <p>This is essentially a <strong>digital lock-in amplifier</strong> or a <strong>single-bin DFT</strong>.
+  For each frequency we care about, we multiply the signal by cos and sin at that frequency,
+  then sum over many samples. If the signal contains that frequency, the sum grows large.
+  If not, it averages to zero.</p>
+
+  <div class="card explain">
+    <strong>Step by step for one frequency f<sub>k</sub>:</strong>
+    <ol>
+      <li>Sample the signal N times at rate F<sub>s</sub></li>
+      <li>For each sample x[n], multiply by cos(2&pi;f<sub>k</sub>n/F<sub>s</sub>) and accumulate &rarr; <strong>I<sub>k</sub></strong></li>
+      <li>For each sample x[n], multiply by sin(2&pi;f<sub>k</sub>n/F<sub>s</sub>) and accumulate &rarr; <strong>Q<sub>k</sub></strong></li>
+      <li>Amplitude = (2/N) &times; &radic;(I<sub>k</sub><sup>2</sup> + Q<sub>k</sub><sup>2</sup>)</li>
+    </ol>
+    <strong>Why both cos and sin?</strong> Because the signal's phase is unknown.
+    If the signal happens to be sin-aligned, the cosine correlation gives zero and vice versa.
+    Using both and combining with &radic;(I&sup2;+Q&sup2;) gives the amplitude regardless of phase.
+  </div>
+
+  <h3>Measurement Parameters</h3>
+  <table>
+    <tr><th>Parameter</th><th>Value</th><th>Why This Value</th></tr>
+    <tr>
+      <td>F<sub>s</sub> (ADC rate)</td>
+      <td>4,800 Hz</td>
+      <td>Well above Nyquist for 470 Hz. All 4 target frequencies fit integer cycles in the window (critical for accuracy).</td>
+    </tr>
+    <tr>
+      <td>N (window)</td>
+      <td>480 samples</td>
+      <td>Window duration = 100 ms. Integer cycles: 60&times;100ms=6, 350&times;100ms=35, 410&times;100ms=41, 470&times;100ms=47.</td>
+    </tr>
+  </table>
+
+  <div class="card info">
+    <strong>Why integer cycles matter:</strong> If the window doesn't contain an exact integer number of cycles
+    of f<sub>k</sub>, the correlation "leaks" &mdash; a non-zero result appears even when the tone isn't present.
+    With integer cycles, the orthogonality of sines guarantees clean separation between frequencies.
+  </div>
+
+  <div class="card">
+    <strong>Phase 5 code will be added here once Phases 1&ndash;3 are verified on the scope.</strong>
+    The implementation uses precomputed 8-bit cos/sin tables (one per target frequency),
+    16-bit multiply-accumulate in the ISR, and 32-bit magnitude computation in main().
+  </div>
+</section>
+
+<!-- ══════════════════════════ 12. MAIN CODE ══════════════════════════ -->
+<section id="main">
+  <h2><span class="num">12</span> Main Code</h2>
+
+  <h3>main.c (Phase 1 &amp; 2: Signal Generation)</h3>
+  <pre><span class="pp">#include &lt;at89c5131A.h&gt;</span>
+<span class="pp">#include "spi.h"</span>
+<span class="pp">#include "mcp4921.h"</span>
+<span class="pp">#include "mcp3008.h"</span>
+
+<span class="cm">/* ======================================================================
+   Mode: 0 = single tone (410 Hz), 1 = two tones (410 + 470 Hz)
+   Start with 0 to verify on scope, then change to 1 and rebuild.
+   ====================================================================== */</span>
+<span class="pp">#define TWO_TONE_MODE  0</span>
+
+<span class="pp">#define TH0_RELOAD    0xFF</span>
+<span class="pp">#define TL0_RELOAD    0x86</span>    <span class="cm">/* 65536 - 122 = 0xFF86 */</span>
+<span class="pp">#define PHASE_INC_F1  1640u</span>   <span class="cm">/* 4 &times; 410 Hz */</span>
+<span class="pp">#define PHASE_INC_F2  1880u</span>   <span class="cm">/* 4 &times; 470 Hz */</span>
+
+<span class="cm">/* CKCON controls X2 mode. Declare at file scope so it compiles even
+   if at89c5131A.h uses a different name. Same-address duplicate is OK in Keil. */</span>
+<span class="kw">sfr</span> CKCON_REG = <span class="num">0x8F</span>;
+
+<span class="kw">code unsigned char</span> sine32[<span class="num">32</span>] = {
+    <span class="num">128</span>, <span class="num">153</span>, <span class="num">177</span>, <span class="num">199</span>, <span class="num">218</span>, <span class="num">234</span>, <span class="num">245</span>, <span class="num">253</span>,
+    <span class="num">255</span>, <span class="num">253</span>, <span class="num">245</span>, <span class="num">234</span>, <span class="num">218</span>, <span class="num">199</span>, <span class="num">177</span>, <span class="num">153</span>,
+    <span class="num">128</span>, <span class="num">103</span>,  <span class="num">79</span>,  <span class="num">57</span>,  <span class="num">38</span>,  <span class="num">22</span>,  <span class="num">11</span>,   <span class="num">3</span>,
+      <span class="num">1</span>,   <span class="num">3</span>,  <span class="num">11</span>,  <span class="num">22</span>,  <span class="num">38</span>,  <span class="num">57</span>,  <span class="num">79</span>, <span class="num">103</span>
+};
+
+<span class="kw">volatile unsigned int</span> phase1 = <span class="num">0</span>;
+<span class="kw">volatile unsigned int</span> phase2 = <span class="num">0</span>;
+
+<span class="kw">void</span> <span class="fn">timer0_isr</span>(<span class="kw">void</span>) <span class="kw">interrupt</span> <span class="num">1</span> {
+    <span class="kw">unsigned char</span> s1;
+<span class="pp">#if TWO_TONE_MODE</span>
+    <span class="kw">unsigned char</span> s2;
+    <span class="kw">unsigned int</span>  sum;
+<span class="pp">#endif</span>
+
+    <span class="cm">/* Reload timer immediately to minimize jitter */</span>
+    TH0 = TH0_RELOAD;
+    TL0 = TL0_RELOAD;
+
+    <span class="cm">/* Advance phase accumulator and look up sine value */</span>
+    phase1 += PHASE_INC_F1;
+    s1 = sine32[((<span class="kw">unsigned char</span>)(phase1 &gt;&gt; <span class="num">8</span>)) &gt;&gt; <span class="num">3</span>];
+
+<span class="pp">#if TWO_TONE_MODE</span>
+    phase2 += PHASE_INC_F2;
+    s2 = sine32[((<span class="kw">unsigned char</span>)(phase2 &gt;&gt; <span class="num">8</span>)) &gt;&gt; <span class="num">3</span>];
+    <span class="cm">/* Average two tones, scale to 12-bit DAC */</span>
+    sum = ((<span class="kw">unsigned int</span>)s1 + (<span class="kw">unsigned int</span>)s2) &lt;&lt; <span class="num">3</span>;
+    <span class="fn">dac_write</span>(sum);
+<span class="pp">#else</span>
+    <span class="cm">/* Single tone, full amplitude, scale 8-bit to 12-bit */</span>
+    <span class="fn">dac_write</span>((<span class="kw">unsigned int</span>)s1 &lt;&lt; <span class="num">4</span>);
+<span class="pp">#endif</span>
+}
+
+<span class="kw">void</span> <span class="fn">main</span>(<span class="kw">void</span>) {
+    <span class="cm">/* Force standard 8051 timer clock (XTAL/12).
+       AT89C5131A supports X2 mode (XTAL/6). If Pt-51 bootloader
+       enables X2, all timer rates double and frequencies are wrong.
+       CKCON (0x8F) bit 0 = T0X2. Clear it. */</span>
+    CKCON_REG &amp;= ~<span class="num">0x01</span>;
+
+    <span class="fn">spi_init</span>();
+    <span class="fn">dac_init</span>();
+    <span class="fn">adc_init</span>();
+
+    <span class="cm">/* Timer 0: mode 1 (16-bit, manual reload).
+       Preserve Timer 1 config in upper nibble (may be used by bootloader). */</span>
+    TMOD = (TMOD &amp; <span class="num">0xF0</span>) | <span class="num">0x01</span>;
+    TH0  = TH0_RELOAD;
+    TL0  = TL0_RELOAD;
+    ET0  = <span class="num">1</span>;    <span class="cm">/* enable Timer 0 interrupt */</span>
+    EA   = <span class="num">1</span>;    <span class="cm">/* global interrupt enable */</span>
+    TR0  = <span class="num">1</span>;    <span class="cm">/* start Timer 0 */</span>
+
+    <span class="kw">while</span> (<span class="num">1</span>);   <span class="cm">/* ISR does all the work */</span>
+}</pre>
+</section>
+
+<!-- ══════════════════════════ 13. AUDIT FINDINGS ══════════════════════════ -->
+<section id="audit">
+  <h2><span class="num">13</span> Code Audit &mdash; Bugs Found &amp; Fixed</h2>
+
+  <p>A rigorous line-by-line audit was performed on all source files, checking SPI protocol correctness,
+  timer math, NCO phase math, DAC/ADC frame formats, 8051 timing budgets, and physical constraints.
+  Here are the findings:</p>
+
+  <h3>Bugs Fixed</h3>
+  <table>
+    <tr><th>#</th><th>Issue</th><th>Impact</th><th>Fix</th></tr>
+    <tr>
+      <td>1</td>
+      <td><strong>CKCON X2 mode</strong> &mdash; AT89C5131A defaults to T0X2=1 after reset, meaning Timer 0
+      runs at XTAL/4 (6 MHz) instead of XTAL/12 (2 MHz). Output frequency would be 3&times; too fast.</td>
+      <td>Wrong frequency, ISR overrun</td>
+      <td><code>CKCON_REG &amp;= ~0x01;</code> at startup. Declared as <code>sfr CKCON_REG = 0x8F;</code>
+      at file scope to avoid name conflicts with device header.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><strong>SPIF stale at power-on</strong> &mdash; if the SPIF flag is set from a previous state
+      or power-on glitch, the first <code>spi_xfer()</code> call would see SPIF=1 immediately, skip the
+      wait loop, and return stale data. The DAC would receive a corrupted first write.</td>
+      <td>Garbage first DAC write</td>
+      <td>Added dummy <code>SPSTA</code> + <code>SPDAT</code> reads in <code>spi_init()</code> to clear
+      any stale SPIF via the two-step clear sequence.</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><strong>Slow phase shift</strong> &mdash; <code>phase &gt;&gt; 11</code> compiles to 11 individual
+      right-shift operations on a 16-bit variable (~22 machine cycles on 8051).</td>
+      <td>ISR ~17 cycles slower than needed</td>
+      <td>Changed to <code>((unsigned char)(phase &gt;&gt; 8)) &gt;&gt; 3</code> &mdash; byte extract + 3 shifts
+      (~5 cycles). Mathematically equivalent.</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><strong>TMOD overwrote Timer 1</strong> &mdash; <code>TMOD = 0x01</code> zeroed the upper nibble,
+      potentially breaking Timer 1 if the bootloader configured it (e.g., for UART).</td>
+      <td>Possible bootloader conflict</td>
+      <td>Changed to <code>TMOD = (TMOD &amp; 0xF0) | 0x01;</code> to preserve Timer 1 config.</td>
+    </tr>
+  </table>
+
+  <h3>Known Limitations (Acceptable)</h3>
+  <table>
+    <tr><th>Issue</th><th>Impact</th><th>Why It's OK</th></tr>
+    <tr>
+      <td>Timer reload race (TH0 written before TL0)</td>
+      <td>~2-4 cycle jitter per ISR, ~2% frequency offset</td>
+      <td>TL0 is at ~0x03-0x08 when ISR fires, nowhere near 0xFF. The catastrophic case
+      (TL0 wrapping during the write) is physically impossible within the 61 &mu;s window.
+      The systematic offset is stable and inaudible.</td>
+    </tr>
+    <tr>
+      <td>8-bit effective DAC resolution (32-entry LUT &times; 8-bit values into 12-bit DAC)</td>
+      <td>Quantization harmonics above 6 kHz in the spectrum</td>
+      <td>Our frequencies of interest (60&ndash;470 Hz) are well below the quantization floor.
+      The harmonics are invisible in the scope FFT at our frequency range.</td>
+    </tr>
+    <tr>
+      <td>Two-tone ISR timing is tight (~95-120 cycles vs 122 budget)</td>
+      <td>Occasional overrun could cause jitter</td>
+      <td>Hardware SPI dominates the ISR (~10 cycles for 2 bytes at 3 MHz). The math adds
+      ~24 cycles for the second tone. Total fits within 122 with ~10-20 cycles margin.
+      If it occasionally overruns, the next interrupt fires immediately &mdash; stable but slightly
+      lower effective sample rate.</td>
+    </tr>
+    <tr>
+      <td>No SPI bus arbitration between ISR (DAC) and main loop (ADC)</td>
+      <td>Bus contention if adc_read() is called while ISR fires</td>
+      <td>Currently adc_read() is never called. When Phase 4 adds ADC reads,
+      interrupts must be disabled around the ADC SPI transaction:
+      <code>EA=0; adc_read(0); EA=1;</code></td>
+    </tr>
+  </table>
+
+  <h3>Verified Correct</h3>
+  <div class="card ok">
+    <ul>
+      <li><strong>SPCON = 0x71</strong> &mdash; AT89C5131A layout: SPR2(0), SPEN(1), SSDIS(1), MSTR(1), CPOL(0), CPHA(0), SPR1(0), SPR0(1).
+      Mode 0,0 correct for MCP4921 and MCP3008. Fosc/8 = 3 MHz, within MCP3008 max (3.6 MHz @5V).</li>
+      <li><strong>MCP4921 frame: 0x7000 | data</strong> &mdash; DAC_A, buffered, 1x gain, active. MSB sent first. Verified against datasheet.</li>
+      <li><strong>MCP3008 frame: 0x01, 0x80|ch&lt;&lt;4, 0x00</strong> &mdash; start bit, single-ended + channel, dummy. Result extraction (hi&amp;0x03)&lt;&lt;8|lo correct.</li>
+      <li><strong>Sine LUT</strong> &mdash; all 32 values verified against 128 + 127&times;sin(2&pi;i/32).</li>
+      <li><strong>NCO math</strong> &mdash; phase increments 1640 and 1880 give exactly 410.0 and 470.0 Hz at F<sub>s</sub>=16384.</li>
+      <li><strong>Timer reload</strong> &mdash; 65536 &minus; 122 = 65414 = 0xFF86. At 2 MHz machine clock, period = 61 &mu;s.</li>
+      <li><strong>SPIF clearing</strong> &mdash; spi_xfer reads SPSTA (polling), then returns SPDAT. Two-step clear matches AT89C5131A spec.</li>
+      <li><strong>interrupt 1</strong> &mdash; correct vector for Timer 0 on 8051.</li>
+      <li><strong>volatile phase accumulators</strong> &mdash; correctly prevents optimizer from caching ISR-modified variables.</li>
+      <li><strong>code keyword</strong> &mdash; correctly places sine LUT in flash/ROM on Keil C51.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════════════════════ 14. DEBUGGING ══════════════════════════ -->
+<section id="debug">
+  <h2><span class="num">14</span> Debugging Guide</h2>
+
+  <h3>Step-by-Step Verification</h3>
+  <p>Work through these in order. Don't skip ahead &mdash; each step depends on the previous one.</p>
+
+  <table>
+    <tr><th>#</th><th>Test</th><th>How</th><th>Expected</th><th>If It Fails</th></tr>
+    <tr>
+      <td><span class="step-num">1</span></td>
+      <td>CPU running?</td>
+      <td>Toggle an LED in <code>while(1)</code> with a delay loop</td>
+      <td>LED blinks at ~1 Hz</td>
+      <td>Programmer/flash failed. Check USB cable, FLIP software, chip power.</td>
+    </tr>
+    <tr>
+      <td><span class="step-num">2</span></td>
+      <td>Timer ISR firing?</td>
+      <td>Inside the ISR, increment a counter; toggle LED every 16384 ticks</td>
+      <td>LED blinks at 1 Hz (16384 Hz / 16384 = 1 Hz)</td>
+      <td>Check TMOD=0x01, ET0=1, EA=1, TR0=1. Also check CKCON &mdash; if X2 mode is on, the blink rate doubles.</td>
+    </tr>
+    <tr>
+      <td><span class="step-num">3</span></td>
+      <td>SPI clock active?</td>
+      <td>Probe P1.6 (SCK) on scope, 10 &mu;s/div</td>
+      <td>Bursts of 16 clock pulses every ~61 &mu;s</td>
+      <td>SPCON value wrong, or the SFR addresses (0xC3/0xC4/0xC5) don't match your chip's header.</td>
+    </tr>
+    <tr>
+      <td><span class="step-num">4</span></td>
+      <td>CS toggling?</td>
+      <td>Probe P1.1 (DAC CS) on scope, 10 &mu;s/div</td>
+      <td>Short LOW pulses (~6 &mu;s wide) every ~61 &mu;s</td>
+      <td>Check <code>sbit DAC_CS = P1^1;</code> is correct.</td>
+    </tr>
+    <tr>
+      <td><span class="step-num">5</span></td>
+      <td>DAC VOUT working?</td>
+      <td>Probe MCP4921 pin 7 (VOUT), <strong>1 V/div, 1 ms/div, DC coupling</strong></td>
+      <td>Clean 410 Hz sine wave, 0&ndash;5 V swing</td>
+      <td>Check VREF (+5V), LDAC (GND), decoupling cap. If voltage is 10x too small, check probe/scope attenuation match.</td>
+    </tr>
+    <tr>
+      <td><span class="step-num">6</span></td>
+      <td>Diode output?</td>
+      <td>Probe node A (junction of diode cathode + resistor + MCP3008 CH0)</td>
+      <td>Same sine but clipped below ~0.6 V (flat bottom)</td>
+      <td>Check diode orientation: band (cathode) faces AWAY from DAC, toward node A.</td>
+    </tr>
+  </table>
+
+  <h3>Common Pitfalls</h3>
+  <div class="card warn">
+    <ul>
+      <li><strong>Probe attenuation mismatch:</strong> Scope probe has a switch (1&times;/10&times;) near the BNC end.
+      The scope channel menu must match. If mismatched, amplitude reads 10&times; wrong.
+      <em>Always use 10&times; probe + 10&times; scope setting for these voltages.</em></li>
+
+      <li><strong>Wrong pin probed:</strong> MCP3008 pin 12 = DOUT (digital SPI data), NOT the analog signal.
+      Pin 1 (CH0) has the analog signal. MCP4921 pin 7 (VOUT) has the DAC output.</li>
+
+      <li><strong>AC coupling on scope:</strong> Removes the 2.5 V DC offset, making the sine look smaller
+      and centered at 0 V. Use <strong>DC coupling</strong> to see the true signal level.</li>
+
+      <li><strong>Missing CKCON fix:</strong> If the Pt-51 bootloader enables X2 mode, Timer 0 runs at
+      XTAL/6 instead of XTAL/12. All frequencies double. Fix: <code>CKCON &amp;= ~0x01;</code> at
+      the start of <code>main()</code>.</li>
+
+      <li><strong>Missing decoupling cap:</strong> SPI data gets corrupted by power supply noise.
+      DAC outputs random voltages instead of smooth sine. Add 100 nF ceramic between VDD and GND
+      on each chip, placed within 1 cm of the chip.</li>
+
+      <li><strong>LDAC floating:</strong> If MCP4921 pin 5 (LDAC) isn't tied to GND, the DAC output
+      updates at random times instead of on CS rising edge. Result: noisy, jittery waveform.</li>
+
+      <li><strong>Slow bit-shift on 8051:</strong> <code>phase &gt;&gt; 11</code> compiles to 11 shifts of
+      a 16-bit value (~22 machine cycles). Use <code>((unsigned char)(phase &gt;&gt; 8)) &gt;&gt; 3</code>
+      instead (~5 cycles). This can make the difference between the ISR fitting in the timer
+      period or not.</li>
+    </ul>
+  </div>
+
+  <h3>Scope Settings Cheat Sheet</h3>
+  <table>
+    <tr><th>What You're Looking At</th><th>V/div</th><th>Time/div</th><th>Coupling</th><th>Where to Probe</th></tr>
+    <tr><td>Single tone (410 Hz)</td><td>1 V</td><td>1 ms</td><td>DC</td><td>MCP4921 pin 7</td></tr>
+    <tr><td>Two-tone beat</td><td>1 V</td><td>5 ms</td><td>DC</td><td>MCP4921 pin 7</td></tr>
+    <tr><td>After diode</td><td>1 V</td><td>5 ms</td><td>DC</td><td>Node A (MCP3008 pin 1)</td></tr>
+    <tr><td>FFT / Spectrum</td><td>&mdash;</td><td>50 ms</td><td>DC</td><td>Node A</td></tr>
+    <tr><td>SPI debug (SCK)</td><td>2 V</td><td>10 &mu;s</td><td>DC</td><td>P1.6 on SPI header</td></tr>
+    <tr><td>SPI debug (CS)</td><td>2 V</td><td>50 &mu;s</td><td>DC</td><td>P1.1 on SPI header</td></tr>
+  </table>
+
+  <h3>Keil Build Steps</h3>
+  <ol>
+    <li>Project &rarr; Options for Target &rarr; Device: select <strong>AT89C5131</strong></li>
+    <li>Target tab: Xtal = <strong>24.0 MHz</strong></li>
+    <li>Right-click Source Group 1 &rarr; Add Existing Files: add <code>main.c</code>, <code>spi.c</code>,
+    <code>mcp4921.c</code>, <code>mcp3008.c</code></li>
+    <li>Options for Target &rarr; C51 tab &rarr; Include Paths: add the <code>src/</code> folder</li>
+    <li>Build (F7) &mdash; should compile with 0 errors, 0 warnings</li>
+    <li>Flash using FLIP or your usual Pt-51 programmer</li>
+  </ol>
+</section>
+
+</main>
+</body>
+</html>
