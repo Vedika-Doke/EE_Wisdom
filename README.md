@@ -4,18 +4,19 @@
 
 Academic projects, hands-on engineering work, and interactive study tools spanning electrical engineering, embedded systems, digital design, and hardware development — built over multiple roles and coursework at IIT Bombay.
 
-The repository is **organized into branches**, each representing a distinct role, project, or study area.
+Each project lives in its own folder on `main`. Interactive study guides are served via GitHub Pages from the [`EE_LearningAids`](https://github.com/Vedika-Doke/EE_Wisdom/tree/EE_LearningAids) branch.
 
 ---
 
-## Branch Overview
+## Repository Structure
 
-| Branch | Contents |
+| Folder / Branch | Contents |
 |---|---|
-| [`EE_LearningAids`](#ee_learningaids) | Interactive browser-based study guides for IIT Bombay EE courses + TI WiSH test prep |
-| [`Electrical-trainee-racing-team`](#electrical-trainee-racing-team) | ECU firmware, AMS/BMS research, HV-LV isolation, and comms protocol work for a student electric racing team |
-| [`JDE-Tenure`](#jde-tenure) | Two complete KiCad PCB designs — STM32 dashboard board and a sensor testing board |
-| [`ToyCPU-1281`](#toycpu-1281) | VHDL-based 8-bit toy CPU (i281) with custom ISA and Bubble Sort implementation |
+| [`EE309-Microprocessors-Project/`](EE309-Microprocessors-Project/) | AT89C5131A + MCP4921 DAC + MCP3008 ADC — sine wave generation, NCO, Goertzel tone detection |
+| [`Electrical-trainee-racing-team/`](Electrical-trainee-racing-team/) | ECU firmware, AMS/BMS research, HV-LV isolation, and comms protocol work for a student electric racing team |
+| [`JDE-Tenure/`](JDE-Tenure/) | Two complete KiCad PCB designs — STM32 dashboard board and a sensor testing board |
+| [`ToyCPU-1281/`](ToyCPU-1281/) | VHDL-based 8-bit toy CPU (i281) with custom ISA and Bubble Sort implementation |
+| [`EE_LearningAids`](https://github.com/Vedika-Doke/EE_Wisdom/tree/EE_LearningAids) (branch) | Interactive browser-based study guides — [live site](https://vedika-doke.github.io/EE_Wisdom/) |
 
 ---
 
@@ -143,8 +144,21 @@ Course project: design and implementation of an 8-bit toy CPU (i281).
 
 ---
 
+## EE309-Microprocessors-Project
+
+Hardware project for EE309 (Microprocessors) — AT89C5131A microcontroller driving external DAC/ADC over SPI.
+
+| Phase | Description |
+|---|---|
+| `phase1/` | Basic MCP4921 DAC sine wave output via lookup table |
+| `phase2/` | NCO (Numerically Controlled Oscillator) — frequency-agile sine generation |
+| `phase3/` | MCP3008 ADC integration — loopback DAC→ADC measurement |
+| `phase3_goertzel/` | Goertzel algorithm for single-bin tone detection on ADC samples |
+| `src/` | Latest working source files |
+
+---
+
 ## Notes
 
-- Each branch is self-contained with its own documentation.
-- All HTML study tools are offline-capable — just open in a browser.
-- Commits to side branches don't appear on the GitHub contribution graph until merged into `main`.
+- All HTML study tools are offline-capable — open in a browser or visit the [live site](https://vedika-doke.github.io/EE_Wisdom/).
+- Study guides are served from the `EE_LearningAids` branch via GitHub Pages.

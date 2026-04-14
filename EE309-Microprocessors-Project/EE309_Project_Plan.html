@@ -1,0 +1,1778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EE309 — Hardware Project Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #080c10;
+    --surface:  #0d1520;
+    --card:     #111b2a;
+    --border:   #1e3048;
+    --accent:   #00e5ff;
+    --accent2:  #ff6b35;
+    --accent3:  #7fff6b;
+    --text:     #ccd8e8;
+    --muted:    #566a82;
+    --heading:  #e8f2ff;
+    --mono:     'IBM Plex Mono', monospace;
+    --sans:     'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── Grid background ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Scanline overlay ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,.08) 2px,
+      rgba(0,0,0,.08) 4px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Header ── */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 60px 40px 50px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(0,229,255,.04) 0%, transparent 100%);
+  }
+
+  .header-meta {
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .header-meta span::before { content: '// '; opacity: .5; }
+
+  h1 {
+    font-family: var(--sans);
+    font-size: clamp(32px, 5vw, 64px);
+    font-weight: 800;
+    color: var(--heading);
+    line-height: 1.05;
+    letter-spacing: -.02em;
+    max-width: 900px;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .header-sub {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--muted);
+    max-width: 680px;
+    line-height: 1.8;
+  }
+
+  .marks-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 28px;
+    background: rgba(0,229,255,.07);
+    border: 1px solid rgba(0,229,255,.2);
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: .08em;
+  }
+
+  .marks-badge strong { font-size: 20px; font-weight: 600; }
+
+  /* ── Nav ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(8,12,16,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+
+  nav a {
+    display: block;
+    padding: 14px 18px;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color .2s, border-color .2s;
+  }
+
+  nav a:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── Layout ── */
+  main {
+    position: relative;
+    z-index: 10;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 40px 80px;
+  }
+
+  /* ── Section ── */
+  section {
+    padding: 60px 0 0;
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    font-family: var(--sans);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--heading);
+    letter-spacing: -.01em;
+    margin-bottom: 28px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h3 {
+    font-family: var(--sans);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--heading);
+    margin: 28px 0 12px;
+  }
+
+  p { color: var(--text); margin-bottom: 14px; }
+
+  /* ── Step cards ── */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .step-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .2s, transform .2s;
+  }
+
+  .step-card:hover {
+    border-color: rgba(0,229,255,.35);
+    transform: translateY(-2px);
+  }
+
+  .step-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+
+  .step-num {
+    font-size: 10px;
+    letter-spacing: .2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .step-title {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--heading);
+    margin-bottom: 10px;
+  }
+
+  .step-desc { font-size: 13px; color: var(--muted); }
+
+  /* ── Hardware table ── */
+  .hw-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 13px;
+  }
+
+  .hw-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hw-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(30,48,72,.5);
+    color: var(--text);
+  }
+
+  .hw-table tr:hover td { background: rgba(0,229,255,.03); }
+
+  .hw-table td:first-child {
+    color: var(--accent);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* ── Code blocks ── */
+  .code-wrap {
+    margin: 16px 0;
+    background: #060a0f;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: .08em;
+  }
+
+  .code-lang {
+    color: var(--accent2);
+    font-weight: 600;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+  }
+
+  pre {
+    padding: 20px 22px;
+    overflow-x: auto;
+    font-size: 12.5px;
+    line-height: 1.75;
+  }
+
+  /* Syntax colours */
+  .kw  { color: #7b9fff; }
+  .fn  { color: #5ecaff; }
+  .cm  { color: #3a5470; font-style: italic; }
+  .str { color: #a8e6a3; }
+  .num { color: var(--accent2); }
+  .pp  { color: #c792ea; }
+  .var { color: var(--text); }
+
+  /* ── Signal flow diagram ── */
+  .signal-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 20px 0;
+    padding: 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+
+  .sf-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 16px;
+    font-size: 12px;
+    color: var(--heading);
+    white-space: nowrap;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .sf-block.highlight {
+    border-color: rgba(0,229,255,.4);
+    background: rgba(0,229,255,.07);
+    color: var(--accent);
+  }
+
+  .sf-block .sf-sub {
+    display: block;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .sf-arrow {
+    padding: 0 8px;
+    color: var(--muted);
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  /* ── Frequency table ── */
+  .freq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .freq-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+  }
+
+  .freq-card.im2 { border-color: rgba(255,107,53,.3); }
+  .freq-card.im3 { border-color: rgba(127,255,107,.3); }
+  .freq-card.fund { border-color: rgba(0,229,255,.3); }
+
+  .freq-tag {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .16em;
+    margin-bottom: 6px;
+  }
+
+  .freq-card.im2 .freq-tag { color: var(--accent2); }
+  .freq-card.im3 .freq-tag { color: var(--accent3); }
+  .freq-card.fund .freq-tag { color: var(--accent); }
+
+  .freq-val {
+    font-family: var(--sans);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--heading);
+  }
+
+  .freq-formula { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* ── Marking scheme ── */
+  .marks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .mark-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .mark-pts {
+    font-family: var(--sans);
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    flex-shrink: 0;
+    min-width: 36px;
+  }
+
+  .mark-label {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* ── Tips ── */
+  .tip-box {
+    display: flex;
+    gap: 14px;
+    background: rgba(0,229,255,.04);
+    border: 1px solid rgba(0,229,255,.15);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 13px;
+    line-height: 1.65;
+  }
+
+  .tip-box.warn {
+    background: rgba(255,107,53,.04);
+    border-color: rgba(255,107,53,.15);
+    border-left-color: var(--accent2);
+  }
+
+  .tip-icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+
+  /* ── Math formula ── */
+  .math {
+    display: block;
+    background: #060a0f;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 20px;
+    margin: 12px 0;
+    font-size: 13.5px;
+    color: var(--accent);
+    letter-spacing: .04em;
+    overflow-x: auto;
+  }
+
+  /* ── Circuit ASCII ── */
+  .circuit {
+    background: #060a0f;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 22px 26px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--accent3);
+    overflow-x: auto;
+    margin: 16px 0;
+    white-space: pre;
+  }
+
+  /* ── Footer ── */
+  footer {
+    position: relative;
+    z-index: 10;
+    padding: 32px 40px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* ── Scroll animations ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity .55s ease, transform .55s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── Viz panels ── */
+  .viz-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 14px;
+  }
+
+  .viz-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .viz-btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .viz-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .06em;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+
+  .viz-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .viz-btn.active { background: rgba(0,229,255,.1); border-color: var(--accent); color: var(--accent); }
+
+  .viz-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .viz-slider-row input[type=range] {
+    -webkit-appearance: none;
+    width: 140px;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  .viz-slider-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  .viz-slider-row span { color: var(--accent); font-weight: 600; min-width: 36px; }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #060a0f;
+  }
+
+  .viz-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 10px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .leg {
+    font-size: 11px;
+    letter-spacing: .06em;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .leg::before {
+    content: '';
+    display: inline-block;
+    width: 22px; height: 2px;
+    border-radius: 1px;
+  }
+
+  .leg-f1::before   { background: #00e5ff; }
+  .leg-f2::before   { background: #7b9fff; }
+  .leg-sum::before  { background: #ffffff; }
+  .leg-im2::before  { background: #ff6b35; }
+  .leg-im3::before  { background: #7fff6b; }
+  .leg-dc::before   { background: #566a82; }
+
+  .leg-f1  { color: #00e5ff; }
+  .leg-f2  { color: #7b9fff; }
+  .leg-sum { color: #ffffff; }
+  .leg-im2 { color: #ff6b35; }
+  .leg-im3 { color: #7fff6b; }
+  .leg-dc  { color: #566a82; }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    header, main, footer, nav { padding-left: 20px; padding-right: 20px; }
+    h1 { font-size: 28px; }
+    .signal-flow { flex-direction: column; align-items: flex-start; }
+    .sf-arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-meta">
+    <span>EE309 — Microprocessors</span>
+    <span>Spring 2026</span>
+    <span>IIT Bombay</span>
+    <span>PT-51 Board</span>
+  </div>
+  <h1>Non-Linear Intermodulation<br><em>Hardware Project</em></h1>
+  <p class="header-sub">
+    Generate a two-tone signal with the 8051 MCU, drive a non-linear BJT circuit,
+    measure the intermodulation distortion products via coherent ADC sampling,
+    and verify against oscilloscope FFT.
+  </p>
+  <div class="marks-badge">
+    <strong>25</strong> marks &nbsp;|&nbsp; Optional hardware project
+  </div>
+</header>
+
+<nav>
+  <a href="#overview">Overview</a>
+  <a href="#hardware">Hardware</a>
+  <a href="#step1">DAC &amp; Gen</a>
+  <a href="#step2">Two-Tone</a>
+  <a href="#step3">BJT Circuit</a>
+  <a href="#step4">ADC &amp; Sampling</a>
+  <a href="#step5">Amplitude Meas.</a>
+  <a href="#frequencies">Frequencies</a>
+  <a href="#marks">Marking</a>
+  <a href="#viz">Visualisations</a>
+</nav>
+
+<main>
+
+  <!-- OVERVIEW -->
+  <section id="overview">
+    <div class="section-label">// 00 — Project Overview</div>
+    <h2>What You're Building</h2>
+
+    <div class="signal-flow reveal">
+      <div class="sf-block highlight">
+        8051 MCU<br>
+        <span class="sf-sub">PT-51 Board</span>
+      </div>
+      <div class="sf-arrow">→</div>
+      <div class="sf-block">
+        DAC0808<br>
+        <span class="sf-sub">P1 port</span>
+      </div>
+      <div class="sf-arrow">→</div>
+      <div class="sf-block">
+        LPF + Op-Amp<br>
+        <span class="sf-sub">smoothing</span>
+      </div>
+      <div class="sf-arrow">→</div>
+      <div class="sf-block highlight">
+        BJT Amplifier<br>
+        <span class="sf-sub">non-linear</span>
+      </div>
+      <div class="sf-arrow">→</div>
+      <div class="sf-block">
+        ADC0804<br>
+        <span class="sf-sub">P0 port</span>
+      </div>
+      <div class="sf-arrow">→</div>
+      <div class="sf-block highlight">
+        8051 MCU<br>
+        <span class="sf-sub">Goertzel / coherent</span>
+      </div>
+    </div>
+
+    <div class="steps reveal">
+      <div class="step-card">
+        <div class="step-num">Step 01</div>
+        <div class="step-title">Generate Two-Tone Signal</div>
+        <div class="step-desc">Use a sine lookup table + Timer ISR to output x(t) = A[cos(2πf₁t) + cos(2πf₂t)] via DAC.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">Step 02</div>
+        <div class="step-title">Drive Non-Linear Circuit</div>
+        <div class="step-desc">Feed the two-tone signal into a BJT CE amplifier. The transistor's exponential Ic–Vbe generates new IM tones.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">Step 03</div>
+        <div class="step-title">Sample Output with ADC</div>
+        <div class="step-desc">Use ADC0804 to digitise the distorted output at a carefully chosen coherent sampling rate.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">Step 04</div>
+        <div class="step-title">Measure IM Amplitudes</div>
+        <div class="step-desc">Apply Goertzel algorithm or coherent multiplication to extract amplitudes at f₁, f₂, f₂−f₁, 2f₁−f₂.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">Step 05</div>
+        <div class="step-title">Verify on Oscilloscope</div>
+        <div class="step-desc">Compare your computed IM amplitudes with the oscilloscope FFT spectrum display.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HARDWARE BOM -->
+  <section id="hardware">
+    <div class="section-label">// 01 — Bill of Materials</div>
+    <h2>Hardware Required</h2>
+    <table class="hw-table reveal">
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Value / Part #</th>
+          <th>Purpose</th>
+          <th>Qty</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>PT-51 Board</td><td>AT89C5131A (8051)</td><td>MCU — signal generation + ADC control</td><td>1</td></tr>
+        <tr><td>DAC</td><td>DAC0808 / MC1408</td><td>Convert 8-bit digital → analog current</td><td>1</td></tr>
+        <tr><td>Op-Amp</td><td>LM741 / TL071</td><td>DAC current → voltage conversion (I-to-V)</td><td>1</td></tr>
+        <tr><td>ADC</td><td>ADC0804 <em>or</em> MCP3008</td><td>Digitise BJT output (8-bit / 10-bit SPI)</td><td>1</td></tr>
+        <tr><td>BJT</td><td>2N2222 / BC547</td><td>Non-linear element (CE amplifier)</td><td>1</td></tr>
+        <tr><td>Resistors</td><td>47kΩ, 10kΩ, 2.2kΩ, 470Ω, 5kΩ, 10kΩ</td><td>Bias divider, RC, RE, op-amp feedback, ADC clock</td><td>—</td></tr>
+        <tr><td>Capacitors</td><td>10µF (×2), 150pF</td><td>Input/output coupling, ADC clock RC</td><td>—</td></tr>
+        <tr><td>Power supply</td><td>+9V, +5V, −5V</td><td>BJT Vcc, digital supply, op-amp negative rail</td><td>—</td></tr>
+        <tr><td>Oscilloscope</td><td>(with FFT mode)</td><td>Visual verification of spectrum</td><td>1</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tip-box reveal">
+      <span class="tip-icon">💡</span>
+      <span>If the PT-51 lab kit already has the <strong>MCP3008</strong> SPI ADC onboard (used in EE337 labs), use that for ADC sampling — it's 10-bit and talks over SPI using P3 pins, saving breadboard space.</span>
+    </div>
+  </section>
+
+  <!-- STEP 1 — DAC -->
+  <section id="step1">
+    <div class="section-label">// 02 — Signal Generation</div>
+    <h2>Step 1 — DAC Wiring &amp; Single-Tone Sine Wave</h2>
+
+    <h3>DAC0808 Pin Connections</h3>
+    <p>Connect all 8 data pins of DAC0808 directly to <strong>Port 1 (P1)</strong> of the 8051. P1 is a full-push-pull 8-bit output with no alternate functions conflicting with data.</p>
+
+    <table class="hw-table reveal">
+      <thead><tr><th>DAC0808 Pin</th><th>Connect to</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>D0–D7 (pins 5–12)</td><td>P1.0–P1.7</td><td>D7 = MSB → P1.7</td></tr>
+        <tr><td>Pin 14 (Vref−)</td><td>GND via 5kΩ to −5V</td><td>Sets Iref ≈ 2 mA</td></tr>
+        <tr><td>Pin 15 (Vref+)</td><td>+5V via 5kΩ</td><td>Reference voltage</td></tr>
+        <tr><td>Pin 16 (Vcc)</td><td>+5V</td><td>Digital supply</td></tr>
+        <tr><td>Pin 13 (Vee)</td><td>−5V</td><td>Negative supply</td></tr>
+        <tr><td>Pin 4 (Iout)</td><td>LM741 inverting input</td><td>Op-amp feedback Rf = 5kΩ to Vout</td></tr>
+        <tr><td>Pin 3 (GND)</td><td>Analog GND</td><td>Star ground</td></tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top:16px;">Op-amp output voltage formula:</p>
+    <code class="math">Vout = −Iref × Rfeedback × [D7/2 + D6/4 + ... + D0/256]</code>
+    <p>With Iref = 2mA, Rf = 5kΩ → Vout swings <strong>0 to −5V</strong> (inverted). Add a unity-gain inverting stage or swap the reference polarity to get 0–5V.</p>
+
+    <h3>Single-Tone Lookup Table (C)</h3>
+    <div class="code-wrap reveal">
+      <div class="code-header">
+        <span>sine_gen_single.c</span>
+        <span class="code-lang">C — 8051</span>
+      </div>
+      <pre><span class="pp">#include</span> <span class="str">&lt;reg51.h&gt;</span>
+
+<span class="cm">/* 36-sample sine table — 0° to 350° in 10° steps
+   Formula: val = 128 + 127*sin(theta)
+   Midpoint 128 = 0V (DAC centred) */</span>
+<span class="kw">code unsigned char</span> sine36[<span class="num">36</span>] = {
+  <span class="num">128</span>,<span class="num">150</span>,<span class="num">172</span>,<span class="num">192</span>,<span class="num">210</span>,<span class="num">226</span>,<span class="num">239</span>,<span class="num">248</span>,<span class="num">254</span>,<span class="num">255</span>,
+  <span class="num">254</span>,<span class="num">248</span>,<span class="num">239</span>,<span class="num">226</span>,<span class="num">210</span>,<span class="num">192</span>,<span class="num">172</span>,<span class="num">150</span>,<span class="num">128</span>,<span class="num">106</span>,
+  <span class="num">84</span>, <span class="num">64</span>, <span class="num">46</span>, <span class="num">30</span>, <span class="num">17</span>,  <span class="num">8</span>,  <span class="num">2</span>,  <span class="num">0</span>,  <span class="num">2</span>,  <span class="num">8</span>,
+  <span class="num">17</span>, <span class="num">30</span>, <span class="num">46</span>, <span class="num">64</span>, <span class="num">84</span>,<span class="num">106</span>
+};
+
+<span class="cm">/* Timer 0 reload value controls output frequency
+   f_out = F_clk / (12 × T_reload × N_samples)
+   For 12MHz crystal, N=36, f_out=500Hz:
+   T = 12e6/(12*500*36) = 55.6 → TH0 = 256-56 = 200 */</span>
+<span class="pp">#define</span> TH0_RELOAD <span class="num">200</span>
+<span class="pp">#define</span> N_SAMPLES  <span class="num">36</span>
+
+<span class="kw">volatile unsigned char</span> idx = <span class="num">0</span>;
+
+<span class="kw">void</span> <span class="fn">timer0_isr</span>(<span class="kw">void</span>) <span class="kw">interrupt</span> <span class="num">1</span> {
+  TH0 = TH0_RELOAD;         <span class="cm">/* reload */</span>
+  P1  = sine36[idx];        <span class="cm">/* write sample to DAC */</span>
+  <span class="kw">if</span> (++idx >= N_SAMPLES) idx = <span class="num">0</span>;
+}
+
+<span class="kw">void</span> <span class="fn">main</span>(<span class="kw">void</span>) {
+  TMOD = <span class="num">0x02</span>;             <span class="cm">/* Timer 0, Mode 2 (8-bit auto-reload) */</span>
+  TH0  = TH0_RELOAD;
+  TL0  = TH0_RELOAD;
+  ET0  = <span class="num">1</span>; EA = <span class="num">1</span>; TR0 = <span class="num">1</span>;
+  <span class="kw">while</span>(<span class="num">1</span>);
+}</pre>
+    </div>
+
+    <div class="tip-box reveal">
+      <span class="tip-icon">📐</span>
+      <span><strong>Frequency formula:</strong> f_out = F_clk ÷ (12 × (256 − TH0_RELOAD) × N_samples). For a 12 MHz crystal, 1 machine cycle = 1 µs. Adjust TH0_RELOAD to tune output frequency.</span>
+    </div>
+
+    <div class="tip-box warn reveal">
+      <span class="tip-icon">⚠️</span>
+      <span>Add an RC low-pass filter (R = 1kΩ, C = 10nF, cutoff ~16kHz) between the op-amp output and the BJT base to smooth DAC staircase artifacts before they reach the nonlinear circuit.</span>
+    </div>
+  </section>
+
+  <!-- STEP 2 — TWO TONE -->
+  <section id="step2">
+    <div class="section-label">// 03 — Two-Tone Generation</div>
+    <h2>Step 2 — Dual Phase Accumulator</h2>
+
+    <p>Maintain two independent phase counters. On each timer interrupt, advance both, look up both sine values, average them, and output. This produces x(t) = A[cos(2πf₁t) + cos(2πf₂t)] digitally.</p>
+
+    <div class="code-wrap reveal">
+      <div class="code-header">
+        <span>two_tone_gen.c</span>
+        <span class="code-lang">C — 8051</span>
+      </div>
+      <pre><span class="pp">#include</span> <span class="str">&lt;reg51.h&gt;</span>
+
+<span class="cm">/* 64-sample sine table (0–255, midpoint=128) */</span>
+<span class="kw">code unsigned char</span> sine64[<span class="num">64</span>] = {
+  <span class="num">128</span>,<span class="num">140</span>,<span class="num">153</span>,<span class="num">165</span>,<span class="num">177</span>,<span class="num">188</span>,<span class="num">199</span>,<span class="num">209</span>,<span class="num">218</span>,<span class="num">226</span>,<span class="num">233</span>,<span class="num">239</span>,
+  <span class="num">244</span>,<span class="num">248</span>,<span class="num">251</span>,<span class="num">253</span>,<span class="num">254</span>,<span class="num">253</span>,<span class="num">251</span>,<span class="num">248</span>,<span class="num">244</span>,<span class="num">239</span>,<span class="num">233</span>,<span class="num">226</span>,
+  <span class="num">218</span>,<span class="num">209</span>,<span class="num">199</span>,<span class="num">188</span>,<span class="num">177</span>,<span class="num">165</span>,<span class="num">153</span>,<span class="num">140</span>,<span class="num">128</span>,<span class="num">116</span>,<span class="num">103</span>, <span class="num">91</span>,
+   <span class="num">79</span>, <span class="num">68</span>, <span class="num">57</span>, <span class="num">47</span>, <span class="num">38</span>, <span class="num">30</span>, <span class="num">23</span>, <span class="num">17</span>, <span class="num">12</span>,  <span class="num">8</span>,  <span class="num">5</span>,  <span class="num">3</span>,
+    <span class="num">2</span>,  <span class="num">3</span>,  <span class="num">5</span>,  <span class="num">8</span>, <span class="num">12</span>, <span class="num">17</span>, <span class="num">23</span>, <span class="num">30</span>, <span class="num">38</span>, <span class="num">47</span>, <span class="num">57</span>, <span class="num">68</span>,
+   <span class="num">79</span>, <span class="num">91</span>,<span class="num">103</span>,<span class="num">116</span>
+};
+
+<span class="cm">/* Choose step values for desired frequency ratio:
+   f_tone = (step × Fs) / 64
+   Fs = F_clk / (12 × (256-TH0_RELOAD))
+   Example: Fs=8192Hz, step1=4 → f1=512Hz, step2=5 → f2=640Hz
+   IM2 at |f2-f1|=128Hz, IM3 at 2f1-f2=384Hz */</span>
+<span class="pp">#define</span> STEP1  <span class="num">4</span>
+<span class="pp">#define</span> STEP2  <span class="num">5</span>
+<span class="pp">#define</span> TH0_R  <span class="num">137</span>   <span class="cm">/* 256 - 119 → ~8192Hz sample rate at 12MHz */</span>
+
+<span class="kw">volatile unsigned char</span> ph1 = <span class="num">0</span>, ph2 = <span class="num">0</span>;
+
+<span class="kw">void</span> <span class="fn">timer0_isr</span>(<span class="kw">void</span>) <span class="kw">interrupt</span> <span class="num">1</span> {
+  <span class="kw">unsigned int</span> s;
+  TH0 = TH0_R;
+  ph1 = (ph1 + STEP1) & <span class="num">0x3F</span>;   <span class="cm">/* mod 64 */</span>
+  ph2 = (ph2 + STEP2) & <span class="num">0x3F</span>;
+  s   = (<span class="kw">unsigned int</span>)sine64[ph1]
+      + (<span class="kw">unsigned int</span>)sine64[ph2];
+  P1  = (<span class="kw">unsigned char</span>)(s >> <span class="num">1</span>); <span class="cm">/* average → keeps in 0–255 */</span>
+}
+
+<span class="kw">void</span> <span class="fn">main</span>(<span class="kw">void</span>) {
+  TMOD = <span class="num">0x02</span>;
+  TH0  = TH0_R; TL0 = TH0_R;
+  ET0  = <span class="num">1</span>; EA = <span class="num">1</span>; TR0 = <span class="num">1</span>;
+  <span class="kw">while</span>(<span class="num">1</span>);
+}</pre>
+    </div>
+
+    <div class="tip-box reveal">
+      <span class="tip-icon">🎯</span>
+      <span><strong>Choosing step values:</strong> Pick step1 and step2 as small integers with no common factor (coprime). The IM products land at integer multiples of (Fs/64) — all cleanly resolvable without spectral leakage.</span>
+    </div>
+  </section>
+
+  <!-- STEP 3 — BJT CIRCUIT -->
+  <section id="step3">
+    <div class="section-label">// 04 — Non-Linear Element</div>
+    <h2>Step 3 — BJT Common-Emitter Amplifier</h2>
+
+    <p>The BJT collector current follows an exponential: <code>Ic = Is · exp(Vbe/Vt)</code>. Expanding around the Q-point, the small-signal model includes 2nd and 3rd order terms that generate intermodulation products.</p>
+
+    <h3>Circuit (2N2222, Vcc = 9V)</h3>
+    <div class="circuit">        +9V
+          |
+         RC = 2.2kΩ
+          |
+    ------+----------> Vout (to ADC + scope)
+    |
+   [C] 2N2222
+   [B]----[10µF]-----< Vin (from DAC + LPF)
+   [E]
+    |
+   RE = 470Ω  (unbypassed — keep some gain compression visible)
+    |
+   GND
+
+Bias network:  R1 = 47kΩ (from +9V to Base)
+               R2 = 10kΩ (from Base to GND)
+Output cap:    10µF in series to Vout node</div>
+
+    <h3>Bias Point Verification</h3>
+    <table class="hw-table reveal">
+      <thead><tr><th>Parameter</th><th>Calculation</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Vb</td><td>9 × 10k / (47k+10k)</td><td>≈ 1.58 V</td></tr>
+        <tr><td>Ve</td><td>Vb − 0.6</td><td>≈ 0.98 V</td></tr>
+        <tr><td>Ic</td><td>Ve / RE = 0.98 / 470</td><td>≈ 2.1 mA</td></tr>
+        <tr><td>Vc</td><td>9 − Ic × RC = 9 − 4.62</td><td>≈ 4.4 V ✓ (good midpoint)</td></tr>
+        <tr><td>Small-signal gain</td><td>−RC / RE = −2200/470</td><td>≈ −4.7</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tip-box reveal">
+      <span class="tip-icon">🔬</span>
+      <span>Drive the BJT base with <strong>200–500 mVpp per tone</strong> to push into the nonlinear region. Too small → IM products buried in noise. Too large → clipping (hard saturation) rather than smooth polynomial nonlinearity.</span>
+    </div>
+
+    <div class="tip-box warn reveal">
+      <span class="tip-icon">⚡</span>
+      <span><strong>Simpler alternative:</strong> A single silicon diode (1N4148) in series with a 1kΩ load to GND gives a strong α₂ nonlinearity (I–V exponential) and is much easier to breadboard. Good for demonstrating the f₂−f₁ IM2 product clearly.</span>
+    </div>
+  </section>
+
+  <!-- STEP 4 — ADC -->
+  <section id="step4">
+    <div class="section-label">// 05 — ADC Interfacing</div>
+    <h2>Step 4 — Sampling the Output</h2>
+
+    <h3>ADC0804 Pin Connections</h3>
+    <table class="hw-table reveal">
+      <thead><tr><th>ADC0804 Pin</th><th>Signal</th><th>Connect to 8051</th></tr></thead>
+      <tbody>
+        <tr><td>CS (pin 1)</td><td>Chip Select</td><td>GND (always enabled) or P3.x</td></tr>
+        <tr><td>RD (pin 2)</td><td>Read enable</td><td>P3.6</td></tr>
+        <tr><td>WR (pin 3)</td><td>Start conversion</td><td>P3.5</td></tr>
+        <tr><td>INTR (pin 5)</td><td>Conv. done (active low)</td><td>P3.4</td></tr>
+        <tr><td>Vin+ (pin 6)</td><td>Analog input</td><td>BJT Vout (via 10µF coupling cap)</td></tr>
+        <tr><td>Vin− (pin 7)</td><td>Analog GND</td><td>GND</td></tr>
+        <tr><td>VREF/2 (pin 9)</td><td>Half reference</td><td>Leave open → 0 to 5V range</td></tr>
+        <tr><td>CLK R + CLK IN</td><td>RC oscillator clock</td><td>10kΩ + 150pF → ≈640 kHz</td></tr>
+        <tr><td>D0–D7 (pins 11–18)</td><td>8-bit digital output</td><td>P0</td></tr>
+      </tbody>
+    </table>
+
+    <h3>ADC Read Routine (C)</h3>
+    <div class="code-wrap reveal">
+      <div class="code-header">
+        <span>adc_read.c</span>
+        <span class="code-lang">C — 8051</span>
+      </div>
+      <pre><span class="kw">sbit</span> WR   = P3^<span class="num">5</span>;
+<span class="kw">sbit</span> RD   = P3^<span class="num">6</span>;
+<span class="kw">sbit</span> INTR = P3^<span class="num">4</span>;
+
+<span class="kw">unsigned char</span> <span class="fn">read_adc</span>(<span class="kw">void</span>) {
+  P0   = <span class="num">0xFF</span>;       <span class="cm">/* set P0 as input */</span>
+  RD   = <span class="num">1</span>;
+  WR   = <span class="num">0</span>;          <span class="cm">/* WR low  ↓ */</span>
+  WR   = <span class="num">1</span>;          <span class="cm">/* WR high ↑ → rising edge starts conversion */</span>
+  <span class="kw">while</span> (INTR == <span class="num">1</span>); <span class="cm">/* wait for INTR to go low (done) */</span>
+  RD   = <span class="num">0</span>;          <span class="cm">/* enable output */</span>
+  <span class="kw">return</span> P0;         <span class="cm">/* read 8-bit result */</span>
+}</pre>
+    </div>
+
+    <div class="tip-box reveal">
+      <span class="tip-icon">⏱️</span>
+      <span><strong>Timing critical:</strong> Call <code>read_adc()</code> from a Timer 1 ISR at exactly your chosen sampling rate Fs. The time between ADC samples must be constant for coherent sampling to work correctly.</span>
+    </div>
+  </section>
+
+  <!-- STEP 5 — AMPLITUDE MEASUREMENT -->
+  <section id="step5">
+    <div class="section-label">// 06 — Tone Amplitude Measurement</div>
+    <h2>Step 5 — Coherent Sampling &amp; Goertzel</h2>
+
+    <h3>Method A — Simple Coherent Multiplication (from project sheet)</h3>
+    <p>Sample the signal at exactly <strong>2× the tone frequency</strong>. First sample at t=0, then multiply alternate samples by +1 and −1, sum and average. This extracts the amplitude of that specific tone.</p>
+    <code class="math">A_tone ≈ (2/N) × Σ [ x(n) × (+1,−1,+1,−1,...) ]</code>
+    <p>For the 60 Hz (or your chosen f₂−f₁) IM2 product: sample at 120 Hz. For 350 Hz IM3: sample at 700 Hz. This only works if no other tones are at integer multiples of the target frequency.</p>
+
+    <h3>Method B — Goertzel Algorithm (recommended for 8051)</h3>
+    <p>Computes DFT power at a <em>single bin</em> — far less computation than full FFT. Run it for each tone of interest.</p>
+    <div class="code-wrap reveal">
+      <div class="code-header">
+        <span>goertzel.c</span>
+        <span class="code-lang">C — 8051 (integer version)</span>
+      </div>
+      <pre><span class="cm">/* Integer Goertzel for 8051 — avoids float
+   k = target bin = round(f_target × N / Fs)
+   coeff_Q15 = 2*cos(2π*k/N) in Q1.15 fixed point */</span>
+
+<span class="pp">#define</span> N_SAMP <span class="num">256</span>
+
+<span class="kw">unsigned long</span> <span class="fn">goertzel_power</span>(<span class="kw">unsigned char</span> *buf,
+                                <span class="kw">int</span> coeff_Q15) {
+  <span class="kw">long</span> s0 = <span class="num">0</span>, s1 = <span class="num">0</span>, s2;
+  <span class="kw">int</span>  i;
+  <span class="kw">for</span> (i = <span class="num">0</span>; i < N_SAMP; i++) {
+    <span class="cm">/* s0 = x[i] - 128 (remove DC) + coeff*s1 - s2 */</span>
+    s2 = s1; s1 = s0;
+    s0 = (((<span class="kw">long</span>)coeff_Q15 * s1) >> <span class="num">14</span>) - s2
+         + ((<span class="kw">int</span>)buf[i] - <span class="num">128</span>);
+  }
+  <span class="kw">return</span> (<span class="kw">unsigned long</span>)(s1*s1 + s0*s0
+         - ((<span class="kw">long</span>)coeff_Q15 * s1 >> <span class="num">14</span>) * s0);
+}
+
+<span class="cm">/* Usage example — measure power at f1=480Hz, Fs=8192Hz, N=256:
+   k = round(480*256/8192) = 15
+   coeff = 2*cos(2π*15/256) = 2*cos(0.368) ≈ 1.932
+   coeff_Q15 = round(1.932 * 16384) = 31654 */</span>
+
+<span class="kw">void</span> <span class="fn">measure_tones</span>(<span class="kw">void</span>) {
+  <span class="kw">unsigned char</span> samples[N_SAMP];
+  <span class="kw">unsigned long</span> P_f1, P_f2, P_im2, P_im3;
+
+  <span class="cm">/* Collect N_SAMP samples from ADC at Fs */</span>
+  <span class="fn">collect_samples</span>(samples, N_SAMP);
+
+  P_f1  = <span class="fn">goertzel_power</span>(samples, <span class="num">31654</span>); <span class="cm">/* f1=480Hz, k=15 */</span>
+  P_f2  = <span class="fn">goertzel_power</span>(samples, <span class="num">29197</span>); <span class="cm">/* f2=640Hz, k=20 */</span>
+  P_im2 = <span class="fn">goertzel_power</span>(samples, <span class="num">32737</span>); <span class="cm">/* f2-f1=160Hz, k=5 */</span>
+  P_im3 = <span class="fn">goertzel_power</span>(samples, <span class="num">30591</span>); <span class="cm">/* 2f1-f2=320Hz, k=10 */</span>
+
+  <span class="cm">/* Compare ratios — IMD3 = P_im3 / P_f1 in dB */</span>
+}</pre>
+    </div>
+
+    <h3>Coherent Sampling Condition</h3>
+    <p>To avoid spectral leakage, ensure your captured record contains an <em>exact integer</em> number of cycles of each tone:</p>
+    <code class="math">f_in / Fs = M_cycles / N_samples   (M should be odd or prime)</code>
+    <p>Since you control both DAC output frequency and ADC sampling rate from the same 8051 clock, you can guarantee this by design — set your frequencies to land exactly on FFT bins.</p>
+  </section>
+
+  <!-- FREQUENCIES -->
+  <section id="frequencies">
+    <div class="section-label">// 07 — Frequency Planning</div>
+    <h2>Recommended Frequency Set</h2>
+
+    <p>Using N=256 samples, Fs=8192 Hz, 64-sample lookup table:</p>
+    <div class="freq-grid reveal">
+      <div class="freq-card fund">
+        <div class="freq-tag">Tone 1 (step=4)</div>
+        <div class="freq-val">480 Hz</div>
+        <div class="freq-formula">f₁ = 4×8192/64 — bin k=15 (prime ✓)</div>
+      </div>
+      <div class="freq-card fund">
+        <div class="freq-tag">Tone 2 (step=5)</div>
+        <div class="freq-val">640 Hz</div>
+        <div class="freq-formula">f₂ = 5×8192/64 — bin k=20</div>
+      </div>
+      <div class="freq-card im2">
+        <div class="freq-tag">IM2 product (α₂)</div>
+        <div class="freq-val">160 Hz</div>
+        <div class="freq-formula">f₂ − f₁ — bin k=5</div>
+      </div>
+      <div class="freq-card im3">
+        <div class="freq-tag">IM3 product (α₃)</div>
+        <div class="freq-val">320 Hz</div>
+        <div class="freq-formula">2f₁ − f₂ — bin k=10</div>
+      </div>
+      <div class="freq-card im3">
+        <div class="freq-tag">IM3 product (α₃)</div>
+        <div class="freq-val">800 Hz</div>
+        <div class="freq-formula">2f₂ − f₁ — bin k=25</div>
+      </div>
+      <div class="freq-card im2">
+        <div class="freq-tag">IM2 product (α₂)</div>
+        <div class="freq-val">1120 Hz</div>
+        <div class="freq-formula">f₁ + f₂ — bin k=35</div>
+      </div>
+    </div>
+
+    <div class="tip-box reveal">
+      <span class="tip-icon">✅</span>
+      <span>All these frequencies fall on exact FFT bins — no spectral leakage, no windowing needed. The IM products are well-separated from fundamentals and from each other, making them easy to resolve on both the oscilloscope FFT and your Goertzel measurements.</span>
+    </div>
+
+    <h3>Alternatively — project-suggested frequencies</h3>
+    <table class="hw-table reveal">
+      <thead><tr><th>Tone</th><th>Frequency</th><th>IM products</th></tr></thead>
+      <tbody>
+        <tr><td>f₁</td><td>410 Hz</td><td rowspan="2">IM2: f₂−f₁ = <strong>60 Hz</strong><br>IM3: 2f₁−f₂ = <strong>350 Hz</strong></td></tr>
+        <tr><td>f₂</td><td>470 Hz</td></tr>
+      </tbody>
+    </table>
+    <p style="color:var(--muted); font-size:12px;">Note: 410/470 Hz do not fall on simple coherent-sampling ratios — you'd need to use the 4-sample-per-period method (get sine + cosine components) described in the project sheet.</p>
+  </section>
+
+  <!-- MARKING -->
+  <section id="marks">
+    <div class="section-label">// 08 — Assessment</div>
+    <h2>Marking Scheme (25 marks)</h2>
+    <div class="marks-grid reveal">
+      <div class="mark-item">
+        <div class="mark-pts">4</div>
+        <div class="mark-label">Stable single-tone waveform generation — clean sinusoid visible on oscilloscope</div>
+      </div>
+      <div class="mark-item">
+        <div class="mark-pts">4</div>
+        <div class="mark-label">Stable two-tone generation — waveform comprising two summed sinusoids</div>
+      </div>
+      <div class="mark-item">
+        <div class="mark-pts">4</div>
+        <div class="mark-label">Display multi-tone output of non-linear circuit on oscilloscope (FFT mode showing IM products)</div>
+      </div>
+      <div class="mark-item">
+        <div class="mark-pts">4</div>
+        <div class="mark-label">Successful measurement of tone amplitudes for single-tone inputs</div>
+      </div>
+      <div class="mark-item">
+        <div class="mark-pts">4</div>
+        <div class="mark-label">Successful measurement of tone amplitudes for two-tone inputs (IM products)</div>
+      </div>
+      <div class="mark-item">
+        <div class="mark-pts">5</div>
+        <div class="mark-label">Overall execution — polish, correctness, comparison with oscilloscope FFT</div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:36px;">Suggested Execution Order</h3>
+    <div class="code-wrap reveal">
+      <div class="code-header"><span>execution_order.md</span><span class="code-lang">checklist</span></div>
+      <pre><span class="cm">[ ] 1. Build DAC0808 circuit + op-amp on breadboard
+[ ] 2. Write single-tone sine gen, verify on scope — get +4 marks
+[ ] 3. Upgrade to two-tone (dual phase accumulator) — get +4 marks
+[ ] 4. Build BJT CE amplifier, feed two-tone signal into it
+[ ] 5. Display BJT output on scope FFT — identify IM products — +4 marks
+[ ] 6. Wire ADC0804 to P0
+[ ] 7. Write coherent sampling + Goertzel for single tone — +4 marks
+[ ] 8. Extend to two-tone; measure f1, f2, IM2, IM3 amplitudes — +4 marks
+[ ] 9. Print/display results, compare with oscilloscope — +5 marks</span></pre>
+    </div>
+  </section>
+
+  <!-- VISUALISATIONS -->
+  <section id="viz">
+    <div class="section-label">// 09 — Interactive Visualisations</div>
+    <h2>Live Signal Demos</h2>
+
+    <!-- VIZ 1: Waveform -->
+    <h3>1 — Time-Domain Waveform Generator</h3>
+    <p>Watch how the DAC lookup table produces a two-tone signal. Toggle modes and drag the amplitude slider.</p>
+    <div class="viz-panel reveal" id="waveform-panel">
+      <div class="viz-controls">
+        <div class="viz-btn-group">
+          <button class="viz-btn active" id="btn-single">Single Tone (f₁)</button>
+          <button class="viz-btn" id="btn-two">Two Tone (f₁ + f₂)</button>
+          <button class="viz-btn" id="btn-samples">Show DAC Samples</button>
+        </div>
+        <div class="viz-slider-row">
+          <label>Amplitude A</label>
+          <input type="range" id="amp-slider" min="10" max="100" value="60">
+          <span id="amp-val">60%</span>
+        </div>
+      </div>
+      <canvas id="waveform-canvas" width="1000" height="200"></canvas>
+      <div class="viz-legend">
+        <span class="leg leg-f1">f₁ = 480 Hz</span>
+        <span class="leg leg-f2">f₂ = 640 Hz</span>
+        <span class="leg leg-sum">sum x(t)</span>
+      </div>
+    </div>
+
+    <!-- VIZ 2: Spectrum Analyser -->
+    <h3 style="margin-top:44px;">2 — Interactive Spectrum Analyser (FFT View)</h3>
+    <p>Drag the <strong>Drive Level</strong> slider to increase input amplitude. Watch IM2 products grow as A² and IM3 products grow as A³ — exactly as the theory predicts.</p>
+    <div class="viz-panel reveal" id="spectrum-panel">
+      <div class="viz-controls">
+        <div class="viz-slider-row">
+          <label>Drive Level</label>
+          <input type="range" id="drive-slider" min="1" max="100" value="25">
+          <span id="drive-val">25%</span>
+        </div>
+        <div class="viz-btn-group">
+          <button class="viz-btn active" id="btn-lin">Linear Scale</button>
+          <button class="viz-btn" id="btn-db">dB Scale</button>
+        </div>
+      </div>
+      <canvas id="spectrum-canvas" width="1000" height="260"></canvas>
+      <div class="viz-legend">
+        <span class="leg leg-f1">Fundamentals (∝ A)</span>
+        <span class="leg leg-im2">IM2 products (∝ A²)</span>
+        <span class="leg leg-im3">IM3 products (∝ A³)</span>
+        <span class="leg leg-dc">DC / harmonics</span>
+      </div>
+    </div>
+
+    <!-- VIZ 3: BJT Nonlinearity -->
+    <h3 style="margin-top:44px;">3 — BJT Non-Linear Transfer Curve</h3>
+    <p>The exponential Ic–Vbe characteristic is why new tones are generated. The animated dot shows the operating point sweeping with a sine-wave input; the distorted output waveform appears on the right.</p>
+    <div class="viz-panel reveal" id="bjt-panel">
+      <div class="viz-controls">
+        <div class="viz-slider-row">
+          <label>Input Vpp</label>
+          <input type="range" id="bjt-slider" min="5" max="100" value="30">
+          <span id="bjt-val">30%</span>
+        </div>
+      </div>
+      <canvas id="bjt-canvas" width="1000" height="280"></canvas>
+      <div class="viz-legend">
+        <span class="leg leg-f1">Ic–Vbe curve (exponential)</span>
+        <span class="leg leg-f2">Input sine (Vbe)</span>
+        <span class="leg leg-im3">Output current (distorted)</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <span>EE309(S1) — Optional Hardware Project — Spring 2026</span>
+  <span>IIT Bombay, Dept. of Electrical Engineering</span>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  reveals.forEach(r => io.observe(r));
+
+  // ─────────────────────────────────────────────
+  // VIZ 1 — WAVEFORM
+  // ─────────────────────────────────────────────
+  (function() {
+    const canvas = document.getElementById('waveform-canvas');
+    const ctx    = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const CY = H / 2;
+
+    let mode       = 'single';   // 'single' | 'two' | 'samples'
+    let amplitude  = 0.6;
+    let phase      = 0;
+
+    document.getElementById('btn-single').onclick  = function() { setMode('single',  this); };
+    document.getElementById('btn-two').onclick     = function() { setMode('two',     this); };
+    document.getElementById('btn-samples').onclick = function() { setMode('samples', this); };
+
+    function setMode(m, btn) {
+      mode = m;
+      document.querySelectorAll('#waveform-panel .viz-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    const ampSlider = document.getElementById('amp-slider');
+    const ampVal    = document.getElementById('amp-val');
+    ampSlider.oninput = function() {
+      amplitude = this.value / 100;
+      ampVal.textContent = this.value + '%';
+    };
+
+    // 64-sample sine table
+    const sine64 = Array.from({length:64}, (_, i) => Math.sin(2*Math.PI*i/64));
+
+    function drawGrid() {
+      ctx.clearRect(0, 0, W, H);
+      // background grid
+      ctx.strokeStyle = 'rgba(0,229,255,0.04)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+      // zero line
+      ctx.strokeStyle = 'rgba(0,229,255,0.15)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0,CY); ctx.lineTo(W,CY); ctx.stroke();
+    }
+
+    function drawCurve(yFn, color, lw=1.5) {
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lw;
+      for (let px = 0; px < W; px++) {
+        const t  = (px / W) * 4 * Math.PI + phase * 2 * Math.PI;
+        const y  = yFn(t);
+        const py = CY - y * (H * 0.42);
+        px === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+
+    function drawSamples(yFn, color) {
+      const N = 64;
+      const step1 = 4, step2 = 5;
+      for (let i = 0; i < N * 3; i++) {
+        const t  = (i / N) * 2 * Math.PI;
+        const ph1 = ((i * step1) % N);
+        const ph2 = ((i * step2) % N);
+        const y1 = mode === 'single' ? sine64[ph1] : (sine64[ph1] + sine64[ph2]) / 2;
+        const px = (i / (N * 3)) * W;
+        const py = CY - y1 * amplitude * (H * 0.42);
+        ctx.beginPath();
+        ctx.arc(px, py, 3, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(0,229,255,0.2)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(px, CY); ctx.lineTo(px, py); ctx.stroke();
+      }
+    }
+
+    function frame() {
+      drawGrid();
+      if (mode === 'samples') {
+        drawSamples(() => 0, '#00e5ff');
+      } else if (mode === 'single') {
+        drawCurve(t => amplitude * Math.sin(t * 2), '#00e5ff', 2.5);
+      } else {
+        // f1
+        drawCurve(t => amplitude * Math.sin(t * 2),       'rgba(0,229,255,0.45)', 1.5);
+        // f2
+        drawCurve(t => amplitude * Math.sin(t * 2.667),   'rgba(123,159,255,0.45)', 1.5);
+        // sum
+        drawCurve(t => amplitude * (Math.sin(t*2) + Math.sin(t*2.667)) / 2, '#ffffff', 2.5);
+      }
+
+      // axis labels
+      ctx.fillStyle = 'rgba(86,106,130,0.8)';
+      ctx.font = '11px IBM Plex Mono, monospace';
+      ctx.fillText('0', 6, CY - 4);
+      ctx.fillText('+A', 6, CY - H*0.38);
+      ctx.fillText('−A', 6, CY + H*0.4);
+
+      phase += 0.003;
+      requestAnimationFrame(frame);
+    }
+    frame();
+  })();
+
+  // ─────────────────────────────────────────────
+  // VIZ 2 — SPECTRUM ANALYSER
+  // ─────────────────────────────────────────────
+  (function() {
+    const canvas = document.getElementById('spectrum-canvas');
+    const ctx    = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const PAD_L = 54, PAD_B = 44, PAD_R = 20, PAD_T = 20;
+    const PW = W - PAD_L - PAD_R;
+    const PH = H - PAD_T - PAD_B;
+
+    let drive   = 0.25;
+    let useDb   = false;
+    let targets = {};  // current displayed heights
+    let noiseT  = 0;
+
+    const driveSlider = document.getElementById('drive-slider');
+    const driveVal    = document.getElementById('drive-val');
+    driveSlider.oninput = function() {
+      drive = this.value / 100;
+      driveVal.textContent = this.value + '%';
+    };
+
+    document.getElementById('btn-lin').onclick = function() {
+      useDb = false;
+      document.getElementById('btn-lin').classList.add('active');
+      document.getElementById('btn-db').classList.remove('active');
+    };
+    document.getElementById('btn-db').onclick = function() {
+      useDb = true;
+      document.getElementById('btn-db').classList.add('active');
+      document.getElementById('btn-lin').classList.remove('active');
+    };
+
+    // Frequency bins (Hz), labels, types, α-order exponents
+    const bins = [
+      { f: 160,  label: 'f₂−f₁\n160',  type: 'im2', exp: 2 },
+      { f: 320,  label: '2f₁−f₂\n320', type: 'im3', exp: 3 },
+      { f: 480,  label: 'f₁\n480',      type: 'fund', exp: 1 },
+      { f: 640,  label: 'f₂\n640',      type: 'fund', exp: 1 },
+      { f: 800,  label: '2f₂−f₁\n800', type: 'im3', exp: 3 },
+      { f: 960,  label: '2f₁\n960',     type: 'dc',   exp: 2 },
+      { f: 1120, label: 'f₁+f₂\n1120', type: 'im2',  exp: 2 },
+      { f: 1280, label: '2f₂\n1280',    type: 'dc',   exp: 2 },
+      { f: 1440, label: '3f₁\n1440',    type: 'dc',   exp: 3 },
+      { f: 1600, label: '2f₁+f₂\n1600',type: 'dc',   exp: 3 },
+    ];
+
+    const colors = {
+      fund: '#00e5ff',
+      im2:  '#ff6b35',
+      im3:  '#7fff6b',
+      dc:   '#566a82',
+    };
+
+    // Baseline amplitudes (A=1)
+    const base = {
+      fund: 1.0,
+      im2:  0.55,
+      im3:  0.35,
+      dc:   0.22,
+    };
+
+    bins.forEach(b => { targets[b.f] = 0; });
+
+    function getAmplitude(bin, d) {
+      const raw = base[bin.type] * Math.pow(d, bin.exp);
+      return Math.min(raw, 0.98);
+    }
+
+    function toDbHeight(amp) {
+      if (amp < 1e-4) return 0;
+      const db = 20 * Math.log10(amp);  // 0 dB at amp=1
+      const minDb = -60;
+      return Math.max(0, (db - minDb) / (-minDb));
+    }
+
+    let displayHeights = {};
+    bins.forEach(b => { displayHeights[b.f] = 0; });
+
+    function frame() {
+      noiseT += 0.07;
+      ctx.clearRect(0, 0, W, H);
+
+      // Grid
+      ctx.strokeStyle = 'rgba(0,229,255,0.05)';
+      ctx.lineWidth = 1;
+      const gridLines = 5;
+      for (let i = 0; i <= gridLines; i++) {
+        const y = PAD_T + PH - (i / gridLines) * PH;
+        ctx.beginPath(); ctx.moveTo(PAD_L, y); ctx.lineTo(PAD_L + PW, y); ctx.stroke();
+        // y-axis label
+        ctx.fillStyle = '#566a82';
+        ctx.font = '10px IBM Plex Mono, monospace';
+        ctx.textAlign = 'right';
+        const label = useDb ? ((-60 + i*12) + ' dB') : ((i/gridLines*100).toFixed(0) + '%');
+        ctx.fillText(label, PAD_L - 5, y + 4);
+      }
+
+      // Axes
+      ctx.strokeStyle = 'rgba(0,229,255,0.2)';
+      ctx.lineWidth   = 1;
+      ctx.beginPath();
+      ctx.moveTo(PAD_L, PAD_T);
+      ctx.lineTo(PAD_L, PAD_T + PH);
+      ctx.lineTo(PAD_L + PW, PAD_T + PH);
+      ctx.stroke();
+
+      const bw = PW / (bins.length + 1);
+
+      bins.forEach((bin, i) => {
+        const targetH = useDb ? toDbHeight(getAmplitude(bin, drive)) : getAmplitude(bin, drive);
+        displayHeights[bin.f] += (targetH - displayHeights[bin.f]) * 0.12;
+
+        const noise = (Math.sin(noiseT * 3.7 + i*1.1) * 0.008 + Math.sin(noiseT*7.1+i*2.3)*0.004);
+        const h     = Math.max(0, displayHeights[bin.f] + noise) * PH;
+        const x     = PAD_L + (i + 1) * bw - bw * 0.3;
+        const y     = PAD_T + PH - h;
+        const bwBar = bw * 0.6;
+        const col   = colors[bin.type];
+
+        // Glow
+        const grd = ctx.createLinearGradient(x, y, x, PAD_T + PH);
+        grd.addColorStop(0, col);
+        grd.addColorStop(1, col + '22');
+        ctx.fillStyle = grd;
+        ctx.fillRect(x, y, bwBar, h);
+
+        // Top highlight
+        ctx.fillStyle = col;
+        ctx.fillRect(x, y, bwBar, 2);
+
+        // Frequency label (two lines)
+        ctx.fillStyle = '#566a82';
+        ctx.font = '9px IBM Plex Mono, monospace';
+        ctx.textAlign = 'center';
+        const parts = bin.label.split('\n');
+        ctx.fillStyle = col + 'cc';
+        ctx.fillText(parts[1] + ' Hz', x + bwBar/2, PAD_T + PH + 14);
+        ctx.fillStyle = '#566a82';
+        ctx.fillText(parts[0], x + bwBar/2, PAD_T + PH + 26);
+
+        // Value on top of bar
+        if (h > 18) {
+          ctx.fillStyle = col;
+          ctx.font = '10px IBM Plex Mono, monospace';
+          ctx.textAlign = 'center';
+          const valStr = useDb
+            ? (20*Math.log10(Math.max(getAmplitude(bin,drive),1e-4))).toFixed(1)+'dB'
+            : (getAmplitude(bin,drive)*100).toFixed(0)+'%';
+          ctx.fillText(valStr, x + bwBar/2, y - 4);
+        }
+      });
+
+      // Axis title
+      ctx.fillStyle = '#566a82';
+      ctx.font = '10px IBM Plex Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('Frequency', PAD_L + PW/2, H - 2);
+
+      requestAnimationFrame(frame);
+    }
+    frame();
+  })();
+
+  // ─────────────────────────────────────────────
+  // VIZ 3 — BJT NON-LINEAR CURVE
+  // ─────────────────────────────────────────────
+  (function() {
+    const canvas = document.getElementById('bjt-canvas');
+    const ctx    = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+
+    // Left panel: Ic-Vbe curve   Right panel: time domain
+    const LP = { x: 50, y: 20, w: 340, h: H-60 };
+    const RP = { x: 430, y: 20, w: W-460, h: H-60 };
+
+    let inputAmp = 0.30;
+    let t = 0;
+
+    const bjtSlider = document.getElementById('bjt-slider');
+    const bjtVal    = document.getElementById('bjt-val');
+    bjtSlider.oninput = function() {
+      inputAmp = this.value / 100;
+      bjtVal.textContent = this.value + '%';
+    };
+
+    // BJT model: Ic = Is * exp(Vbe/Vt), normalised
+    // Vbe range: 0 to 1 (normalised), Q-point at 0.6
+    const Vt = 0.1;
+    const qVbe = 0.55;
+    function icNorm(vbe) {
+      return Math.exp((vbe - qVbe) / Vt);
+    }
+    // Clamp and normalise Ic for display
+    const icMax = icNorm(0.95);
+    function icDisplay(vbe) {
+      return Math.max(0, Math.min(1, icNorm(Math.max(0.2, Math.min(0.95, vbe))) / icMax));
+    }
+
+    function drawCurvePanel() {
+      // Background
+      ctx.fillStyle = '#060a0f';
+      ctx.fillRect(LP.x, LP.y, LP.w, LP.h);
+
+      // Grid
+      ctx.strokeStyle = 'rgba(0,229,255,0.04)';
+      ctx.lineWidth = 1;
+      for (let i=0;i<=5;i++) {
+        const gx = LP.x + (i/5)*LP.w;
+        const gy = LP.y + (i/5)*LP.h;
+        ctx.beginPath(); ctx.moveTo(gx, LP.y); ctx.lineTo(gx, LP.y+LP.h); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(LP.x, gy); ctx.lineTo(LP.x+LP.w, gy); ctx.stroke();
+      }
+
+      // Axes
+      ctx.strokeStyle = 'rgba(0,229,255,0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(LP.x, LP.y);
+      ctx.lineTo(LP.x, LP.y + LP.h);
+      ctx.lineTo(LP.x + LP.w, LP.y + LP.h);
+      ctx.stroke();
+
+      // Ic–Vbe exponential curve
+      ctx.beginPath();
+      ctx.strokeStyle = '#00e5ff';
+      ctx.lineWidth = 2.5;
+      for (let px = 0; px <= LP.w; px++) {
+        const vbe = 0.2 + (px / LP.w) * 0.75;
+        const ic  = icDisplay(vbe);
+        const sx  = LP.x + px;
+        const sy  = LP.y + LP.h - ic * LP.h * 0.92;
+        px === 0 ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
+      }
+      ctx.stroke();
+
+      // Current Vbe (animated)
+      const vbeInput = qVbe + inputAmp * 0.35 * Math.sin(t);
+      const icCurrent = icDisplay(vbeInput);
+      const dotX = LP.x + ((vbeInput - 0.2) / 0.75) * LP.w;
+      const dotY = LP.y + LP.h - icCurrent * LP.h * 0.92;
+
+      // Dashed projection lines
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = 'rgba(255,107,53,0.4)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(dotX, dotY); ctx.lineTo(dotX, LP.y + LP.h); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(dotX, dotY); ctx.lineTo(LP.x, dotY); ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Dot on curve
+      ctx.beginPath();
+      ctx.arc(dotX, dotY, 6, 0, Math.PI*2);
+      ctx.fillStyle = '#ff6b35';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Q-point marker
+      const qDotX = LP.x + ((qVbe - 0.2) / 0.75) * LP.w;
+      const qDotY = LP.y + LP.h - icDisplay(qVbe) * LP.h * 0.92;
+      ctx.beginPath();
+      ctx.arc(qDotX, qDotY, 5, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(0,229,255,0.3)';
+      ctx.fill();
+      ctx.strokeStyle = '#00e5ff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Labels
+      ctx.fillStyle = '#566a82';
+      ctx.font = '11px IBM Plex Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('Vbe →', LP.x + LP.w/2, LP.y + LP.h + 18);
+      ctx.save();
+      ctx.translate(LP.x - 18, LP.y + LP.h/2);
+      ctx.rotate(-Math.PI/2);
+      ctx.fillText('Ic →', 0, 0);
+      ctx.restore();
+
+      ctx.fillStyle = '#00e5ff88';
+      ctx.font = '10px IBM Plex Mono, monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('Q-point', qDotX + 8, qDotY - 6);
+
+      ctx.fillStyle = '#ff6b35';
+      ctx.textAlign = 'left';
+      ctx.fillText('operating\npoint', dotX + 8, dotY + 4);
+
+      // Title
+      ctx.fillStyle = '#566a82';
+      ctx.font = '10px IBM Plex Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('Ic vs Vbe (exponential)', LP.x + LP.w/2, LP.y - 6);
+    }
+
+    function drawTimePanel() {
+      ctx.fillStyle = '#060a0f';
+      ctx.fillRect(RP.x, RP.y, RP.w, RP.h);
+
+      // Grid
+      ctx.strokeStyle = 'rgba(0,229,255,0.04)';
+      ctx.lineWidth = 1;
+      for (let i=0;i<=4;i++) {
+        const gy = RP.y + (i/4)*RP.h;
+        ctx.beginPath(); ctx.moveTo(RP.x, gy); ctx.lineTo(RP.x+RP.w, gy); ctx.stroke();
+      }
+
+      // Zero lines
+      ctx.strokeStyle = 'rgba(0,229,255,0.12)';
+      ctx.lineWidth = 1;
+      const midIn  = RP.y + RP.h * 0.28;
+      const midOut = RP.y + RP.h * 0.78;
+      ctx.beginPath(); ctx.moveTo(RP.x, midIn);  ctx.lineTo(RP.x+RP.w, midIn);  ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(RP.x, midOut); ctx.lineTo(RP.x+RP.w, midOut); ctx.stroke();
+
+      const N = 300;
+
+      // Input sine (Vbe)
+      ctx.beginPath();
+      ctx.strokeStyle = '#7b9fff';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < N; i++) {
+        const tSamp = t - 4*Math.PI + (i / N) * 4 * Math.PI;
+        const vin   = inputAmp * 0.35 * Math.sin(tSamp);
+        const px    = RP.x + (i / N) * RP.w;
+        const py    = midIn - vin * RP.h * 0.28;
+        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+
+      // Output current (distorted — use actual BJT model)
+      ctx.beginPath();
+      ctx.strokeStyle = '#7fff6b';
+      ctx.lineWidth = 2;
+      let firstOut = true;
+      const icQ = icNorm(qVbe);
+      for (let i = 0; i < N; i++) {
+        const tSamp = t - 4*Math.PI + (i / N) * 4 * Math.PI;
+        const vin   = inputAmp * 0.35 * Math.sin(tSamp);
+        const vbe   = qVbe + vin;
+        const ic    = (icNorm(Math.max(0.2, Math.min(0.95, vbe))) - icQ) / icMax;
+        const px    = RP.x + (i / N) * RP.w;
+        const py    = midOut - ic * RP.h * 0.28;
+        firstOut ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        firstOut = false;
+      }
+      ctx.stroke();
+
+      // Labels
+      ctx.fillStyle = '#566a82';
+      ctx.font = '10px IBM Plex Mono, monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('time →', RP.x + RP.w - 54, RP.y + RP.h + 16);
+
+      ctx.fillStyle = '#7b9fff';
+      ctx.fillText('input Vbe (sine)', RP.x + 6, midIn - RP.h*0.22);
+
+      ctx.fillStyle = '#7fff6b';
+      ctx.fillText('output Ic (distorted)', RP.x + 6, midOut - RP.h*0.22);
+
+      // Annotation: asymmetry arrow
+      if (inputAmp > 0.35) {
+        ctx.fillStyle = '#ff6b3588';
+        ctx.font = '9px IBM Plex Mono, monospace';
+        ctx.fillText('← asymmetric!', RP.x + RP.w * 0.6, midOut + 14);
+      }
+
+      // Title
+      ctx.fillStyle = '#566a82';
+      ctx.font = '10px IBM Plex Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('Time domain', RP.x + RP.w/2, RP.y - 6);
+
+      // Divider
+      ctx.strokeStyle = 'rgba(0,229,255,0.08)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 6]);
+      ctx.beginPath(); ctx.moveTo(RP.x - 14, RP.y + RP.h*0.52); ctx.lineTo(RP.x + RP.w, RP.y + RP.h*0.52); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    function frame() {
+      ctx.clearRect(0, 0, W, H);
+      drawCurvePanel();
+      drawTimePanel();
+      t += 0.025;
+      requestAnimationFrame(frame);
+    }
+    frame();
+  })();
+
+  // Active nav link
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a');
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 80) cur = s.id;
+    });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + cur
+        ? 'var(--accent)' : '';
+      a.style.borderColor = a.getAttribute('href') === '#' + cur
+        ? 'var(--accent)' : '';
+    });
+  });
+</script>
+</body>
+</html>
