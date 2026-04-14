@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EE337 Phase 3 &mdash; Complete Code Explanation</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #181b24;
+    --border: #2a2e3a;
+    --accent: #6c9cfc;
+    --accent2: #a78bfa;
+    --accent3: #34d399;
+    --accent4: #f59e42;
+    --accent5: #f06292;
+    --text: #e2e6ef;
+    --muted: #8b93a7;
+    --code-bg: #12141c;
+    --highlight: #23283a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text);
+    line-height: 1.75; padding: 2rem 1rem;
+  }
+  .container { max-width: 960px; margin: 0 auto; }
+
+  /* Header */
+  header { text-align:center; padding: 2.5rem 1rem 2rem; border-bottom: 1px solid var(--border); margin-bottom: 2.5rem; }
+  header h1 { font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: .4rem; }
+  header .sub { color: var(--muted); font-size: .95rem; }
+  header .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; margin-top: 1rem; }
+  header .chip { font-size: .75rem; padding: .25rem .7rem; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); }
+
+  /* TOC */
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 2rem; margin-bottom: 2.5rem; }
+  .toc h2 { color: var(--accent); font-size: 1.1rem; margin-bottom: .8rem; }
+  .toc ol { padding-left: 1.4rem; }
+  .toc li { margin-bottom: .35rem; }
+  .toc a { color: var(--accent2); text-decoration: none; font-size: .92rem; }
+  .toc a:hover { text-decoration: underline; }
+
+  /* Phase banner */
+  .phase-banner {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1.2rem 1.5rem; margin: 2.5rem 0 1.5rem;
+    background: linear-gradient(135deg, #1a1e2e, #1e1530);
+    border: 1px solid var(--accent2); border-radius: 12px;
+  }
+  .phase-banner .num {
+    font-size: 2rem; font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .phase-banner .info h2 { font-size: 1.2rem; color: #fff; margin-bottom: .15rem; }
+  .phase-banner .info p { color: var(--muted); font-size: .85rem; }
+
+  /* Section card */
+  .section { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 1.5rem; overflow: hidden; }
+  .section-header { display: flex; align-items: center; gap: .75rem; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); }
+  .section-header h3 { flex:1; font-size: 1.05rem; font-weight: 600; }
+  .section-header .file { color: var(--muted); font-size: .78rem; font-family: 'Courier New', monospace; }
+  .section-body { padding: 1.5rem; }
+  .section-body p { margin-bottom: 1rem; }
+
+  /* Tags */
+  .tag { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; padding:.2rem .6rem; border-radius:4px; white-space:nowrap; }
+  .tag-i2c   { background:#1e3a5f; color:#6cb4ee; }
+  .tag-rtc   { background:#2d1f54; color:#b39ddb; }
+  .tag-lcd   { background:#1a3a2a; color:#66d9a0; }
+  .tag-uart  { background:#3a2a10; color:#f5c96a; }
+  .tag-main  { background:#3a1028; color:#f06292; }
+  .tag-bmp   { background:#1a2a3a; color:#64b5f6; }
+  .tag-concept { background:#2a1a1a; color:#ef9a9a; }
+
+  /* Function block */
+  .fn-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1.2rem; overflow: hidden; }
+  .fn-name { padding: .55rem 1rem; font-family: 'Courier New', monospace; font-size: .88rem; font-weight: 600; color: var(--accent3); border-bottom: 1px solid var(--border); background: rgba(52,211,153,.05); }
+  .fn-body { padding: .8rem 1rem; font-size: .88rem; line-height: 1.8; }
+  .fn-body ul { padding-left: 1.2rem; margin: .3rem 0; }
+  .fn-body li { margin-bottom: .35rem; }
+  .fn-body code, code { background: var(--highlight); padding: .1rem .4rem; border-radius: 3px; font-family: 'Courier New', monospace; font-size: .84rem; color: var(--accent); }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; margin: .8rem 0; font-size: .87rem; }
+  th { text-align: left; padding: .55rem .8rem; background: var(--highlight); color: var(--accent); font-weight: 600; border-bottom: 1px solid var(--border); }
+  td { padding: .5rem .8rem; border-bottom: 1px solid var(--border); }
+
+  /* Step */
+  .step { display: flex; align-items: flex-start; margin-bottom: .6rem; }
+  .step-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: var(--bg); font-size: .72rem; font-weight: 700; margin-right: .5rem; flex-shrink: 0; margin-top: 2px; }
+  .step span { flex: 1; }
+
+  /* Note */
+  .note { background: rgba(245,158,66,.08); border-left: 3px solid var(--accent4); padding: .7rem 1rem; margin: .8rem 0; border-radius: 0 6px 6px 0; font-size: .87rem; color: var(--accent4); }
+  .note-green { background: rgba(52,211,153,.08); border-left-color: var(--accent3); color: var(--accent3); }
+  .note-blue { background: rgba(108,156,252,.08); border-left-color: var(--accent); color: var(--accent); }
+  .note-pink { background: rgba(240,98,146,.08); border-left-color: var(--accent5); color: var(--accent5); }
+
+  /* Flow diagram */
+  .flow { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 1rem 0; }
+  .flow-item { background: var(--highlight); border: 1px solid var(--border); border-radius: 8px; padding: .45rem 1.2rem; text-align: center; font-size: .84rem; min-width: 240px; }
+  .flow-arrow { color: var(--muted); font-size: 1.1rem; line-height: 1; padding: .1rem 0; }
+
+  /* Bit table */
+  .bit-table { display: grid; grid-template-columns: repeat(8,1fr); gap: 2px; margin: .6rem 0; font-family: 'Courier New', monospace; font-size: .76rem; text-align: center; }
+  .bit-table div { padding: .35rem .15rem; background: var(--highlight); border-radius: 3px; }
+  .bit-table .bit-label { color: var(--muted); font-size: .68rem; }
+  .bit-table .bit-set { background: rgba(108,156,252,.2); color: var(--accent); font-weight: 700; }
+
+  /* Diagram box */
+  .diagram { font-family: 'Courier New', monospace; font-size: .82rem; color: var(--muted); background: var(--code-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin: .5rem 0; }
+  .diagram pre { margin: 0; line-height: 1.45; }
+
+  /* Pre/code blocks */
+  pre.code-block { background: var(--highlight); padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: .84rem; line-height: 1.6; margin: .8rem 0; font-family: 'Courier New', monospace; color: var(--text); }
+
+  /* Quiz */
+  .quiz-box { background: linear-gradient(135deg,#1a1e2e,#1e1530); border: 1px solid var(--accent2); border-radius: 12px; padding: 2rem; margin-top: 2.5rem; }
+  .quiz-box h2 { color: var(--accent2); margin-bottom: 1rem; font-size: 1.25rem; }
+  .quiz-box ol { padding-left: 1.4rem; }
+  .quiz-box li { margin-bottom: .7rem; line-height: 1.7; }
+  .quiz-box li strong { color: var(--accent); }
+
+  /* Concept grid */
+  .concept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .concept-card { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+  .concept-card h4 { color: var(--accent3); font-size: .9rem; margin-bottom: .4rem; }
+  .concept-card p { font-size: .85rem; margin-bottom: 0; }
+
+  /* Waveform / timing */
+  .timing { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin: .8rem 0; font-family: 'Courier New', monospace; font-size: .8rem; color: var(--accent); overflow-x: auto; }
+  .timing pre { margin: 0; }
+
+  @media (max-width:650px) {
+    body { padding: 1rem .5rem; }
+    header h1 { font-size: 1.5rem; }
+    .section-body, .quiz-box { padding: 1rem; }
+    .concept-grid { grid-template-columns: 1fr; }
+    .phase-banner { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ============================================================ -->
+<!-- HEADER -->
+<!-- ============================================================ -->
+<header>
+  <h1>EE337 Phase 3 &mdash; Complete Code Explanation</h1>
+  <p class="sub">AT89C5131 Microcontroller &bull; BMP280 Temperature Sensor &bull; DS1307 RTC &bull; 16x2 LCD &bull; UART</p>
+  <div class="chips">
+    <span class="chip">I2C Protocol</span>
+    <span class="chip">BCD Encoding</span>
+    <span class="chip">Forced Mode ADC</span>
+    <span class="chip">Interrupt-Driven UART</span>
+    <span class="chip">HD44780 LCD</span>
+    <span class="chip">Temperature Compensation</span>
+  </div>
+</header>
+
+<!-- ============================================================ -->
+<!-- TABLE OF CONTENTS -->
+<!-- ============================================================ -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#overview">System Overview &amp; Architecture</a></li>
+    <li><a href="#phase1">Phase 1 &mdash; I2C Communication (i2c.c / i2c.h)</a></li>
+    <li><a href="#phase2">Phase 2 &mdash; LCD Display Driver (lcd.h)</a></li>
+    <li><a href="#phase3">Phase 3 &mdash; UART Serial Communication (serial.h)</a></li>
+    <li><a href="#phase4">Phase 4 &mdash; DS1307 Real-Time Clock (r2c.c / r2c.h)</a></li>
+    <li><a href="#phase5">Phase 5 &mdash; BMP280 Temperature Sensor (in main.c)</a></li>
+    <li><a href="#phase6">Phase 6 &mdash; Main Application Logic (main.c)</a></li>
+    <li><a href="#quiz">Key Concepts for Quiz</a></li>
+  </ol>
+</div>
+
+<!-- ============================================================ -->
+<!-- OVERVIEW -->
+<!-- ============================================================ -->
+<div id="overview" class="section">
+  <div class="section-header">
+    <span class="tag tag-concept">OVERVIEW</span>
+    <h3>System Overview &amp; Architecture</h3>
+  </div>
+  <div class="section-body">
+    <p><strong>What does this project do?</strong> It reads <em>temperature</em> from a BMP280 sensor and <em>time</em> from a DS1307 RTC clock, both connected via the I2C bus, and displays them on a 16x2 LCD screen while simultaneously logging them over UART to a PC terminal.</p>
+
+    <div class="diagram">
+<pre>
+                    +---------------------------+
+                    |        AT89C5131          |
+                    |      Microcontroller      |
+                    |                           |
+  +-----------+     |   +-------+  +--------+  |     +----------+
+  | 16x2 LCD  |&lt;----|- P2 (data) P0 (ctrl) |  |     | PC       |
+  | HD44780   |     |   +-------+  +--------+  |     | Terminal |
+  +-----------+     |                           |     +----+-----+
+                    |   +------- I2C Bus -----+ |          |
+                    |   | SDA          SCL    | |     UART TX/RX
+                    +---+---+-----------+-----+-+----------+
+                        |               |
+               +--------+---+   +------+--------+
+               | BMP280     |   | DS1307        |
+               | Temp Sensor|   | Real-Time     |
+               | Addr: 0x76 |   | Clock         |
+               | ID: 0x58   |   | Addr: 0x68    |
+               +------------+   +---------------+
+</pre>
+    </div>
+
+    <h4 style="color: var(--accent); margin: 1.2rem 0 .8rem;">Files in the Project</h4>
+    <table>
+      <tr><th>File</th><th>Role</th><th>What It Talks To</th></tr>
+      <tr><td><code>main.c</code></td><td>Application logic &mdash; ties everything together</td><td>All modules below</td></tr>
+      <tr><td><code>i2c.c / i2c.h</code></td><td>I2C bus driver (hardware TWI layer)</td><td>SSCON / SSDAT registers</td></tr>
+      <tr><td><code>r2c.c / r2c.h</code></td><td>DS1307 RTC driver</td><td>Uses I2C functions</td></tr>
+      <tr><td><code>lcd.h</code></td><td>16x2 LCD driver</td><td>Port P0 (control), Port P2 (data)</td></tr>
+      <tr><td><code>serial.h</code></td><td>UART serial driver</td><td>SBUF, SCON, Timer 1</td></tr>
+      <tr><td><code>STARTUP.A51</code></td><td>Assembly startup code (auto-generated by Keil)</td><td>Initializes memory before main()</td></tr>
+    </table>
+
+    <h4 style="color: var(--accent); margin: 1.2rem 0 .8rem;">Communication Protocols Used</h4>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <h4>I2C (Inter-Integrated Circuit)</h4>
+        <p><strong>Type:</strong> Synchronous, half-duplex, multi-slave<br>
+        <strong>Wires:</strong> 2 (SDA + SCL)<br>
+        <strong>Used for:</strong> BMP280 sensor + DS1307 RTC<br>
+        <strong>Speed:</strong> ~100 kHz standard mode</p>
+      </div>
+      <div class="concept-card">
+        <h4>UART (Universal Async Receiver/Transmitter)</h4>
+        <p><strong>Type:</strong> Asynchronous, full-duplex, point-to-point<br>
+        <strong>Wires:</strong> 2 (TX + RX)<br>
+        <strong>Used for:</strong> Sending data to PC terminal<br>
+        <strong>Baud rate:</strong> Set by Timer 1 (TH1=0xCB)</p>
+      </div>
+      <div class="concept-card">
+        <h4>Parallel (LCD)</h4>
+        <p><strong>Type:</strong> 8-bit parallel, one-directional<br>
+        <strong>Wires:</strong> 11 (8 data + RS + RW + EN)<br>
+        <strong>Used for:</strong> Displaying text on 16x2 LCD<br>
+        <strong>Protocol:</strong> HD44780 command set</p>
+      </div>
+      <div class="concept-card">
+        <h4>BCD (Binary-Coded Decimal)</h4>
+        <p><strong>Type:</strong> Data encoding (not a bus)<br>
+        <strong>Used by:</strong> DS1307 RTC stores time in BCD<br>
+        <strong>Example:</strong> Decimal 25 stored as 0x25<br>
+        <strong>Why:</strong> Easy to display digit-by-digit</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PHASE 1: I2C -->
+<!-- ============================================================ -->
+<div id="phase1" class="phase-banner">
+  <div class="num">01</div>
+  <div class="info">
+    <h2>I2C Communication Driver</h2>
+    <p>i2c.c / i2c.h &mdash; The foundation layer that enables talking to both the BMP280 and DS1307</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="tag tag-concept">CONCEPT</span>
+    <h3>How I2C Works &mdash; The Protocol</h3>
+  </div>
+  <div class="section-body">
+    <p>I2C is a <strong>2-wire serial bus</strong> where one master (our microcontroller) talks to multiple slaves (BMP280, DS1307) using just two lines:</p>
+    <table>
+      <tr><th>Line</th><th>Name</th><th>Purpose</th></tr>
+      <tr><td><strong>SDA</strong></td><td>Serial Data</td><td>Carries data bits (bidirectional)</td></tr>
+      <tr><td><strong>SCL</strong></td><td>Serial Clock</td><td>Clock signal (always driven by master)</td></tr>
+    </table>
+
+    <p>Every I2C transaction follows this pattern:</p>
+    <div class="timing">
+<pre>
+SDA: ~~\___[A6][A5][A4][A3][A2][A1][A0][R/W][ACK][D7][D6]...[D0][ACK]___/~~
+         |                                   |                        |
+SCL: ~~~~|_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~|_/~\_/~\_..._/~\_/~\_/~|~~~~
+         |                                   |                        |
+       START                              data byte                  STOP
+</pre>
+    </div>
+
+    <div class="note note-blue">
+      <strong>START condition:</strong> SDA goes LOW while SCL is HIGH.<br>
+      <strong>STOP condition:</strong> SDA goes HIGH while SCL is HIGH.<br>
+      During normal data transfer, SDA only changes when SCL is LOW.
+    </div>
+
+    <h4 style="color: var(--accent); margin: 1rem 0 .6rem;">I2C Address Byte Format</h4>
+    <p>The first byte after START is always the <strong>address byte</strong>:</p>
+    <div class="bit-table">
+      <div class="bit-label">Bit 7</div><div class="bit-label">Bit 6</div><div class="bit-label">Bit 5</div><div class="bit-label">Bit 4</div><div class="bit-label">Bit 3</div><div class="bit-label">Bit 2</div><div class="bit-label">Bit 1</div><div class="bit-label">Bit 0</div>
+      <div class="bit-set">A6</div><div class="bit-set">A5</div><div class="bit-set">A4</div><div class="bit-set">A3</div><div class="bit-set">A2</div><div class="bit-set">A1</div><div class="bit-set">A0</div><div class="bit-set">R/W</div>
+    </div>
+    <table>
+      <tr><th>Bits [7:1]</th><th>Bit 0 (R/W)</th><th>Meaning</th></tr>
+      <tr><td>7-bit slave address</td><td><code>0</code></td><td>Master wants to <strong>WRITE</strong> to slave</td></tr>
+      <tr><td>7-bit slave address</td><td><code>1</code></td><td>Master wants to <strong>READ</strong> from slave</td></tr>
+    </table>
+    <p>Example: BMP280 address = <code>0x76</code> (7-bit). For writing: <code>0x76 &lt;&lt; 1 | 0 = 0xEC</code>. For reading: <code>0x76 &lt;&lt; 1 | 1 = 0xED</code>.</p>
+
+    <h4 style="color: var(--accent); margin: 1rem 0 .6rem;">ACK vs NACK</h4>
+    <p>After every byte, the <em>receiver</em> pulls SDA LOW (ACK) or leaves it HIGH (NACK):</p>
+    <table>
+      <tr><th>Signal</th><th>SDA</th><th>Meaning</th><th>When Used</th></tr>
+      <tr><td><strong>ACK</strong></td><td>LOW</td><td>"Got it, send more"</td><td>After every byte except the last one in a multi-byte read</td></tr>
+      <tr><td><strong>NACK</strong></td><td>HIGH</td><td>"Done, stop sending"</td><td>After the last byte the master wants to read</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="tag tag-i2c">I2C</span>
+    <h3>Hardware Registers &mdash; SSCON &amp; SSDAT</h3>
+    <span class="file">i2c.c</span>
+  </div>
+  <div class="section-body">
+    <p>The AT89C5131 has a <strong>hardware I2C (TWI) peripheral</strong> controlled via two special-function registers. You don't bit-bang the SDA/SCL lines manually &mdash; you set bits in SSCON and the hardware generates the correct waveforms.</p>
+
+    <h4 style="color: var(--accent); margin: .8rem 0 .5rem;">SSCON Register (I2C Control)</h4>
+    <div class="bit-table">
+      <div class="bit-label">Bit 7</div><div class="bit-label">Bit 6</div><div class="bit-label">Bit 5</div><div class="bit-label">Bit 4</div><div class="bit-label">Bit 3</div><div class="bit-label">Bit 2</div><div class="bit-label">Bit 1</div><div class="bit-label">Bit 0</div>
+      <div>CR1</div><div>SSEN</div><div class="bit-set">STA</div><div class="bit-set">STO</div><div class="bit-set">SI</div><div class="bit-set">AA</div><div>CR0</div><div>-</div>
+    </div>
+    <table>
+      <tr><th>Bit</th><th>Name</th><th>Mask</th><th>What It Does</th></tr>
+      <tr><td>7, 1</td><td>CR1, CR0</td><td></td><td>Clock Rate selection (sets I2C speed)</td></tr>
+      <tr><td>6</td><td>SSEN</td><td><code>0x40</code></td><td>I2C Enable &mdash; turns on the peripheral</td></tr>
+      <tr><td>5</td><td>STA</td><td><code>0x20</code></td><td>START flag &mdash; set to 1 to generate START condition</td></tr>
+      <tr><td>4</td><td>STO</td><td><code>0x10</code></td><td>STOP flag &mdash; set to 1 to generate STOP condition</td></tr>
+      <tr><td>3</td><td>SI</td><td><code>0x08</code></td><td>Serial Interrupt &mdash; goes HIGH when an I2C event completes. <strong>Must be cleared manually</strong> to let the bus proceed</td></tr>
+      <tr><td>2</td><td>AA</td><td><code>0x04</code></td><td>Assert Acknowledge &mdash; 1 = send ACK, 0 = send NACK after reading</td></tr>
+    </table>
+
+    <div class="note note-blue">
+      <strong>Key insight:</strong> SI is the "handshake" bit. The I2C hardware pauses after every operation (START, byte sent, byte received) and sets SI = 1. Your code must clear SI to let the next operation proceed. This is how software stays in sync with hardware.
+    </div>
+
+    <h4 style="color: var(--accent); margin: 1rem 0 .5rem;">SSDAT Register (I2C Data)</h4>
+    <p>An 8-bit register. Write a byte to it before sending; read from it after receiving.</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="tag tag-i2c">I2C</span>
+    <h3>Low-Level Functions</h3>
+    <span class="file">i2c.c lines 4&ndash;48</span>
+  </div>
+  <div class="section-body">
+
+    <div class="fn-block">
+      <div class="fn-name">void I2C_Init(void)</div>
+      <div class="fn-body">
+<pre class="code-block">SSCON = 0xC5;   // binary: 1100 0101</pre>
+        Breaks down as:
+        <ul>
+          <li>CR1 = 1, SSEN = 1 &rarr; I2C peripheral <strong>enabled</strong></li>
+          <li>STA = 0, STO = 0 &rarr; no START/STOP yet</li>
+          <li>SI = 0 &rarr; interrupt flag cleared</li>
+          <li>AA = 1 &rarr; ACK enabled by default</li>
+          <li>CR0 = 0 &rarr; along with CR1, sets clock rate</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void I2C_Start(void)</div>
+      <div class="fn-body">
+        Generates a START condition on the I2C bus:
+<pre class="code-block">SSCON = SSCON | 0x20;    // Set STA bit (bit 5) = 1
+SSCON = SSCON & 0xF7;    // Clear SI bit (bit 3) = 0  &rarr; releases bus
+while((SSCON & 0x08)==0); // Wait until SI = 1 (START completed)
+SSCON = SSCON & 0xDF;    // Clear STA bit (don't repeat START)</pre>
+        <p><strong>Why clear STA at the end?</strong> If you leave STA = 1, the hardware would try to send another START after the next operation. You only want one START per transaction.</p>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void I2C_Stop(void)</div>
+      <div class="fn-body">
+        Generates a STOP condition:
+<pre class="code-block">SSCON = SSCON | 0x10;    // Set STO bit (bit 4) = 1
+SSCON = SSCON & 0xF7;    // Clear SI = 0  &rarr; triggers STOP
+while(SSCON & 0x10);     // Wait until STO auto-clears</pre>
+        <div class="note note-green">Unlike STA, the <strong>STO bit clears itself automatically</strong> once the STOP condition is complete. That's why we wait for it to become 0.</div>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void I2C_Write(unsigned char byte)</div>
+      <div class="fn-body">
+        Sends one byte (address or data) on the bus:
+<pre class="code-block">SSDAT = byte;            // Load byte into data register
+SSCON = SSCON & 0xF7;    // Clear SI &rarr; hardware starts sending
+while((SSCON & 0x08)==0); // Wait until SI = 1 (byte sent + ACK/NACK received)</pre>
+        <p>After this, the slave has either ACKed or NACKed. The status code in SSCON indicates which, but this code doesn't check it (simplified).</p>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">unsigned char I2C_Read(void)</div>
+      <div class="fn-body">
+        Reads one byte from the bus:
+<pre class="code-block">SSCON = SSCON & 0xF7;    // Clear SI &rarr; hardware clocks in 8 bits
+while((SSCON & 0x08)==0); // Wait until SI = 1 (byte received)
+return SSDAT;            // Return the received byte</pre>
+        <div class="note"><strong>Important:</strong> You must call <code>I2C_Ack()</code> or <code>I2C_Nack()</code> <em>before</em> calling <code>I2C_Read()</code>. The AA bit tells the hardware what to send on the 9th clock pulse (the acknowledge slot).</div>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void I2C_Ack(void) / void I2C_Nack(void)</div>
+      <div class="fn-body">
+<pre class="code-block">// ACK: "I want more data"
+SSCON = SSCON | 0x04;    // AA = 1 &rarr; will pull SDA LOW after read
+
+// NACK: "This is the last byte"
+SSCON = SSCON & 0xFB;    // AA = 0 &rarr; will leave SDA HIGH after read</pre>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void I2C_RepeatedStart(void)</div>
+      <div class="fn-body">
+        <p>Identical to <code>I2C_Start()</code>. A <strong>Repeated START</strong> is a START sent <em>without</em> a preceding STOP. It's used when the master needs to <strong>change direction</strong> (write &rarr; read) without releasing the bus. This prevents another master from stealing the bus between transactions.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="tag tag-i2c">I2C</span>
+    <h3>High-Level Device Functions</h3>
+    <span class="file">i2c.c lines 51&ndash;88</span>
+  </div>
+  <div class="section-body">
+    <p>These combine the low-level primitives into complete I2C read/write transactions.</p>
+
+    <div class="fn-block">
+      <div class="fn-name">unsigned char I2C_ReadRegister(devAddr, regAddr)</div>
+      <div class="fn-body">
+        <p>Reads <strong>one byte</strong> from a specific register of a slave device. This is a <em>two-phase</em> operation:</p>
+
+        <p><strong>Phase A &mdash; Tell the slave WHICH register:</strong></p>
+        <div class="flow">
+          <div class="flow-item"><strong>START</strong></div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">Write: <code>devAddr &lt;&lt; 1 | 0</code> = address + <strong>WRITE</strong> bit</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">Write: <code>regAddr</code> = register pointer</div>
+        </div>
+        <p><strong>Phase B &mdash; Read the data:</strong></p>
+        <div class="flow">
+          <div class="flow-item"><strong>Repeated START</strong> (switch from write &rarr; read)</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">Write: <code>devAddr &lt;&lt; 1 | 1</code> = address + <strong>READ</strong> bit</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">NACK (only 1 byte needed) &rarr; Read byte from SSDAT</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item"><strong>STOP</strong></div>
+        </div>
+
+        <div class="note">
+          <strong>Why two phases?</strong> I2C devices have many registers. You first WRITE the register address (telling the slave "point your internal pointer to this register"), then READ the data from that register. The Repeated START separates these two directions.
+        </div>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void I2C_WriteRegister(devAddr, regAddr, val)</div>
+      <div class="fn-body">
+        <p>Writes <strong>one byte</strong> to a specific register. Simpler because both the register address and data go in the same direction (master &rarr; slave):</p>
+        <div class="flow">
+          <div class="flow-item"><strong>START</strong></div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">Write: <code>devAddr &lt;&lt; 1 | 0</code> (address + WRITE)</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">Write: <code>regAddr</code> (register address)</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">Write: <code>val</code> (data to store)</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item"><strong>STOP</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void I2C_ReadMultiple(devAddr, regAddr, *buf, len)</div>
+      <div class="fn-body">
+        <p>Reads <code>len</code> consecutive bytes starting from <code>regAddr</code> into buffer <code>buf[]</code>.</p>
+        <ul>
+          <li>Same two-phase approach as <code>I2C_ReadRegister</code></li>
+          <li>But reads multiple bytes in a loop</li>
+          <li>Sends <strong>ACK</strong> after every byte except the last</li>
+          <li>Sends <strong>NACK</strong> before the last byte &rarr; tells slave "stop after this"</li>
+          <li>The slave <strong>auto-increments</strong> its internal register pointer, so consecutive reads give consecutive registers</li>
+        </ul>
+<pre class="code-block">for(i = 0; i < len; i++){
+    if(i < len-1)  I2C_Ack();   // More bytes to come
+    else           I2C_Nack();  // Last byte
+    buf[i] = I2C_Read();
+}</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- PHASE 2: LCD -->
+<!-- ============================================================ -->
+<div id="phase2" class="phase-banner">
+  <div class="num">02</div>
+  <div class="info">
+    <h2>LCD Display Driver</h2>
+    <p>lcd.h &mdash; Controls a 16x2 HD44780 character LCD in 8-bit parallel mode</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="tag tag-concept">CONCEPT</span>
+    <h3>How the LCD Works</h3>
+  </div>
+  <div class="section-body">
+    <p>The HD44780 LCD has an internal controller with its own memory. You send it <strong>commands</strong> (to control cursor, clear screen, etc.) and <strong>data</strong> (ASCII characters to display). It distinguishes between them using the <strong>RS pin</strong>.</p>
+
+    <h4 style="color: var(--accent); margin: .8rem 0 .5rem;">Pin Connections</h4>
+    <table>
+      <tr><th>LCD Pin</th><th>MCU Port</th><th>Purpose</th></tr>
+      <tr><td>RS</td><td><code>P0.0</code></td><td>Register Select: <code>0</code> = command, <code>1</code> = data (character)</td></tr>
+      <tr><td>RW</td><td><code>P0.1</code></td><td>Read/Write: always <code>0</code> (we only write)</td></tr>
+      <tr><td>EN</td><td><code>P0.2</code></td><td>Enable: data is latched on HIGH &rarr; LOW transition (falling edge)</td></tr>
+      <tr><td>D0&ndash;D7</td><td><code>P2.0&ndash;P2.7</code></td><td>8-bit parallel data bus</td></tr>
+    </table>
+
+    <h4 style="color: var(--accent); margin: 1rem 0 .5rem;">How a Write Cycle Works</h4>
+    <div class="timing">
+<pre>
+RS:  ____/~~~~~~~~~~~~~~~~~\____    (0 for cmd, 1 for data)
+RW:  ___________________________    (always 0 = write)
+EN:  ________/~~~~~~~~~~\______     (pulse HIGH then LOW)
+P2:  ========[  DATA BYTE  ]====    (stable while EN is HIGH)
+              ^             ^
+              |             |
+         EN goes HIGH   EN goes LOW
+         (LCD reads)    (data latched)
+</pre>
+    </div>
+
+    <h4 style="color: var(--accent); margin: 1rem 0 .5rem;">LCD Memory Map (DDRAM Addresses)</h4>
+    <table>
+      <tr><th>Position</th><th>Address Range</th><th>Command to Move Cursor</th></tr>
+      <tr><td>Line 1, Col 0&ndash;15</td><td><code>0x80</code> &ndash; <code>0x8F</code></td><td><code>lcd_cmd(0x80)</code> = start of line 1</td></tr>
+      <tr><td>Line 2, Col 0&ndash;15</td><td><code>0xC0</code> &ndash; <code>0xCF</code></td><td><code>lcd_cmd(0xC0)</code> = start of line 2</td></tr>
+    </table>
+    <div class="note note-green">To move to any position: <code>lcd_cmd(0x80 + offset)</code> for line 1, <code>lcd_cmd(0xC0 + offset)</code> for line 2. For example, line 1 column 5 = <code>lcd_cmd(0x85)</code>.</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="tag tag-lcd">LCD</span>
+    <h3>LCD Functions Explained</h3>
+    <span class="file">lcd.h</span>
+  </div>
+  <div class="section-body">
+
+    <div class="fn-block">
+      <div class="fn-name">void lcd_init(void)</div>
+      <div class="fn-body">
+        <p>Initializes Port P2 and sends the startup command sequence:</p>
+        <table>
+          <tr><th>Order</th><th>Command</th><th>Hex</th><th>Binary</th><th>What It Does</th></tr>
+          <tr><td>1</td><td>Function Set</td><td><code>0x38</code></td><td><code>0011 1000</code></td><td><strong>8-bit mode</strong>, 2 display lines, 5x7 font</td></tr>
+          <tr><td>2</td><td>Entry Mode</td><td><code>0x06</code></td><td><code>0000 0110</code></td><td>Cursor moves RIGHT after each char, no display shift</td></tr>
+          <tr><td>3</td><td>Display ON</td><td><code>0x0C</code></td><td><code>0000 1100</code></td><td>Display ON, cursor OFF, blink OFF</td></tr>
+          <tr><td>4</td><td>Clear</td><td><code>0x01</code></td><td><code>0000 0001</code></td><td>Clears all characters, cursor to home (0,0)</td></tr>
+          <tr><td>5</td><td>Set Cursor</td><td><code>0x80</code></td><td><code>1000 0000</code></td><td>Move cursor to Row 1, Column 0</td></tr>
+        </table>
+        <div class="note">Each command is followed by a <code>msdelay(4)</code> because the LCD controller needs time to process commands (especially Clear which takes ~1.6ms).</div>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void msdelay(unsigned int time)</div>
+      <div class="fn-body">
+        <p>Software delay function. The inner loop (<code>j &lt; 382</code>) is calibrated to produce approximately <strong>1 ms delay per iteration</strong> of the outer loop at the crystal frequency used.</p>
+<pre class="code-block">for(i=0; i&lt;time; i++)       // outer loop = 'time' ms
+    for(j=0; j&lt;382; j++);   // inner loop ~ 1 ms</pre>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void lcd_cmd(unsigned int i)</div>
+      <div class="fn-body">
+        <p>Sends a command byte to the LCD:</p>
+<pre class="code-block">RS = 0;       // Command mode (not data)
+RW = 0;       // Write mode
+EN = 1;       // Enable HIGH
+P2 = i;       // Put command byte on data bus
+msdelay(10);  // Hold for LCD to read
+EN = 0;       // Enable LOW &rarr; LCD latches the command</pre>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void lcd_write_char(unsigned char ch)</div>
+      <div class="fn-body">
+        <p>Sends a <strong>data byte</strong> (ASCII character) to display:</p>
+<pre class="code-block">RS = 1;       // Data mode (character, not command!)
+RW = 0;       // Write mode
+EN = 1;       // Enable HIGH
+P2 = ch;      // Put ASCII character on data bus
+msdelay(10);  // Hold
+EN = 0;       // Latch &rarr; character appears on screen</pre>
+        <p>The <strong>only difference</strong> from <code>lcd_cmd()</code> is <code>RS = 1</code> instead of <code>RS = 0</code>.</p>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void lcd_write_string(unsigned char *s)</div>
+      <div class="fn-body">
+        <p>Takes a pointer to a null-terminated string and prints each character:</p>
+<pre class="code-block">while(*s != '\0')        // until null terminator
+{
+    lcd_write_char(*s++);  // print char, advance pointer
+}</pre>
+        <p>The cursor auto-increments (thanks to <code>0x06</code> entry mode), so characters appear left-to-right.</p>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void lcd_print_num(int num)</div>
+      <div class="fn-body">
+        <p>Prints an integer number on the LCD. Since there's no <code>printf()</code> on embedded systems, we manually extract digits:</p>
+        <div class="step"><span class="step-num">1</span><span>Handle <code>num == 0</code>: just print <code>'0'</code></span></div>
+        <div class="step"><span class="step-num">2</span><span>Handle negative: print <code>'-'</code>, then work with <code>-num</code></span></div>
+        <div class="step"><span class="step-num">3</span><span>Extract digits using <code>num % 10</code> (gives last digit), convert to ASCII by adding <code>'0'</code> (0x30). Store in array.</span></div>
+        <div class="step"><span class="step-num">4</span><span>Digits come out in <strong>reverse order</strong> (units first), so print the array <strong>backwards</strong></span></div>
+
+        <p><strong>Example:</strong> num = 253</p>
+        <table>
+          <tr><th>Iteration</th><th>num % 10</th><th>digits[i]</th><th>num / 10</th></tr>
+          <tr><td>i=0</td><td>3</td><td><code>'3'</code></td><td>25</td></tr>
+          <tr><td>i=1</td><td>5</td><td><code>'5'</code></td><td>2</td></tr>
+          <tr><td>i=2</td><td>2</td><td><code>'2'</code></td><td>0 (stop)</td></tr>
+        </table>
+        <p>Print in reverse: <code>'2'</code> <code>'5'</code> <code>'3'</code> &rarr; "253"</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- PHASE 3: UART -->
+<!-- ============================================================ -->
+<div id="phase3" class="phase-banner">
+  <div class="num">03</div>
+  <div class="info">
+    <h2>UART Serial Communication</h2>
+    <p>serial.h &mdash; Interrupt-driven UART for sending data to a PC terminal</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="tag tag-concept">CONCEPT</span>
+    <h3>How UART Works</h3>
+  </div>
+  <div class="section-body">
+    <p>UART is an <strong>asynchronous</strong> protocol &mdash; there's no clock line. Both sides must agree on the <strong>baud rate</strong> (bits per second) beforehand.</p>
+
+    <h4 style="color: var(--accent); margin: .8rem 0 .5rem;">UART Frame Format (Mode 1)</h4>
+    <div class="timing">
+<pre>
+Idle ___      ___________________________________      _____ Idle
+        \    |   |   |   |   |   |   |   |   |   |   |
+         |ST | D0| D1| D2| D3| D4| D5| D6| D7|STOP|
+         |___|___|___|___|___|___|___|___|___|___|
+
+         START  &lt;---- 8 data bits (LSB first) ---&gt;  STOP
+          bit                                        bit
+</pre>
+    </div>
+    <table>
+      <tr><th>Part</th><th>Value</th><th>Purpose</th></tr>
+      <tr><td>Start bit</td><td>0 (LOW)</td><td>Signals the beginning of a frame</td></tr>
+      <tr><td>Data bits</td><td>8 bits</td><td>The actual character (LSB first)</td></tr>
+      <tr><td>Stop bit</td><td>1 (HIGH)</td><td>Signals end of frame, line goes idle</td></tr>
+    </table>
+
+    <h4 style="color: var(--accent); margin: 1rem 0 .5rem;">Baud Rate Generation</h4>
+    <p>In the 8051, <strong>Timer 1 in Mode 2</strong> (8-bit auto-reload) generates the baud rate clock:</p>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <h4>Timer 1 Mode 2</h4>
+        <p>The timer counts up from <code>TH1</code> to <code>0xFF</code>, overflows, and <strong>automatically reloads</strong> <code>TH1</code>. This creates a periodic overflow that clocks the UART.</p>
+      </div>
+      <div class="concept-card">
+        <h4>Baud Rate Formula</h4>
+        <p><code>Baud = (2^SMOD / 32) &times; (f_osc / (12 &times; (256 - TH1)))</code><br><br>
+        <code>TH1 = 0xCB</code> = 203, so <code>256 - 203 = 53</code>. The exact baud depends on the crystal frequency.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="tag tag-uart">UART</span>
+    <h3>UART Functions Explained</h3>
+    <span class="file">serial.h</span>
+  </div>
+  <div class="section-body">
+
+    <div class="fn-block">
+      <div class="fn-name">void uart_init(void)</div>
+      <div class="fn-body">
+<pre class="code-block">TMOD = 0x20;    // Timer 1: Mode 2 (8-bit auto-reload)
+TH1  = 0xCB;    // Reload value &rarr; sets baud rate
+SCON = 0x50;    // UART Mode 1 (8-bit), REN=1 (receiver enabled)
+TR1  = 1;       // Start Timer 1
+ES   = 1;       // Enable Serial Interrupt
+EA   = 1;       // Enable Global Interrupts</pre>
+
+        <h4 style="color: var(--accent); margin: .6rem 0 .4rem;">SCON Register Breakdown (0x50 = 0101 0000)</h4>
+        <div class="bit-table">
+          <div class="bit-label">Bit 7</div><div class="bit-label">Bit 6</div><div class="bit-label">Bit 5</div><div class="bit-label">Bit 4</div><div class="bit-label">Bit 3</div><div class="bit-label">Bit 2</div><div class="bit-label">Bit 1</div><div class="bit-label">Bit 0</div>
+          <div class="bit-set">SM0=0</div><div class="bit-set">SM1=1</div><div>SM2=0</div><div class="bit-set">REN=1</div><div>TB8</div><div>RB8</div><div>TI</div><div>RI</div>
+        </div>
+        <table>
+          <tr><th>Bit</th><th>Value</th><th>Meaning</th></tr>
+          <tr><td>SM0:SM1 = 01</td><td></td><td><strong>Mode 1</strong>: 8-bit UART, variable baud rate</td></tr>
+          <tr><td>REN = 1</td><td></td><td>Receiver <strong>enabled</strong> (can receive data)</td></tr>
+          <tr><td>TI = 0</td><td></td><td>Transmit Interrupt flag (cleared)</td></tr>
+          <tr><td>RI = 0</td><td></td><td>Receive Interrupt flag (cleared)</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void transmit_char(unsigned char ch)</div>
+      <div class="fn-body">
+<pre class="code-block">SBUF = ch;             // Load character into Serial Buffer
+                       // &rarr; hardware automatically starts transmitting
+while(!tx_complete);   // Wait for ISR to set tx_complete flag
+tx_complete = 0;       // Clear flag for next transmission</pre>
+        <p><strong>Flow:</strong> Writing to SBUF triggers hardware to shift out the byte bit-by-bit. When all bits (start + 8 data + stop) are sent, hardware sets <code>TI = 1</code>, which triggers the ISR. The ISR sets <code>tx_complete = 1</code>. Main code detects this and proceeds.</p>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void transmit_string(unsigned char *s)</div>
+      <div class="fn-body">
+        <p>Sends a null-terminated string character by character:</p>
+<pre class="code-block">while(*s != 0)
+    transmit_char(*s++);</pre>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">unsigned char receive_char(void)</div>
+      <div class="fn-body">
+<pre class="code-block">while(!rx_complete);   // Wait for ISR to set rx_complete
+rx_complete = 0;       // Clear flag
+ch = SBUF;             // Read received byte from Serial Buffer
+return ch;</pre>
+        <p>(Not used in this project's main loop, but available for bidirectional communication.)</p>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void serial_ISR(void) interrupt 4</div>
+      <div class="fn-body">
+        <p>The <strong>Interrupt Service Routine</strong> for the serial port. Triggered whenever <code>TI</code> or <code>RI</code> is set by hardware.</p>
+<pre class="code-block">void serial_ISR(void) interrupt 4
+{
+    if(TI == 1) {          // Transmit complete?
+        TI = 0;            // Clear TI (MUST be done manually!)
+        tx_complete = 1;   // Signal to transmit_char()
+    }
+    else if(RI == 1) {     // Receive complete?
+        RI = 0;            // Clear RI (MUST be done manually!)
+        rx_complete = 1;   // Signal to receive_char()
+    }
+}</pre>
+        <div class="note note-pink">
+          <strong>interrupt 4</strong> = Serial port interrupt vector at address <code>0x0023</code>.<br>
+          <strong>Critical:</strong> TI and RI flags are NOT auto-cleared by hardware. If you don't clear them in the ISR, the interrupt fires endlessly!
+        </div>
+
+        <h4 style="color: var(--accent); margin: .8rem 0 .4rem;">8051 Interrupt Vector Table</h4>
+        <table>
+          <tr><th>Interrupt #</th><th>Source</th><th>Vector Address</th><th>Flag</th></tr>
+          <tr><td>0</td><td>External INT0</td><td>0x0003</td><td>IE0</td></tr>
+          <tr><td>1</td><td>Timer 0</td><td>0x000B</td><td>TF0</td></tr>
+          <tr><td>2</td><td>External INT1</td><td>0x0013</td><td>IE1</td></tr>
+          <tr><td>3</td><td>Timer 1</td><td>0x001B</td><td>TF1</td></tr>
+          <tr><td><strong>4</strong></td><td><strong>Serial Port</strong></td><td><strong>0x0023</strong></td><td><strong>TI or RI</strong></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- PHASE 4: RTC -->
+<!-- ============================================================ -->
+<div id="phase4" class="phase-banner">
+  <div class="num">04</div>
+  <div class="info">
+    <h2>DS1307 Real-Time Clock Driver</h2>
+    <p>r2c.c / r2c.h &mdash; Keeps accurate time using an external RTC chip on the I2C bus</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="tag tag-concept">CONCEPT</span>
+    <h3>About the DS1307</h3>
+  </div>
+  <div class="section-body">
+    <p>The DS1307 is a <strong>battery-backed Real-Time Clock</strong> (RTC). It has its own 32.768 kHz crystal oscillator and keeps counting time even when the main system is powered off (via a coin cell battery).</p>
+
+    <table>
+      <tr><th>Property</th><th>Value</th></tr>
+      <tr><td>I2C Address</td><td><code>0x68</code> (7-bit, fixed &mdash; cannot be changed)</td></tr>
+      <tr><td>Data Format</td><td><strong>BCD</strong> (Binary-Coded Decimal)</td></tr>
+      <tr><td>Time Keeping</td><td>Seconds, Minutes, Hours, Day, Date, Month, Year</td></tr>
+      <tr><td>Backup</td><td>Battery-backed (CR2032 coin cell)</td></tr>
+    </table>
+
+    <h4 style="color: var(--accent); margin: 1rem 0 .5rem;">DS1307 Register Map (Time Registers)</h4>
+    <table>
+      <tr><th>Address</th><th>Register</th><th>Bit 7</th><th>Bits [6:4]</th><th>Bits [3:0]</th></tr>
+      <tr><td><code>0x00</code></td><td>Seconds</td><td><strong>CH</strong></td><td>10s digit (0&ndash;5)</td><td>1s digit (0&ndash;9)</td></tr>
+      <tr><td><code>0x01</code></td><td>Minutes</td><td>0</td><td>10s digit (0&ndash;5)</td><td>1s digit (0&ndash;9)</td></tr>
+      <tr><td><code>0x02</code></td><td>Hours</td><td>0</td><td>10s digit (0&ndash;2)</td><td>1s digit (0&ndash;9)</td></tr>
+    </table>
+
+    <div class="note note-pink">
+      <strong>CH (Clock Halt) Bit:</strong> Bit 7 of register 0x00. When CH = 1, the oscillator is <strong>stopped</strong> and the clock doesn't tick. You MUST clear CH to 0 to start the clock. That's why <code>R2C_SetTime()</code> masks the seconds with <code>& 0x7F</code>.
+    </div>
+
+    <h4 style="color: var(--accent); margin: 1rem 0 .5rem;">BCD Encoding &mdash; Deep Dive</h4>
+    <p>BCD stores each decimal digit separately in 4 bits (a nibble). This is different from normal binary!</p>
+    <table>
+      <tr><th>Decimal</th><th>BCD (Hex)</th><th>BCD (Binary)</th><th>Normal Binary</th><th>Same?</th></tr>
+      <tr><td>9</td><td><code>0x09</code></td><td><code>0000 1001</code></td><td><code>0000 1001</code></td><td>Yes (single digit)</td></tr>
+      <tr><td>25</td><td><code>0x25</code></td><td><code>0010 0101</code></td><td><code>0001 1001</code></td><td><strong>NO!</strong></td></tr>
+      <tr><td>59</td><td><code>0x59</code></td><td><code>0101 1001</code></td><td><code>0011 1011</code></td><td><strong>NO!</strong></td></tr>
+    </table>
+    <div class="note note-green"><strong>Why BCD?</strong> It's easy to display: each nibble is already a decimal digit. No division needed. Older hardware (like 7-segment displays) can decode BCD directly.</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="tag tag-rtc">RTC</span>
+    <h3>RTC Functions Explained</h3>
+    <span class="file">r2c.c</span>
+  </div>
+  <div class="section-body">
+
+    <div class="fn-block">
+      <div class="fn-name">void R2C_Init(void)</div>
+      <div class="fn-body">
+        <p>Just a 200ms startup delay. The DS1307 needs time to stabilize after power-on before I2C communication begins.</p>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">unsigned char BCD_to_Dec(unsigned char bcd)</div>
+      <div class="fn-body">
+        <p>Converts BCD to normal decimal:</p>
+<pre class="code-block">return ((bcd >> 4) * 10) + (bcd & 0x0F);
+//      ^^^^^^^^^^^         ^^^^^^^^^^^^
+//     upper nibble          lower nibble
+//     (tens digit)         (ones digit)</pre>
+        <p><strong>Example:</strong> <code>BCD_to_Dec(0x25)</code></p>
+        <ul>
+          <li><code>0x25 >> 4 = 0x02 = 2</code> (tens digit)</li>
+          <li><code>0x25 & 0x0F = 0x05 = 5</code> (ones digit)</li>
+          <li>Result: <code>2 * 10 + 5 = 25</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">unsigned char Dec_to_BCD(unsigned char dec)</div>
+      <div class="fn-body">
+        <p>Converts decimal to BCD:</p>
+<pre class="code-block">return ((dec / 10) << 4) | (dec % 10);
+//      ^^^^^^^^^^^^        ^^^^^^^^^
+//      tens &rarr; upper nibble  ones &rarr; lower nibble</pre>
+        <p><strong>Example:</strong> <code>Dec_to_BCD(25)</code></p>
+        <ul>
+          <li><code>25 / 10 = 2</code> &rarr; <code>2 &lt;&lt; 4 = 0x20</code></li>
+          <li><code>25 % 10 = 5</code></li>
+          <li>Result: <code>0x20 | 0x05 = 0x25</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void R2C_SetTime(sec, min, hour)</div>
+      <div class="fn-body">
+        <p>Writes the given time to the DS1307:</p>
+<pre class="code-block">// Write seconds &mdash; clear CH bit (bit 7) to START the clock
+I2C_WriteRegister(DS1307_ADDR, 0x00, Dec_to_BCD(sec) & 0x7F);
+
+// Write minutes
+I2C_WriteRegister(DS1307_ADDR, 0x01, Dec_to_BCD(min));
+
+// Write hours (24-hour format)
+I2C_WriteRegister(DS1307_ADDR, 0x02, Dec_to_BCD(hour));</pre>
+        <div class="note">
+          <strong>Why <code>& 0x7F</code>?</strong><br>
+          <code>0x7F</code> = <code>0111 1111</code>. ANDing with this clears bit 7 (CH bit) to 0, which means "oscillator ON, clock is running". Without this, the clock might be halted.
+        </div>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">void R2C_GetTime(*sec, *min, *hour)</div>
+      <div class="fn-body">
+        <p>Reads current time from the DS1307 and converts BCD &rarr; decimal:</p>
+<pre class="code-block">*sec  = BCD_to_Dec(I2C_ReadRegister(DS1307_ADDR, 0x00));
+*min  = BCD_to_Dec(I2C_ReadRegister(DS1307_ADDR, 0x01));
+*hour = BCD_to_Dec(I2C_ReadRegister(DS1307_ADDR, 0x02));</pre>
+        <p>Uses pointers (<code>*sec</code>, <code>*min</code>, <code>*hour</code>) so the function can return <strong>three values</strong> at once. The caller passes addresses: <code>R2C_GetTime(&sec, &min, &hour)</code>.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- PHASE 5: BMP280 -->
+<!-- ============================================================ -->
+<div id="phase5" class="phase-banner">
+  <div class="num">05</div>
+  <div class="info">
+    <h2>BMP280 Temperature Sensor</h2>
+    <p>Driven directly from main.c &mdash; Reads raw ADC values and applies the compensation formula</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="tag tag-concept">CONCEPT</span>
+    <h3>About the BMP280</h3>
+  </div>
+  <div class="section-body">
+    <p>The BMP280 is a <strong>digital temperature and pressure sensor</strong> by Bosch. In this project, we only use the temperature functionality.</p>
+
+    <table>
+      <tr><th>Property</th><th>Value</th></tr>
+      <tr><td>I2C Address</td><td><code>0x76</code> (when SDO pin is LOW)</td></tr>
+      <tr><td>Chip ID</td><td><code>0x58</code> (read from register 0xD0)</td></tr>
+      <tr><td>Temperature Range</td><td>-40 to +85 &deg;C</td></tr>
+      <tr><td>Resolution</td><td>0.01 &deg;C</td></tr>
+      <tr><td>ADC Resolution</td><td>20 bits</td></tr>
+    </table>
+
+    <h4 style="color: var(--accent); margin: 1rem 0 .5rem;">Key BMP280 Registers</h4>
+    <table>
+      <tr><th>Address</th><th>Name</th><th>Purpose</th></tr>
+      <tr><td><code>0xD0</code></td><td>ID</td><td>Chip identification &mdash; always reads <code>0x58</code></td></tr>
+      <tr><td><code>0xF4</code></td><td>ctrl_meas</td><td>Controls oversampling and measurement mode</td></tr>
+      <tr><td><code>0xFA</code></td><td>temp_msb</td><td>Temperature data bits [19:12]</td></tr>
+      <tr><td><code>0xFB</code></td><td>temp_lsb</td><td>Temperature data bits [11:4]</td></tr>
+      <tr><td><code>0xFC</code></td><td>temp_xlsb</td><td>Temperature data bits [3:0] (upper nibble only)</td></tr>
+      <tr><td><code>0x88&ndash;0x8D</code></td><td>calib</td><td>Factory calibration data (dig_T1, dig_T2, dig_T3)</td></tr>
+    </table>
+
+    <h4 style="color: var(--accent); margin: 1rem 0 .5rem;">Measurement Modes</h4>
+    <table>
+      <tr><th>Mode</th><th>Bits [1:0]</th><th>Behavior</th></tr>
+      <tr><td>Sleep</td><td><code>00</code></td><td>No measurements, lowest power</td></tr>
+      <tr><td><strong>Forced</strong></td><td><code>01 or 10</code></td><td>Take ONE measurement, then go to Sleep</td></tr>
+      <tr><td>Normal</td><td><code>11</code></td><td>Continuously measure at set interval</td></tr>
+    </table>
+    <div class="note note-green"><strong>This project uses Forced Mode (<code>0x21</code>).</strong> Every second, the code writes <code>0x21</code> to trigger one measurement, waits 50ms, then reads the result. The sensor goes back to sleep until triggered again. This is power-efficient.</div>
+
+    <h4 style="color: var(--accent); margin: 1rem 0 .5rem;">ctrl_meas Register (0xF4) &mdash; Value 0x21 Breakdown</h4>
+    <div class="bit-table">
+      <div class="bit-label">Bit 7</div><div class="bit-label">Bit 6</div><div class="bit-label">Bit 5</div><div class="bit-label">Bit 4</div><div class="bit-label">Bit 3</div><div class="bit-label">Bit 2</div><div class="bit-label">Bit 1</div><div class="bit-label">Bit 0</div>
+      <div>0</div><div>0</div><div class="bit-set">1</div><div>0</div><div>0</div><div>0</div><div class="bit-set">0</div><div class="bit-set">1</div>
+    </div>
+    <table>
+      <tr><th>Field</th><th>Bits</th><th>Value</th><th>Meaning</th></tr>
+      <tr><td>osrs_t</td><td>[7:5]</td><td><code>001</code></td><td>Temperature oversampling &times;1</td></tr>
+      <tr><td>osrs_p</td><td>[4:2]</td><td><code>000</code></td><td>Pressure measurement <strong>skipped</strong></td></tr>
+      <tr><td>mode</td><td>[1:0]</td><td><code>01</code></td><td><strong>Forced mode</strong></td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="tag tag-bmp">BMP280</span>
+    <h3>Calibration &amp; Compensation Formula</h3>
+  </div>
+  <div class="section-body">
+    <p>Every BMP280 chip is slightly different due to manufacturing variations. To get accurate temperature, you must use <strong>factory calibration data</strong> stored in the chip's non-volatile memory.</p>
+
+    <h4 style="color: var(--accent); margin: .8rem 0 .5rem;">Step 1: Read Calibration Data (done once at startup)</h4>
+<pre class="code-block">I2C_ReadMultiple(BMP280_ADDR, 0x88, calib, 6);
+
+// Assemble into 16-bit values (LITTLE-ENDIAN: low byte first!)
+dig_T1 = (calib[1] << 8) | calib[0];  // unsigned 16-bit
+dig_T2 = (calib[3] << 8) | calib[2];  // signed 16-bit
+dig_T3 = (calib[5] << 8) | calib[4];  // signed 16-bit</pre>
+    <table>
+      <tr><th>Parameter</th><th>Registers</th><th>Type</th><th>Role in Formula</th></tr>
+      <tr><td><code>dig_T1</code></td><td>0x88, 0x89</td><td>unsigned int</td><td>Offset correction</td></tr>
+      <tr><td><code>dig_T2</code></td><td>0x8A, 0x8B</td><td>signed int</td><td>Linear sensitivity</td></tr>
+      <tr><td><code>dig_T3</code></td><td>0x8C, 0x8D</td><td>signed int</td><td>Quadratic (nonlinearity) correction</td></tr>
+    </table>
+
+    <div class="note note-blue">
+      <strong>Little-Endian:</strong> The low byte comes first in memory. Register 0x88 = low byte of dig_T1, register 0x89 = high byte. So we assemble as <code>(high &lt;&lt; 8) | low</code>.
+    </div>
+
+    <h4 style="color: var(--accent); margin: 1rem 0 .5rem;">Step 2: Read Raw Temperature (every second)</h4>
+<pre class="code-block">I2C_ReadMultiple(BMP280_ADDR, 0xFA, temp_raw, 3);
+
+// Assemble 20-bit ADC value from 3 bytes:
+adc_T = ((long)temp_raw[0] << 12) |   // MSB: bits [19:12]
+        ((long)temp_raw[1] << 4)  |   // LSB: bits [11:4]
+        (temp_raw[2] >> 4);            // XLSB: bits [3:0]</pre>
+
+    <p><strong>Why 20 bits from 3 bytes?</strong></p>
+    <div class="diagram">
+<pre>
+  temp_raw[0]     temp_raw[1]     temp_raw[2]
+ [  MSB byte  ]  [  LSB byte  ]  [XLSB byte  ]
+  b19 .... b12    b11 .... b4     b3 b2 b1 b0 x x x x
+                                  ^^^^^^^^^^^^
+                                  upper nibble only!
+</pre>
+    </div>
+
+    <h4 style="color: var(--accent); margin: 1rem 0 .5rem;">Step 3: Apply Compensation Formula</h4>
+    <p>This formula is straight from the <strong>BMP280 datasheet</strong> (Section 8.1). It corrects for manufacturing variations using the calibration data:</p>
+
+<pre class="code-block">// var1 = linear correction term
+var1 = ((adc_T / 8) - ((long)dig_T1 * 2)) * ((long)dig_T2) / 2048;
+
+// var2 = quadratic (non-linear) correction term
+var2 = (adc_T / 16) - (long)dig_T1;
+var2 = (var2 * var2) / 4096 * ((long)dig_T3) / 16384;
+
+// Combine and scale
+T = (var1 + var2) * 5 + 128;
+T = T / 256;</pre>
+
+    <p><strong>What each part does:</strong></p>
+    <table>
+      <tr><th>Variable</th><th>Purpose</th></tr>
+      <tr><td><code>var1</code></td><td><strong>Linear correction</strong> &mdash; proportional to (adc_T &minus; dig_T1), scaled by dig_T2</td></tr>
+      <tr><td><code>var2</code></td><td><strong>Quadratic correction</strong> &mdash; (adc_T &minus; dig_T1)&sup2;, scaled by dig_T3. Compensates for sensor nonlinearity</td></tr>
+      <tr><td><code>T</code></td><td>Final temperature in <strong>units of 0.01 &deg;C</strong></td></tr>
+    </table>
+
+    <p><strong>Example output:</strong></p>
+    <table>
+      <tr><th>T value</th><th>T/100</th><th>T%100</th><th>Display</th></tr>
+      <tr><td>2534</td><td>25</td><td>34</td><td>25.34 &deg;C</td></tr>
+      <tr><td>3100</td><td>31</td><td>00</td><td>31.00 &deg;C</td></tr>
+      <tr><td>-520</td><td>-5</td><td>20</td><td>-5.20 &deg;C</td></tr>
+    </table>
+
+    <div class="note">
+      <strong>Why integer math?</strong> The 8051 has no floating-point unit (FPU). All operations use integer arithmetic with carefully chosen division factors (2048, 4096, 16384, 256) that are powers of 2 &mdash; the compiler can optimize these as bit shifts.
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- PHASE 6: MAIN -->
+<!-- ============================================================ -->
+<div id="phase6" class="phase-banner">
+  <div class="num">06</div>
+  <div class="info">
+    <h2>Main Application Logic</h2>
+    <p>main.c &mdash; Ties all modules together: init, verify, read, display, transmit</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="tag tag-main">MAIN</span>
+    <h3>Startup Sequence (runs once)</h3>
+    <span class="file">main.c lines 46&ndash;86</span>
+  </div>
+  <div class="section-body">
+
+    <div class="fn-block">
+      <div class="fn-name">Step 1: Initialize All Peripherals</div>
+      <div class="fn-body">
+<pre class="code-block">lcd_init();       // Setup LCD (8-bit, 2-line, cursor off)
+uart_init();      // Setup UART (Timer 1 Mode 2, baud rate, interrupts)
+I2C_Init();       // Setup I2C bus (enable TWI hardware)
+R2C_Init();       // Wait 200ms for DS1307 to stabilize
+R2C_SetTime(0,0,0); // Set clock to 00:00:00 and START oscillator</pre>
+        <div class="note note-green">
+          <strong>Order matters!</strong> I2C must be initialized before R2C_SetTime() because the RTC communicates over I2C. Similarly, LCD must be initialized before displaying anything.
+        </div>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">Step 2: Display Splash Screen</div>
+      <div class="fn-body">
+<pre class="code-block">lcd_cmd(0x01);              // Clear LCD
+lcd_cmd(0x80);              // Cursor to line 1, col 0
+lcd_write_string("BMP280 Test");  // Show test message
+msdelay(1000);              // Wait 1 second</pre>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">Step 3: Verify BMP280 Chip ID</div>
+      <div class="fn-body">
+<pre class="code-block">ID = I2C_ReadRegister(BMP280_ADDR, BMP280_ID_REG);
+// BMP280_ADDR = 0x76, BMP280_ID_REG = 0xD0
+
+if (ID == 0x58) {
+    lcd_write_string("ID OK: 0x58");    // Correct chip found
+} else {
+    lcd_write_string("ID Error");       // Wrong chip or wiring issue
+}</pre>
+        <p><strong>Why check the ID?</strong> This is a <strong>sanity check</strong> to verify:</p>
+        <ul>
+          <li>The I2C bus is working</li>
+          <li>The BMP280 is wired correctly</li>
+          <li>The correct I2C address is being used</li>
+          <li>The chip is actually a BMP280 (not a BME280 which returns 0x60)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">Step 4: Test I2C Write Path</div>
+      <div class="fn-body">
+<pre class="code-block">I2C_WriteRegister(BMP280_ADDR, BMP280_CTRL_MEAS, 0x30);
+val = I2C_ReadRegister(BMP280_ADDR, BMP280_CTRL_MEAS);
+
+if (val == 0x30) {
+    lcd_write_string("Write OK");     // Write-read-back successful
+} else {
+    lcd_write_string("Write FAIL");   // Something went wrong
+}</pre>
+        <p><strong>Write-Read-Back test:</strong> Write a known value, read it back, compare. If they match, both I2C write and read paths are working. <code>0x30</code> is just a test value (temp oversampling x1, sleep mode).</p>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">Step 5: Read Calibration Data</div>
+      <div class="fn-body">
+<pre class="code-block">I2C_ReadMultiple(BMP280_ADDR, 0x88, calib, 6);
+
+dig_T1 = ((unsigned int)calib[1] << 8) | calib[0];  // unsigned
+dig_T2 = ((int)calib[3] << 8) | calib[2];           // signed
+dig_T3 = ((int)calib[5] << 8) | calib[4];           // signed</pre>
+        <p>These calibration values are <strong>read once</strong> at startup and used in every temperature calculation in the main loop. They never change (factory-programmed into the BMP280's ROM).</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="tag tag-main">MAIN</span>
+    <h3>Main Loop (runs forever)</h3>
+    <span class="file">main.c lines 87&ndash;143</span>
+  </div>
+  <div class="section-body">
+
+    <div class="fn-block">
+      <div class="fn-name">Loop Structure &mdash; 1 Hz Update</div>
+      <div class="fn-body">
+<pre class="code-block">while (1) {
+    R2C_GetTime(&sec, &min, &hour);     // Read current time from RTC
+
+    if(sec != prev_sec) {               // Only update when second changes
+        prev_sec = sec;
+        // ... do all the work ...
+    }
+}</pre>
+        <p><strong>Why <code>sec != prev_sec</code>?</strong> The <code>while(1)</code> loop runs thousands of times per second. Without this check, we'd:</p>
+        <ul>
+          <li>Read the BMP280 thousands of times per second (wasteful, sensor needs time)</li>
+          <li>Clear and redraw the LCD thousands of times (causes flicker)</li>
+          <li>Flood the UART with thousands of messages per second</li>
+        </ul>
+        <p>Instead, we <strong>poll the RTC</strong> and only act when the second counter changes &mdash; giving exactly <strong>1 update per second</strong>.</p>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">Inside the Loop &mdash; Step-by-Step</div>
+      <div class="fn-body">
+
+        <div class="step"><span class="step-num">1</span><span><strong>Trigger BMP280 measurement:</strong> Write <code>0x21</code> to <code>CTRL_MEAS</code> (forced mode, temp x1, no pressure). Wait 50ms for conversion.</span></div>
+
+        <div class="step"><span class="step-num">2</span><span><strong>Read 3 raw bytes</strong> from registers <code>0xFA</code>&ndash;<code>0xFC</code>. Assemble into 20-bit <code>adc_T</code>.</span></div>
+
+        <div class="step"><span class="step-num">3</span><span><strong>Apply compensation formula</strong> using dig_T1/T2/T3 to get temperature in 0.01&deg;C units.</span></div>
+
+        <div class="step"><span class="step-num">4</span><span><strong>Display on LCD Line 1:</strong> <code>"Time = HH:MM:SS"</code></span></div>
+
+        <div class="step"><span class="step-num">5</span><span><strong>Display on LCD Line 2:</strong> <code>"Temp = XX.XX"</code> &mdash; with leading zero for decimals < 10</span></div>
+
+        <div class="step"><span class="step-num">6</span><span><strong>Send over UART:</strong> <code>"Time = HH:MM:SS Temp = XX.XX\r\n"</code></span></div>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">LCD Display Code Explained</div>
+      <div class="fn-body">
+<pre class="code-block">lcd_cmd(0x01);                   // Clear entire display
+lcd_cmd(0x80);                   // Cursor &rarr; Line 1, Column 0
+lcd_write_string("Time = ");
+lcd_print_num(hour);             // e.g., "1"
+lcd_write_char(':');
+lcd_print_num(min);              // e.g., "30"
+lcd_write_char(':');
+lcd_print_num(sec);              // e.g., "45"
+                                 // LINE 1: "Time = 1:30:45"
+
+lcd_cmd(0xC0);                   // Cursor &rarr; Line 2, Column 0
+lcd_write_string("Temp = ");
+lcd_print_num(T / 100);          // Integer part: 25
+lcd_write_char('.');
+if ((T % 100) < 10)
+    lcd_write_char('0');         // Leading zero: .05 not .5
+lcd_print_num(T % 100);         // Decimal part: 05
+                                 // LINE 2: "Temp = 25.05"</pre>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">uart_print_num(int num) &mdash; Helper Function</div>
+      <div class="fn-body">
+        <p>Defined at the top of main.c (lines 21&ndash;44). Works exactly like <code>lcd_print_num()</code> but uses <code>transmit_char()</code> instead of <code>lcd_write_char()</code>. Needed because we can't modify serial.h (it was provided).</p>
+<pre class="code-block">// Same algorithm: extract digits, store reversed, print forward
+void uart_print_num(int num)
+{
+    unsigned char digits[10];
+    int i = 0, j;
+    if(num == 0){ transmit_char('0'); return; }
+    if(num < 0){ transmit_char('-'); num = -num; }
+    while(num > 0){
+        digits[i++] = (num % 10) + '0';
+        num /= 10;
+    }
+    for(j = i-1; j >= 0; j--)
+        transmit_char(digits[j]);
+}</pre>
+      </div>
+    </div>
+
+    <div class="fn-block">
+      <div class="fn-name">Complete Execution Flow Diagram</div>
+      <div class="fn-body">
+        <div class="flow">
+          <div class="flow-item" style="background:rgba(108,156,252,.15); border-color:var(--accent);">Power On &rarr; Init LCD, UART, I2C, RTC</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">Set RTC to 00:00:00 (start clock)</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">Verify BMP280 ID = 0x58</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">Test I2C write (0x30 write-readback)</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">Read calibration: dig_T1, dig_T2, dig_T3</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item" style="background:rgba(167,139,250,.15); border-color:var(--accent2);">Enter main loop (while 1)</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">Read time from DS1307</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">Second changed? &mdash; No &rarr; loop back</div>
+          <div class="flow-arrow">&darr; Yes</div>
+          <div class="flow-item">Trigger BMP280 (forced mode 0x21)</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">Wait 50ms</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">Read raw temp (20-bit ADC)</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">Apply compensation formula &rarr; T in 0.01&deg;C</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item" style="background:rgba(52,211,153,.15); border-color:var(--accent3);">Display Time + Temp on LCD &amp; UART</div>
+          <div class="flow-arrow">&darr;</div>
+          <div class="flow-item">Loop back &uarr;</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- QUIZ SECTION -->
+<!-- ============================================================ -->
+<div id="quiz" class="quiz-box">
+  <h2>Key Concepts for Your Quiz</h2>
+  <ol>
+    <li><strong>I2C Address Byte:</strong> 7-bit address is shifted left by 1 bit. Bit 0 = R/W (0=write, 1=read). BMP280 at 0x76: write byte = <code>0xEC</code>, read byte = <code>0xED</code>. DS1307 at 0x68: write = <code>0xD0</code>, read = <code>0xD1</code>.</li>
+
+    <li><strong>I2C Repeated START:</strong> Used to switch direction (write &rarr; read) without releasing the bus. First you WRITE the register address, then Repeated START, then READ the data. No STOP in between.</li>
+
+    <li><strong>ACK/NACK in multi-byte reads:</strong> Master sends ACK after every byte except the last one. NACK on the final byte tells the slave to release the data line.</li>
+
+    <li><strong>SSCON bits:</strong> STA (bit 5) = start, STO (bit 4) = stop, SI (bit 3) = interrupt flag (wait on this!), AA (bit 2) = ack/nack control. SI must be cleared to let bus proceed. STO auto-clears; STA does not.</li>
+
+    <li><strong>BCD Encoding:</strong> Each decimal digit uses 4 bits. 0x25 = 25 decimal (NOT 37). Convert: <code>(upper nibble &times; 10) + lower nibble</code>. Used by DS1307 for time storage.</li>
+
+    <li><strong>Clock Halt (CH) Bit:</strong> Bit 7 of DS1307 seconds register. CH=1 stops the clock. Must clear to 0 (<code>& 0x7F</code>) for the clock to tick. This is done in <code>R2C_SetTime()</code>.</li>
+
+    <li><strong>BMP280 Forced Mode (0x21):</strong> Takes one measurement then returns to sleep. Must write to ctrl_meas EACH time you want a new reading. Contrast with Normal mode (continuous).</li>
+
+    <li><strong>BMP280 Calibration:</strong> Factory-stored trim values (dig_T1/T2/T3) are unique per chip. Read once at startup from registers 0x88&ndash;0x8D. Stored little-endian. Raw ADC is useless without these.</li>
+
+    <li><strong>Temperature Compensation:</strong> var1 = linear term, var2 = quadratic term. Final T is in 0.01&deg;C units (T=2534 means 25.34&deg;C). Uses integer math only (no FPU on 8051).</li>
+
+    <li><strong>20-bit ADC Assembly:</strong> <code>adc_T = (MSB &lt;&lt; 12) | (LSB &lt;&lt; 4) | (XLSB &gt;&gt; 4)</code>. Three bytes combine to form a 20-bit value. The bottom 4 bits of XLSB are unused.</li>
+
+    <li><strong>UART Baud Rate:</strong> Timer 1 in Mode 2 (8-bit auto-reload). TH1 reload value determines baud rate. Timer overflow rate = baud clock. SCON=0x50 = Mode 1, 8-bit, receiver enabled.</li>
+
+    <li><strong>UART ISR (interrupt 4):</strong> Both TI and RI trigger the SAME interrupt. ISR checks which flag is set. Flags must be cleared manually in software (not auto-cleared). tx_complete/rx_complete are software flags polled by main code.</li>
+
+    <li><strong>LCD RS Pin:</strong> RS=0 for commands (clear, cursor move, init). RS=1 for data (characters). EN pin must be pulsed HIGH&rarr;LOW to latch data. 0x80 = line 1, 0xC0 = line 2.</li>
+
+    <li><strong>LCD Init Sequence:</strong> 0x38 (8-bit, 2-line) &rarr; 0x06 (auto-increment) &rarr; 0x0C (display on, cursor off) &rarr; 0x01 (clear) &rarr; 0x80 (cursor home). Order and delays matter.</li>
+
+    <li><strong>Polling vs Interrupt:</strong> The RTC time is <em>polled</em> (main loop continuously reads it). The UART uses <em>interrupts</em> (ISR sets flags, main code waits on flags). Polling is simpler; interrupts are more efficient.</li>
+
+    <li><strong>Little-Endian:</strong> BMP280 stores calibration data with the low byte at the lower address. So register 0x88 = low byte of dig_T1, 0x89 = high byte. Assemble as <code>(high &lt;&lt; 8) | low</code>.</li>
+  </ol>
+</div>
+
+</div>
+</body>
+</html>
