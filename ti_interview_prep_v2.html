@@ -1,0 +1,2967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TI WiSH Interview Prep — Vedika Doke (Complete)</title>
+<script>
+  window.MathJax = { tex: { inlineMath: [['$','$']] }, options: { skipHtmlTags: ['script','noscript','style','textarea'] } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0a0a10;--s1:#12121c;--s2:#1a1a28;--s3:#222234;
+    --bdr:#2c2c42;--tx:#e4e4f2;--dim:#7a7a9a;
+    --red:#e74040;--grn:#00c9a7;--blu:#3b82f6;--pur:#8b5cf6;
+    --pnk:#ec4899;--yel:#f59e0b;--cyn:#06b6d4;--org:#f97316;
+    --ti-red:#cc0000;
+  }
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+
+  /* ── TOPBAR ── */
+  .topbar{position:sticky;top:0;z-index:200;background:rgba(10,10,16,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--bdr);padding:0.6rem 1rem;display:flex;align-items:center;gap:0.6rem;overflow-x:auto}
+  .topbar::-webkit-scrollbar{height:0}
+  .logo{font-size:0.85rem;font-weight:800;color:var(--ti-red);white-space:nowrap;margin-right:0.4rem;padding:0.3rem 0.7rem;border:2px solid var(--ti-red);border-radius:8px}
+  .pill{padding:0.35rem 0.75rem;border-radius:999px;border:1px solid var(--bdr);background:var(--s1);color:var(--dim);font-size:0.7rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:inherit}
+  .pill:hover,.pill.on{background:var(--ti-red);border-color:var(--ti-red);color:#fff}
+  .pill.racing{border-color:var(--org)}
+  .pill.racing.on,.pill.racing:hover{background:var(--org);border-color:var(--org)}
+
+  /* ── SECTIONS ── */
+  .sec{display:none;max-width:960px;margin:0 auto;padding:2rem 1.5rem 5rem}
+  .sec.on{display:block}
+  .sec h1{font-size:1.9rem;font-weight:800;margin-bottom:0.2rem}
+  .sec .sub{color:var(--dim);margin-bottom:2rem;font-size:0.88rem}
+
+  /* ── CARDS ── */
+  .c{background:var(--s1);border:1px solid var(--bdr);border-radius:14px;padding:1.3rem 1.4rem;margin-bottom:0.9rem}
+  .c h3{font-size:0.95rem;font-weight:700;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap}
+  .c p,.c li{font-size:0.85rem;line-height:1.7}
+  .c ul,.c ol{padding-left:1.2rem}
+  .c li{margin-bottom:0.3rem}
+  .c table{width:100%;border-collapse:collapse;font-size:0.8rem;margin-top:0.5rem}
+  .c th{text-align:left;padding:0.5rem;color:var(--dim);border-bottom:1px solid var(--bdr);font-weight:600}
+  .c td{padding:0.5rem;border-bottom:1px solid var(--bdr)}
+
+  /* ── TAGS ── */
+  .t{display:inline-block;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:2px 7px;border-radius:4px}
+  .t.hot{background:#e7404025;color:var(--red)}
+  .t.imp{background:#f59e0b25;color:var(--yel)}
+  .t.ok{background:#00c9a725;color:var(--grn)}
+  .t.res{background:#8b5cf625;color:var(--pur)}
+  .t.rac{background:#f9731625;color:var(--org)}
+
+  /* ── COLLAPSIBLE ── */
+  .cb{width:100%;text-align:left;background:var(--s1);border:1px solid var(--bdr);border-radius:12px;padding:0.9rem 1.1rem;color:var(--tx);font-size:0.88rem;font-weight:700;cursor:pointer;transition:all 0.2s;font-family:inherit;display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;gap:0.5rem}
+  .cb:hover{border-color:var(--pur)}
+  .cb .ar{transition:transform 0.3s;font-size:0.75rem;color:var(--dim);flex-shrink:0}
+  .cb.op .ar{transform:rotate(90deg)}
+  .cbd{display:none;padding:0.8rem 1.1rem 1.1rem;background:var(--s1);border:1px solid var(--bdr);border-top:none;border-radius:0 0 12px 12px;margin-top:-0.5rem;margin-bottom:0.9rem}
+  .cbd.op{display:block}
+
+  /* ── CODE / FORMULA ── */
+  .f{font-family:'JetBrains Mono',monospace;background:var(--s2);padding:0.5rem 0.9rem;border-radius:8px;font-size:0.78rem;margin:0.5rem 0;border:1px solid var(--bdr);color:var(--yel);overflow-x:auto;line-height:1.6;white-space:pre-wrap}
+  .code{font-family:'JetBrains Mono',monospace;background:#0e0e18;border:1px solid var(--bdr);border-radius:10px;padding:1rem;font-size:0.73rem;line-height:1.65;color:var(--cyn);overflow-x:auto;white-space:pre;margin:0.6rem 0}
+  .diag{font-family:'JetBrains Mono',monospace;background:#08080f;border:1px solid var(--bdr);border-radius:10px;padding:1rem;font-size:0.72rem;line-height:1.7;color:var(--cyn);overflow-x:auto;white-space:pre;margin:0.6rem 0}
+
+  /* ── HIGHLIGHT ── */
+  .hi{background:var(--s2);border-left:3px solid var(--cyn);padding:0.9rem 1.1rem;border-radius:0 10px 10px 0;margin:0.8rem 0;font-size:0.85rem;line-height:1.6}
+  .hi strong{color:var(--cyn)}
+  .hi.warn{border-color:var(--red)}
+  .hi.warn strong{color:var(--red)}
+  .hi.tip{border-color:var(--grn)}
+  .hi.tip strong{color:var(--grn)}
+
+  /* ── QA ── */
+  .qa{margin-bottom:1.3rem}
+  .qa .q{font-weight:700;color:var(--pnk);font-size:0.86rem;margin-bottom:0.3rem}
+  .qa .a{font-size:0.84rem;line-height:1.7;padding-left:0.8rem;border-left:2px solid var(--bdr)}
+
+  /* ── CHECKLIST ── */
+  .cl{list-style:none;padding:0}
+  .cl li{display:flex;align-items:flex-start;gap:0.6rem;padding:0.5rem 0;border-bottom:1px solid var(--bdr);font-size:0.85rem}
+  .cl li:last-child{border:none}
+  .ck{width:18px;height:18px;border:2px solid var(--bdr);border-radius:5px;flex-shrink:0;margin-top:2px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center}
+  .ck.d{background:var(--grn);border-color:var(--grn)}
+  .ck.d::after{content:'\2713';color:#fff;font-size:0.65rem;font-weight:700}
+
+  /* ── PROGRESS BAR ── */
+  .prog-wrap{margin:1.5rem 0}
+  .prog-label{font-size:0.78rem;color:var(--dim);margin-bottom:0.4rem}
+  .prog-bar{background:var(--s2);height:8px;border-radius:4px;overflow:hidden}
+  .prog-fill{height:100%;background:linear-gradient(90deg,var(--ti-red),var(--org));border-radius:4px;transition:width 0.5s}
+
+  /* ── TIMER ── */
+  .tmr{background:var(--s1);border:1px solid var(--bdr);border-radius:12px;padding:1rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+  .tmr-d{font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;color:var(--ti-red)}
+  .tmr-b{padding:0.45rem 0.9rem;border-radius:8px;border:none;font-weight:700;font-size:0.78rem;cursor:pointer;font-family:inherit}
+  .tmr-b.go{background:var(--grn);color:#000}
+  .tmr-b.rs{background:var(--s2);color:var(--dim);border:1px solid var(--bdr)}
+
+  @media(max-width:640px){
+    .sec h1{font-size:1.4rem}
+    .topbar{padding:0.5rem 0.6rem}
+    .sec{padding:1.2rem 0.8rem 3rem}
+    .pill{font-size:0.62rem;padding:0.3rem 0.6rem}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">TI WiSH</div>
+  <button class="pill on" onclick="go('plan')">Game Plan</button>
+  <button class="pill racing" onclick="go('ecu')">ECU + CAN</button>
+  <button class="pill racing" onclick="go('pcb')">Sensor PCB</button>
+  <button class="pill racing" onclick="go('bms')">BMS / AMS</button>
+  <button class="pill racing" onclick="go('dash')">Dashboard PCB</button>
+  <button class="pill racing" onclick="go('tv')">Torque Vectoring</button>
+  <button class="pill" onclick="go('mosfet')">MOSFET / BJT</button>
+  <button class="pill" onclick="go('cmos')">CMOS Circuits</button>
+  <button class="pill" onclick="go('rc')">RC & Filters</button>
+  <button class="pill" onclick="go('opamp')">Op-Amps</button>
+  <button class="pill" onclick="go('digi')">Digital / VHDL</button>
+  <button class="pill" onclick="go('flipflop')">Flip-Flops &amp; Seq</button>
+  <button class="pill" onclick="go('micro')">Microprocessors</button>
+  <button class="pill" onclick="go('proto')">Protocols</button>
+  <button class="pill" onclick="go('ctrl')">Control Systems</button>
+  <button class="pill" onclick="go('personal')">Personal Qs</button>
+  <button class="pill" onclick="go('mock')">Mock 30min</button>
+</div>
+
+<!-- ═══════════════════ GAME PLAN ═══════════════════ -->
+<div class="sec on" id="plan">
+  <h1>Interview Game Plan</h1>
+  <p class="sub">TI WiSH (Women in Semiconductor Hardware) &mdash; ~30 minutes &mdash; April 15, 2026</p>
+
+  <div class="c" style="border-color:var(--ti-red)">
+    <h3><span class="t hot">CRITICAL</span> What TI WiSH Is</h3>
+    <ul>
+      <li><strong>Program:</strong> Women in Semiconductor Hardware &mdash; TI's internship for women in EE/ECE</li>
+      <li><strong>Location:</strong> TI Bangalore &mdash; 8-10 week summer internship</li>
+      <li><strong>Domains:</strong> Analog/Mixed-Signal IC Design, Digital Design/Verification, Embedded Systems, Power Management, Test Engineering</li>
+      <li><strong>Tools they use:</strong> Cadence Virtuoso (analog), Synopsys (digital), SPICE, their own MSP430/C2000 ecosystem</li>
+      <li><strong>TI's identity:</strong> World's largest analog semiconductor company. Also dominant in embedded processors (MSP430, C2000, Sitara) and power management ICs</li>
+      <li><strong>Strong PPO offer rate</strong> for good performers</li>
+    </ul>
+  </div>
+
+  <div class="c" style="border-color:var(--org)">
+    <h3><span class="t rac">YOUR EDGE</span> Why your profile is strong for TI</h3>
+    <ul>
+      <li><strong>IITB Racing (Electrical Subsystem)</strong> &mdash; real embedded firmware on Teensy/STM32, CAN bus at 500kbps, sensor interfacing, PCB design in KiCad &mdash; this is exactly what TI's embedded division does</li>
+      <li><strong>Analog computation</strong> &mdash; op-amp circuits, integrators, multipliers &mdash; maps directly to TI's analog IC design</li>
+      <li><strong>VHDL/FPGA</strong> &mdash; RTL design, simulation, hardware verification &mdash; relevant to TI's digital design/verification teams</li>
+      <li><strong>Control systems + PID</strong> &mdash; TI's C2000 series is built for real-time control applications</li>
+      <li><strong>9.12 CPI</strong> + top JEE rank &mdash; strong academics</li>
+    </ul>
+  </div>
+
+  <div class="hi warn">
+    <strong>Senior warning:</strong> "Since my resume was heavy on electrical (because of the racing team), most questions were from my resume." Your resume is EVEN MORE electrical-heavy. Expect 60-70% of questions directly from your projects. They will go deep.
+  </div>
+
+  <div class="c">
+    <h3>Priority Tonight</h3>
+    <ul class="cl">
+      <li><div class="ck" onclick="this.classList.toggle('d')"></div><strong>Racing ECU + CAN bus</strong> &mdash; Your code, APPS safety logic, CAN frame structure, motor controller commands</li>
+      <li><div class="ck" onclick="this.classList.toggle('d')"></div><strong>Sensor PCB</strong> &mdash; I2C conflict story, INA333, TCA9543A mux, ADC signal chain</li>
+      <li><div class="ck" onclick="this.classList.toggle('d')"></div><strong>MOSFET regions</strong> &mdash; Structure, cutoff/linear/saturation, I-V equations, PMOS difference</li>
+      <li><div class="ck" onclick="this.classList.toggle('d')"></div><strong>BJT basics</strong> &mdash; NPN/PNP, active/saturation/cutoff, MOSFET vs BJT comparison</li>
+      <li><div class="ck" onclick="this.classList.toggle('d')"></div><strong>RC circuits</strong> &mdash; Square wave input, sketch V_C, charging/discharging equations</li>
+      <li><div class="ck" onclick="this.classList.toggle('d')"></div><strong>Filters</strong> &mdash; Identify LPF/HPF from circuit, transfer function, Bode sketch</li>
+      <li><div class="ck" onclick="this.classList.toggle('d')"></div><strong>Op-amp circuits</strong> &mdash; Inverting, non-inverting, integrator (from your analog computation project)</li>
+      <li><div class="ck" onclick="this.classList.toggle('d')"></div><strong>BMS/AMS basics</strong> &mdash; 96s5p pack, SOC methods, passive balancing, LTC6813</li>
+      <li><div class="ck" onclick="this.classList.toggle('d')"></div><strong>Communication protocols</strong> &mdash; CAN vs I2C vs SPI vs UART comparison table</li>
+      <li><div class="ck" onclick="this.classList.toggle('d')"></div><strong>Personal answers</strong> &mdash; Favorite scientist, book, best invention, why TI</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════ ECU + CAN BUS ═══════════════════ -->
+<div class="sec" id="ecu">
+  <h1>ECU Firmware & CAN Bus</h1>
+  <p class="sub">IITB Racing &mdash; Electrical Subsystem &mdash; Your actual code on Teensy 4.1</p>
+
+  <div class="hi">
+    <strong>Context for interviewer:</strong> IITB Racing builds an electric race car for Formula Bharat and Formula Student Netherlands. You worked on the ECU firmware that reads pedal sensors, implements FSAE safety rules, and sends torque commands to two motor controllers over CAN bus.
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    ECU Architecture &mdash; Complete System Overview <span class="t rac">YOUR CODE</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Hardware Setup</h3>
+      <ul>
+        <li><strong>MCU:</strong> Teensy 4.1 (ARM Cortex-M7, 600 MHz, NXP iMXRT1062)</li>
+        <li><strong>CAN Interface:</strong> FlexCAN_T4 library, CAN1 bus at <strong>500 kbps</strong></li>
+        <li><strong>Sensors:</strong> 2x redundant APPS (Accelerator Pedal Position Sensors) + 2x BPS (Brake Pedal Sensors)</li>
+        <li><strong>Outputs:</strong> CAN commands to Left motor controller (ID 0x202) and Right motor controller (ID 0x201)</li>
+        <li><strong>Safety pins:</strong> RFE (Ready For Enable), FRG (Forward/Reverse Gate), CPLUS (precharge relay)</li>
+      </ul>
+      <div class="diag">
+APPS1 (analog) ──┐
+APPS2 (analog) ──┤
+BPS1  (analog) ──┼──> Teensy 4.1 ──CAN 500kbps──> Motor Controller L (0x202)
+BPS2  (analog) ──┤       │                    └──> Motor Controller R (0x201)
+                  │       │
+CPLUS (digital)──┘       ├──> RFE pin (enable)
+                          └──> FRG pin (forward gate)
+      </div>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    APPS Signal Processing &mdash; How pedal data flows <span class="t hot">LIKELY QUESTION</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Dual Redundant Pedal Sensors</h3>
+      <p>Two APPS sensors read the same pedal position independently. Each outputs a 10-bit analog value (0-1023). The firmware normalizes both:</p>
+      <div class="code">// From your ECU.cpp
+#define APPS_GMIN 10    // calibrated minimum raw value
+#define APPS_GMAX 1000  // calibrated maximum raw value
+
+float normalize(int raw) {
+    return constrain((raw - APPS_GMIN) / (float)(APPS_GMAX - APPS_GMIN), 0.0, 1.0);
+}
+// Result: 0.0 = no pedal, 1.0 = full throttle</div>
+      <p style="margin-top:0.5rem"><strong>Why two sensors?</strong> FSAE rules require redundancy. If one fails (wire breaks, short circuit), the other catches it. The firmware cross-checks both values continuously.</p>
+    </div>
+
+    <div class="c">
+      <h3>Torque Command Calculation</h3>
+      <div class="code">// Average the two normalized APPS values
+float avg_apps = (apps1_norm + apps2_norm) / 2.0;
+
+// Scale to motor controller torque range
+uint8_t torque_val = MAX_TORQUE_REQUEST_SCALER * avg_apps;
+// MAX_TORQUE_REQUEST_SCALER = 0x90 (144 decimal)
+
+// Pack into CAN frame for motor controller
+CAN_message_t msg;
+msg.id = 0x202;  // Left motor
+msg.buf[0] = 0x90;
+msg.buf[1] = torque_val;
+// bytes 2-7 = 0x00
+CAN1.write(msg);</div>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    FSAE T11.8 Safety Rules &mdash; Your Implementation <span class="t hot">IMPRESSIVE DETAIL</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>T11.8.3 &mdash; Hardware Failure Detection</h3>
+      <div class="code">// ADC reads 0-1023 for a 10-bit sensor
+// Values near 0 or 1023 indicate wire fault
+if (raw_apps1 < 5 || raw_apps1 > 1018) {
+    hw_fault_latched = true;  // LATCHED - won't clear until restart
+    torque_cmd = 0;           // immediately cut torque
+}</div>
+      <p>If the ADC reads near its rails (below 5 or above 1018), it likely means a broken wire (reads 0) or short to supply (reads 1023). This is a <strong>latched fault</strong> &mdash; you must restart the car.</p>
+    </div>
+
+    <div class="c">
+      <h3>T11.8.4/T11.8.7 &mdash; APPS Disagreement Check</h3>
+      <div class="code">// If the two pedal sensors disagree by more than 10%
+if (abs(apps1_norm - apps2_norm) >= 0.10) {
+    disagreement_timer++;
+    if (disagreement_timer >= 4) {  // ~100ms at 30ms loop
+        fault_latched = true;
+        torque_cmd = 0;
+    }
+} else {
+    disagreement_timer = 0;
+}
+
+// Unlatch only when pedal returns below 5%
+if (fault_latched && avg_apps < 0.05) {
+    fault_latched = false;
+}</div>
+      <p><strong>Why 100ms delay?</strong> Brief noise spikes shouldn't trigger a fault. But sustained disagreement (100ms+) means a real sensor problem. The 5% unlatch threshold ensures the driver has released the pedal before re-enabling torque.</p>
+    </div>
+
+    <div class="c">
+      <h3>T11.8.6 &mdash; Brake/Throttle Plausibility</h3>
+      <div class="code">// If driver is hard braking AND throttle > 25% for > 1 second
+if (brake_hard && avg_apps > 0.25) {
+    plausibility_timer++;
+    if (plausibility_timer > 33) {  // ~1 second at 30ms loop
+        plausibility_fault = true;
+        torque_cmd = 0;
+    }
+} else {
+    plausibility_timer = 0;
+}
+// Unlatch when pedal < 5%</div>
+      <p><strong>Safety rationale:</strong> If both brake and throttle are pressed hard simultaneously, something is wrong (stuck pedal, driver confusion). Cut power after 1 second.</p>
+    </div>
+
+    <div class="c">
+      <h3>T11.8.9 &mdash; Startup Throttle Inhibit</h3>
+      <div class="code">// At startup, if pedal is already pressed > 25%
+if (startup && avg_apps > 0.25) {
+    startup_inhibit = true;  // block all torque
+}
+// Only release when pedal drops below 5%
+if (startup_inhibit && avg_apps < 0.05) {
+    startup_inhibit = false;
+}</div>
+      <p>Prevents the car from lurching forward if the pedal is accidentally pressed during startup.</p>
+    </div>
+
+    <div class="hi tip">
+      <strong>Interview tip:</strong> This safety logic is excellent to discuss because it shows you understand real-world embedded safety programming &mdash; latching faults, debounce timers, unlatch conditions. This is exactly what TI cares about in automotive-grade ICs.
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Precharge &amp; Motor Enable Sequence <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Why Precharge?</h3>
+      <p>The motor controller has large DC-link capacitors (~400V). If you close the main contactors (AIRs) directly, a massive inrush current spike would flow into the uncharged capacitors, potentially welding the contactor contacts or damaging electronics.</p>
+      <p><strong>Solution:</strong> Close a precharge relay first (has a series resistor, ~1k&#937;), which gently charges the capacitors through the resistor. Once capacitors reach >90% of pack voltage, close the main AIRs.</p>
+      <div class="code">// Precharge monitoring
+// CPLUS_PIN (pin 18) goes HIGH when precharge relay closes
+attachInterrupt(CPLUS_PIN, prechargeISR, RISING);
+
+// Motor enable sequence (after precharge complete):
+// Step 1: RFE (Ready For Enable) HIGH
+digitalWrite(RFE_PIN, HIGH);
+delay(500);
+// Step 2: FRG (Forward Gate) HIGH
+digitalWrite(FRG_PIN, HIGH);
+// Step 3: Send CAN enable command
+CAN_message_t en;
+en.id = motor_id;
+en.buf = {0x51, 0x40, 0, 0, 0, 0, 0, 0};
+CAN1.write(en);
+
+// Shutdown sequence (reverse order):
+// 1. Send zero torque
+// 2. FRG LOW
+// 3. Wait 1000ms
+// 4. RFE LOW
+// 5. Send CAN disable: {0x51, 0x04, ...}</div>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    CAN Bus Protocol &mdash; Deep Theory <span class="t hot">CORE TOPIC</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>What is CAN? (Controller Area Network)</h3>
+      <ul>
+        <li><strong>Invented by:</strong> Bosch (1986), now ISO 11898 standard</li>
+        <li><strong>Why it exists:</strong> Automotive ECUs need reliable, real-time communication in electrically noisy environments (ignition, motors, alternators)</li>
+        <li><strong>Physical layer:</strong> Differential signaling on 2 wires (CAN-H, CAN-L)</li>
+        <li><strong>Data rate:</strong> Up to 1 Mbps (you used 500 kbps)</li>
+        <li><strong>Topology:</strong> Multi-drop bus &mdash; all nodes connected to same 2 wires</li>
+        <li><strong>Termination:</strong> 120&#937; resistors at each end of the bus (you have this in your PCB!)</li>
+      </ul>
+    </div>
+
+    <div class="c">
+      <h3>Differential Signaling &mdash; Why CAN is noise-immune</h3>
+      <div class="diag">
+Dominant (logic 0):    CAN-H = 3.5V    CAN-L = 1.5V    Diff = 2.0V
+Recessive (logic 1):   CAN-H = 2.5V    CAN-L = 2.5V    Diff = 0.0V
+
+     CAN-H ──────┐            ┌──────
+    3.5V         │            │
+    2.5V --------+------------+--------  (idle/recessive)
+    1.5V ────────┘            └──────
+     CAN-L
+      </div>
+      <p>Electromagnetic noise couples equally into both wires (common-mode). The receiver reads the <strong>difference</strong> (CAN-H minus CAN-L), so the noise cancels out. This is why CAN works reliably in a race car with high-current motors nearby.</p>
+    </div>
+
+    <div class="c">
+      <h3>CAN Frame Structure</h3>
+      <div class="diag">
+| SOF | Identifier (11-bit) | RTR | IDE | r0 | DLC (4-bit) | Data (0-8 bytes) | CRC (15-bit) | ACK | EOF |
+
+SOF = Start of Frame (dominant bit)
+Identifier = Message priority (lower = higher priority)
+RTR = Remote Transmission Request (0 = data frame, 1 = remote request)
+IDE = Identifier Extension (0 = standard 11-bit, 1 = extended 29-bit)
+DLC = Data Length Code (how many data bytes, 0-8)
+CRC = Cyclic Redundancy Check (error detection)
+ACK = Acknowledgment slot (receiver drives dominant to confirm receipt)
+EOF = End of Frame (7 recessive bits)
+      </div>
+    </div>
+
+    <div class="c">
+      <h3>Arbitration &mdash; How priority works</h3>
+      <p>If two nodes try to transmit simultaneously, they both start sending their identifier bit by bit. <strong>Dominant (0) overwrites recessive (1)</strong>. The node with the lower ID wins because it keeps seeing its own bits, while the losing node detects a dominant bit where it sent recessive and backs off.</p>
+      <div class="f">Example: Node A sends ID 0x201 (0010 0000 001)
+         Node B sends ID 0x202 (0010 0000 010)
+
+At bit 1 (from right): A sends 1 (recessive), B sends 0 (dominant)
+Bus shows 0 → A sees mismatch, backs off. B wins.
+
+Lower ID = higher priority (your right motor 0x201 has priority over left 0x202)</div>
+    </div>
+
+    <div class="c">
+      <h3>Error Detection in CAN (5 mechanisms)</h3>
+      <ol>
+        <li><strong>CRC check</strong> &mdash; 15-bit polynomial over the frame</li>
+        <li><strong>Bit stuffing</strong> &mdash; after 5 consecutive identical bits, a stuff bit of opposite polarity is inserted. If receiver sees 6 identical bits, it's a stuff error</li>
+        <li><strong>Frame check</strong> &mdash; fixed-form fields (EOF, ACK delimiter) must have expected values</li>
+        <li><strong>ACK check</strong> &mdash; transmitter checks that at least one node acknowledged</li>
+        <li><strong>Bit monitoring</strong> &mdash; transmitter reads back the bus; if it sent recessive but reads dominant (outside arbitration), it's an error</li>
+      </ol>
+    </div>
+
+    <div class="c">
+      <h3>Your CAN Transceiver: SN65HVD230</h3>
+      <p><strong>This is a TI chip!</strong> Great to mention in interview.</p>
+      <ul>
+        <li>CAN transceiver IC that converts logic-level TX/RX signals from the MCU to differential CAN-H/CAN-L signals</li>
+        <li>3.3V operation, up to 1 Mbps</li>
+        <li>Supports up to 120 nodes on one bus</li>
+        <li>Has slope control (Rs pin) to reduce EMI by controlling edge rates</li>
+        <li>You used <strong>2x SN65HVD230</strong> on your dashboard PCB (one for each CAN channel)</li>
+      </ul>
+    </div>
+
+    <div class="c">
+      <h3>Your CAN Messages (from your DBC file)</h3>
+      <div class="code">// Message ID 120 "First4Variables" (6 bytes):
+// AcceleratorPedal:      bits 0-9    (10-bit, 0-1023)
+// BrakePedal:            bits 10-19  (10-bit, 0-1023)
+// FrontLeftWheelRPM:     bits 20-33  (14-bit, 0-6000 RPM)
+// FrontRightWheelRPM:    bits 34-47  (14-bit, 0-6000 RPM)
+
+// Message ID 121 "Last2Variables" (4 bytes):
+// RearLeftWheelRPM:      bits 0-15   (16-bit, 0-6000 RPM)
+// RearRightWheelRPM:     bits 16-31  (16-bit, 0-6000 RPM)</div>
+      <p>Notice how data is <strong>bit-packed</strong> to fit maximum information into the 8-byte CAN payload. The DBC file is a standard format used in automotive to define CAN message layouts.</p>
+    </div>
+
+    <div class="c">
+      <h3>Wheel RPM Measurement</h3>
+      <div class="code">// Hall-effect sensors on each wheel, rising-edge interrupts
+// 4 sensors on pins 2, 3, 4, 5
+volatile int pulses_FL = 0;  // incremented in ISR
+
+void FL_ISR() { pulses_FL++; }
+attachInterrupt(2, FL_ISR, RISING);
+
+// Every 100ms sampling window:
+noInterrupts();            // atomic read
+int p = pulses_FL;
+pulses_FL = 0;
+interrupts();
+
+RPM_FL = p * 600;  // pulses in 100ms → pulses per minute
+// (pulses/0.1s) × 60s = pulses × 600</div>
+      <p><strong>Why noInterrupts()?</strong> Reading and resetting the counter must be atomic. If an interrupt fires between read and reset, you'd lose a pulse count. This is a classic embedded concurrency problem.</p>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Likely Interview Questions on ECU/CAN <span class="t hot">PRACTICE THESE</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="qa">
+      <div class="q">Q: Walk me through what happens when the driver presses the accelerator.</div>
+      <div class="a">Two redundant APPS sensors read the pedal position as analog voltages. The Teensy's ADC converts these to 10-bit values (0-1023). Firmware normalizes both to 0.0-1.0 range using calibrated min/max values. It then checks for faults: hardware failure (values at ADC rails), sensor disagreement (>10% difference for >100ms), and brake/throttle plausibility (both pressed for >1s). If all checks pass, it averages the two values, multiplies by a torque scaler (0x90), and sends the torque command as a CAN frame to both motor controllers at IDs 0x201 and 0x202.</div>
+    </div>
+    <div class="qa">
+      <div class="q">Q: Why CAN bus and not I2C or SPI?</div>
+      <div class="a">CAN is designed for automotive environments &mdash; its differential signaling rejects electromagnetic noise from motors and power electronics, it supports multi-node communication on a simple 2-wire bus (I2C also uses 2 wires but can't handle noise or long distances), it has built-in error detection (CRC + bit stuffing + ACK), and priority-based arbitration ensures critical messages get through first. SPI would need a separate chip-select for each node, and I2C can't handle the noise or cable lengths in a car. CAN is the industry standard for vehicle ECUs.</div>
+    </div>
+    <div class="qa">
+      <div class="q">Q: What is bit stuffing in CAN?</div>
+      <div class="a">After 5 consecutive bits of the same value, the transmitter inserts one bit of the opposite value. The receiver knows to remove these stuff bits. Purpose: it maintains synchronization (long runs of identical bits could cause clock drift), and it provides error detection (6 consecutive identical bits = stuff error).</div>
+    </div>
+    <div class="qa">
+      <div class="q">Q: What happens if a CAN message is corrupted?</div>
+      <div class="a">The receiving node's CRC check fails, so it sends an Error Frame (6 dominant bits, violating bit stuffing). All nodes see this and discard the message. The transmitting node automatically retransmits. CAN also has error counters &mdash; if a node causes too many errors, it progressively moves from Error Active to Error Passive to Bus Off, isolating the faulty node.</div>
+    </div>
+    <div class="qa">
+      <div class="q">Q: Why do you need 120&#937; termination resistors?</div>
+      <div class="a">The CAN bus is a transmission line. Without proper termination, signals reflect off the open ends of the wire and cause interference. The 120&#937; resistors at each end of the bus match the characteristic impedance of the twisted pair cable (~120&#937;), absorbing the signal and preventing reflections. Two 120&#937; in parallel = 60&#937; total bus resistance.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SENSOR PCB ═══════════════════ -->
+<div class="sec" id="pcb">
+  <h1>Sensor Testing PCB</h1>
+  <p class="sub">IITB Racing &mdash; Custom KiCad PCB for data acquisition</p>
+
+  <div class="hi">
+    <strong>This is your best "challenge" story for the interview.</strong> The I2C bus conflict problem and your solution demonstrates problem-solving, hardware debugging, and firmware development.
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    PCB Architecture &mdash; Complete System <span class="t rac">YOUR DESIGN</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Bill of Materials (Key Components)</h3>
+      <table>
+        <tr><th>Component</th><th>Part</th><th>Function</th></tr>
+        <tr><td>MCU</td><td>Teensy 4.0 (DEV-15583)</td><td>ARM Cortex-M7, 600 MHz, reads all sensors, logs data</td></tr>
+        <tr><td>Instrumentation Amps (x2)</td><td>INA333 (MSOP8)</td><td>Amplify millivolt-level strain/load gauge signals</td></tr>
+        <tr><td>I2C Multiplexer</td><td>TCA9543APWR</td><td>2-channel I2C switch to solve address conflict</td></tr>
+        <tr><td>Level Shifters (x2)</td><td>TXS0102DCTR</td><td>3.3V &#8596; 5V bidirectional I2C level translation</td></tr>
+        <tr><td>5V Regulator</td><td>L7805CV-DG</td><td>12V battery &rarr; 5V for sensors</td></tr>
+        <tr><td>3.3V Regulator</td><td>ZLDO1117G33TA</td><td>5V &rarr; 3.3V for Teensy and I2C</td></tr>
+        <tr><td>High-Side Switch</td><td>HSS10-B20-P40</td><td>Power control with overcurrent protection</td></tr>
+        <tr><td>Trimpots (x3)</td><td>Bourns 3296W</td><td>Calibration of amplifier gain/offset</td></tr>
+        <tr><td>CAN Termination</td><td>120&#937; resistor</td><td>Bus termination for CAN connection</td></tr>
+        <tr><td>Protection</td><td>PMOS + fuse</td><td>Reverse polarity protection</td></tr>
+      </table>
+    </div>
+
+    <div class="c">
+      <h3>Signal Chain</h3>
+      <div class="diag">
+ANALOG PATH (Strain/Load Gauges):
+Sensor (mV) → INA333 (instrumentation amp) → Trimpot (gain cal) → Teensy ADC (12-bit, 0-3.3V)
+
+DIGITAL PATH (Temperature Sensors):
+Temp Sensor 1 ──I2C──┐
+                      ├── TCA9543A (I2C mux) ── TXS0102 (level shift) ── Teensy I2C
+Temp Sensor 2 ──I2C──┘
+
+Both sensors have SAME I2C address (0x48) → mux creates 2 separate channels
+      </div>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    The I2C Bus Conflict &mdash; Problem &amp; Solution <span class="t hot">YOUR BEST STORY</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>The Problem</h3>
+      <p>Two identical temperature sensors (same manufacturer, same part) needed to be on the same I2C bus. But they both have the <strong>same hardcoded I2C address (0x48)</strong>. When the master sends a read request to 0x48, BOTH sensors respond simultaneously, corrupting the data on SDA.</p>
+      <p><strong>Why not just change the address?</strong> Some I2C devices have address pins (A0, A1) you can tie HIGH/LOW to set different addresses. These particular sensors had no such option &mdash; the address is burned into the chip.</p>
+    </div>
+
+    <div class="c">
+      <h3>The Solution: TCA9543A I2C Multiplexer</h3>
+      <div class="diag">
+                     ┌─── Channel 0 ─── [Temp Sensor 1] (addr 0x48)
+Teensy ──I2C──── TCA9543A ──┤
+                     └─── Channel 1 ─── [Temp Sensor 2] (addr 0x48)
+
+TCA9543A's own address: 0x70 (configurable via A0, A1 pins)
+      </div>
+      <p>The TCA9543A is a 2-channel I2C switch (made by TI!). It sits between the master and the sensors. You write a control byte to the mux (at address 0x70) to select which downstream channel is active. Only one channel is connected at a time, so the address conflict disappears.</p>
+      <div class="code">// Firmware: Channel selection logic
+#include &lt;Wire.h&gt;
+#define MUX_ADDR 0x70
+
+void selectChannel(uint8_t channel) {
+    Wire.beginTransmission(MUX_ADDR);
+    Wire.write(1 << channel);  // bit 0 = ch0, bit 1 = ch1
+    Wire.endTransmission();
+}
+
+float readTemp(uint8_t channel) {
+    selectChannel(channel);          // switch mux to this sensor
+    Wire.requestFrom(0x48, 2);       // read 2 bytes from temp sensor
+    int16_t raw = (Wire.read() << 8) | Wire.read();
+    return raw * 0.0625;             // convert to Celsius
+}
+
+// In main loop:
+float temp1 = readTemp(0);  // sensor on channel 0
+float temp2 = readTemp(1);  // sensor on channel 1</div>
+    </div>
+
+    <div class="c">
+      <h3>Level Shifting with TXS0102</h3>
+      <p>The Teensy runs at 3.3V but some sensors need 5V I2C. The TXS0102 is a <strong>bidirectional voltage-level translator</strong> &mdash; it translates 3.3V signals to 5V and vice versa, on both SDA and SCL lines simultaneously.</p>
+      <p><strong>Why needed:</strong> If you connect a 3.3V device directly to a 5V I2C bus, the 5V signal could damage the 3.3V device, and the 3.3V HIGH might not be recognized as HIGH by the 5V device (5V logic threshold is ~3.5V for some chips).</p>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    INA333 Instrumentation Amplifier &mdash; Analog Signal Conditioning <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Why Instrumentation Amplifier?</h3>
+      <p>Strain gauges and load cells output <strong>millivolt-level</strong> differential signals (typically 1-10 mV at full scale). The Teensy's ADC range is 0-3.3V. You need ~500x gain, with high precision and noise rejection.</p>
+      <ul>
+        <li><strong>INA333</strong> is a precision instrumentation amp (made by TI!)</li>
+        <li><strong>Gain equation:</strong> G = 1 + (100k&#937; / R_G) &mdash; set by a single external resistor R_G</li>
+        <li><strong>CMRR:</strong> >100 dB &mdash; rejects common-mode noise (vibration, EMI)</li>
+        <li><strong>Why not a regular op-amp?</strong> An instrumentation amp has matched input impedances on both inputs, very high CMRR, and single-resistor gain setting. A regular differential amp would need precisely matched resistors for good CMRR.</li>
+      </ul>
+      <p>The trimpots (Bourns 3296W) allow fine calibration of gain and offset in the field.</p>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Likely Interview Questions on PCB <span class="t hot">PRACTICE THESE</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="qa">
+      <div class="q">Q: What was the hardest problem you solved in a project?</div>
+      <div class="a">On the sensor testing PCB for IITB Racing, I had two identical temperature sensors that needed to be on the same I2C bus, but they had the same hardcoded address. When both responded simultaneously, the data was corrupted. I researched solutions and chose a TCA9543A I2C multiplexer — a 2-channel switch that lets me select which sensor is connected at any time. I redesigned the PCB schematic in KiCad to include the mux, added TXS0102 level shifters for 3.3V/5V compatibility, and wrote the firmware channel-selection logic. The result was clean, error-free readings from both sensors.</div>
+    </div>
+    <div class="qa">
+      <div class="q">Q: How does I2C work?</div>
+      <div class="a">I2C uses 2 wires: SDA (data) and SCL (clock), both with pull-up resistors to VCC. Communication: Master sends a START condition (SDA falls while SCL is HIGH), then sends the 7-bit slave address + R/W bit. The addressed slave pulls SDA LOW for ACK. Then data transfers in 8-bit chunks, each followed by an ACK. Master sends STOP (SDA rises while SCL is HIGH). Multiple devices share the same bus, each with a unique address — which is exactly why our identical-address sensors were a problem.</div>
+    </div>
+    <div class="qa">
+      <div class="q">Q: What is an instrumentation amplifier and when would you use one?</div>
+      <div class="a">An instrumentation amp is a precision differential amplifier with very high input impedance on both inputs, extremely high CMRR (>100dB), and gain set by a single external resistor. You use it when you need to amplify small differential signals in the presence of large common-mode noise — exactly what we had with strain gauges in a vibrating race car. The INA333 we used has gain G = 1 + 100k/R_G.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ BMS / AMS ═══════════════════ -->
+<div class="sec" id="bms">
+  <h1>Battery Management System</h1>
+  <p class="sub">IITB Racing &mdash; Accumulator Management System (AMS)</p>
+
+  <button class="cb" onclick="tog(this)">
+    Battery Pack Configuration <span class="t rac">YOUR TEAM'S CAR</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>96s5p Configuration</h3>
+      <div class="diag">
+Cell: INR-21700-P45B (Li-ion, 3.6V nominal, 4.5Ah)
+
+5 cells in parallel  → 1 module  (3.6V, 22.5Ah)
+16 modules in series → 1 stack   (57.6V, 22.5Ah)
+6 stacks in series   → full pack (345.6V nominal, 403.2V max)
+
+Total: 96 series × 5 parallel = 480 cells
+Energy: ~7.8 kWh
+      </div>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    SOC Estimation Methods <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <ul>
+        <li><strong>Voltage method:</strong> Measure open-circuit voltage, look up SOC from the V-SOC curve. Simple but inaccurate under load (voltage sags due to internal resistance). Must correct for current and temperature.</li>
+        <li><strong>Coulomb counting:</strong> Integrate current over time: SOC(t) = SOC(0) - (1/Q)&#8747;I dt. Accurate short-term but drifts over time due to accumulated sensor error.</li>
+        <li><strong>Kalman Filter:</strong> Combines voltage method + coulomb counting. Uses a state-space model of the battery. Predicts SOC from coulomb counting, then corrects using voltage measurement. Best accuracy but most computationally expensive.</li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Cell Balancing &mdash; Passive vs Active <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Why Balancing is Needed</h3>
+      <p>In a series string, all cells see the same current but have slightly different capacities and self-discharge rates. Over charge/discharge cycles, their SOCs diverge. Without balancing, the weakest cell hits its voltage limit first, limiting the entire pack.</p>
+
+      <h3 style="margin-top:0.8rem">Passive Balancing (your team's approach)</h3>
+      <p>Drain higher-SOC cells through a bleed resistor until they match the lowest cell. Done during charging only. Simple and cheap, but wastes energy as heat.</p>
+
+      <h3 style="margin-top:0.8rem">Active Balancing</h3>
+      <p>Transfer charge from higher-SOC cells to lower-SOC cells using inductors or capacitors. More efficient but much more complex PCB and control logic.</p>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    BMS Hardware &mdash; LTC6813 + iso-SPI <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Architecture</h3>
+      <div class="diag">
+Master Board (LTC6820) ── iso-SPI ── Slave 1 (LTC6813) ── iso-SPI ── Slave 2 ── ... ── Slave 6
+                                        │                                 │
+                                   Monitors 16 cells              Monitors 16 cells
+                                   + thermistors                  + thermistors
+      </div>
+      <ul>
+        <li><strong>LTC6813:</strong> Monitors up to 18 cell voltages and 9 GPIO (for thermistors) per IC. 16-bit ADC, &lt;1.2mV measurement error.</li>
+        <li><strong>iso-SPI:</strong> Isolated SPI daisy chain &mdash; galvanic isolation between each slave board (they sit at different voltage potentials in the series string!). Uses LTC6820 on the master side as SPI-to-isoSPI bridge.</li>
+        <li><strong>BPM (Battery Pack Monitor):</strong> Monitors total pack current and voltage</li>
+        <li><strong>Busbar PCBs:</strong> Route voltage sense wires and thermistor signals from physical cells to the slave boards</li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Shutdown Circuit (SDC) <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Series Safety Chain</h3>
+      <div class="f">LVMS → BSPD → IMD → AMS → Inertia Switch → Shutdown Button 1 → Shutdown Button 2 → Shutdown Button 3 → BOTS → HVD → TSMS → Precharge/AIRs</div>
+      <p>A <strong>series chain</strong> of normally-closed safety devices. If ANY device trips (opens), the entire chain breaks and the AIRs (Accumulator Isolation Relays) open, disconnecting the high-voltage battery from the car. This is a hardware-level safety system &mdash; it doesn't depend on software.</p>
+      <ul>
+        <li><strong>IMD:</strong> Insulation Monitoring Device &mdash; detects if HV leaks to chassis (threshold: R &lt; 500&#937;/V &times; 403.2V ≈ 201k&#937;)</li>
+        <li><strong>BSPD:</strong> Brake System Plausibility Device &mdash; hardware check for simultaneous brake + throttle</li>
+        <li><strong>AMS fault:</strong> BMS detects overvoltage, undervoltage, overtemperature, or current limit</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ DASHBOARD PCB ═══════════════════ -->
+<div class="sec" id="dash">
+  <h1>Dashboard PCB (STM32)</h1>
+  <p class="sub">IITB Racing &mdash; KiCad Design &mdash; JDE Tenure</p>
+
+  <button class="cb" onclick="tog(this)">
+    Dashboard PCB Architecture <span class="t rac">YOUR DESIGN</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Key Components</h3>
+      <table>
+        <tr><th>Component</th><th>Part</th><th>Function</th></tr>
+        <tr><td>MCU</td><td>STM32G0B1KETxN (LQFP-32)</td><td>ARM Cortex-M0+, handles CAN comms, drives indicators</td></tr>
+        <tr><td>CAN Transceivers (x2)</td><td>SN65HVD230 (TI!)</td><td>One for C_CAN, one for D_CAN &mdash; dual CAN bus</td></tr>
+        <tr><td>5V Regulator</td><td>L7805CV-DG</td><td>12V → 5V</td></tr>
+        <tr><td>3.3V Regulator</td><td>ZLDO1117G33TA</td><td>5V → 3.3V for STM32</td></tr>
+        <tr><td>Voltage Supervisor</td><td>UCC2946D</td><td>Monitors supply, resets MCU if voltage drops</td></tr>
+        <tr><td>Solid State Relays (x2)</td><td>CPC1006N</td><td>Optically isolated MOSFET relays for outputs</td></tr>
+        <tr><td>Status LEDs</td><td>AMS, IMD, TS_OFF, 12V</td><td>Visual indicators for driver</td></tr>
+        <tr><td>Connectors (x8)</td><td>Molex Micro-Fit 43045</td><td>Robust automotive-grade connectors</td></tr>
+      </table>
+    </div>
+
+    <div class="c">
+      <h3>Why Dual CAN?</h3>
+      <p>C_CAN (Critical CAN) carries safety-critical messages (motor commands, BMS alerts, shutdown signals). D_CAN (Data CAN) carries non-critical data (telemetry, dashboard info, RPM data). Separating them ensures that high-frequency telemetry data doesn't delay safety-critical messages.</p>
+    </div>
+
+    <div class="c">
+      <h3>UCC2946D Voltage Supervisor</h3>
+      <p>Monitors the 3.3V supply. If it drops below threshold (brownout), it asserts a reset signal to the STM32, preventing the MCU from running with unreliable voltage (which could cause erratic behavior or data corruption). This is especially important in a car where the 12V battery voltage fluctuates during motor startup.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ TORQUE VECTORING ═══════════════════ -->
+<div class="sec" id="tv">
+  <h1>Torque Vectoring System</h1>
+  <p class="sub">IITB Racing &mdash; Trainee Project &mdash; MATLAB/Simulink &rarr; STM32</p>
+
+  <button class="cb" onclick="tog(this)">
+    Vehicle Dynamics Model (3-DOF) <span class="t rac">YOUR PROJECT</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Three Degrees of Freedom</h3>
+      <ol>
+        <li><strong>Longitudinal (x):</strong> Forward/backward acceleration &mdash; governed by total torque and drag</li>
+        <li><strong>Lateral (y):</strong> Side-to-side forces during cornering &mdash; governed by tire lateral forces</li>
+        <li><strong>Yaw (&#968;):</strong> Rotation about vertical axis &mdash; this is what torque vectoring controls</li>
+      </ol>
+      <div class="f">Yaw dynamics: I_z * d&#968;/dt = (F_right - F_left) * track_width / 2
+
+where:
+  I_z = moment of inertia about vertical axis
+  F_right, F_left = longitudinal forces at each wheel
+  track_width = distance between left and right wheels
+
+Desired yaw rate: &#968;_desired = V * tan(&#948;) / (L * (1 + K_us * V²))
+where &#948; = steering angle, L = wheelbase, K_us = understeer gradient</div>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    PID Controller Design <span class="t hot">LIKELY QUESTION</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Control Loop</h3>
+      <div class="diag">
+                    ┌──────────────────────────────────┐
+                    │                                  │
+&#968;_desired ──(-)──→ PID ──→ &#916;Torque ──→ Vehicle ──→ &#968;_actual
+           ↑ error                                     │
+           │                                          │
+           └──────────── Yaw Rate Sensor ←────────────┘
+                         (via CAN bus)
+      </div>
+      <div class="f">error = &#968;_desired - &#968;_actual
+
+&#916;Torque = Kp * error + Ki * &#8747;error dt + Kd * d(error)/dt
+
+Left_torque  = Base_torque - &#916;Torque / 2
+Right_torque = Base_torque + &#916;Torque / 2</div>
+
+      <h3 style="margin-top:0.8rem">What each term does:</h3>
+      <ul>
+        <li><strong>P (Proportional):</strong> Immediate correction proportional to error. Higher Kp = faster response but can overshoot. If the car understeers (yaw rate too low), P immediately adds more torque to the outer wheel.</li>
+        <li><strong>I (Integral):</strong> Accumulates error over time, eliminates steady-state offset. Without I, the car might have a persistent small yaw error during constant-radius turns.</li>
+        <li><strong>D (Derivative):</strong> Responds to rate of change of error. Dampens oscillations. Prevents the correction from overshooting when the car transitions between turns. Critical during chicanes and slaloms.</li>
+      </ul>
+    </div>
+
+    <div class="c">
+      <h3>Understeer vs Oversteer Correction</h3>
+      <ul>
+        <li><strong>Understeer:</strong> Actual yaw rate < desired (car turns less than steering commands). Error is positive. Controller adds more torque to the outer wheel, creating a yaw moment that turns the car more.</li>
+        <li><strong>Oversteer:</strong> Actual yaw rate > desired (car rotates too much, tail slides out). Error is negative. Controller adds more torque to the inner wheel, counteracting the excessive rotation.</li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Simulink &rarr; Embedded C &rarr; STM32 Pipeline <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <ol>
+        <li><strong>Model in Simulink:</strong> Build the vehicle dynamics + PID controller as block diagrams. Simulate with various steering inputs and speeds. Tune PID gains until performance is satisfactory.</li>
+        <li><strong>Embedded Coder:</strong> MATLAB's Embedded Coder generates optimized, production-quality C code from the Simulink model. It handles fixed-point conversion, loop unrolling, and memory optimization for the target MCU.</li>
+        <li><strong>Compile &amp; Flash:</strong> Generated C code is compiled with STM32 toolchain (arm-none-eabi-gcc) and flashed onto the STM32 microcontroller.</li>
+        <li><strong>Sensor Integration:</strong> Yaw rate sensor sends data over CAN bus. STM32 reads CAN frames, feeds yaw rate into the PID controller, computes torque split, sends commands to motor controllers.</li>
+      </ol>
+      <p><strong>Key advantage:</strong> Same mathematical model validated in simulation runs on real hardware. Reduces sim-to-real gap dramatically compared to hand-coding the controller.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MOSFET / BJT ═══════════════════ -->
+<div class="sec" id="mosfet">
+  <h1>MOSFET &amp; BJT Fundamentals</h1>
+  <p class="sub">Most frequently asked topic in TI WiSH interviews</p>
+
+  <button class="cb" onclick="tog(this)">
+    NMOS Structure &amp; Channel Formation <span class="t hot">HIGH PRIORITY</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Physical Structure</h3>
+      <div class="diag">
+            Gate (G) ── metal/poly-Si
+              │
+        ┌─────┴─────┐
+        │  SiO2 oxide│  ← thin gate oxide (few nm)
+        └─────┬─────┘
+     ┌────────┴────────┐
+     │ n+ │  p-sub  │ n+ │
+     │ SRC │ channel │ DRN │
+     └─────┴────────┴─────┘
+              │
+           Body (B)  ← p-type substrate
+      </div>
+
+      <h3 style="margin-top:0.8rem">How the Channel Forms</h3>
+      <ol>
+        <li><strong>V_GS = 0:</strong> Two back-to-back pn junctions (n+-p-n+). No current can flow. Device is OFF.</li>
+        <li><strong>0 &lt; V_GS &lt; V_th:</strong> Positive gate voltage repels holes from the surface, creating a depletion region under the gate. Still no continuous n-channel. Only subthreshold leakage current flows (exponential with V_GS).</li>
+        <li><strong>V_GS = V_th:</strong> Surface electron concentration equals substrate hole concentration &mdash; this is <strong>onset of inversion</strong>. A thin n-type channel connects source to drain.</li>
+        <li><strong>V_GS &gt; V_th:</strong> Strong inversion. Dense n-channel exists. Current can flow from drain to source (electrons flow source to drain).</li>
+      </ol>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Three Regions of Operation <span class="t hot">MUST KNOW</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>1. Cutoff (V_GS &lt; V_th)</h3>
+      <div class="f">I_D = 0  (ideally)
+Subthreshold: I_D ∝ exp(V_GS / nV_T)  where n ≈ 1-2, V_T ≈ 26mV</div>
+      <p>No channel. Transistor is OFF. Used as a switch in the open state.</p>
+    </div>
+
+    <div class="c">
+      <h3>2. Linear / Triode (V_GS &gt; V_th AND V_DS &lt; V_GS - V_th)</h3>
+      <div class="f">I_D = μ_n C_ox (W/L) [(V_GS - V_th)V_DS - V_DS²/2]
+
+For small V_DS: I_D ≈ μ_n C_ox (W/L)(V_GS - V_th)V_DS  ← linear like a resistor
+R_on = 1 / [μ_n C_ox (W/L)(V_GS - V_th)]</div>
+      <p>Channel exists from source to drain, uniform thickness. MOSFET behaves like a <strong>voltage-controlled resistor</strong>. Current increases linearly with V_DS (for small V_DS). Used as a switch in the closed state or as a variable resistor.</p>
+    </div>
+
+    <div class="c">
+      <h3>3. Saturation (V_GS &gt; V_th AND V_DS ≥ V_GS - V_th)</h3>
+      <div class="f">I_D = (μ_n C_ox / 2)(W/L)(V_GS - V_th)²  × (1 + λV_DS)
+
+V_ov = V_GS - V_th  (overdrive voltage)
+I_D ∝ V_ov²  ← square-law device</div>
+      <p>Channel is <strong>pinched off</strong> at the drain end (where V_GD = V_th). Current is controlled by V_GS only (ideally constant with V_DS). This is the <strong>amplification region</strong> &mdash; used in analog circuits. The λV_DS term models channel length modulation (finite output resistance).</p>
+    </div>
+
+    <div class="hi tip">
+      <strong>Memory aid:</strong> Cutoff = switch OFF, Linear = switch ON (resistor), Saturation = amplifier. The boundary between linear and saturation is V_DS = V_GS - V_th (= V_ov).
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    PMOS &mdash; Key Differences <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <table>
+        <tr><th>Parameter</th><th>NMOS</th><th>PMOS</th></tr>
+        <tr><td>Substrate</td><td>p-type</td><td>n-type</td></tr>
+        <tr><td>Source/Drain</td><td>n+ doped</td><td>p+ doped</td></tr>
+        <tr><td>Channel carriers</td><td>Electrons</td><td>Holes (2-3x slower)</td></tr>
+        <tr><td>Turns ON when</td><td>V_GS > V_th (positive)</td><td>V_SG > |V_tp| (V_GS more negative)</td></tr>
+        <tr><td>Current direction</td><td>Drain → Source (conventional)</td><td>Source → Drain</td></tr>
+        <tr><td>CMOS role</td><td>Pull-down network (connects to GND)</td><td>Pull-up network (connects to VDD)</td></tr>
+        <tr><td>Speed</td><td>Faster (higher μ_n)</td><td>Slower (lower μ_p)</td></tr>
+      </table>
+      <p style="margin-top:0.5rem">In CMOS, PMOS is typically made ~2-3x wider than NMOS to compensate for lower hole mobility, giving equal rise/fall times.</p>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    BJT &mdash; NPN and PNP <span class="t imp">IMPORTANT</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>NPN BJT Structure &amp; Operation</h3>
+      <div class="diag">
+     C (n-type, collector)
+     │  ← CB junction: reverse biased in active mode
+     B (p-type, base) ← thin, lightly doped
+     │  ← BE junction: forward biased in active mode
+     E (n+, emitter) ← heavily doped
+      </div>
+      <p><strong>Active mode:</strong> Forward bias BE (V_BE ≈ 0.7V) injects electrons from emitter into thin base. Most diffuse across and are swept into collector by CB reverse bias field. I_C = β·I_B where β ≈ 100-300.</p>
+
+      <h3 style="margin-top:0.8rem">Three Regions</h3>
+      <table>
+        <tr><th>Region</th><th>BE Junction</th><th>CB Junction</th><th>Behavior</th></tr>
+        <tr><td>Active</td><td>Forward</td><td>Reverse</td><td>Amplifier: I_C = β·I_B</td></tr>
+        <tr><td>Saturation</td><td>Forward</td><td>Forward</td><td>Switch ON: V_CE ≈ 0.2V</td></tr>
+        <tr><td>Cutoff</td><td>Reverse</td><td>Reverse</td><td>Switch OFF: I_C ≈ 0</td></tr>
+      </table>
+    </div>
+
+    <div class="c">
+      <h3>PNP BJT</h3>
+      <ul>
+        <li>All polarities reversed: Emitter is p+, Base is n, Collector is p</li>
+        <li>Active mode: V_EB > 0.7V, V_BC < 0</li>
+        <li>Current flows Emitter → Collector (holes are majority carriers)</li>
+        <li>In circuits: often connected with emitter to VCC, collector to load</li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    MOSFET vs BJT &mdash; Complete Comparison <span class="t hot">LIKELY QUESTION</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <table>
+        <tr><th>Parameter</th><th>MOSFET</th><th>BJT</th></tr>
+        <tr><td>Control</td><td>Voltage-controlled (V_GS)</td><td>Current-controlled (I_B)</td></tr>
+        <tr><td>Input impedance</td><td>Extremely high (10¹²-10¹⁵ Ω, insulated gate)</td><td>Low-moderate (kΩ range)</td></tr>
+        <tr><td>Carriers</td><td>Unipolar (only electrons OR holes)</td><td>Bipolar (both electrons AND holes)</td></tr>
+        <tr><td>Switching speed</td><td>Faster (no minority carrier storage)</td><td>Slower (storage delay in base)</td></tr>
+        <tr><td>Power at DC</td><td>Zero gate current (no static power in gate)</td><td>Continuous I_B needed</td></tr>
+        <tr><td>Scalability</td><td>Excellent → dominates VLSI/digital</td><td>Poor at small feature sizes</td></tr>
+        <tr><td>Transconductance (g_m)</td><td>Lower</td><td>Higher (g_m = I_C/V_T)</td></tr>
+        <tr><td>1/f noise</td><td>Higher (oxide traps)</td><td>Lower</td></tr>
+        <tr><td>Thermal behavior</td><td>Negative temp coeff → self-balancing in parallel</td><td>Positive → thermal runaway risk</td></tr>
+        <tr><td>Dominant use</td><td>Digital logic, power switches, VLSI</td><td>Analog amplifiers, RF, high-speed</td></tr>
+      </table>
+    </div>
+    <div class="hi">
+      <strong>Why TI cares:</strong> TI is the world's #1 analog semiconductor company (BJT-heavy designs) AND makes digital/embedded processors (MOSFET-heavy). Knowing both and their trade-offs is exactly what they want.
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Threshold Voltage &amp; Channel Length Modulation <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>What determines V_th?</h3>
+      <div class="f">V_th = V_FB + 2φ_F + Q_dep/C_ox
+
+V_FB = flat-band voltage (depends on gate material work function & oxide charges)
+φ_F = Fermi potential (depends on substrate doping: φ_F = V_T ln(N_A/n_i))
+Q_dep = depletion charge (depends on doping and body bias)
+C_ox = ε_ox / t_ox (oxide capacitance per unit area)</div>
+      <p>Factors: gate oxide thickness (↑t_ox → ↑V_th), substrate doping (↑N_A → ↑V_th), body effect (V_SB > 0 → ↑V_th), gate material, oxide charges.</p>
+    </div>
+    <div class="c">
+      <h3>Channel Length Modulation</h3>
+      <p>In saturation, ↑V_DS pushes pinch-off point away from drain, shortening effective channel. This makes I_D increase slightly with V_DS instead of being perfectly flat.</p>
+      <div class="f">I_D = (K/2)(V_GS - V_th)² (1 + λV_DS)
+λ ∝ 1/L (shorter channel → larger λ → less ideal)
+Output resistance: r_o = 1/(λI_D)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ CMOS CIRCUIT DESIGN ═══════════════════ -->
+<div class="sec" id="cmos">
+  <h1>CMOS Circuit Design</h1>
+  <p class="sub">Transistor-level gates, transmission gates, MUX design &mdash; core TI interview material</p>
+
+  <!-- ── INVERTER ── -->
+  <button class="cb" onclick="tog(this)">
+    CMOS Inverter <span class="t hot">START HERE</span> <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <div class="diag">
+     VDD                A=0 → PMOS ON, NMOS OFF → Y=VDD (1)
+      │                 A=1 → PMOS OFF, NMOS ON → Y=GND (0)
+   ┌──┴──┐
+   │ PMOS │─── gate=A   Key properties:
+   └──┬──┘              • Zero static power (no VDD→GND path)
+      ├─── Y = A'       • Full rail-to-rail swing
+   ┌──┴──┐              • 2 transistors
+   │ NMOS │─── gate=A   • PMOS ~2-3× wider than NMOS
+   └──┬──┘                (compensate lower hole mobility)
+      │
+     GND
+      </div>
+      <div class="f">VTC: 5 regions as Vin sweeps 0→VDD
+  1. PMOS linear, NMOS off    → Vout = VDD
+  2. PMOS linear, NMOS sat    → Vout drops
+  3. Both sat                 → steep transition (gain region)
+  4. PMOS sat, NMOS linear    → Vout near 0
+  5. PMOS off, NMOS linear    → Vout = 0
+
+Switching threshold V_M ≈ VDD/2 (when properly sized)
+Noise margins: NM_H = VOH − VIH,  NM_L = VIL − VOL</div>
+    </div>
+  </div>
+
+  <!-- ── NAND / NOR ── -->
+  <button class="cb" onclick="tog(this)">
+    CMOS NAND &amp; NOR <span class="t hot">MOST ASKED</span> <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <div class="diag">
+    ┌── 2-input NAND: Y=(AB)' ──┐    ┌── 2-input NOR: Y=(A+B)' ──┐
+    │                            │    │                             │
+    │     VDD     VDD            │    │        VDD                  │
+    │      │       │             │    │         │                   │
+    │   ┌──┴──┐ ┌──┴──┐         │    │      ┌──┴──┐               │
+    │   │ P1  │ │ P2  │ PARALLEL │    │      │ P1  │               │
+    │   │(A)  │ │(B)  │         │    │      │(A)  │  SERIES       │
+    │   └──┬──┘ └──┬──┘         │    │      └──┬──┘               │
+    │      └───┬───┘            │    │      ┌──┴──┐               │
+    │          ├── Y            │    │      │ P2  │               │
+    │       ┌──┴──┐             │    │      │(B)  │               │
+    │       │ N1  │             │    │      └──┬──┘               │
+    │       │(A)  │  SERIES     │    │         ├── Y              │
+    │       └──┬──┘             │    │   ┌──┴──┐  ┌──┴──┐        │
+    │       ┌──┴──┐             │    │   │ N1  │  │ N2  │PARALLEL│
+    │       │ N2  │             │    │   │(A)  │  │(B)  │        │
+    │       │(B)  │             │    │   └──┬──┘  └──┬──┘        │
+    │       └──┬──┘             │    │      └───┬───┘            │
+    │         GND               │    │         GND               │
+    └───────────────────────────┘    └──────────────────────────-┘
+      </div>
+
+      <div class="hi">
+        <strong>The rule (memorize this):</strong><br>
+        <strong>NAND:</strong> NMOS <strong>series</strong> + PMOS <strong>parallel</strong> &nbsp;&nbsp;|&nbsp;&nbsp; <strong>NOR:</strong> NMOS <strong>parallel</strong> + PMOS <strong>series</strong><br>
+        Pull-up is always the <strong>dual</strong> of pull-down (series↔parallel, NMOS↔PMOS).<br>
+        N-input gate = <strong>2N transistors</strong>.
+      </div>
+
+      <h3 style="margin-top:0.8rem">Why NAND &gt; NOR in CMOS</h3>
+      <p>NAND has PMOS in parallel (fast) + NMOS in series (OK since electrons are fast). NOR has PMOS in series (very slow &mdash; holes are 2-3× slower + series R compounds). NAND is <strong>~1.5-2× faster</strong> → universal gate of choice.</p>
+    </div>
+  </div>
+
+  <!-- ── DESIGN METHOD ── -->
+  <button class="cb" onclick="tog(this)">
+    How to Design Any CMOS Gate <span class="t imp">DESIGN SKILL</span> <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <div class="f">Given Y = f(A,B,C,...):
+
+Step 1: Write Y' (complement) → this is when output = 0 (pull-down active)
+Step 2: Build PULL-DOWN (NMOS): AND→series, OR→parallel
+Step 3: Build PULL-UP (PMOS): take DUAL of pull-down (series↔parallel)
+Step 4: Same input drives both NMOS and PMOS gates</div>
+
+      <h3 style="margin-top:0.8rem">Example: Y = (A(B+C))' &mdash; 6 transistors</h3>
+      <div class="diag">
+Pull-down: Y' = A·(B+C) → A series with (B ∥ C)
+Pull-up:   DUAL        → (Pa ∥ (Pb series Pc))  ... wait, flip:
+           A series → A parallel in PUN
+           (B∥C)    → (B series C) in PUN
+
+       VDD                        Na in series with (Nb ∥ Nc)
+        │                         is the pull-down.
+   ┌────┴────┐
+   │ Pa ∥ Pb │ Pc               Pull-up is the dual:
+   │(A)  (B) │(C)  in series    Pa ∥ with (Pb series Pc)
+   └────┬────┘
+        ├──── Y                  Total: 3N + 3P = 6T
+   ┌────┴────┐
+   │   Na    │
+   │  (A)    │
+   └────┬────┘
+   ┌──┴──┐ ┌──┴──┐
+   │ Nb  │ │ Nc  │
+   │(B)  │ │(C)  │
+   └──┬──┘ └──┬──┘
+      └───┬───┘
+         GND
+      </div>
+
+      <h3 style="margin-top:0.8rem">Example: Y = (AB + C)' &mdash; 6 transistors</h3>
+      <div class="f">Pull-down: (A series B) parallel C
+Pull-up (dual): (A parallel B) series C
+Total: 6T</div>
+    </div>
+  </div>
+
+  <!-- ── TRANSMISSION GATE ── -->
+  <button class="cb" onclick="tog(this)">
+    Transmission Gate <span class="t hot">KEY FOR MUX</span> <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>The Problem</h3>
+      <div class="f">NMOS alone: passes strong 0, but logic 1 only reaches VDD − Vtn (weak HIGH)
+PMOS alone: passes strong 1, but logic 0 only reaches |Vtp| (weak LOW)</div>
+
+      <h3 style="margin-top:0.8rem">The Solution: NMOS + PMOS in Parallel</h3>
+      <div class="diag">
+            ┌───PMOS───┐
+ In ────────┤  gate=S̄  ├───────── Out      S=1: Both ON → full 0-to-VDD pass
+            └──────────┘                    S=0: Both OFF → high-Z (disconnected)
+            ┌───NMOS───┐
+ In ────────┤  gate=S   ├──────── Out       2 transistors per TG
+            └──────────┘                    + 1 inverter (shared) for S̄
+      </div>
+      <ul>
+        <li>Full rail-to-rail: NMOS handles lows, PMOS handles highs</li>
+        <li>Bidirectional (signal flows either way)</li>
+        <li>Building block for: <strong>MUXes, XOR, latches, analog switches</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── MUX ── -->
+  <button class="cb" onclick="tog(this)">
+    2:1 MUX &mdash; CMOS Implementations <span class="t hot">FREQUENTLY ASKED</span> <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Method 1: Transmission Gate MUX (6T) &mdash; Standard</h3>
+      <div class="diag">
+ A ────[TG1: S̄,S ]────┐
+                        ├──── Y       S=0: TG1 on → Y=A
+ B ────[TG2: S, S̄]────┘               S=1: TG2 on → Y=B
+
+ 4T (two TGs) + 2T (inverter for S̄) = 6 transistors
+ Full rail-to-rail output, no static power
+      </div>
+
+      <h3 style="margin-top:0.8rem">Method 2: Gate-Level (14-16T)</h3>
+      <div class="f">Y = A·S̄ + B·S = NAND(NAND(A,S̄), NAND(B,S))
+4 gates = 14-16T. Stronger drive but much bigger.</div>
+
+      <h3 style="margin-top:0.8rem">Method 3: Pass Transistor (4T)</h3>
+      <div class="f">2 NMOS only (gate=S̄ and gate=S) + 1 inverter = 4T
+Cheapest, but output has Vtn drop → needs restoring buffer.</div>
+
+      <table style="margin-top:0.8rem">
+        <tr><th>Method</th><th>Count</th><th>Output</th><th>Best for</th></tr>
+        <tr><td><strong>TG (standard)</strong></td><td>6T</td><td>Rail-to-rail</td><td>Standard cell libraries</td></tr>
+        <tr><td>Gate-level</td><td>14-16T</td><td>Full drive</td><td>Strong fanout needed</td></tr>
+        <tr><td>Pass transistor</td><td>4T</td><td>Degraded</td><td>Internal nodes + buffer</td></tr>
+      </table>
+
+      <h3 style="margin-top:1rem">4:1 MUX</h3>
+      <p><strong>Tree approach:</strong> Three 2:1 TG-MUXes → 3 × 6T = <strong>18T</strong>. Two MUXes select on S0, their outputs feed a third MUX selecting on S1.</p>
+    </div>
+  </div>
+
+  <!-- ── XOR / DECODER ── -->
+  <button class="cb" onclick="tog(this)">
+    XOR Gate &amp; Decoder in CMOS <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>XOR: Y = A &oplus; B</h3>
+      <div class="f">TG approach (8T, most efficient):
+  TG1 passes A when B=0, TG2 passes A' when B=1
+  = 2 TGs (4T) + 2 inverters (4T) = 8T
+
+Complex gate (12T): PDN implements (A·B' + A'·B), PUN is dual + 2 inverters
+NAND-based (14T): less efficient, more gates</div>
+
+      <h3 style="margin-top:0.8rem">2-to-4 Decoder</h3>
+      <div class="f">Y0=S1'S0', Y1=S1'S0, Y2=S1S0', Y3=S1S0
+Each = NAND + INV = 6T per output
+Total: 4×6T + 4T (inverters for S1',S0') = 28T</div>
+    </div>
+  </div>
+
+  <!-- ── POWER ── -->
+  <button class="cb" onclick="tog(this)">
+    Power &amp; Delay <span class="t imp">THEORY</span> <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Power Dissipation</h3>
+      <div class="f">P_total = P_dynamic + P_short-circuit + P_leakage
+
+P_dynamic     = α · C_L · VDD² · f      ← dominates above ~45nm
+P_short-circ  = I_sc · VDD              ← both FETs briefly ON during transition
+P_leakage     = I_leak · VDD            ← dominates below ~45nm (subthreshold + gate tunneling)</div>
+
+      <p><strong>How to reduce power:</strong> (1) Lower VDD (quadratic!), (2) Clock gating (reduce α), (3) Multi-V<sub>th</sub> (high-V<sub>th</sub> on non-critical paths), (4) Power gating (sleep transistors).</p>
+
+      <h3 style="margin-top:1rem">Propagation Delay &amp; Sizing</h3>
+      <div class="f">t_p = 0.69 × R_on × C_L
+
+Equal rise/fall → (W/L)_p = 2-3 × (W/L)_n   (compensate μ_p < μ_n)
+
+Series transistors: R_eff = N × R_unit → make each N× wider
+  3-input NAND: each NMOS = 3×W_n, each PMOS = W_p (parallel, no penalty)
+  3-input NOR:  each PMOS = 3×W_p, each NMOS = W_n (parallel, no penalty)
+  → NOR is physically LARGER → another reason NAND is preferred</div>
+    </div>
+  </div>
+
+  <!-- ── LATCH / FF ── -->
+  <button class="cb" onclick="tog(this)">
+    CMOS D-Latch &amp; D Flip-Flop <span class="t imp">TRANSISTOR LEVEL</span> <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>TG D-Latch (8T)</h3>
+      <div class="diag">
+ D ──[TG1: CLK]──┬──[INV]──[TG2: CLK']──┐
+                  │    │                   │      CLK=1: TG1 on (transparent), TG2 off
+                  │    └── Q               │      CLK=0: TG1 off, TG2 on (holds value)
+                  └────────────────────────┘
+                        feedback loop             2 TGs + 1 INV + CLK INV = 8T
+      </div>
+
+      <h3 style="margin-top:0.8rem">Master-Slave D Flip-Flop (14T)</h3>
+      <div class="diag">
+       ┌── Master (CLK=0 transparent) ──┐  ┌── Slave (CLK=1 transparent) ──┐
+ D ──[TG]──┬──[INV]──[TG]────────────[TG]──┬──[INV]──[TG]──── Q
+           └──────feedback──┘               └──────feedback──┘
+
+  CLK=0: Master captures D, Slave holds
+  CLK=1: Master holds, Slave outputs → Q changes on rising edge only
+
+  4 TGs (8T) + 2 INVs (4T) + CLK INV (2T) = 14T
+      </div>
+      <p>Your i281 register file: 4 regs × 8 bits = 32 D-FFs = ~450 transistors just for storage.</p>
+    </div>
+  </div>
+
+  <!-- ── Q&A ── -->
+  <button class="cb" onclick="tog(this)">
+    Interview Q&amp;A <span class="t hot">BE READY</span> <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <div class="qa">
+        <div class="q">Q: Design a 2:1 MUX. How many transistors?</div>
+        <div class="a"><strong>6T.</strong> Two transmission gates (4T) + inverter for S̄ (2T). TG1 passes A when S=0, TG2 passes B when S=1. Full rail-to-rail, no threshold drop. This is the standard cell approach.</div>
+      </div>
+      <div class="qa">
+        <div class="q">Q: Why zero static power in CMOS?</div>
+        <div class="a">Pull-up and pull-down are <strong>complementary</strong> &mdash; one is always OFF. No DC path from VDD to GND in steady state. Power only during switching (dynamic) and brief short-circuit during transitions.</div>
+      </div>
+      <div class="qa">
+        <div class="q">Q: Implement Y = (AB + C)' in CMOS.</div>
+        <div class="a"><strong>PDN (NMOS):</strong> (A series B) parallel C. <strong>PUN (PMOS):</strong> dual → (A parallel B) series C. <strong>6 transistors total.</strong></div>
+      </div>
+      <div class="qa">
+        <div class="q">Q: Transmission gate vs single pass transistor?</div>
+        <div class="a">Single NMOS loses V<sub>tn</sub> passing a 1. Single PMOS loses |V<sub>tp</sub>| passing a 0. TG (both in parallel) gives <strong>full rail-to-rail</strong> &mdash; NMOS handles lows, PMOS handles highs. Trade-off: needs complementary control (S and S̄).</div>
+      </div>
+      <div class="qa">
+        <div class="q">Q: Why PMOS wider than NMOS?</div>
+        <div class="a">μ<sub>p</sub> ≈ (1/2 to 1/3) × μ<sub>n</sub>. Equal rise/fall times require W<sub>p</sub> = 2-3 × W<sub>n</sub> to match on-resistance.</div>
+      </div>
+      <div class="qa">
+        <div class="q">Q: Transistor count for a D flip-flop?</div>
+        <div class="a"><strong>14T</strong> (master-slave using TGs): 4 TGs (8T) + 2 feedback inverters (4T) + CLK inverter (2T). Master transparent when CLK=0, slave when CLK=1 → edge-triggered.</div>
+      </div>
+      <div class="qa">
+        <div class="q">Q: What happens to power at smaller technology nodes?</div>
+        <div class="a">Dynamic drops (lower VDD, C<sub>L</sub>). But <strong>leakage explodes</strong> &mdash; thinner oxide = gate tunneling, shorter channel = subthreshold leakage. Below ~45nm, leakage ≈ dynamic power. Solutions: high-k dielectrics, FinFET, multi-V<sub>th</sub>, power gating.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ RC & FILTERS ═══════════════════ -->
+<div class="sec" id="rc">
+  <h1>RC Circuits &amp; Filters</h1>
+  <p class="sub">Directly asked in last year's TI WiSH interview</p>
+
+  <button class="cb" onclick="tog(this)">
+    RC Charging &amp; Discharging <span class="t hot">ASKED LAST YEAR</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <div class="diag">    R
+Vin ──[===]──┬── Vout (across C)
+             │
+            === C
+             │
+            GND</div>
+      <h3>Charging (step from 0 to V)</h3>
+      <div class="f">V_C(t) = V(1 - e^(-t/τ))    where τ = RC
+I(t) = (V/R) e^(-t/τ)
+
+t = τ  → V_C = 0.632V  (63.2%)
+t = 3τ → V_C = 0.950V  (95%)
+t = 5τ → V_C = 0.993V  (≈100%)</div>
+
+      <h3 style="margin-top:0.8rem">Discharging (step from V to 0)</h3>
+      <div class="f">V_C(t) = V · e^(-t/τ)
+I(t) = -(V/R) e^(-t/τ)
+
+t = τ  → V_C = 0.368V  (36.8%)
+t = 5τ → V_C ≈ 0       (≈0%)</div>
+
+      <h3 style="margin-top:0.8rem">Derivation (mention in interview to show depth)</h3>
+      <div class="f">KVL: V_in = V_R + V_C = RC·(dV_C/dt) + V_C
+→ First-order linear ODE: dV_C/dt + V_C/RC = V_in/RC
+→ Solution with V_C(0) = 0: V_C(t) = V_in(1 - e^(-t/RC))
+Units check: RC = Ω × F = (V/A)(C/V) = C/A = seconds ✓</div>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Square Wave Input → V_C Waveform <span class="t hot">EXACT QUESTION FROM LAST YEAR</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Case 1: T >> τ (slow switching)</h3>
+      <div class="diag">V_C:    ________          ________
+       /        \        /        \
+      /          \      /          \
+ ____/            \____/            \____
+
+Cap fully charges to V, fully discharges to 0.
+Almost a square wave with rounded edges.</div>
+
+      <h3 style="margin-top:0.8rem">Case 2: T ≈ τ (comparable)</h3>
+      <div class="diag">V_C:     /\      /\      /\
+        /  \    /  \    /  \
+      /    \  /    \  /    \
+ ___/      \/      \/      \___
+
+Partial charge/discharge. Clear exponential curves.
+Oscillates between two intermediate levels after settling.</div>
+
+      <h3 style="margin-top:0.8rem">Case 3: T << τ (fast switching)</h3>
+      <div class="diag">V_C:   ───────────────────────────
+              small ripple
+       ≈ V/2 DC level
+
+Cap barely responds. Output is nearly the average of input (V/2).
+This IS low-pass filtering in action.</div>
+    </div>
+    <div class="hi tip">
+      <strong>Interview power move:</strong> "The behavior depends on the ratio of RC time constant to the input period. This is fundamentally what makes this circuit a low-pass filter &mdash; when the frequency is much higher than 1/(2πRC), the capacitor can't follow, and the output is just the DC average."
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Low-Pass Filter <span class="t hot">ASKED LAST YEAR</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <div class="diag">    R                          Output across C = LPF
+Vin ──[===]──┬── Vout
+             │
+            === C
+             │
+            GND</div>
+      <div class="f">H(jω) = 1 / (1 + jωRC) = 1 / (1 + j·f/f_c)
+|H| = 1 / √(1 + (ωRC)²)
+∠H = -arctan(ωRC)
+f_c = 1/(2πRC)   ← -3dB cutoff (|H| = 1/√2 = 0.707)</div>
+      <ul>
+        <li>Low freq (f << f_c): Z_C = 1/(jωC) → ∞, so V_out ≈ V_in. Passes through.</li>
+        <li>High freq (f >> f_c): Z_C → 0, C acts as short, V_out → 0. Blocked.</li>
+        <li>Roll-off: -20 dB/decade = -6 dB/octave (first-order)</li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    High-Pass Filter <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <div class="diag">    C                          Output across R = HPF
+Vin ──||──┬── Vout
+          │
+         [R]
+          │
+         GND</div>
+      <div class="f">H(jω) = jωRC / (1 + jωRC)
+|H| = ωRC / √(1 + (ωRC)²)
+Same f_c = 1/(2πRC)</div>
+      <ul>
+        <li>Low freq: C blocks → no current → V_out ≈ 0</li>
+        <li>High freq: C passes → all voltage on R → V_out ≈ V_in</li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Quick Identification Trick <span class="t imp">USEFUL</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <p><strong>Rule:</strong> Look at what element the output is taken across:</p>
+      <ul>
+        <li>Output across <strong>capacitor</strong> → <strong>Low-Pass</strong> (cap charges slowly, smooths out fast changes)</li>
+        <li>Output across <strong>resistor</strong> (with cap in series) → <strong>High-Pass</strong> (resistor sees current only during transitions)</li>
+        <li>Output across <strong>inductor</strong> → <strong>High-Pass</strong> (inductor opposes change, passes high freq)</li>
+        <li>Output across <strong>resistor</strong> (with inductor in series) → <strong>Low-Pass</strong></li>
+      </ul>
+      <p style="margin-top:0.5rem"><strong>Physical intuition test:</strong> At DC (f=0), does the output exist? If yes → low-pass. At very high frequency, does the output exist? If yes → high-pass.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ OP-AMPS ═══════════════════ -->
+<div class="sec" id="opamp">
+  <h1>Op-Amp Circuits</h1>
+  <p class="sub">From your Analog Computation project + relevant for TI analog division</p>
+
+  <button class="cb" onclick="tog(this)">
+    Ideal Op-Amp Rules &amp; Key Circuits <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Two Golden Rules (negative feedback)</h3>
+      <ol>
+        <li><strong>No input current:</strong> I+ = I- = 0 (infinite input impedance)</li>
+        <li><strong>Virtual short:</strong> V+ = V- (infinite open-loop gain drives the difference to zero)</li>
+      </ol>
+
+      <h3 style="margin-top:0.8rem">Inverting Amplifier</h3>
+      <div class="f">V_out = -(R_f / R_in) × V_in
+Input impedance = R_in (relatively low)
+Virtual ground at (–) terminal</div>
+
+      <h3 style="margin-top:0.8rem">Non-Inverting Amplifier</h3>
+      <div class="f">V_out = (1 + R_f / R_in) × V_in
+Input impedance = very high (signal at + terminal)
+Minimum gain = 1 (unity-gain buffer when R_f = 0)</div>
+
+      <h3 style="margin-top:0.8rem">Summing Amplifier (Inverting)</h3>
+      <div class="f">V_out = -R_f × (V1/R1 + V2/R2 + V3/R3)</div>
+
+      <h3 style="margin-top:0.8rem">Integrator</h3>
+      <div class="f">V_out = -(1/RC) ∫ V_in dt
+Replaces R_f with capacitor C. This is what you used for Lotka-Volterra!</div>
+
+      <h3 style="margin-top:0.8rem">Differentiator</h3>
+      <div class="f">V_out = -RC × dV_in/dt
+Replaces R_in with capacitor C.</div>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Your Analog Computer &mdash; Lotka-Volterra <span class="t res">RESUME PROJECT</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Lotka-Volterra Equations (Predator-Prey Model)</h3>
+      <div class="f">dx/dt = ax - bxy    (prey: grows naturally, eaten by predators)
+dy/dt = -cy + dxy   (predator: dies naturally, grows by eating prey)</div>
+
+      <h3 style="margin-top:0.8rem">Mapping to Op-Amp Circuits</h3>
+      <p>Each equation is implemented as an integrator whose input is formed by summers and multipliers:</p>
+      <div class="diag">
+For dx/dt = ax - bxy:
+
+x(t) ──[×a]──┐
+              ├──[summer]──[integrator]──→ x(t) (feedback loop)
+x×y ──[×(-b)]┘
+
+The integrator outputs x(t) = ∫(ax - bxy)dt
+The multiplier computes x×y using a log/antilog or Gilbert cell circuit
+The summer adds the two terms
+      </div>
+      <p><strong>Result:</strong> Connect both equation circuits in a loop, set initial conditions using voltage sources, and the voltages oscillate as predator-prey populations. You validated the output waveforms in LTspice against the mathematical solution.</p>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Op-Amp Non-Idealities (bonus depth) <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <ul>
+        <li><strong>Finite open-loop gain (A):</strong> Real op-amps have A ≈ 10⁵-10⁶, not ∞. Causes gain error.</li>
+        <li><strong>Finite bandwidth (GBW):</strong> Gain × bandwidth = constant. Higher gain → lower bandwidth.</li>
+        <li><strong>Input offset voltage:</strong> Small DC voltage between inputs needed to make V_out = 0.</li>
+        <li><strong>Slew rate:</strong> Maximum rate of output change (V/μs). If input changes faster, output distorts.</li>
+        <li><strong>CMRR:</strong> Common-Mode Rejection Ratio. How well the op-amp ignores signals common to both inputs. Ideal = ∞, real = 80-120 dB.</li>
+        <li><strong>Input bias current:</strong> Small current flowing into inputs (nA range). Matters for high-impedance sources.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ DIGITAL / VHDL ═══════════════════ -->
+<div class="sec" id="digi">
+  <h1>Digital Design &amp; VHDL</h1>
+  <p class="sub">i281 CPU + Digital Circuits Lab + FPGA work</p>
+
+  <button class="cb" onclick="tog(this)">
+    i281 CPU &mdash; Architecture Overview <span class="t res">RESUME PROJECT</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Project Objective</h3>
+      <p>Design and implement a simplified processor (Toy-CPU) in VHDL capable of executing a <strong>bubble sort algorithm</strong> &mdash; read an unsorted array from data memory, sort it, and write the sorted result back. EE224 Digital Systems, team of 3.</p>
+
+      <h3 style="margin-top:1rem">Full Datapath Architecture</h3>
+      <div class="diag">
+                    ┌───────────────────────────────────────────────────┐
+                    │                   CONTROL LOGIC                   │
+                    │  (18 control signals c1-c18 from one-hot decode) │
+                    └──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬┘
+                       │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+    ┌──────────┐   c1  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+    │  Code    │◄──────┘  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+    │  Memory  │──16-bit instruction──→ OpCode Decoder (4-to-27)      │
+    │ (64×16b) │       │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+    └────┬─────┘       │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+         │             │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+    ┌────┴─────┐   c2  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+    │ PC Mux   │◄──────┘  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+    │(next/jmp)│       │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+    └────┬─────┘       │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+         │             │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+    ┌────┴─────┐       │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+    │ Program  │       │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+    │ Counter  │       │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+    │  (6-bit) │       │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+    └──────────┘       │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+                       │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+    ┌──────────┐  c4-c10  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+    │ Register │◄─────────┘  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+    │   File   │ Port0(c4,c5)→ ALU_in_1   │  │  │  │  │  │  │  │  │
+    │ A,B,C,D  │ Port1(c6,c7)→ ALU_src_0──┤  │  │  │  │  │  │  │  │
+    │  (4×8b)  │ Write(c8,c9,c10)          │  │  │  │  │  │  │  │  │
+    └──────────┘       │  │  │  │  │  │    │  │  │  │  │  │  │  │  │
+                       │  │  │  │  │  │    │  │  │  │  │  │  │  │  │
+    ┌──────────┐       │  │  │c11│  │  │    │  │  │  │  │  │  │  │  │
+    │ ALU Src  │◄──────┘  │  │  │  │  │    │  │  │  │  │  │  │  │  │
+    │   Mux    │ reg_val OR imm_val(I[7:0])│  │  │  │  │  │  │  │  │
+    └────┬─────┘       │  │  │  │  │  │    │  │  │  │  │  │  │  │  │
+         │             │  │  │  │  │  │    │  │  │  │  │  │  │  │  │
+    ┌────┴─────┐  c12,c13  │  │  │  │  │    │  │  │  │  │  │  │  │
+    │   ALU    │◄──────────┘  │  │  │  │    │  │  │  │  │  │  │  │
+    │ ADD/SUB/ │              │  │  │  │    │  │  │  │  │  │  │  │
+    │ SHL/SHR  │──→ result ──┤  │  │  │    │  │  │  │  │  │  │  │
+    │          │──→ C,O,N,Z──┼──┼──┼──┤    │  │  │  │  │  │  │  │
+    └──────────┘             │  │  │  │    │  │  │  │  │  │  │  │
+                             │  │ c14│  │    │  │  │  │  │  │  │
+    ┌──────────┐             │  │  │  │    │  │  │  │  │  │  │  │
+    │  Flags   │◄────────────┘  │  │  │    │  │  │  │  │  │  │  │
+    │ Register │ C,O,N,Z ──→ Control Logic (branch decisions)  │
+    │ (4 bits) │             │  │  │  │    │  │  │  │  │  │  │  │
+    └──────────┘             │  │  │  │    │  │  │  │  │  │  │  │
+                             │  │  │  │    │  │  │  │  │  │  │  │
+    ┌──────────┐        c15  │  │  │ c17,c16  │  │  │  │ c18│  │
+    │ ALU Res  │◄────────────┘  │  │  │    │  │  │  │  │  │  │  │
+    │   Mux    │ alu_res OR imm │  │  │    │  │  │  │  │  │  │  │
+    └────┬─────┘             │  │  │  │    │  │  │  │  │  │  │  │
+         │                   │  │  │  │    │  │  │  │  │  │  │  │
+         ├───────────────────┤  │  │  │    │  │  │  │  │  │  │  │
+         │                   │  │  │  │    │  │  │  │  │  │  │  │
+    ┌────┴─────┐             │  │  │  │    │  │  │  │  │  │  │  │
+    │  Data    │◄────────────┘──┘──┘──┘    │  │  │  │  │  │  │  │
+    │  Memory  │ (16×8 bit)  read/write    │  │  │  │  │  │  │  │
+    └────┬─────┘             │  │  │  │    │  │  │  │  │  │  │  │
+         │                   │  │  │  │    │  │  │  │  │  │  │  │
+    ┌────┴─────┐        c18  │  │  │  │    │  │  │  │  │  │  │  │
+    │Writeback │◄────────────┘  │  │  │    │  │  │  │  │  │  │  │
+    │   Mux    │ alu_result OR dmem_out    │  │  │  │  │  │  │  │
+    └────┬─────┘ ──→ back to Register File │  │  │  │  │  │  │
+         └─────────────────────────────────┘  │  │  │  │  │  │
+      </div>
+
+      <h3 style="margin-top:1rem">Specifications Summary</h3>
+      <table>
+        <tr><th>Parameter</th><th>Value</th></tr>
+        <tr><td>Word width</td><td><strong>8-bit</strong> data, <strong>16-bit</strong> instructions</td></tr>
+        <tr><td>Registers</td><td>4 general-purpose: <strong>A, B, C, D</strong> (8-bit each)</td></tr>
+        <tr><td>Code Memory</td><td>64 × 16-bit (addressed by 6-bit PC)</td></tr>
+        <tr><td>Data Memory</td><td>16 × 8-bit (addressed by 4-bit address)</td></tr>
+        <tr><td>Program Counter</td><td>6-bit (0-63), supports sequential + jump/branch</td></tr>
+        <tr><td>ALU operations</td><td>ADD, SUB, Shift Left, Shift Right</td></tr>
+        <tr><td>Flags</td><td><strong>4 flags:</strong> Carry (C), Overflow (O), Negative (N), Zero (Z)</td></tr>
+        <tr><td>Instructions</td><td><strong>23 instructions</strong> with one-hot decoding</td></tr>
+        <tr><td>Control signals</td><td>18 control lines (c1-c18)</td></tr>
+        <tr><td>Clock</td><td>Single-phase, rising-edge triggered</td></tr>
+        <tr><td>Execution model</td><td><strong>Single-cycle</strong> (1 instruction per clock)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    i281 Instruction Set (23 Instructions) <span class="t hot">KNOW FOR INTERVIEW</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Instruction Encoding Format (16-bit)</h3>
+      <div class="f">
+[15:12] = Primary Opcode (4 bits) → selects instruction group
+[11:8]  = Secondary bits: RX (dest register), RY (src register), or sub-opcode
+[7:0]   = Operand: immediate value, memory address, or PC offset
+      </div>
+
+      <h3 style="margin-top:0.8rem">Complete ISA</h3>
+      <table>
+        <tr><th>Category</th><th>Instruction</th><th>Opcode</th><th>Operation</th></tr>
+        <tr><td rowspan="5" style="color:var(--cyn)">I/O</td><td>NOOP</td><td>0000</td><td>No operation</td></tr>
+        <tr><td>INPUTC</td><td>0001..00</td><td>Write external input → Code Memory</td></tr>
+        <tr><td>INPUTCF</td><td>0001..01</td><td>Write to Code Memory with register offset</td></tr>
+        <tr><td>INPUTD</td><td>0001..10</td><td>Write external input → Data Memory</td></tr>
+        <tr><td>INPUTDF</td><td>0001..11</td><td>Write to Data Memory with register offset</td></tr>
+        <tr><td rowspan="2" style="color:var(--grn)">Data Move</td><td>MOVE</td><td>0010</td><td>RX ← RY</td></tr>
+        <tr><td>LOADI/LOADP</td><td>0011</td><td>RX ← immediate value (8-bit)</td></tr>
+        <tr><td rowspan="4" style="color:var(--yel)">Arithmetic</td><td>ADD</td><td>0100</td><td>RX ← RX + RY, update flags</td></tr>
+        <tr><td>ADDI</td><td>0101</td><td>RX ← RX + immediate, update flags</td></tr>
+        <tr><td>SUB</td><td>0110</td><td>RX ← RX − RY, update flags</td></tr>
+        <tr><td>SUBI</td><td>0111</td><td>RX ← RX − immediate, update flags</td></tr>
+        <tr><td rowspan="4" style="color:var(--pur)">Memory</td><td>LOAD</td><td>1000</td><td>RX ← DataMem[address]</td></tr>
+        <tr><td>LOADF</td><td>1001</td><td>RX ← DataMem[RY + address] (offset)</td></tr>
+        <tr><td>STORE</td><td>1010</td><td>DataMem[address] ← RX</td></tr>
+        <tr><td>STOREF</td><td>1011</td><td>DataMem[RY + address] ← RX (offset)</td></tr>
+        <tr><td rowspan="3" style="color:var(--org)">Logic/Shift</td><td>SHIFTL</td><td>1100.0</td><td>RX ← RX &lt;&lt; 1 (carry = MSB)</td></tr>
+        <tr><td>SHIFTR</td><td>1100.1</td><td>RX ← RX &gt;&gt; 1 (carry = LSB)</td></tr>
+        <tr><td>CMP</td><td>1101</td><td>Flags ← RX − RY (result discarded)</td></tr>
+        <tr><td rowspan="5" style="color:var(--pnk)">Branch</td><td>JUMP</td><td>1110</td><td>PC ← target address (unconditional)</td></tr>
+        <tr><td>BRE/BRZ</td><td>1111.00</td><td>Branch if Equal / Zero (ZF=1)</td></tr>
+        <tr><td>BRNE/BRNZ</td><td>1111.01</td><td>Branch if Not Equal / Not Zero (ZF=0)</td></tr>
+        <tr><td>BRG</td><td>1111.10</td><td>Branch if Greater: ZF=0 AND (NF XNOR OF)</td></tr>
+        <tr><td>BRGE</td><td>1111.11</td><td>Branch if Greater or Equal: (NF XNOR OF)</td></tr>
+      </table>
+
+      <div class="hi tip">
+        <strong>Interview insight:</strong> The branch conditions use flag combinations just like real CPUs (x86 uses similar flag logic for JG, JGE, JE, JNE). This shows you understand <strong>signed comparison using overflow and sign flags</strong>, not just zero flag.
+      </div>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    i281 Datapath Components &mdash; Your VHDL Modules <span class="t hot">DEEP DIVE</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>1. OpCode Decoder (<code>opcode_decoder.vhd</code>)</h3>
+      <ul>
+        <li>Takes 8-bit opcode <code>I[15:8]</code> from instruction</li>
+        <li>Primary decoder: 4-to-16 using <code>I[15:12]</code> (CASE statement)</li>
+        <li>Nested secondary decoder for INPUT group (<code>I[9:8]</code>) and BRANCH group (<code>I[9:8]</code>)</li>
+        <li>Outputs: <strong>23 one-hot lines</strong> (exactly one active per instruction) + 4 register select bits (X1, X0, Y1, Y0)</li>
+        <li><strong>27 outputs total</strong> fed into control logic</li>
+      </ul>
+      <div class="f">Why one-hot encoding?
+• Simple: each instruction just sets 1 bit → no further decode needed in control logic
+• Control logic becomes OR of instruction lines (sum-of-products)
+• Trade-off: uses 23 wires vs 5-bit binary (needs 2^5 decode)
+• For 23 instructions, the area cost is acceptable
+• Used in your FPGA: FPGA LUTs make one-hot efficient</div>
+
+      <h3 style="margin-top:1rem">2. Control Logic (<code>control_logic.vhd</code>) <span class="t hot">HEART OF CPU</span></h3>
+      <p>Pure combinational logic generating 18 control signals from one-hot instruction lines + flags.</p>
+      <div class="f">Key control signal equations (from YOUR code):
+
+c1  (IMEM Write Enable)  = INPUTC | INPUTCF
+c2  (PC Mux: jump/branch)= JUMP | (B1 & BRE_BRZ) | (B2 & BRNE_BRNZ)
+                            | (B3 & BRG) | (B4 & BRGE)
+c10 (Reg Write Enable)   = MOVE | LOADI | ADD | ADDI | SUB | SUBI
+                            | LOAD | LOADF | SHIFTL | SHIFTR
+c11 (ALU Source Mux)     = INPUTCF | INPUTDF | MOVE | ADDI | SUBI
+                            | LOADF | STOREF
+c12,c13 (ALU Select)     = "00"=SHL, "01"=SHR, "10"=ADD, "11"=SUB/CMP
+c17 (DMEM Write Enable)  = INPUTD | INPUTDF | STORE | STOREF
+c18 (Writeback Mux)      = LOAD | LOADF (selects dmem_out over alu_result)
+
+Branch condition logic:
+  B1 = ZF                          (BRE/BRZ: equal → zero flag set)
+  B2 = ~ZF                         (BRNE/BRNZ: not equal)
+  B3 = ~ZF AND (NF XNOR OF)       (BRG: greater, signed comparison)
+  B4 = NF XNOR OF                  (BRGE: greater or equal)</div>
+
+      <div class="hi">
+        <strong>Why this matters for TI:</strong> This is exactly how control units work in real processors. TI's C2000 MCUs and MSP430s use similar control decode logic. Being able to trace how an instruction flows through fetch → decode → execute → writeback is fundamental.
+      </div>
+
+      <h3 style="margin-top:1rem">3. ALU (<code>alu.vhd</code>)</h3>
+      <table>
+        <tr><th>c12</th><th>c13</th><th>Operation</th><th>Flag Updates</th></tr>
+        <tr><td>0</td><td>0</td><td>Shift Left (SHL)</td><td>C = MSB shifted out</td></tr>
+        <tr><td>0</td><td>1</td><td>Shift Right (SHR)</td><td>C = LSB shifted out</td></tr>
+        <tr><td>1</td><td>0</td><td>ADD</td><td>C = unsigned carry, O = signed overflow, N, Z</td></tr>
+        <tr><td>1</td><td>1</td><td>SUB / CMP</td><td>C = no borrow (C=1 if A≥B), O = signed overflow, N, Z</td></tr>
+      </table>
+      <div class="f">Your ALU overflow detection (from your VHDL):
+
+ADD overflow: extend A,B to 9-bit signed, check if result > 127 or < -128
+  tmp_s := resize(signed(A), 9) + resize(signed(B), 9);
+  if (tmp_s > 127) or (tmp_s < -128) then v_out := '1';
+
+SUB borrow: C=0 means borrow occurred (unsigned A < unsigned B)
+  i281 convention: C=1 = No Borrow, C=0 = Borrow
+  (opposite of some architectures!)
+
+SUB overflow: v_out := (A(7) XOR B(7)) AND (A(7) XOR result(7))
+  This checks: did signs of operands differ, and did the result
+  sign differ from A? Classic signed overflow detection.</div>
+
+      <h3 style="margin-top:1rem">4. Register File (<code>register_file.vhd</code>)</h3>
+      <ul>
+        <li><strong>4 registers:</strong> A(00), B(01), C(10), D(11) &mdash; 8-bit each</li>
+        <li><strong>2 read ports</strong> (asynchronous/combinational): Port0 → ALU_in_1, Port1 → ALU_source_0</li>
+        <li><strong>1 write port</strong> (synchronous, rising edge): selected by c8,c9 + write enable c10</li>
+        <li>Asynchronous read means data is available in the same cycle &mdash; enables <strong>single-cycle execution</strong></li>
+      </ul>
+
+      <h3 style="margin-top:1rem">5. Memories</h3>
+      <table>
+        <tr><th>Memory</th><th>Size</th><th>Width</th><th>Read</th><th>Write</th></tr>
+        <tr><td>Code Memory</td><td>64 locations</td><td>16-bit (instruction)</td><td>Async (combinational)</td><td>Sync (c1 enable)</td></tr>
+        <tr><td>Data Memory</td><td>16 locations</td><td>8-bit (data)</td><td>Async (combinational)</td><td>Sync (c17 enable)</td></tr>
+      </table>
+      <p>Both use async read for single-cycle operation. Data memory is initialized with unsorted array <code>{7,3,2,1,6,4,5,8,7,0}</code> for bubble sort testing.</p>
+
+      <h3 style="margin-top:1rem">6. Program Counter (<code>program_counter.vhd</code>)</h3>
+      <ul>
+        <li>6-bit register (addresses 0-63 in code memory)</li>
+        <li>Asynchronous reset to address 0</li>
+        <li>PC Mux (c2) selects between: <strong>PC+1</strong> (sequential) or <strong>branch target</strong> (from instruction offset)</li>
+        <li>Always-enabled (c3='1') &mdash; updates every clock cycle</li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Bubble Sort &mdash; Execution Walkthrough <span class="t imp">VALIDATION STORY</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>The Algorithm on i281</h3>
+      <div class="f">Data Memory initial state: {7, 3, 2, 1, 6, 4, 5, 8, 7, 0}
+
+Bubble Sort pseudo-assembly:
+  LOADI A, 0          ; A = outer loop counter (i)
+  outer_loop:
+    LOAD  C, [A]      ; C = array[i] (using LOADF with offset)
+    LOADI B, 0        ; B = inner loop counter (j)
+    inner_loop:
+      LOAD  C, [j]    ; C = array[j]
+      LOAD  D, [j+1]  ; D = array[j+1]
+      CMP   C, D      ; Compare: sets flags
+      BRGE  skip_swap  ; if array[j] <= array[j+1], skip
+      ; Swap:
+      STOREF D, [j]   ; array[j] = D (the smaller value)
+      STOREF C, [j+1] ; array[j+1] = C (the larger value)
+    skip_swap:
+      ADDI  B, 1      ; j++
+      ; (check inner loop bound, branch back)
+    ADDI  A, 1        ; i++
+    ; (check outer loop bound, branch back)
+  ; Done: data memory now sorted {0, 1, 2, 3, 4, 5, 6, 7, 7, 8}</div>
+
+      <h3 style="margin-top:1rem">How Validation Worked</h3>
+      <ul>
+        <li>Bubble sort program pre-loaded into Code Memory (addresses 32-51)</li>
+        <li>JUMP at address 1 branches to address 30 (start of bubble sort code)</li>
+        <li>Unsorted array in Data Memory addresses 0-9</li>
+        <li><strong>Simulation in ModelSim:</strong> ran testbench, observed register file values and data memory contents cycle-by-cycle</li>
+        <li>Verified waveforms show correct comparisons, swaps, and loop iterations</li>
+        <li>After execution: Data Memory contains sorted array &mdash; <strong>CPU is functional!</strong></li>
+      </ul>
+
+      <div class="hi tip">
+        <strong>Interview framing:</strong> "We validated the CPU by running bubble sort on it &mdash; it's a real end-to-end test because it exercises almost every instruction category: arithmetic (ADDI for loop counters), memory (LOAD/STORE for array access), comparison (CMP + flag setting), and conditional branches (BRGE for sort comparison). If bubble sort produces the correct sorted output, the CPU works."
+      </div>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    i281 Design Decisions &amp; Interview Q&amp;A <span class="t hot">BE READY FOR THESE</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <div class="qa">
+        <div class="q">Q: Why one-hot encoding instead of binary encoding for opcodes?</div>
+        <div class="a"><strong>One-hot:</strong> Each instruction sets exactly 1 of 23 lines. Control logic becomes simple OR gates (sum-of-products). No need for priority encoder or complex decode cascading. Trade-off: more wires (23 vs 5 for binary). But for 23 instructions, the area overhead is small, and on FPGAs one-hot is actually <strong>preferred</strong> because FPGAs have abundant flip-flops but limited routing &mdash; one-hot uses more FFs but simpler routing and faster decode.
+        <br><br><strong>Binary encoding</strong> would use 5 bits (2<sup>5</sup>=32 > 23) but require a complex decoder with AND gates for every instruction. Denser in ASIC, slower to decode.</div>
+      </div>
+
+      <div class="qa">
+        <div class="q">Q: Why is this a single-cycle design? What are the trade-offs vs. pipelined?</div>
+        <div class="a"><strong>Single-cycle:</strong> Each instruction completes in exactly 1 clock cycle. The clock period must accommodate the <em>longest</em> instruction path (e.g., LOAD: PC → Code Memory → Decode → Reg Read → ALU (address calc) → Data Memory → Writeback Mux → Reg Write). This is the <strong>critical path</strong>.<br><br>
+        <strong>Trade-off:</strong> Simple control (no pipeline hazards, no forwarding, no stalling). But clock speed is limited by worst-case instruction. A pipelined design could run faster by overlapping fetch/decode/execute/writeback of different instructions &mdash; but introduces hazards (data, control, structural) requiring forwarding and stalling logic.<br><br>
+        <strong>For bubble sort on a small CPU, single-cycle is the right choice</strong> &mdash; complexity of pipelining isn't justified for 23 instructions.</div>
+      </div>
+
+      <div class="qa">
+        <div class="q">Q: How do the branch conditions work? How does CMP + BRG detect "greater than" for signed numbers?</div>
+        <div class="a"><strong>CMP RX, RY</strong> computes RX − RY internally (same as SUB) but <strong>discards the result</strong> &mdash; only updates the 4 flags (C, O, N, Z).<br><br>
+        Then: <strong>BRG</strong> (Branch if Greater) checks: <code>ZF=0 AND (NF XNOR OF)</code><br>
+        • ZF=0: result wasn't zero (so not equal)<br>
+        • NF XNOR OF: Negative flag matches Overflow flag. If no overflow, N=0 means positive result (A>B). If overflow occurred, the sign flipped, so N=1 with O=1 still means A>B.<br>
+        This is <strong>identical to how x86 implements JG</strong> (Jump if Greater): ZF=0 AND SF=OF.</div>
+      </div>
+
+      <div class="qa">
+        <div class="q">Q: Walk me through what happens when ADD RX, RY executes.</div>
+        <div class="a"><strong>Cycle-by-cycle trace for ADD:</strong><br>
+        1. <strong>Fetch:</strong> Code Memory reads instruction at PC address → 16-bit instruction on bus<br>
+        2. <strong>Decode:</strong> Opcode Decoder sees <code>I[15:12]=0100</code> → asserts ADD=1 (one-hot). Passes X1,X0 (destination RX) and Y1,Y0 (source RY) from <code>I[11:8]</code><br>
+        3. <strong>Control:</strong> ADD=1 activates: c4,c5=X (read RX on Port0), c6,c7=Y (read RY on Port1), c12=1,c13=0 (ALU=ADD), c14=1 (flags write enable), c10=1 (reg write enable), c8,c9=X (write back to RX)<br>
+        4. <strong>Execute:</strong> ALU receives Port0 (RX value) and Port1 (RY value), computes sum, produces result + C,O,N,Z flags<br>
+        5. <strong>Writeback:</strong> ALU result passes through muxes (c15=0→ALU, c18=0→ALU not DMEM) → written to RX in register file on rising clock edge. Flags stored in Flags register (c14=1).<br>
+        6. <strong>PC Update:</strong> c2=0 (no branch) → PC ← PC+1. Next instruction fetched.</div>
+      </div>
+
+      <div class="qa">
+        <div class="q">Q: How did you handle the LOADF instruction (load with offset)?</div>
+        <div class="a"><strong>LOADF RX, RY, ADDR:</strong> loads RX from DataMem[RY + ADDR].<br>
+        The control logic sets c11=1 (ALU source mux selects register value, not immediate). ALU performs addition (c12=1, c13=0) of RY's value + the address from instruction bits. The ALU result becomes the data memory read address. The data memory output is routed back through the writeback mux (c18=1) to the register file. This enables <strong>array indexing</strong> &mdash; RY acts as a base/index register, critical for the bubble sort inner loop.</div>
+      </div>
+
+      <div class="qa">
+        <div class="q">Q: What was the biggest challenge?</div>
+        <div class="a"><strong>Getting the control signal equations right.</strong> With 18 control signals and 23 instructions, the control logic truth table is large. A single wrong bit means one instruction corrupts data for a completely different instruction. Debugging required: (1) isolating individual instructions in the testbench, (2) tracing every mux and enable signal in the ModelSim waveform, (3) cross-referencing with the control decode table from the spec. We caught a bug where the SUB overflow formula was using the wrong XOR structure &mdash; fixed it to <code>(A[7] XOR B[7]) AND (A[7] XOR result[7])</code>.</div>
+      </div>
+
+      <div class="qa">
+        <div class="q">Q: If you had more time, what would you improve?</div>
+        <div class="a">Three things: (1) <strong>Pipeline it</strong> &mdash; add pipeline registers between fetch/decode/execute/writeback stages, implement forwarding for data hazards, and a branch predictor for control hazards. (2) <strong>Expand the ISA</strong> &mdash; add AND/OR/XOR logic ops, multiply, and interrupt support. (3) <strong>FPGA hardware verification</strong> &mdash; we simulated in ModelSim but could map it to an actual FPGA board with switches for input and LEDs/seven-segment displays for output, connecting to physical memory.</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    VHDL Modeling Styles <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <table>
+        <tr><th>Style</th><th>Description</th><th>Example</th></tr>
+        <tr><td>Behavioral</td><td>Describes WHAT (process, if-else, case)</td><td>process(clk) if rising_edge(clk) then...</td></tr>
+        <tr><td>Dataflow</td><td>Concurrent signal assignments (Boolean eqns)</td><td>y <= a AND b; z <= a XOR c;</td></tr>
+        <tr><td>Structural</td><td>Wiring components together (port maps)</td><td>U1: AND2 port map(a, b, y);</td></tr>
+      </table>
+      <p style="margin-top:0.5rem">Behavioral = most abstract, Structural = closest to actual hardware. In practice, you use all three.</p>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Scan Chain &amp; FPGA Verification <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <p><strong>Scan chain</strong> connects all flip-flops into a shift register for testing. In test mode: shift in test patterns → apply one clock → capture results in flip-flops → shift out and compare. Essential for Design for Testability (DFT) in manufacturing.</p>
+      <p><strong>Your FPGA work:</strong> Implemented designs on XEN 10 boards. Pin mapping, RTL simulation in Quartus, hardware verification on the actual FPGA to confirm the design works beyond just simulation.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ FLIP-FLOPS & SEQUENTIAL CIRCUITS ═══════════════════ -->
+<div class="sec" id="flipflop">
+  <h1>Flip-Flops &amp; Sequential Circuits</h1>
+  <p class="sub">Latches, flip-flops, counters, shift registers, timing &mdash; core digital design for TI</p>
+
+  <button class="cb" onclick="tog(this)">
+    Latch vs Flip-Flop &mdash; The Critical Distinction <span class="t hot">FREQUENTLY ASKED</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <table>
+        <tr><th>Property</th><th>Latch</th><th>Flip-Flop</th></tr>
+        <tr><td>Triggering</td><td><strong>Level-sensitive</strong> (transparent when enable is active)</td><td><strong>Edge-triggered</strong> (samples only at clock edge)</td></tr>
+        <tr><td>When output changes</td><td>Continuously while enable is active</td><td>Only at the rising or falling clock edge</td></tr>
+        <tr><td>Construction</td><td>2 cross-coupled gates (NAND or NOR)</td><td>Master-slave (two latches in series)</td></tr>
+        <tr><td>Timing hazards</td><td>Prone to races if feedback exists</td><td>Safe for synchronous design</td></tr>
+        <tr><td>Usage</td><td>Simple storage, async circuits</td><td>Registers, counters, FSMs, pipelines</td></tr>
+      </table>
+      <div class="hi tip">
+        <strong>Key insight:</strong> A flip-flop is built from two latches (master + slave). The master is transparent when clock is LOW, slave when clock is HIGH. This ensures the output only changes at the clock edge, preventing race-through problems.
+      </div>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    SR Latch (Set-Reset) <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>NOR-based SR Latch</h3>
+      <div class="diag">
+        S ──┐
+            NOR──── Q
+        Q'─┘  ┌─┘
+              │
+        R ──┐ │
+            NOR──── Q'
+        Q ──┘
+      </div>
+      <table>
+        <tr><th>S</th><th>R</th><th>Q(next)</th><th>Action</th></tr>
+        <tr><td>0</td><td>0</td><td>Q (no change)</td><td>Hold / Memory</td></tr>
+        <tr><td>1</td><td>0</td><td>1</td><td>Set</td></tr>
+        <tr><td>0</td><td>1</td><td>0</td><td>Reset</td></tr>
+        <tr><td style="color:var(--red)">1</td><td style="color:var(--red)">1</td><td style="color:var(--red)">INVALID</td><td style="color:var(--red)">Both outputs = 0, race when released</td></tr>
+      </table>
+      <div class="hi warn">
+        <strong>Why S=R=1 is invalid:</strong> Both NOR gates output 0, so Q=Q'=0 (violates Q and Q' being complements). When S and R return to 0 simultaneously, the final state depends on gate delays &mdash; it's a <strong>race condition</strong>. This is why the JK flip-flop was invented.
+      </div>
+      <p><strong>NAND-based SR Latch:</strong> Inputs are <strong>active-LOW</strong> (S'=0, R'=0 is the invalid state). Often called S̄R̄ latch.</p>
+      <p><strong>Characteristic equation:</strong> Q(next) = S + R'Q, with constraint SR = 0</p>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    D Flip-Flop (Data) <span class="t hot">MOST IMPORTANT</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <table>
+        <tr><th>D</th><th>CLK Edge</th><th>Q(next)</th><th>Action</th></tr>
+        <tr><td>0</td><td>&#8593;</td><td>0</td><td>Reset (stores 0)</td></tr>
+        <tr><td>1</td><td>&#8593;</td><td>1</td><td>Set (stores 1)</td></tr>
+        <tr><td>X</td><td>No edge</td><td>Q</td><td>Hold (no change)</td></tr>
+      </table>
+      <div class="f">Characteristic equation: Q(next) = D
+Excitation table:    Q → Q(next) | D required
+                     0 → 0       | D = 0
+                     0 → 1       | D = 1
+                     1 → 0       | D = 0
+                     1 → 1       | D = 1</div>
+      <ul>
+        <li><strong>Simplest flip-flop</strong> &mdash; output simply copies D at the clock edge</li>
+        <li><strong>No invalid states</strong> (unlike SR)</li>
+        <li><strong>D Latch vs D Flip-Flop:</strong> Latch is transparent when Enable=1 (output follows D). Flip-flop only changes at clock edge.</li>
+        <li><strong>Applications:</strong> Registers, pipeline stages, data sampling, shift registers</li>
+        <li><strong>In VHDL:</strong> <code>process(clk) begin if rising_edge(clk) then Q &lt;= D; end if; end process;</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    JK Flip-Flop <span class="t imp">VERSATILE</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <table>
+        <tr><th>J</th><th>K</th><th>Q(next)</th><th>Action</th></tr>
+        <tr><td>0</td><td>0</td><td>Q</td><td>Hold (no change)</td></tr>
+        <tr><td>0</td><td>1</td><td>0</td><td>Reset</td></tr>
+        <tr><td>1</td><td>0</td><td>1</td><td>Set</td></tr>
+        <tr><td style="color:var(--grn)">1</td><td style="color:var(--grn)">1</td><td style="color:var(--grn)">Q'</td><td style="color:var(--grn)">Toggle (the fix for SR's invalid state)</td></tr>
+      </table>
+      <div class="f">Characteristic equation: Q(next) = JQ' + K'Q
+
+Excitation table:    Q → Q(next) | J  K required
+                     0 → 0       | 0  X
+                     0 → 1       | 1  X
+                     1 → 0       | X  1
+                     1 → 1       | X  0</div>
+      <div class="hi tip">
+        <strong>The excitation table is critical for counter design.</strong> When designing a counter, you determine the state transitions, then use the excitation table to find J, K inputs for each flip-flop, then simplify with K-maps.
+      </div>
+      <ul>
+        <li>Most <strong>versatile</strong> flip-flop &mdash; can do hold, set, reset, and toggle</li>
+        <li>J=1, K=1 → <strong>Toggle</strong> (solves the S=R=1 invalid problem of SR)</li>
+        <li>The "don't care" (X) conditions in the excitation table simplify counter design</li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    T Flip-Flop (Toggle) <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <table>
+        <tr><th>T</th><th>Q(next)</th><th>Action</th></tr>
+        <tr><td>0</td><td>Q</td><td>Hold</td></tr>
+        <tr><td>1</td><td>Q'</td><td>Toggle</td></tr>
+      </table>
+      <div class="f">Characteristic equation: Q(next) = T ⊕ Q  (T XOR Q)
+
+Made from JK flip-flop by connecting J = K = T
+Made from D flip-flop by connecting D = T ⊕ Q</div>
+      <ul>
+        <li><strong>Frequency divider:</strong> T=1 with clock f → output at f/2</li>
+        <li>N cascaded T flip-flops divide frequency by 2<sup>N</sup></li>
+        <li><strong>Used in:</strong> ripple counters, frequency dividers, clock prescalers</li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Flip-Flop Conversions <span class="t hot">ASKED OFTEN</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <table>
+        <tr><th>From</th><th>To</th><th>Connection</th></tr>
+        <tr><td>JK</td><td>D</td><td>J = D, K = D'</td></tr>
+        <tr><td>JK</td><td>T</td><td>J = K = T</td></tr>
+        <tr><td>JK</td><td>SR</td><td>J = S, K = R (ensure SR=0)</td></tr>
+        <tr><td>D</td><td>T</td><td>D = T &oplus; Q</td></tr>
+        <tr><td>D</td><td>JK</td><td>D = JQ' + K'Q</td></tr>
+        <tr><td>T</td><td>D</td><td>T = D &oplus; Q</td></tr>
+        <tr><td>T</td><td>JK</td><td>T = JQ' + K'Q</td></tr>
+      </table>
+      <div class="hi">
+        <strong>Method:</strong> Write the characteristic equation of the target FF type. Express it in terms of the source FF's input. For example, to convert D→T: D flip-flop needs D = Q(next). T flip-flop has Q(next) = T⊕Q. So D = T⊕Q.
+      </div>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Setup Time, Hold Time &amp; Metastability <span class="t hot">CRITICAL FOR TI</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <div class="diag">
+                    t_su         t_h
+              ├──────────────┤├──────────┤
+              │   Data must   ││  Data must│
+              │   be stable   ││  be stable│
+              │   BEFORE edge ││  AFTER edge│
+    ──────────┤               ├┤──────────────
+              │    ┌──CLK Edge
+    ──────────┘    │          └────────────────
+                   ↑
+             Active clock edge
+
+    Clock-to-Q delay (t_cq): time from clock edge to output changing
+      </div>
+      <ul>
+        <li><strong>Setup time (t<sub>su</sub>):</strong> Minimum time data must be stable <em>before</em> the active clock edge</li>
+        <li><strong>Hold time (t<sub>h</sub>):</strong> Minimum time data must remain stable <em>after</em> the active clock edge</li>
+        <li><strong>Clock-to-Q (t<sub>cq</sub>):</strong> Propagation delay from clock edge to output changing</li>
+      </ul>
+      <div class="f">Maximum clock frequency:
+f_max = 1 / (t_cq + t_combinational + t_su)
+
+Slack = T_clock - (t_cq + t_comb + t_su)
+Slack > 0 → timing met
+Slack < 0 → setup violation!</div>
+      <div class="hi warn">
+        <strong>Metastability:</strong> If setup or hold time is violated, the flip-flop enters a <strong>metastable state</strong> &mdash; output oscillates unpredictably between 0 and 1 for an indeterminate time before settling. This is dangerous in digital systems because it can propagate through downstream logic.<br><br>
+        <strong>Solution: Synchronizer chain</strong> &mdash; use 2-3 flip-flops in series to cross clock domains. The probability of metastability decreases exponentially with each stage.
+      </div>
+      <p><strong>TI interview context:</strong> TI designs clock distribution and timing ICs. They care deeply about setup/hold analysis, clock domain crossing, and metastability.</p>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Counters &mdash; Synchronous vs Asynchronous <span class="t imp">IMPORTANT</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Asynchronous (Ripple) Counter</h3>
+      <div class="diag">
+CLK ──→ [T FF₀] ──Q₀──→ [T FF₁] ──Q₁──→ [T FF₂] ──Q₂──→ [T FF₃] ──Q₃
+         (LSB)                                                (MSB)
+Each FF clocked by the previous FF's output → delay accumulates!
+Total delay = N × t_prop → limits max frequency, causes glitches
+      </div>
+      <ul>
+        <li><strong>Simple:</strong> each T flip-flop (T=1) clocked by output of previous one</li>
+        <li><strong>Problem:</strong> propagation delay accumulates &mdash; for 4 bits, output valid only after 4 × t<sub>prop</sub></li>
+        <li><strong>Glitches:</strong> intermediate states appear briefly during ripple &mdash; can cause false triggers in downstream logic</li>
+      </ul>
+
+      <h3 style="margin-top:1rem">Synchronous Counter</h3>
+      <div class="diag">
+CLK ──→ [JK FF₀] ──Q₀
+  │  ──→ [JK FF₁] ──Q₁     J₁ = Q₀
+  │  ──→ [JK FF₂] ──Q₂     J₂ = Q₀·Q₁
+  │  ──→ [JK FF₃] ──Q₃     J₃ = Q₀·Q₁·Q₂
+  └──── All FFs share the same clock!
+      </div>
+      <ul>
+        <li><strong>All flip-flops clocked simultaneously</strong> &mdash; no accumulated delay</li>
+        <li>Combinational logic determines which FFs toggle</li>
+        <li><strong>Faster, glitch-free</strong> &mdash; used in all practical applications</li>
+        <li><strong>Toggle condition:</strong> bit N toggles when ALL lower bits are 1</li>
+      </ul>
+
+      <h3 style="margin-top:1rem">Mod-N Counter Design</h3>
+      <div class="f">Number of flip-flops = ⌈log₂(N)⌉
+
+Mod-8:  3 FFs, counts 0-7 (full count, no extra logic needed)
+Mod-10: 4 FFs, counts 0-9, reset when state=10 (BCD/decade counter)
+Mod-6:  3 FFs, counts 0-5, reset when state=6
+Mod-12: 4 FFs, counts 0-11, reset when state=12</div>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Shift Registers <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <table>
+        <tr><th>Type</th><th>Input</th><th>Output</th><th>Application</th></tr>
+        <tr><td>SISO</td><td>Serial</td><td>Serial</td><td>Delay line (N-clock delay)</td></tr>
+        <tr><td>SIPO</td><td>Serial</td><td>Parallel</td><td>Serial-to-parallel converter (e.g., receiving SPI data)</td></tr>
+        <tr><td>PISO</td><td>Parallel</td><td>Serial</td><td>Parallel-to-serial converter (e.g., sending SPI data)</td></tr>
+        <tr><td>PIPO</td><td>Parallel</td><td>Parallel</td><td>Buffer / temporary storage</td></tr>
+      </table>
+      <h3 style="margin-top:1rem">Special Configurations</h3>
+      <ul>
+        <li><strong>Ring Counter:</strong> Output of last FF feeds back to first. N FFs → N states. Only one bit is 1 at a time (one-hot). Simple decoding but inefficient (N FFs for N states).</li>
+        <li><strong>Johnson (Twisted Ring) Counter:</strong> <em>Complement</em> of last output feeds back. N FFs → 2N states. Used for glitch-free decoding.</li>
+        <li><strong>LFSR (Linear Feedback Shift Register):</strong> XOR taps feed back. Generates pseudo-random sequences of length 2<sup>N</sup>-1. Used in CRC generation, scrambling, built-in self-test (BIST).</li>
+      </ul>
+      <div class="hi">
+        <strong>TI Connection:</strong> Shift registers are fundamental to JTAG (boundary scan), SPI implementation, and TI's scan-chain based manufacturing test. LFSRs are used in TI's BIST (Built-In Self-Test) methodology.
+      </div>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Finite State Machines (FSM) <span class="t imp">DESIGN QUESTIONS</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <table>
+        <tr><th>Type</th><th>Moore</th><th>Mealy</th></tr>
+        <tr><td>Output depends on</td><td>Current state only</td><td>Current state + current input</td></tr>
+        <tr><td>Output changes</td><td>Only at clock edges (with state)</td><td>Can change asynchronously with input</td></tr>
+        <tr><td>States needed</td><td>Generally more states</td><td>Fewer states (one less typically)</td></tr>
+        <tr><td>Output glitches</td><td>Glitch-free (registered outputs)</td><td>Can glitch if inputs glitch</td></tr>
+        <tr><td>Timing</td><td>Output available one clock later</td><td>Output available immediately</td></tr>
+      </table>
+      <div class="f">FSM Design Steps:
+1. Draw state diagram from specifications
+2. Assign state encoding (binary, gray, one-hot)
+3. Write state transition table
+4. Derive next-state logic (using K-maps or Boolean algebra)
+5. Derive output logic
+6. Implement with flip-flops + combinational logic
+
+State Encoding:
+  Binary:  log₂(N) FFs, complex decode logic
+  Gray:    log₂(N) FFs, only 1 bit changes per transition (glitch-safe)
+  One-hot: N FFs (one per state), simplest decode, used in FPGAs</div>
+      <p><strong>VHDL FSM template:</strong> <code>type state_type is (S0, S1, S2, S3); signal state: state_type;</code> — then use a CASE statement in a clocked process.</p>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="q">Q: What's the difference between synchronous and asynchronous reset?</div>
+    <div class="a"><strong>Synchronous reset:</strong> Reset is checked only at the clock edge (<code>if rising_edge(clk) then if rst='1' then Q&lt;='0'</code>). Cleaner timing, no reset glitches, but requires an active clock.<br>
+    <strong>Asynchronous reset:</strong> Reset takes effect immediately, regardless of clock (<code>process(clk, rst) if rst='1' then Q&lt;='0' elsif rising_edge(clk)...</code>). Works without clock, but can cause metastability if released near a clock edge. <strong>Best practice:</strong> assert asynchronously, de-assert synchronously (async assert, sync deassert).</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MICROPROCESSORS ═══════════════════ -->
+<div class="sec" id="micro">
+  <h1>Microprocessors (8051 / AT89C5131A)</h1>
+  <p class="sub">EE309 Course Project &mdash; SPI DAC/ADC + Goertzel Algorithm</p>
+
+  <button class="cb" onclick="tog(this)">
+    NCO Sine Wave Generator <span class="t res">YOUR CODE</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Architecture</h3>
+      <div class="diag">
+Timer 0 ISR (Fs = 8196.7 Hz)
+  → Phase Accumulator (16-bit) += phase_delta
+  → Top 5 bits index 32-entry sine LUT
+  → 12-bit value sent to MCP4921 DAC via SPI
+  → Analog sine wave output
+
+For 410 Hz: delta = 3275
+For 470 Hz: delta = 3754
+Output freq = Fs × delta / 2^16</div>
+      <div class="code">// SPI configuration for AT89C5131A
+#define SPCON_CFG 0x71  // SPEN=1, SSDIS=1, MSTR=1, CPOL=0, CPHA=0, SPR=Fosc/8
+
+// MCP4921 DAC write (12-bit)
+// Config nibble: 0x7000 = DAC A, buffered VREF, gain 1x, active
+uint16_t dac_word = 0x7000 | (sine_val & 0x0FFF);
+CS_LOW();
+SPI_write(dac_word >> 8);   // high byte first
+SPI_write(dac_word & 0xFF); // low byte
+CS_HIGH();</div>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Goertzel Tone Detection <span class="t res">YOUR CODE</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>What is Goertzel?</h3>
+      <p>Computes the power at a <strong>single specific frequency</strong> from N samples, without computing the full FFT. Computationally much cheaper than FFT when you only need a few frequency bins. O(N) per frequency vs O(N log N) for full FFT.</p>
+      <div class="f">Algorithm for each sample x[n]:
+  s0 = x[n] + coeff * s1 - s2
+  s2 = s1
+  s1 = s0
+
+After N samples:
+  Power = s1² + s2² - coeff * s1 * s2
+
+coeff = 2 * cos(2π * k / N)  where k = target bin index</div>
+      <p>You implemented this on the 8051 for tone detection at 60 Hz, 350 Hz, 410 Hz, and 470 Hz with Fs = 2000 Hz and N = 200 samples. Both floating-point and Q8 fixed-point versions.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ PROTOCOLS COMPARISON ═══════════════════ -->
+<div class="sec" id="proto">
+  <h1>Communication Protocols</h1>
+  <p class="sub">CAN vs I2C vs SPI vs UART vs RS-232/485 vs JTAG &mdash; comprehensive deep-dive with your practical experience</p>
+
+  <div class="c">
+    <h3>Master Comparison Table <span class="t hot">KNOW THIS COLD</span></h3>
+    <table>
+      <tr><th>Parameter</th><th>CAN</th><th>I2C</th><th>SPI</th><th>UART</th><th>RS-485</th></tr>
+      <tr><td>Wires</td><td>2 (CAN-H, CAN-L)</td><td>2 (SDA, SCL)</td><td>4+ (MOSI,MISO,SCK,CS)</td><td>2 (TX, RX)</td><td>2 (A, B differential)</td></tr>
+      <tr><td>Signaling</td><td>Differential</td><td>Single-ended, open-drain</td><td>Single-ended, push-pull</td><td>Single-ended</td><td>Differential</td></tr>
+      <tr><td>Synchronous?</td><td>Sync (bit-stuffed)</td><td>Synchronous (SCL)</td><td>Synchronous (SCK)</td><td><strong>Asynchronous</strong></td><td>Asynchronous</td></tr>
+      <tr><td>Speed</td><td>1 Mbps (CAN FD: 8 Mbps)</td><td>100k/400k/1M/3.4M Hz</td><td>Up to 50+ MHz</td><td>Up to ~1 Mbps</td><td>Up to 10 Mbps</td></tr>
+      <tr><td>Topology</td><td>Multi-master bus</td><td>Multi-master bus</td><td>Single master, multi-slave</td><td>Point-to-point</td><td>Multi-drop bus</td></tr>
+      <tr><td>Addressing</td><td>Message ID (content-based)</td><td>7/10-bit device address</td><td>CS pin per slave</td><td>None (P2P)</td><td>Software-defined</td></tr>
+      <tr><td>Duplex</td><td>Half</td><td>Half</td><td><strong>Full</strong></td><td><strong>Full</strong></td><td>Half (2-wire) or Full (4-wire)</td></tr>
+      <tr><td>Max distance</td><td>40m @1Mbps, 1km @50kbps</td><td>&lt;1m typical</td><td>&lt;1m typical</td><td>~15m (RS-232)</td><td><strong>1200m</strong> @100kbps</td></tr>
+      <tr><td>Max devices</td><td>~112 nodes</td><td>128 (7-bit) / 1024 (10-bit)</td><td>Limited by CS pins</td><td>2 (P2P)</td><td>32 (standard), 256 (enhanced)</td></tr>
+      <tr><td>Error detection</td><td>CRC + bit stuffing + ACK + frame check + error counters</td><td>ACK/NACK per byte</td><td>None built-in</td><td>Parity bit (optional)</td><td>None built-in (software CRC)</td></tr>
+      <tr><td>Your usage</td><td>ECU ↔ motor controllers</td><td>Temperature sensors</td><td>DAC/ADC in EE309</td><td>Debug output</td><td>&mdash;</td></tr>
+    </table>
+  </div>
+
+  <div class="hi">
+    <strong>When interviewer asks "why did you choose X protocol?":</strong> Always frame it as a trade-off. CAN for noise immunity and multi-node automotive. I2C for simple 2-wire sensor comms when distance is short. SPI for high-speed data to DAC/ADC when you have spare pins. UART for simple debug/logging. RS-485 for long-distance industrial.
+  </div>
+
+  <!-- ── UART Deep Dive ── -->
+  <button class="cb" onclick="tog(this)">
+    UART &mdash; Complete Deep Dive <span class="t imp">FUNDAMENTALS</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>What is UART?</h3>
+      <p><strong>Universal Asynchronous Receiver-Transmitter</strong> &mdash; a hardware block that converts parallel data to/from serial. It is <strong>asynchronous</strong> (no shared clock), so both sides must agree on baud rate beforehand.</p>
+
+      <h3 style="margin-top:1rem">Signal Lines</h3>
+      <div class="diag">
+Device A                    Device B
+┌──────┐                   ┌──────┐
+│   TX ├──────────────────→│ RX   │
+│   RX │←──────────────────┤ TX   │
+│  GND ├───────────────────┤ GND  │
+└──────┘                   └──────┘
+  (TX of one connects to RX of the other!)
+      </div>
+
+      <h3 style="margin-top:1rem">Frame Format (8N1 — most common)</h3>
+      <div class="diag">
+IDLE ──┐   ┌── D0 ── D1 ── D2 ── D3 ── D4 ── D5 ── D6 ── D7 ──┐   ┌── IDLE
+(HIGH) │   │             8 data bits (LSB first)                 │   │ (HIGH)
+       └───┘                                                     └───┘
+       START                                                     STOP
+       bit(0)                                                    bit(1)
+      </div>
+      <ul>
+        <li><strong>Start bit:</strong> Always LOW (0) &mdash; signals beginning of frame</li>
+        <li><strong>Data bits:</strong> 5 to 9 bits, <strong>LSB first</strong> (most common: 8 bits)</li>
+        <li><strong>Parity bit (optional):</strong> Even or odd parity for error detection</li>
+        <li><strong>Stop bit(s):</strong> Always HIGH (1) &mdash; 1 or 2 stop bits</li>
+        <li><strong>IDLE state:</strong> Line is HIGH when no data is being transmitted</li>
+      </ul>
+
+      <h3 style="margin-top:1rem">Throughput Calculation</h3>
+      <div class="f">8N1 at 9600 baud:
+  Each frame = 1 start + 8 data + 1 stop = 10 bits
+  Raw rate = 9600 bits/sec
+  Effective = 9600/10 = 960 bytes/sec
+  Efficiency = 8/10 = 80%
+
+8E1 at 115200 baud:
+  Each frame = 1 start + 8 data + 1 parity + 1 stop = 11 bits
+  Effective = 115200/11 = 10,472 bytes/sec
+  Efficiency = 8/11 = 72.7%</div>
+
+      <h3 style="margin-top:1rem">Common Baud Rates</h3>
+      <p>9600, 19200, 38400, 57600, <strong>115200</strong> (most common for debug), 230400, 460800, 921600</p>
+
+      <div class="hi warn">
+        <strong>Baud rate mismatch:</strong> If devices use different baud rates, data is completely garbled. There's no error indication &mdash; you just get garbage bytes. This is the #1 debugging issue with UART. Also ensure both sides match data bits, parity, and stop bits.
+      </div>
+
+      <h3 style="margin-top:1rem">Flow Control</h3>
+      <ul>
+        <li><strong>None:</strong> Most common in embedded. Risk of buffer overflow if receiver is slower.</li>
+        <li><strong>Hardware (RTS/CTS):</strong> Extra wires. RTS = "I'm ready to receive", CTS = "You can send". Prevents overflow.</li>
+        <li><strong>Software (XON/XOFF):</strong> Special characters (0x11, 0x13) sent in-band. Can't use if data contains these values (binary data).</li>
+      </ul>
+
+      <h3 style="margin-top:1rem">RS-232 vs TTL UART</h3>
+      <table>
+        <tr><th>Parameter</th><th>TTL UART</th><th>RS-232</th></tr>
+        <tr><td>Logic 1 (Mark)</td><td>3.3V or 5V</td><td><strong>−3V to −15V</strong></td></tr>
+        <tr><td>Logic 0 (Space)</td><td>0V</td><td><strong>+3V to +15V</strong></td></tr>
+        <tr><td>Connector</td><td>Header pins</td><td>DB-9 / DB-25</td></tr>
+        <tr><td>Level shifter</td><td>None needed (MCU native)</td><td><strong>MAX232</strong> chip needed</td></tr>
+        <tr><td>Distance</td><td>~0.5m (PCB traces)</td><td>~15m</td></tr>
+      </table>
+      <p style="margin-top:0.5rem"><strong>Your usage:</strong> Debug serial output from Teensy/STM32 via USB-UART bridge (FTDI/CP2102). The USB-serial chip converts TTL UART to USB for your laptop.</p>
+    </div>
+  </div>
+
+  <!-- ── SPI Deep Dive ── -->
+  <button class="cb" onclick="tog(this)">
+    SPI &mdash; Complete Deep Dive <span class="t hot">YOUR EE309 PROJECT</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Signal Lines</h3>
+      <div class="diag">
+         Master                      Slave
+      ┌──────────┐              ┌──────────┐
+      │     SCLK ├─────────────→│ SCLK     │
+      │     MOSI ├─────────────→│ MOSI(DI) │  (Master Out, Slave In)
+      │     MISO │←─────────────┤ MISO(DO) │  (Master In, Slave Out)
+      │     CS̄   ├─────────────→│ CS̄/SS̄    │  (Chip Select, active LOW)
+      └──────────┘              └──────────┘
+
+Multiple slaves: each gets its own CS̄ line from master
+      ┌──────┐     CS̄₀ ──→ [Slave 0]
+      │Master├──── CS̄₁ ──→ [Slave 1]
+      │      │     CS̄₂ ──→ [Slave 2]
+      │      ├──── SCLK, MOSI, MISO shared by all
+      └──────┘
+      </div>
+
+      <h3 style="margin-top:1rem">Data Transfer Mechanism</h3>
+      <div class="diag">
+Master shift register          Slave shift register
+  [MSB ← ← ← LSB] ──MOSI──→ [MSB ← ← ← LSB]
+  [MSB → → → LSB] ←──MISO── [MSB → → → LSB]
+
+On each SCLK edge: master shifts out 1 bit on MOSI,
+simultaneously shifts in 1 bit from MISO.
+After 8 clocks → master and slave have EXCHANGED one byte each.
+      </div>
+      <div class="hi tip">
+        <strong>Full-duplex by nature:</strong> Even if you only want to READ, you must send 8 clocks (typically sending 0xFF as dummy). Even if you only want to WRITE, you get 8 bits back (which you can ignore). The exchange always happens simultaneously.
+      </div>
+
+      <h3 style="margin-top:1rem">SPI Clock Modes (CPOL + CPHA)</h3>
+      <table>
+        <tr><th>Mode</th><th>CPOL</th><th>CPHA</th><th>CLK Idle</th><th>Sample Edge</th><th>Shift Edge</th></tr>
+        <tr><td><strong>Mode 0</strong></td><td>0</td><td>0</td><td>LOW</td><td>Rising (1st)</td><td>Falling</td></tr>
+        <tr><td>Mode 1</td><td>0</td><td>1</td><td>LOW</td><td>Falling (2nd)</td><td>Rising</td></tr>
+        <tr><td>Mode 2</td><td>1</td><td>0</td><td>HIGH</td><td>Falling (1st)</td><td>Rising</td></tr>
+        <tr><td><strong>Mode 3</strong></td><td>1</td><td>1</td><td>HIGH</td><td>Rising (2nd)</td><td>Falling</td></tr>
+      </table>
+      <p><strong>Modes 0 and 3 are most common.</strong> Your MCP4921 DAC uses Mode 0 (CPOL=0, CPHA=0). Always check the slave's datasheet!</p>
+      <div class="f">Your EE309 SPI config: SPCON = 0x71
+  Bit 7: SPEN=1 (SPI enabled)
+  Bit 6: SSDIS=1 (SS pin disabled, using manual GPIO)
+  Bit 5: MSTR=1 (Master mode)
+  Bit 3: CPOL=0 (idle LOW)
+  Bit 2: CPHA=0 (sample on rising edge → Mode 0)
+  Bits 1-0: SPR=01 (Fosc/8 clock divider)</div>
+
+      <h3 style="margin-top:1rem">SPI Advantages &amp; Disadvantages</h3>
+      <table>
+        <tr><th>Advantages</th><th>Disadvantages</th></tr>
+        <tr><td>Fastest of all (50+ MHz possible)</td><td>More wires (4 + 1 CS per slave)</td></tr>
+        <tr><td>Full-duplex</td><td>No built-in error detection</td></tr>
+        <tr><td>No addressing overhead</td><td>No flow control</td></tr>
+        <tr><td>Simple hardware (shift registers)</td><td>Single master only (standard)</td></tr>
+        <tr><td>No pull-up resistors needed</td><td>Not scalable for many slaves (CS lines)</td></tr>
+      </table>
+
+      <h3 style="margin-top:1rem">SPI Variants</h3>
+      <ul>
+        <li><strong>Dual SPI (2-bit):</strong> MOSI and MISO both carry data in same direction → 2× throughput</li>
+        <li><strong>Quad SPI (QSPI, 4-bit):</strong> 4 data lines → 4× throughput. Common for flash memory (Winbond W25Qxx)</li>
+        <li><strong>iso-SPI:</strong> Isolated SPI with galvanic isolation &mdash; <strong>you used this in BMS!</strong> LTC6820 converts SPI to iso-SPI for daisy-chaining LTC6813 battery monitors across different voltage potentials.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── I2C Deep Dive ── -->
+  <button class="cb" onclick="tog(this)">
+    I2C &mdash; Complete Deep Dive <span class="t hot">YOUR BEST DEBUGGING STORY</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>Bus Architecture</h3>
+      <div class="diag">
+         VDD
+          │
+         [Rp]  [Rp]     ← Pull-up resistors (typically 4.7kΩ)
+          │      │
+    SDA ──┴──────┴──── Master ─── Slave 1 (0x48) ─── Slave 2 (0x50) ─── Slave 3 (0x68)
+    SCL ──┴──────┴──── Master ─── Slave 1 ─────────── Slave 2 ─────────── Slave 3
+
+    All devices have OPEN-DRAIN outputs:
+      - Can only pull line LOW (active) or release (high-Z)
+      - Pull-up resistor returns line to HIGH when released
+      - Wired-AND: if ANY device pulls LOW, line is LOW
+      </div>
+
+      <h3 style="margin-top:1rem">I2C Bus Conditions</h3>
+      <div class="diag">
+SCL:  ────────┐   ┌───┐   ┌───┐   ┌───┐   ┌────────
+              └───┘   └───┘   └───┘   └───┘
+
+SDA:  ──┐                                      ┌────
+        └── START                    STOP ──────┘
+
+START: SDA goes HIGH→LOW while SCL is HIGH
+STOP:  SDA goes LOW→HIGH while SCL is HIGH
+DATA:  SDA must be stable when SCL is HIGH
+       SDA can change only when SCL is LOW
+      </div>
+
+      <h3 style="margin-top:1rem">I2C Frame Format (7-bit addressing)</h3>
+      <div class="diag">
+│ S │ A6 │ A5 │ A4 │ A3 │ A2 │ A1 │ A0 │ R/W̄ │ ACK │ D7 │ ... │ D0 │ ACK │ P │
+│   │          7-bit address             │ 0=W │     │    8 data bits   │     │   │
+│   │                                    │ 1=R │     │                  │     │   │
+
+S = START    P = STOP    ACK = receiver pulls SDA LOW (acknowledged)
+NACK = receiver leaves SDA HIGH (not acknowledged / last byte)
+      </div>
+
+      <h3 style="margin-top:1rem">I2C Speed Modes</h3>
+      <table>
+        <tr><th>Mode</th><th>Max Speed</th><th>Pull-up</th><th>Notes</th></tr>
+        <tr><td>Standard</td><td>100 kHz</td><td>4.7 kΩ</td><td>Original spec</td></tr>
+        <tr><td>Fast</td><td>400 kHz</td><td>~2 kΩ</td><td>Most common today</td></tr>
+        <tr><td>Fast Plus</td><td>1 MHz</td><td>~1 kΩ</td><td>Higher drive strength needed</td></tr>
+        <tr><td>High Speed</td><td>3.4 MHz</td><td>Special</td><td>Requires HS master code</td></tr>
+      </table>
+
+      <h3 style="margin-top:1rem">Why Open-Drain with Pull-ups?</h3>
+      <ul>
+        <li><strong>No bus contention:</strong> If two devices drive simultaneously, line goes LOW (wired-AND) &mdash; no short circuit, no damage</li>
+        <li><strong>Multi-master arbitration:</strong> If a master sees SDA LOW when it sent HIGH, it lost arbitration → backs off gracefully</li>
+        <li><strong>Clock stretching:</strong> Slow slave holds SCL LOW to pause master &mdash; built-in flow control</li>
+      </ul>
+      <div class="f">Pull-up resistor trade-off:
+  Too large (10kΩ+) → slow rise time (RC delay with bus capacitance)
+                    → may not reach VIH before next clock edge → FAIL
+  Too small (1kΩ-)  → higher power consumption
+                    → open-drain sinks more current to pull LOW
+
+  Rule of thumb: 4.7kΩ for 100kHz, 2.2kΩ for 400kHz, 1kΩ for 1MHz
+  Max bus capacitance: 400pF (limits cable length and device count)</div>
+
+      <h3 style="margin-top:1rem">Advanced I2C Features</h3>
+      <ul>
+        <li><strong>Repeated START (Sr):</strong> START without preceding STOP. Used to change direction (write register address → read data) without releasing the bus. Prevents another master from stealing the bus between operations.</li>
+        <li><strong>10-bit addressing:</strong> Two address bytes (first byte: 11110 + A9:A8 + R/W). Allows 1024 addresses. Backwards compatible.</li>
+        <li><strong>General call (0x00):</strong> Broadcast to all slaves. Used for software reset, address programming.</li>
+        <li><strong>Clock stretching:</strong> Slave holds SCL LOW when it needs more time. Master must check SCL before proceeding. <strong>Not all masters support this!</strong></li>
+      </ul>
+
+      <div class="hi">
+        <strong>Your I2C debugging story:</strong> Two temp sensors with same hardcoded address 0x48 → both respond simultaneously → SDA corruption. Solution: TCA9543A I2C multiplexer (TI part!) creates 2 separate channels. Added TXS0102 level shifters for 3.3V↔5V translation. This story demonstrates real debugging, independent research, and hardware+software integration.
+      </div>
+
+      <h3 style="margin-top:1rem">Common I2C Issues in Practice</h3>
+      <ul>
+        <li><strong>Address conflict:</strong> Your story! Multiple devices with same address → use I2C mux or choose devices with configurable address pins</li>
+        <li><strong>Bus stuck LOW:</strong> A slave holding SDA LOW (crashed mid-transaction). Fix: toggle SCL 9+ times to complete the phantom byte, then send STOP.</li>
+        <li><strong>Missing pull-ups:</strong> Bus floats, random data. Symptoms: intermittent failures, works on short wires but not long.</li>
+        <li><strong>Level mismatch:</strong> 3.3V master + 5V slave → need level translator (TXS0102, PCA9306)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── CAN Deep Dive ── -->
+  <button class="cb" onclick="tog(this)">
+    CAN Bus &mdash; Comprehensive Theory <span class="t hot">YOUR ECU PROJECT</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <p>Covered in detail in the <strong>ECU + CAN</strong> section. Key additions here:</p>
+
+      <h3>CAN Physical Layer</h3>
+      <div class="diag">
+                      CANH ────────────────────────── CANH
+   [Node A] ─────── {twisted pair} ────────── [Node B]
+                      CANL ────────────────────────── CANL
+      │                                                   │
+    [120Ω]            ← bus termination →              [120Ω]
+
+Dominant (logic 0): CANH=3.5V, CANL=1.5V → differential = 2V
+Recessive (logic 1): CANH=CANL=2.5V → differential = 0V
+      </div>
+
+      <h3 style="margin-top:1rem">CAN Frame Format (Standard 2.0A)</h3>
+      <div class="diag">
+│SOF│  11-bit ID  │RTR│IDE│ r │  4-bit DLC  │  0-8 bytes data  │ 15-bit CRC │ACK│EOF│
+│ 1 │   Arbitration  │ 1 │ 1 │ 1 │ Data Length │ Payload (0-64B)  │  + delimit │ 2 │ 7 │
+
+SOF = Start of Frame (dominant bit)
+RTR = Remote Transmission Request (0=data, 1=remote frame)
+IDE = Identifier Extension (0=standard 11-bit, 1=extended 29-bit)
+DLC = Data Length Code (0-8 bytes in classic CAN, 0-64 in CAN FD)
+ACK = Receiving nodes drive dominant to acknowledge
+EOF = 7 recessive bits (End of Frame)
+      </div>
+
+      <h3 style="margin-top:1rem">CAN Arbitration (Non-Destructive)</h3>
+      <div class="f">Node A sends ID: 0x645 = 110 0100 0101
+Node B sends ID: 0x643 = 110 0100 0011
+
+Bit-by-bit comparison (MSB first):
+  Bit 10: A=1, B=1 → both recessive, match ✓
+  Bit 9:  A=1, B=1 → match ✓
+  Bit 8:  A=0, B=0 → match ✓
+  ...
+  Bit 1:  A=1, B=1 → match ✓
+  Bit 0:  A=1, B=0 → A sends recessive(1), B sends dominant(0)
+          → Bus reads DOMINANT → A detects mismatch, BACKS OFF
+          → B WINS (lower ID = higher priority)
+
+Node A retries on the next bus-free period. No data lost!</div>
+
+      <h3 style="margin-top:1rem">CAN Error Detection (5 mechanisms!)</h3>
+      <table>
+        <tr><th>Mechanism</th><th>How it works</th></tr>
+        <tr><td>CRC check</td><td>15-bit CRC polynomial calculated over message. Receiver computes same CRC and compares.</td></tr>
+        <tr><td>Bit stuffing</td><td>After 5 consecutive same bits, a complementary bit is inserted. Receiver removes it. Violation = error.</td></tr>
+        <tr><td>ACK check</td><td>Transmitter sends recessive ACK slot. At least one receiver must drive dominant. No ACK = error.</td></tr>
+        <tr><td>Frame check</td><td>Fixed-format fields (EOF, delimiters) must have specific values. Violation = error.</td></tr>
+        <tr><td>Bit monitoring</td><td>Transmitter reads back the bus. If sent bit ≠ bus bit (outside arbitration) = error.</td></tr>
+      </table>
+
+      <h3 style="margin-top:1rem">CAN Error States</h3>
+      <div class="f">Each node maintains two error counters: TEC (Transmit) and REC (Receive)
+
+Error Active:   TEC < 128 AND REC < 128
+  → Can transmit error frames with 6 DOMINANT bits (active error flag)
+  → Normal operation
+
+Error Passive:  TEC ≥ 128 OR REC ≥ 128
+  → Sends error frames with 6 RECESSIVE bits (passive error flag)
+  → Must wait extra time after transmitting before retrying
+  → Reduced bus impact
+
+Bus Off:        TEC ≥ 256
+  → Node disconnects from bus completely
+  → Can only recover after 128 × 11 recessive bits (takes ~1.3ms @1Mbps)
+  → Faulty node isolated automatically!</div>
+
+      <h3 style="margin-top:1rem">CAN FD (Flexible Data-rate)</h3>
+      <ul>
+        <li><strong>Data phase speed:</strong> Up to 8 Mbps (vs 1 Mbps classical) during the data field only</li>
+        <li><strong>Larger payload:</strong> Up to 64 bytes per frame (vs 8 bytes classical)</li>
+        <li><strong>Same arbitration:</strong> Uses classical CAN speed for arbitration, then switches to higher speed for data</li>
+        <li><strong>Backwards compatible:</strong> CAN FD nodes can coexist with classical CAN nodes (with limitations)</li>
+      </ul>
+
+      <p style="margin-top:0.5rem"><strong>Your experience:</strong> ECU sends torque commands at 500kbps. SN65HVD230 transceiver (TI part!). Standard CAN 2.0B frames with specific message IDs for APPS data, torque commands, and fault flags.</p>
+    </div>
+  </div>
+
+  <!-- ── RS-232/485 ── -->
+  <button class="cb" onclick="tog(this)">
+    RS-232 vs RS-485 &mdash; Industrial Serial Standards <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <table>
+        <tr><th>Parameter</th><th>RS-232</th><th>RS-422</th><th>RS-485</th></tr>
+        <tr><td>Signaling</td><td>Single-ended, bipolar</td><td>Differential</td><td>Differential</td></tr>
+        <tr><td>Voltage levels</td><td>±3V to ±15V (logic 1 = negative!)</td><td>Differential ±2V</td><td>Differential ±1.5V (min)</td></tr>
+        <tr><td>Topology</td><td>Point-to-point only</td><td>1 master, 10 slaves</td><td><strong>Multi-drop (32 nodes)</strong></td></tr>
+        <tr><td>Duplex</td><td>Full-duplex</td><td>Full-duplex</td><td>Half (2-wire) or Full (4-wire)</td></tr>
+        <tr><td>Max distance</td><td>~15m</td><td>~1200m</td><td><strong>~1200m</strong></td></tr>
+        <tr><td>Max speed</td><td>~115 kbps (practical)</td><td>10 Mbps</td><td>10 Mbps (short distance)</td></tr>
+        <tr><td>Level shifter</td><td>MAX232 (TI!)</td><td>SN75176</td><td><strong>MAX485 / SN65HVD75</strong> (TI!)</td></tr>
+        <tr><td>Application</td><td>Legacy PC serial ports</td><td>Industrial, MIDI</td><td>MODBUS, DMX512, industrial</td></tr>
+      </table>
+
+      <div class="hi">
+        <strong>Why differential is better for long distances:</strong> Both wires pick up the same noise (common-mode). The receiver takes the DIFFERENCE, canceling the noise. Single-ended signals have no noise reference, so they degrade over distance. This is why CAN and RS-485 can reach 1+ km while RS-232 maxes out at ~15m.
+      </div>
+
+      <h3 style="margin-top:1rem">RS-485 Direction Control</h3>
+      <div class="f">RS-485 is half-duplex on 2 wires: nodes share A and B lines.
+Only one node can transmit at a time!
+
+Transceiver has DE (Driver Enable) and R̄E (Receiver Enable) pins:
+  To TRANSMIT: DE=1, R̄E=1 (driver on, receiver off)
+  To RECEIVE:  DE=0, R̄E=0 (driver off, receiver on)
+
+Firmware must toggle DE/RE before and after transmission.
+Forgetting to release the bus = all other nodes blocked!</div>
+    </div>
+  </div>
+
+  <!-- ── JTAG ── -->
+  <button class="cb" onclick="tog(this)">
+    JTAG (IEEE 1149.1) &mdash; Test &amp; Debug <span class="t imp">TI USES EXTENSIVELY</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <h3>JTAG Signals</h3>
+      <table>
+        <tr><th>Signal</th><th>Direction</th><th>Purpose</th></tr>
+        <tr><td><strong>TCK</strong></td><td>In</td><td>Test Clock &mdash; synchronizes the TAP state machine</td></tr>
+        <tr><td><strong>TMS</strong></td><td>In</td><td>Test Mode Select &mdash; navigates the TAP controller state machine</td></tr>
+        <tr><td><strong>TDI</strong></td><td>In</td><td>Test Data In &mdash; serial data shifted into the device</td></tr>
+        <tr><td><strong>TDO</strong></td><td>Out</td><td>Test Data Out &mdash; serial data shifted out from the device</td></tr>
+        <tr><td>TRST (optional)</td><td>In</td><td>Test Reset &mdash; asynchronous reset of TAP controller</td></tr>
+      </table>
+
+      <h3 style="margin-top:1rem">JTAG Uses</h3>
+      <ul>
+        <li><strong>Boundary Scan:</strong> Test PCB interconnections without physical probes. Each I/O pin has a boundary scan cell. Shift in patterns → check output patterns → verify solder joints, opens, shorts.</li>
+        <li><strong>In-System Programming:</strong> Flash FPGAs, CPLDs, microcontrollers through JTAG. No need to remove chips.</li>
+        <li><strong>On-Chip Debugging:</strong> Set breakpoints, single-step, read/write memory and registers. Used by tools like Segger J-Link, TI XDS debuggers, OpenOCD.</li>
+        <li><strong>Daisy-chaining:</strong> Multiple JTAG devices on one chain. All share TCK and TMS. TDO of one connects to TDI of the next.</li>
+      </ul>
+
+      <div class="diag">
+Debugger ── TCK ──→ [Device 1] ──→ [Device 2] ──→ [Device 3]
+         ── TMS ──→ [   All share TMS and TCK   ]
+         ── TDI ──→ [Dev 1]──TDO→TDI──[Dev 2]──TDO→TDI──[Dev 3]──TDO──→ Debugger
+      </div>
+
+      <div class="hi tip">
+        <strong>TI connection:</strong> TI makes JTAG debug probes (XDS110, XDS200) for their MCUs (MSP430, C2000, Sitara). They also use boundary scan extensively in manufacturing test. If asked about testing/debugging, mention JTAG!
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Protocol Selection Guide ── -->
+  <button class="cb" onclick="tog(this)">
+    Protocol Selection Decision Guide <span class="t hot">INTERVIEW FRAMEWORK</span>
+    <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <div class="f">
+"Which protocol should I use?"
+
+Need SPEED? ──────────────────────→ SPI (50+ MHz, full-duplex)
+Need FEW WIRES + MANY DEVICES? ──→ I2C (2 wires, 128 addresses)
+Need SIMPLE 2-DEVICE LINK? ──────→ UART (no clock, no addressing overhead)
+Need NOISE IMMUNITY + AUTOMOTIVE?→ CAN (differential, error detection, arbitration)
+Need LONG DISTANCE (>100m)? ─────→ RS-485 (1200m, differential, multi-drop)
+Need CHIP TESTING/DEBUG? ────────→ JTAG (boundary scan, programming, debug)
+Need GALVANIC ISOLATION? ────────→ iso-SPI (your BMS!) or optically isolated CAN</div>
+
+      <h3 style="margin-top:1rem">Common Combinations in Real Systems</h3>
+      <ul>
+        <li><strong>Your IITB Racing car:</strong> CAN (inter-ECU communication) + I2C (local sensors) + SPI (high-speed DAC/ADC) + UART (debug)</li>
+        <li><strong>Typical TI evaluation board:</strong> SPI (flash, ADC) + I2C (EEPROM, sensors) + UART (debug console) + JTAG (programming/debug)</li>
+        <li><strong>Automotive ECU:</strong> CAN/CAN FD (vehicle bus) + SPI (internal high-speed peripherals) + LIN (low-cost body electronics)</li>
+      </ul>
+
+      <h3 style="margin-top:1rem">Baud Rate vs Bit Rate</h3>
+      <div class="hi">
+        <strong>Baud rate</strong> = symbols per second.<br>
+        <strong>Bit rate</strong> = bits per second.<br>
+        <strong>Bit rate = Baud rate × bits per symbol.</strong><br>
+        In UART/SPI/I2C: each symbol = 1 bit → baud rate = bit rate.<br>
+        In QAM/PSK modulation: 16-QAM at 1000 baud = 4000 bps (4 bits/symbol).
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Quick-Fire Protocol Q&A ── -->
+  <div class="c" style="margin-top:1.5rem">
+    <h3>Quick-Fire Interview Q&amp;A <span class="t hot">RAPID REVIEW</span></h3>
+  </div>
+  <div class="qa">
+    <div class="q">Q: What happens if you forget pull-up resistors on I2C?</div>
+    <div class="a">The bus lines float at indeterminate voltages since all I2C outputs are open-drain. Communication is completely unreliable &mdash; you'll see random ACK/NACK, corrupted data, or no communication at all. The lines might work intermittently due to parasitic capacitance, which makes it extra confusing to debug.</div>
+  </div>
+  <div class="qa">
+    <div class="q">Q: Can you put SPI and I2C devices on the same bus?</div>
+    <div class="a"><strong>No.</strong> They are completely different protocols with different electrical characteristics. SPI uses push-pull drivers; I2C uses open-drain. SPI has no addressing; I2C uses addresses. They need separate buses. However, a single microcontroller can have both an SPI peripheral and an I2C peripheral, talking to different devices on different pins.</div>
+  </div>
+  <div class="qa">
+    <div class="q">Q: Why does CAN need 120Ω termination?</div>
+    <div class="a">The CAN bus is a transmission line. Without termination matching the cable's characteristic impedance (~120Ω), signals reflect off the open ends, causing interference and bit errors. Two 120Ω resistors at each end of the bus (total 60Ω between CANH and CANL) absorb the signal energy. You can verify with a multimeter: measure resistance between CANH and CANL &mdash; should read ~60Ω with both terminators present.</div>
+  </div>
+  <div class="qa">
+    <div class="q">Q: SPI has no error detection. How do you ensure data integrity?</div>
+    <div class="a">Add software-level CRC to your SPI transactions. Some SPI devices (like SD cards) include CRC in their protocol. You can also read-back-verify: write a value, then read it back and compare. For critical systems, use hamming codes or duplicate messages. Alternatively, choose a protocol with built-in error detection (CAN, I2C ACK) if reliability is paramount.</div>
+  </div>
+  <div class="qa">
+    <div class="q">Q: What is the maximum number of I2C devices you can connect?</div>
+    <div class="a">Theoretically 128 (7-bit addressing: 2<sup>7</sup> = 128, minus reserved addresses ≈ 112 usable). Practically limited by <strong>bus capacitance</strong> (max 400pF). Each device and wire adds capacitance. With 20+ devices and long wires, you may exceed 400pF, requiring I2C bus expanders or buffers (like PCA9600). With 10-bit addressing: up to 1024 devices.</div>
+  </div>
+  <div class="qa">
+    <div class="q">Q: How is CAN different from I2C at the physical level?</div>
+    <div class="a"><strong>CAN</strong>: Differential signaling (CANH-CANL), works over long distances (40m+), noise-immune, 120Ω termination, dominant/recessive bus states. <strong>I2C</strong>: Single-ended open-drain with pull-ups, short distances only (<1m), susceptible to noise, wired-AND bus logic. CAN is designed for hostile automotive environments; I2C is for short PCB-level connections.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ CONTROL SYSTEMS ═══════════════════ -->
+<div class="sec" id="ctrl">
+  <h1>Control Systems</h1>
+  <p class="sub">Summer of Science + Self-Balancing Bot + Torque Vectoring PID</p>
+
+  <button class="cb" onclick="tog(this)">
+    PID Controller &mdash; Complete Theory <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <div class="f">u(t) = Kp·e(t) + Ki·∫e(t)dt + Kd·de(t)/dt
+
+Transfer function: C(s) = Kp + Ki/s + Kd·s = (Kd·s² + Kp·s + Ki) / s</div>
+      <table>
+        <tr><th>Term</th><th>Effect</th><th>↑ Gain → </th><th>Trade-off</th></tr>
+        <tr><td>P</td><td>Proportional to current error</td><td>Faster response</td><td>More overshoot, never zero steady-state error</td></tr>
+        <tr><td>I</td><td>Accumulates past error</td><td>Eliminates steady-state error</td><td>Can cause oscillations, integral windup</td></tr>
+        <tr><td>D</td><td>Reacts to rate of change</td><td>Reduces overshoot, dampens</td><td>Amplifies noise, can cause instability</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    PID vs LQR (from your self-balancing bot) <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <table>
+        <tr><th>Aspect</th><th>PID</th><th>LQR</th></tr>
+        <tr><td>Design method</td><td>Heuristic tuning (Ziegler-Nichols, manual)</td><td>Optimal control theory (minimizes cost function)</td></tr>
+        <tr><td>MIMO systems</td><td>Needs multiple loops, complex interactions</td><td>Handles naturally (state-space)</td></tr>
+        <tr><td>Model needed?</td><td>No (can tune experimentally)</td><td>Yes (needs accurate state-space model)</td></tr>
+        <tr><td>Optimality</td><td>Not guaranteed</td><td>Optimal for given Q and R matrices</td></tr>
+        <tr><td>Ease</td><td>Simple to implement and understand</td><td>Requires linear algebra, Riccati equation</td></tr>
+      </table>
+      <p style="margin-top:0.5rem"><strong>Your experience:</strong> You compared both on a self-balancing bot (inverted pendulum) in Simulink. PID was simpler but required careful tuning. LQR gave better performance once you had an accurate model.</p>
+    </div>
+  </div>
+
+  <button class="cb" onclick="tog(this)">
+    Stability Analysis Methods <span class="ar">&#9654;</span>
+  </button>
+  <div class="cbd">
+    <div class="c">
+      <ul>
+        <li><strong>Routh-Hurwitz criterion:</strong> Algebraic test using coefficients of characteristic polynomial. All first-column elements must be positive for stability. Quick check without finding actual poles.</li>
+        <li><strong>Root locus:</strong> Graphical plot of pole locations as gain varies. Stable if all poles stay in left half-plane.</li>
+        <li><strong>Bode plot:</strong> Gain and phase vs frequency. Stable if gain margin > 0 dB and phase margin > 0° (typically want PM > 45° for robustness).</li>
+        <li><strong>Pole-zero analysis:</strong> System stable iff all poles have negative real parts.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ PERSONAL QUESTIONS ═══════════════════ -->
+<div class="sec" id="personal">
+  <h1>Personal / HR Questions</h1>
+  <p class="sub">"Be honest — if you try to frame, it's clearly visible" — Senior advice</p>
+
+  <div class="c" style="border-color:var(--yel)">
+    <h3><span class="t imp">PRINCIPLE</span> Authenticity wins</h3>
+    <p>TI interviewers specifically check for genuine answers. They've seen hundreds of rehearsed responses. The ones who stand out are honest and specific.</p>
+  </div>
+
+  <div class="qa">
+    <div class="q">Q: Tell me about yourself (60-90 sec)</div>
+    <div class="a"><strong>Draft:</strong> "I'm Vedika, a second-year Electrical Engineering student at IIT Bombay with a CS minor. I'm drawn to embedded systems and hardware design. At IITB Racing, I developed ECU firmware for our electric race car &mdash; writing safety-critical code on Teensy that communicates with motor controllers over CAN bus, and I designed a sensor testing PCB in KiCad where I solved an I2C address conflict using a TCA9543A multiplexer. I've also explored analog computation, building an analog computer in LTspice that solves differential equations using op-amp circuits. What excites me about TI is that your work in analog semiconductors and embedded processors directly maps to what I love building."</div>
+  </div>
+
+  <div class="qa">
+    <div class="q">Q: Why TI? Why WiSH specifically?</div>
+    <div class="a">"TI is the world leader in analog semiconductors, and I've actually used TI parts in my projects &mdash; the SN65HVD230 CAN transceiver on our dashboard PCB, the TCA9543A I2C mux and INA333 instrumentation amps on my sensor PCB. Working at TI would let me understand how these chips are designed from the inside, not just how to use them. WiSH specifically excites me because it focuses on semiconductor hardware, which is exactly where my interests lie."<br><br><em>(Mentioning specific TI part numbers from YOUR projects is a power move.)</em></div>
+  </div>
+
+  <div class="qa">
+    <div class="q">Q: What book are you reading right now?</div>
+    <div class="a">Be honest. If it's Sedra/Smith or Art of Electronics, great. If it's fiction, that's fine too. Just have a genuine 30-second answer about what you find interesting in it.</div>
+  </div>
+
+  <div class="qa">
+    <div class="q">Q: Who is your favorite scientist?</div>
+    <div class="a">Pick someone you genuinely admire and can speak about for 1-2 minutes. Have a specific reason tied to your interests. E.g., Nikola Tesla (AC power &mdash; connects to your Power Engineering courses), Richard Feynman (first-principles thinking &mdash; connects to how you modeled vehicle dynamics from scratch), Claude Shannon (information theory &mdash; connects to your signals/digital work).</div>
+  </div>
+
+  <div class="qa">
+    <div class="q">Q: What is the best invention in history?</div>
+    <div class="a">No right answer. Strong EE-connected picks: The transistor (enabled all modern computing), the electric motor (powers your race car!), the printing press, the internet. What matters is your reasoning, not the answer.</div>
+  </div>
+
+  <div class="qa">
+    <div class="q">Q: What's the hardest challenge you've faced?</div>
+    <div class="a"><strong>Your I2C story:</strong> Two identical temperature sensors with same hardcoded address on one bus. Diagnosed the issue (both responding simultaneously, corrupting data). Researched solutions independently. Selected the TCA9543A I2C mux, redesigned the PCB schematic, added level shifters, wrote channel-selection firmware. Shows: systematic debugging, independent research, hardware+software solution, full design lifecycle ownership.</div>
+  </div>
+
+  <div class="qa">
+    <div class="q">Q: Any questions for us?</div>
+    <div class="a">Always have 2-3 ready:
+      <ul>
+        <li>"What kind of projects do WiSH interns typically work on? Would it be more analog design, digital verification, or embedded?"</li>
+        <li>"What tools would I be using day-to-day? Cadence, Synopsys, TI's internal tools?"</li>
+        <li>"I used several TI parts in my racing projects. How does the team here approach designing chips like the SN65HVD230?"</li>
+        <li>"What distinguishes the interns who receive PPOs from those who don't?"</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MOCK INTERVIEW ═══════════════════ -->
+<div class="sec" id="mock">
+  <h1>Mock Interview (30 min)</h1>
+  <p class="sub">Practice answering out loud &mdash; not in your head</p>
+
+  <div class="tmr">
+    <div class="tmr-d" id="timer">30:00</div>
+    <button class="tmr-b go" onclick="startT()">Start</button>
+    <button class="tmr-b rs" onclick="resetT()">Reset</button>
+    <span style="color:var(--dim);font-size:0.8rem">Simulate the 30-minute interview</span>
+  </div>
+
+  <div class="c" style="border-color:var(--org)">
+    <h3>Expected Flow</h3>
+    <ul>
+      <li><strong>0-3 min:</strong> Tell me about yourself</li>
+      <li><strong>3-8 min:</strong> Personal questions (book, scientist, invention)</li>
+      <li><strong>8-18 min:</strong> Resume deep-dive (expect CAN bus, I2C, PCB, torque vectoring)</li>
+      <li><strong>18-26 min:</strong> Technical fundamentals (MOSFET regions, RC circuits, filters)</li>
+      <li><strong>26-28 min:</strong> Circuit problem (identify filter type, sketch output)</li>
+      <li><strong>28-30 min:</strong> Your questions for them</li>
+    </ul>
+  </div>
+
+  <h3 style="margin:1.5rem 0 1rem">Practice Questions</h3>
+
+  <button class="cb" onclick="tog(this)">Q1: Tell me about yourself. <span class="ar">&#9654;</span></button>
+  <div class="cbd"><div class="c"><p>60-90 seconds. Name → branch → what excites you → one highlight project → why TI. See Personal Qs tab for draft.</p></div></div>
+
+  <button class="cb" onclick="tog(this)">Q2: Explain your ECU firmware. What happens when the driver presses the pedal? <span class="ar">&#9654;</span></button>
+  <div class="cbd"><div class="c"><p>Cover: dual APPS sensors → normalization → safety checks (T11.8) → torque calculation → CAN frame to motor controllers. See ECU tab for full answer.</p></div></div>
+
+  <button class="cb" onclick="tog(this)">Q3: What is CAN bus and why did you use it? <span class="ar">&#9654;</span></button>
+  <div class="cbd"><div class="c"><p>Differential signaling, multi-node, error detection, priority arbitration. Better than I2C/SPI for automotive noise/distance. Mention SN65HVD230 transceiver (TI part!).</p></div></div>
+
+  <button class="cb" onclick="tog(this)">Q4: Explain the I2C bus conflict you solved. <span class="ar">&#9654;</span></button>
+  <div class="cbd"><div class="c"><p>Two identical sensors → same address → data corruption → TCA9543A mux → channel selection firmware. Your best "challenge" story. See PCB tab.</p></div></div>
+
+  <button class="cb" onclick="tog(this)">Q5: Draw the structure of an NMOS and explain how it works. <span class="ar">&#9654;</span></button>
+  <div class="cbd"><div class="c"><p>p-substrate, n+ source/drain, gate oxide, channel forms at V_GS > V_th. Three regions: cutoff, linear, saturation. See MOSFET tab.</p></div></div>
+
+  <button class="cb" onclick="tog(this)">Q6: MOSFET vs BJT &mdash; key differences? <span class="ar">&#9654;</span></button>
+  <div class="cbd"><div class="c"><p>Voltage vs current controlled, unipolar vs bipolar, input impedance, switching speed, where each is used. Mention TI uses both.</p></div></div>
+
+  <button class="cb" onclick="tog(this)">Q7: Square wave into RC circuit &mdash; draw V across capacitor. <span class="ar">&#9654;</span></button>
+  <div class="cbd"><div class="c"><p>Ask/state T vs RC assumption. Three cases: T>>τ (square-ish), T≈τ (exponentials), T<<τ (DC average). This IS low-pass filtering. See RC tab.</p></div></div>
+
+  <button class="cb" onclick="tog(this)">Q8: Identify this circuit [R series, C to ground]. What filter? <span class="ar">&#9654;</span></button>
+  <div class="cbd"><div class="c"><p>Low-pass filter. At DC, cap is open → V_out = V_in. At high freq, cap is short → V_out = 0. f_c = 1/(2πRC). -20 dB/decade.</p></div></div>
+
+  <button class="cb" onclick="tog(this)">Q9: Explain your torque vectoring PID system. <span class="ar">&#9654;</span></button>
+  <div class="cbd"><div class="c"><p>3-DOF model, desired vs actual yaw rate, PID computes torque difference, split between left/right motors. Tuned in Simulink, Embedded Coder to STM32. See Torque Vectoring tab.</p></div></div>
+
+  <button class="cb" onclick="tog(this)">Q10: What is your favorite scientist / best invention? <span class="ar">&#9654;</span></button>
+  <div class="cbd"><div class="c"><p>Be genuine. Have specific reasoning. Connect to your interests if natural. 60-90 seconds max.</p></div></div>
+</div>
+
+<script>
+function go(id){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  event.target.classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function tog(btn){
+  btn.classList.toggle('op');
+  btn.nextElementSibling.classList.toggle('op');
+}
+
+let tI=null,tL=1800;
+function updT(){
+  const m=Math.floor(tL/60),s=tL%60;
+  document.getElementById('timer').textContent=m.toString().padStart(2,'0')+':'+s.toString().padStart(2,'0');
+  if(tL<=300)document.getElementById('timer').style.color='var(--red)';
+}
+function startT(){if(tI)return;tI=setInterval(()=>{if(tL<=0){clearInterval(tI);tI=null;return}tL--;updT()},1000)}
+function resetT(){clearInterval(tI);tI=null;tL=1800;document.getElementById('timer').style.color='var(--ti-red)';updT()}
+</script>
+
+</body>
+</html>
