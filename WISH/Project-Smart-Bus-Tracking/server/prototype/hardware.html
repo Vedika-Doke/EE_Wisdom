@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>WISH — Hardware</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --panel-2: #1f2630;
+    --text: #e6edf3; --muted: #8b949e;
+    --ti: #cc0000;
+    --pcb: #0a3a1f;
+    --teal: #4ec9b0; --blue: #58a6ff; --gold: #d8a657;
+    --pink: #d3869b; --purple: #b794f6;
+    --power: #f85149; --ground: #444; --signal: #58a6ff;
+    --border: #30363d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; min-height: 100%; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); }
+
+  header { position: sticky; top: 0; background: rgba(13,17,23,0.9); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; z-index: 50; }
+  header h1 { font-size: 14px; margin: 0; font-weight: 600; }
+  header .links a { color: var(--muted); font-size: 12px; margin-left: 14px; text-decoration: none; }
+  header .links a:hover { color: var(--teal); }
+
+  .hero { padding: 40px 60px 20px; max-width: 1400px; margin: 0 auto; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; background: rgba(204,0,0,0.15); color: var(--ti); margin-bottom: 10px; }
+  .hero h2 { font-size: 36px; margin: 0 0 10px; letter-spacing: -0.5px; }
+  .hero p { font-size: 15px; color: var(--muted); max-width: 760px; line-height: 1.55; margin: 0; }
+
+  section { padding: 30px 60px; max-width: 1400px; margin: 0 auto; }
+  h3.section-h { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin: 0 0 16px; font-weight: 600; }
+
+  /* Block schematic */
+  .schematic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .schematic svg { width: 100%; height: auto; max-height: 560px; display: block; }
+
+  /* Breadboard */
+  .breadboard-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .breadboard-wrap svg { width: 100%; height: auto; display: block; }
+
+  /* Parts table */
+  .grid-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
+  @media (max-width: 1000px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  table.parts { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.parts th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--border); font-weight: 600; }
+  table.parts td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.parts tr.ti td { background: rgba(204,0,0,0.04); }
+  table.parts .role { font-weight: 600; }
+  table.parts .part { font-family: 'SF Mono', Menlo, monospace; font-size: 12px; color: var(--ti); font-weight: 600; }
+  table.parts .part.nonti { color: var(--muted); }
+  table.parts .why { color: var(--muted); font-size: 12px; line-height: 1.5; }
+  table.parts .cost { font-family: 'SF Mono', monospace; text-align: right; font-size: 12px; color: var(--text); }
+
+  .bom { background: var(--panel-2); padding: 18px 20px; border-radius: 10px; border: 1px solid var(--border); }
+  .bom h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin: 0 0 12px; }
+  .bom .row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
+  .bom .total { font-size: 18px; font-weight: 600; padding-top: 10px; border-top: 1px solid var(--border); margin-top: 8px; color: var(--teal); }
+
+  .footnote { font-size: 11px; color: var(--muted); margin-top: 14px; font-style: italic; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>WISH · Hardware</h1>
+  <div class="links">
+    <a href="story.html">← Story</a>
+    <a href="end_to_end.html">→ Live system</a>
+    <a href="simulator.html">→ Engine deep-dive</a>
+  </div>
+</header>
+
+<div class="hero">
+  <span class="tag">Slides 5 & 6 · Bread-board model + TI parts</span>
+  <h2>The device that rides on every bus.</h2>
+  <p>A small board with a GPS receiver, a 2G/GSM modem, and a TI microcontroller. Runs off the bus's own 12 V battery. Sends one 80-byte packet every 25 seconds. Bench-prototyped on a 2 × 4 breadboard with three TI ICs at its core.</p>
+</div>
+
+<!-- ================== BLOCK SCHEMATIC ================== -->
+<section>
+  <h3 class="section-h">Block-level schematic</h3>
+  <div class="schematic">
+    <svg viewBox="0 0 1300 520" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b949e" />
+        </marker>
+        <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#f85149" />
+        </marker>
+      </defs>
+
+      <!-- ===== TOP ROW: LDO + GPS + Antenna ===== -->
+      <!-- TPS7A0533 LDO (TI, top-left of centre) -->
+      <g transform="translate(420, 60)">
+        <rect x="0" y="0" width="160" height="80" rx="8" fill="#3a0a0a" stroke="#cc0000" stroke-width="2.5" />
+        <text x="80" y="22" text-anchor="middle" font-size="10" fill="#cc0000" font-weight="700">TI · LDO</text>
+        <text x="80" y="44" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">TPS7A0533</text>
+        <text x="80" y="62" text-anchor="middle" font-size="10" fill="#8b949e">5 V → 3.3 V (clean)</text>
+      </g>
+
+      <!-- GPS NEO-6M top right -->
+      <g transform="translate(900, 60)">
+        <rect x="0" y="0" width="180" height="80" rx="8" fill="#1f2630" stroke="#4ec9b0" stroke-width="2" />
+        <text x="90" y="20" text-anchor="middle" font-size="10" fill="#4ec9b0" font-weight="700">GPS RECEIVER</text>
+        <text x="90" y="44" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">u-blox NEO-6M</text>
+        <text x="90" y="62" text-anchor="middle" font-size="10" fill="#8b949e">lat/lon @ 1 Hz · UART</text>
+      </g>
+
+      <!-- GPS antenna (far right top) -->
+      <g transform="translate(1140, 60)">
+        <line x1="0" y1="40" x2="0" y2="0" stroke="#4ec9b0" stroke-width="2" />
+        <circle cx="0" cy="0" r="7" fill="#4ec9b0" />
+        <text x="14" y="14" font-size="10" fill="#4ec9b0">active</text>
+        <text x="14" y="28" font-size="10" fill="#4ec9b0">GPS antenna</text>
+      </g>
+      <line x1="1080" y1="100" x2="1140" y2="100" stroke="#4ec9b0" stroke-width="1.5" />
+
+      <!-- ===== MIDDLE ROW: Battery → Buck → MCU → SIM800L ===== -->
+      <!-- 12V battery -->
+      <g transform="translate(40, 230)">
+        <rect x="0" y="0" width="120" height="60" rx="6" fill="#1f2630" stroke="#f85149" stroke-width="2" />
+        <text x="60" y="26" text-anchor="middle" font-size="12" fill="#f85149" font-weight="700">12 V</text>
+        <text x="60" y="44" text-anchor="middle" font-size="11" fill="#8b949e">bus battery</text>
+      </g>
+
+      <!-- TPS54302 buck (TI) -->
+      <g transform="translate(220, 210)">
+        <rect x="0" y="0" width="160" height="100" rx="8" fill="#3a0a0a" stroke="#cc0000" stroke-width="2.5" />
+        <text x="80" y="22" text-anchor="middle" font-size="10" fill="#cc0000" font-weight="700">TI · POWER</text>
+        <text x="80" y="46" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">TPS54302</text>
+        <text x="80" y="64" text-anchor="middle" font-size="11" fill="#fff">3 A buck converter</text>
+        <text x="80" y="82" text-anchor="middle" font-size="10" fill="#8b949e">12 V → 5 V</text>
+      </g>
+      <!-- 12V → buck arrow -->
+      <line x1="160" y1="260" x2="220" y2="260" stroke="#f85149" stroke-width="2.5" marker-end="url(#arrow-red)" />
+      <text x="190" y="252" text-anchor="middle" font-size="10" fill="#f85149">12 V</text>
+
+      <!-- 5V branch up from buck to LDO -->
+      <polyline points="380,230 410,230 410,100 420,100" stroke="#f85149" stroke-width="2" fill="none" />
+      <text x="416" y="170" font-size="10" fill="#f85149">5 V</text>
+
+      <!-- MSP430 MCU center -->
+      <g transform="translate(620, 210)">
+        <rect x="0" y="0" width="220" height="140" rx="10" fill="#3a0a0a" stroke="#cc0000" stroke-width="3" />
+        <text x="110" y="24" text-anchor="middle" font-size="11" fill="#cc0000" font-weight="700">TI · MCU</text>
+        <text x="110" y="54" text-anchor="middle" font-size="20" fill="#fff" font-weight="700">MSP430</text>
+        <text x="110" y="76" text-anchor="middle" font-size="14" fill="#fff">FR5969</text>
+        <text x="110" y="98" text-anchor="middle" font-size="10" fill="#8b949e">ultra-low power · FRAM</text>
+        <text x="110" y="114" text-anchor="middle" font-size="10" fill="#8b949e">2× UART · 12-bit ADC</text>
+        <text x="110" y="130" text-anchor="middle" font-size="10" fill="#8b949e">runs the show</text>
+      </g>
+      <!-- 3.3V from LDO down to MCU -->
+      <polyline points="500,140 500,220 620,220" stroke="#f85149" stroke-width="2" fill="none" />
+      <text x="510" y="160" font-size="10" fill="#f85149">3.3 V</text>
+
+      <!-- MCU ↔ GPS UART0 -->
+      <polyline points="840,240 870,240 870,140 900,140" stroke="#58a6ff" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+      <text x="876" y="195" font-size="10" fill="#58a6ff">UART0</text>
+
+      <!-- SIM800L bottom right (same row as MCU but shifted right) -->
+      <g transform="translate(900, 230)">
+        <rect x="0" y="0" width="180" height="100" rx="8" fill="#1f2630" stroke="#b794f6" stroke-width="2" />
+        <text x="90" y="22" text-anchor="middle" font-size="10" fill="#b794f6" font-weight="700">2G GSM MODEM</text>
+        <text x="90" y="48" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">SIM800L</text>
+        <text x="90" y="68" text-anchor="middle" font-size="10" fill="#8b949e">TCP packet send</text>
+        <text x="90" y="84" text-anchor="middle" font-size="10" fill="#8b949e">SIM slot · ~2 A bursts</text>
+      </g>
+      <!-- MCU ↔ SIM800L UART1 -->
+      <line x1="840" y1="290" x2="900" y2="290" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow)" />
+      <text x="870" y="282" text-anchor="middle" font-size="10" fill="#58a6ff">UART1</text>
+
+      <!-- 5V high-current branch: buck → route under everything → up to SIM800L -->
+      <polyline points="300,310 300,420 990,420 990,330" stroke="#f85149" stroke-width="2" fill="none" />
+      <text x="510" y="436" font-size="10" fill="#f85149">5 V (high-current branch — feeds the GSM modem's bursts)</text>
+
+      <!-- ===== BOTTOM: GPIO panel (within MCU x-range only) ===== -->
+      <line x1="700" y1="350" x2="700" y2="370" stroke="#56d364" stroke-width="1.5" />
+      <circle cx="700" cy="382" r="9" fill="none" stroke="#56d364" stroke-width="2" />
+      <text x="716" y="386" font-size="10" fill="#56d364">status LED</text>
+
+      <line x1="800" y1="350" x2="800" y2="370" stroke="#e3b341" stroke-width="1.5" />
+      <rect x="775" y="370" width="50" height="22" rx="3" fill="#1f2630" stroke="#e3b341" stroke-width="2" />
+      <text x="800" y="385" text-anchor="middle" font-size="9" fill="#e3b341" font-weight="700">PANIC</text>
+
+      <text x="700" y="414" font-size="9" fill="#8b949e" font-style="italic">panic button buffered via TI TLV9001 op-amp before reaching MCU GPIO</text>
+
+      <!-- ===== Legend (bottom) ===== -->
+      <g transform="translate(40, 490)">
+        <line x1="0" y1="0" x2="30" y2="0" stroke="#f85149" stroke-width="2.5" /><text x="38" y="4" font-size="11" fill="#8b949e">power rail</text>
+        <line x1="140" y1="0" x2="170" y2="0" stroke="#58a6ff" stroke-width="2" /><text x="178" y="4" font-size="11" fill="#8b949e">serial / signal</text>
+        <line x1="290" y1="0" x2="320" y2="0" stroke="#4ec9b0" stroke-width="2" /><text x="328" y="4" font-size="11" fill="#8b949e">RF antenna</text>
+        <rect x="440" y="-6" width="14" height="10" fill="#3a0a0a" stroke="#cc0000" stroke-width="2" /><text x="460" y="4" font-size="11" fill="#cc0000" font-weight="700">TI silicon</text>
+      </g>
+    </svg>
+  </div>
+  <p class="footnote">Bus's 12 V hits the TI buck converter, drops to 5 V for the GSM modem (which needs the current), and gets cleaned further to 3.3 V by a TI LDO for the MCU and GPS receiver. The MSP430 reads GPS over one UART, pushes the packet over the other UART to the modem.</p>
+</section>
+
+<!-- ================== BREADBOARD PHOTO MOCKUP ================== -->
+<section>
+  <h3 class="section-h">Bread-board photo mock-up</h3>
+  <div class="breadboard-wrap">
+    <svg viewBox="0 0 1300 460" preserveAspectRatio="xMidYMid meet">
+      <!-- breadboard body -->
+      <rect x="40" y="40" width="1220" height="380" rx="10" fill="#eee8d5" stroke="#a39880" stroke-width="2" />
+      <!-- top power rail -->
+      <rect x="40" y="40" width="1220" height="34" fill="#e1dac0" />
+      <line x1="40" y1="56" x2="1260" y2="56" stroke="#f85149" stroke-width="1.5" />
+      <line x1="40" y1="68" x2="1260" y2="68" stroke="#444" stroke-width="1.5" />
+      <text x="50" y="55" font-size="9" fill="#f85149" font-family="monospace">+</text>
+      <text x="50" y="67" font-size="9" fill="#444" font-family="monospace">−</text>
+      <!-- bottom power rail -->
+      <rect x="40" y="386" width="1220" height="34" fill="#e1dac0" />
+      <line x1="40" y1="396" x2="1260" y2="396" stroke="#f85149" stroke-width="1.5" />
+      <line x1="40" y1="408" x2="1260" y2="408" stroke="#444" stroke-width="1.5" />
+      <text x="50" y="395" font-size="9" fill="#f85149" font-family="monospace">+</text>
+      <text x="50" y="407" font-size="9" fill="#444" font-family="monospace">−</text>
+      <!-- center channel -->
+      <rect x="40" y="222" width="1220" height="16" fill="#d4cdb0" />
+
+      <!-- breadboard holes (decorative dots) -->
+      <g fill="#b3a988">
+        <!-- top half holes -->
+        <g>
+          <circle cx="80" cy="100" r="1.5" /><circle cx="100" cy="100" r="1.5" /><circle cx="120" cy="100" r="1.5" />
+        </g>
+      </g>
+      <!-- pattern of holes (we'll skip drawing all to keep file size sane; rely on component placement) -->
+
+      <!-- MSP430 LaunchPad (centre-left, large) -->
+      <g transform="translate(420, 130)">
+        <rect x="0" y="0" width="220" height="200" rx="6" fill="#cc0000" stroke="#7a0000" stroke-width="2" />
+        <text x="110" y="22" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">TI LaunchPad</text>
+        <text x="110" y="42" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">MSP-EXP430FR5969</text>
+        <!-- IC outline -->
+        <rect x="50" y="60" width="120" height="60" rx="3" fill="#1a1a1a" />
+        <text x="110" y="86" text-anchor="middle" font-size="9" fill="#fff" font-family="monospace">MSP430FR5969</text>
+        <text x="110" y="100" text-anchor="middle" font-size="8" fill="#888" font-family="monospace">16 MHz · 64 KB FRAM</text>
+        <!-- USB micro for programming -->
+        <rect x="92" y="130" width="36" height="16" rx="2" fill="#666" />
+        <text x="110" y="142" text-anchor="middle" font-size="7" fill="#fff">USB</text>
+        <!-- pin headers -->
+        <g fill="#888">
+          <rect x="10" y="60" width="6" height="80" /><rect x="204" y="60" width="6" height="80" />
+        </g>
+        <!-- pin labels — inside red area, dark text on cream/red transitions handled by background -->
+        <text x="22" y="72" font-size="8" fill="#fff" text-anchor="start">3V3</text>
+        <text x="22" y="84" font-size="8" fill="#fff" text-anchor="start">GND</text>
+        <text x="22" y="96" font-size="8" fill="#fff" text-anchor="start">P3.4 TX</text>
+        <text x="22" y="108" font-size="8" fill="#fff" text-anchor="start">P3.5 RX</text>
+        <text x="198" y="72" font-size="8" fill="#fff" text-anchor="end">P2.5 TX</text>
+        <text x="198" y="84" font-size="8" fill="#fff" text-anchor="end">P2.6 RX</text>
+        <text x="198" y="96" font-size="8" fill="#fff" text-anchor="end">P1.0 LED</text>
+        <text x="198" y="108" font-size="8" fill="#fff" text-anchor="end">P1.1 BTN</text>
+        <text x="110" y="174" text-anchor="middle" font-size="9" fill="#fff">programming via USB</text>
+        <text x="110" y="188" text-anchor="middle" font-size="9" fill="#fff">Code Composer Studio</text>
+      </g>
+
+      <!-- NEO-6M GPS module (top right) -->
+      <g transform="translate(720, 88)">
+        <rect x="0" y="0" width="160" height="110" rx="4" fill="#1a4a2a" stroke="#0a2a1a" stroke-width="2" />
+        <text x="80" y="20" text-anchor="middle" font-size="10" fill="#56d364" font-weight="700">u-blox NEO-6M</text>
+        <text x="80" y="34" text-anchor="middle" font-size="8" fill="#56d364">GPS breakout</text>
+        <!-- antenna patch on top -->
+        <rect x="20" y="40" width="60" height="40" fill="#d8a657" stroke="#5a3a1f" />
+        <text x="50" y="64" text-anchor="middle" font-size="8" font-weight="700" fill="#000">ANT</text>
+        <!-- IC -->
+        <rect x="92" y="46" width="48" height="32" fill="#0a0a0a" />
+        <text x="116" y="66" text-anchor="middle" font-size="6" fill="#fff" font-family="monospace">NEO-6</text>
+        <!-- pin headers -->
+        <g fill="#888"><rect x="10" y="90" width="140" height="6" /></g>
+        <text x="80" y="106" text-anchor="middle" font-size="9" fill="#fff" font-family="monospace">VCC · GND · TX · RX</text>
+      </g>
+
+      <!-- SIM800L module (bottom right) -->
+      <g transform="translate(720, 280)">
+        <rect x="0" y="0" width="160" height="100" rx="4" fill="#3a1a4a" stroke="#1a0a2a" stroke-width="2" />
+        <text x="80" y="20" text-anchor="middle" font-size="10" fill="#b794f6" font-weight="700">SIM800L</text>
+        <text x="80" y="34" text-anchor="middle" font-size="8" fill="#b794f6">2G / GPRS modem</text>
+        <!-- IC -->
+        <rect x="20" y="44" width="50" height="34" fill="#0a0a0a" />
+        <text x="45" y="65" text-anchor="middle" font-size="6" fill="#fff" font-family="monospace">SIM800</text>
+        <!-- SIM slot -->
+        <rect x="80" y="44" width="60" height="34" fill="#d8a657" stroke="#5a3a1f" />
+        <text x="110" y="65" text-anchor="middle" font-size="8" font-weight="700" fill="#000">SIM</text>
+        <!-- pin headers -->
+        <g fill="#888"><rect x="10" y="84" width="140" height="6" /></g>
+        <text x="80" y="100" text-anchor="middle" font-size="9" fill="#fff" font-family="monospace">VCC · GND · TX · RX</text>
+      </g>
+
+      <!-- TPS54302 buck breakout (top-left) -->
+      <g transform="translate(120, 100)">
+        <rect x="0" y="0" width="170" height="80" rx="4" fill="#3a0a0a" stroke="#7a0000" stroke-width="2" />
+        <text x="85" y="20" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">TI TPS54302</text>
+        <text x="85" y="34" text-anchor="middle" font-size="8" fill="#fff">eval module · 12V→5V</text>
+        <!-- IC -->
+        <rect x="60" y="42" width="50" height="22" fill="#0a0a0a" />
+        <text x="85" y="58" text-anchor="middle" font-size="7" fill="#fff" font-family="monospace">SOT-23</text>
+        <!-- pins -->
+        <text x="85" y="78" text-anchor="middle" font-size="9" fill="#fff" font-family="monospace">VIN · VOUT · GND</text>
+      </g>
+
+      <!-- TPS7A0533 LDO (bottom-left) -->
+      <g transform="translate(120, 270)">
+        <rect x="0" y="0" width="170" height="80" rx="4" fill="#3a0a0a" stroke="#7a0000" stroke-width="2" />
+        <text x="85" y="20" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">TI TPS7A0533</text>
+        <text x="85" y="34" text-anchor="middle" font-size="8" fill="#fff">LDO · 5V → 3.3V</text>
+        <rect x="60" y="42" width="50" height="22" fill="#0a0a0a" />
+        <text x="85" y="58" text-anchor="middle" font-size="7" fill="#fff" font-family="monospace">SOT-23</text>
+        <text x="85" y="78" text-anchor="middle" font-size="9" fill="#fff" font-family="monospace">VIN · VOUT · GND</text>
+      </g>
+
+      <!-- LED + Button (top-right corner of breadboard) -->
+      <g transform="translate(950, 110)">
+        <circle cx="20" cy="20" r="10" fill="#56d364" stroke="#225a25" stroke-width="2" />
+        <line x1="14" y1="32" x2="14" y2="42" stroke="#666" stroke-width="1.5" />
+        <line x1="26" y1="32" x2="26" y2="42" stroke="#666" stroke-width="1.5" />
+        <text x="40" y="24" font-size="10" fill="#225a25" font-weight="600">STATUS LED</text>
+        <text x="40" y="38" font-size="9" fill="#666">+ 330Ω resistor</text>
+
+        <rect x="0" y="64" width="80" height="40" rx="4" fill="#444" stroke="#222" stroke-width="2" />
+        <circle cx="40" cy="84" r="10" fill="#e3b341" stroke="#7a5a1f" stroke-width="2" />
+        <text x="100" y="80" font-size="10" fill="#e3b341" font-weight="600">PANIC BTN</text>
+        <text x="100" y="94" font-size="9" fill="#666">→ TLV9001 buffer → MCU GPIO</text>
+      </g>
+
+      <!-- Antenna pigtail (right edge) -->
+      <g transform="translate(1100, 88)">
+        <circle cx="0" cy="20" r="14" fill="none" stroke="#4ec9b0" stroke-width="3" />
+        <circle cx="0" cy="20" r="6" fill="#4ec9b0" />
+        <text x="22" y="16" font-size="10" fill="#4ec9b0" font-weight="600">SMA pigtail</text>
+        <text x="22" y="30" font-size="9" fill="#8b949e">to roof antenna</text>
+        <path d="M 0 34 Q -20 70 -50 90" stroke="#4ec9b0" stroke-width="2" fill="none" />
+      </g>
+
+      <!-- WIRING (representative — power + signal) -->
+      <!-- 12V input from edge into TPS54302 -->
+      <polyline points="60,56 120,56 120,140" stroke="#f85149" stroke-width="3" fill="none" />
+      <text x="64" y="48" font-size="9" fill="#f85149" font-weight="700">12 V</text>
+
+      <!-- TPS54302 output to top rail (5V) -->
+      <polyline points="290,140 320,140 320,56 720,56" stroke="#f85149" stroke-width="2.5" fill="none" />
+      <text x="500" y="48" font-size="9" fill="#f85149" font-weight="700">+5 V rail</text>
+      <!-- 5V down to SIM800L VCC -->
+      <line x1="720" y1="56" x2="720" y2="280" stroke="#f85149" stroke-width="2" />
+      <!-- 5V into LDO -->
+      <polyline points="320,56 320,310 290,310" stroke="#f85149" stroke-width="2" fill="none" />
+
+      <!-- LDO output (3.3V) into LaunchPad VCC -->
+      <polyline points="120,310 80,310 80,396 420,396 420,140" stroke="#f85149" stroke-width="2" fill="none" stroke-dasharray="0" />
+      <text x="200" y="408" font-size="9" fill="#f85149" font-weight="700">+3.3 V rail</text>
+      <!-- 3.3V to GPS VCC -->
+      <line x1="720" y1="180" x2="720" y2="98" stroke="#f85149" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.6" />
+
+      <!-- GND (black) bottom rail to everything -->
+      <polyline points="640,228 640,408 1260,408" stroke="#444" stroke-width="2" fill="none" />
+      <text x="900" y="420" font-size="9" fill="#444" font-weight="700">GND rail</text>
+
+      <!-- UART0: MCU ↔ GPS -->
+      <polyline points="640,168 700,168 700,178 720,178" stroke="#58a6ff" stroke-width="2" fill="none" />
+      <text x="660" y="160" font-size="9" fill="#58a6ff">UART0 (GPS)</text>
+      <!-- UART1: MCU ↔ SIM800L -->
+      <polyline points="640,210 680,210 680,300 720,300" stroke="#58a6ff" stroke-width="2" fill="none" />
+      <text x="680" y="252" font-size="9" fill="#58a6ff">UART1 (modem)</text>
+
+      <!-- GPIO to LED -->
+      <polyline points="640,250 880,250 880,140 950,140" stroke="#56d364" stroke-width="1.5" fill="none" />
+      <!-- GPIO from panic button -->
+      <polyline points="950,194 880,194 880,290 640,290" stroke="#e3b341" stroke-width="1.5" fill="none" />
+
+      <!-- Footer label -->
+      <text x="650" y="446" text-anchor="middle" font-size="11" fill="#a39880" font-style="italic">2 × 4 standard breadboard · 5 modules + LED + button · ~25 jumpers</text>
+    </svg>
+  </div>
+  <p class="footnote">Bench prototype: MSP430FR5969 LaunchPad in the centre, NEO-6M GPS breakout top-right, SIM800L modem bottom-right, TI TPS54302 buck top-left, TI TPS7A0533 LDO bottom-left. Panic button + status LED on the right. Red = power, blue = serial signals, green/yellow = GPIO, black = ground.</p>
+</section>
+
+<!-- ================== PARTS TABLE + BOM ================== -->
+<section>
+  <h3 class="section-h">Slide 6 — TI parts used</h3>
+  <div class="grid-2">
+    <div>
+      <table class="parts">
+        <thead>
+          <tr><th>Role</th><th>Part</th><th>Why this one</th><th style="text-align:right">Cost</th></tr>
+        </thead>
+        <tbody>
+          <tr class="ti">
+            <td class="role">MCU</td>
+            <td class="part">MSP430FR5969</td>
+            <td class="why">Ultra-low power (~100 µA active, 0.4 µA in standby). FRAM survives power-cuts without data loss — critical for a vehicle that turns off every night. Two UARTs (one for GPS, one for modem). LaunchPad eval board makes prototyping painless.</td>
+            <td class="cost">₹420</td>
+          </tr>
+          <tr class="ti">
+            <td class="role">Power-management IC</td>
+            <td class="part">TPS54302</td>
+            <td class="why">3 A synchronous buck converter, 95% efficient. Drops 12 V bus battery to 5 V. Handles the ~2 A current bursts when the SIM800L transmits, which a cheap linear regulator would never survive.</td>
+            <td class="cost">₹160</td>
+          </tr>
+          <tr class="ti">
+            <td class="role">LDO regulator</td>
+            <td class="part">TPS7A0533</td>
+            <td class="why">Low-noise 3.3 V rail for the MCU and GPS. GPS-receiver sensitivity is killed by power-rail noise, so spending a few rupees on a clean LDO buys real position accuracy.</td>
+            <td class="cost">₹40</td>
+          </tr>
+          <tr class="ti">
+            <td class="role">Analog front end (AFE)</td>
+            <td class="part">TLV9001</td>
+            <td class="why">Rail-to-rail single-supply op-amp. Buffers the panic button signal (debounces mechanical bounce, prevents ESD from killing the MCU pin).</td>
+            <td class="cost">₹20</td>
+          </tr>
+          <tr class="ti">
+            <td class="role">Wireless (optional)</td>
+            <td class="part">CC2640R2F</td>
+            <td class="why">BLE radio so a depot mechanic can walk up with a phone and read device logs without plugging in. Optional for v1 — included if BOM allows.</td>
+            <td class="cost">₹280</td>
+          </tr>
+          <tr>
+            <td class="role">GPS receiver</td>
+            <td class="part nonti">u-blox NEO-6M</td>
+            <td class="why">Industry-standard GPS module. TI doesn't make GPS, so we pair the TI MCU with this. Includes ceramic patch antenna or external SMA.</td>
+            <td class="cost">₹350</td>
+          </tr>
+          <tr>
+            <td class="role">2G modem</td>
+            <td class="part nonti">SIMCom SIM800L</td>
+            <td class="why">Cheap, well-documented, 2G coverage is universal in rural India even where 4G isn't. Talks to MCU over UART, accepts standard SIM.</td>
+            <td class="cost">₹250</td>
+          </tr>
+          <tr>
+            <td class="role">Passives + connectors</td>
+            <td class="part nonti">resistors, caps, headers</td>
+            <td class="why">100 nF + 10 µF decoupling per IC, current-limit resistors, SMA pigtail, 2-pin power connector, fuse.</td>
+            <td class="cost">₹130</td>
+          </tr>
+          <tr>
+            <td class="role">PCB / enclosure</td>
+            <td class="part nonti">2-layer 70×50 mm PCB + ABS box</td>
+            <td class="why">Tiny PCB once we move off the breadboard. ABS box screws under the bus dashboard, IP54-rated.</td>
+            <td class="cost">₹100</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div class="bom">
+        <h4>Bill of materials</h4>
+        <div class="row"><span>TI silicon</span><span style="color:var(--ti); font-weight:600;">₹920</span></div>
+        <div class="row"><span>GPS + modem</span><span>₹600</span></div>
+        <div class="row"><span>Passives + PCB</span><span>₹230</span></div>
+        <div class="row total"><span>Per device</span><span>₹1,750</span></div>
+        <div style="font-size:11px; color:var(--muted); margin-top:8px; line-height:1.5;">
+          At 50+ units, BOM drops to <b style="color:var(--text)">~₹1,200</b> with reel pricing on TI silicon and bulk modules. SIM data plan: ₹50/month per device (rural Jio / Airtel M2M).
+        </div>
+      </div>
+
+      <div class="bom" style="margin-top:14px;">
+        <h4>Why TI for this project</h4>
+        <ul style="margin:0; padding-left:18px; font-size:12px; color:var(--muted); line-height:1.7;">
+          <li>MSP430 family ranks among the lowest-power MCUs available — matters when the device is the only load draining the bus battery overnight.</li>
+          <li>TI's power-management portfolio (buck + LDO) lets us handle the SIM800L's 2 A burst without specialty parts.</li>
+          <li>Full development toolchain free: Code Composer Studio + LaunchPad eval boards. Important for a low-budget pilot.</li>
+          <li>India distribution: all parts available from Element14, Mouser-IN, Robu.in. No import lead times.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================== WIRING NOTES ================== -->
+<section>
+  <h3 class="section-h">Wiring notes (for slide 5)</h3>
+  <div class="grid-2">
+    <div class="bom">
+      <h4>Power chain</h4>
+      <div style="font-family:'SF Mono',Menlo,monospace; font-size:12px; line-height:1.7; color:var(--text);">
+        12 V (bus battery) → 2 A blade fuse → TPS54302 VIN<br>
+        TPS54302 VOUT → +5 V breadboard top rail<br>
+        +5 V → SIM800L VCC (high-current branch)<br>
+        +5 V → TPS7A0533 VIN<br>
+        TPS7A0533 VOUT → +3.3 V breadboard bottom rail<br>
+        +3.3 V → MSP430 VCC, NEO-6M VCC, TLV9001 V+
+      </div>
+    </div>
+    <div class="bom">
+      <h4>Signal connections</h4>
+      <div style="font-family:'SF Mono',Menlo,monospace; font-size:12px; line-height:1.7; color:var(--text);">
+        MSP430 P3.4 TX → NEO-6M RX<br>
+        MSP430 P3.5 RX ← NEO-6M TX<br>
+        MSP430 P2.5 TX → SIM800L RX<br>
+        MSP430 P2.6 RX ← SIM800L TX<br>
+        MSP430 P1.0 → 330Ω → status LED → GND<br>
+        Panic button → TLV9001 buffer → MSP430 P1.1<br>
+        SMA pigtail → NEO-6M ANT pad
+      </div>
+    </div>
+  </div>
+  <p class="footnote">All grounds tied to common GND rail. 100 nF ceramic + 10 µF electrolytic decoupling caps placed within 5 mm of each IC's VCC pin.</p>
+</section>
+
+<div style="height: 60px;"></div>
+
+</body>
+</html>

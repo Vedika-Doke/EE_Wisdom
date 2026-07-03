@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smart Rural Bus Tracking — End-to-End Flow & SMS Fallback</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    max-width: 880px;
+    margin: 40px auto;
+    padding: 0 24px;
+    line-height: 1.65;
+    color: #222;
+    background: #fafafa;
+  }
+  h1 { border-bottom: 3px solid #0066cc; padding-bottom: 8px; }
+  h2 { color: #0066cc; margin-top: 36px; border-bottom: 1px solid #cfd8e3; padding-bottom: 4px; }
+  h3 { color: #335; margin-top: 22px; }
+  code {
+    background: #eef2f7;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.92em;
+  }
+  pre {
+    background: #1e1e2e;
+    color: #f8f8f2;
+    padding: 14px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.9em;
+    line-height: 1.4;
+  }
+  pre code { background: none; color: inherit; padding: 0; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+    background: #fff;
+    font-size: 0.95em;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: #0066cc; color: #fff; }
+  tr:nth-child(even) { background: #f4f7fb; }
+  .callout {
+    background: #fff8e1;
+    border-left: 4px solid #f5a623;
+    padding: 12px 16px;
+    margin: 16px 0;
+    border-radius: 4px;
+  }
+  .info {
+    background: #e8f4ff;
+    border-left: 4px solid #0066cc;
+    padding: 12px 16px;
+    margin: 16px 0;
+    border-radius: 4px;
+  }
+  .good { color: #2a8a3e; font-weight: 600; }
+  .bad { color: #c0392b; font-weight: 600; }
+  ul li { margin-bottom: 6px; }
+  .cite {
+    display: inline-block;
+    font-size: 0.72em;
+    font-weight: 500;
+    background: #eef2f7;
+    color: #334;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    vertical-align: middle;
+    border: 1px solid #cfd8e3;
+  }
+  .cite a { color: #335; text-decoration: none; }
+  .sources {
+    background: #fff;
+    border: 1px solid #cfd8e3;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin-top: 24px;
+    font-size: 0.9em;
+  }
+  .sources ol li { margin-bottom: 8px; }
+  .note {
+    background: #fdecea;
+    border-left: 4px solid #c0392b;
+    padding: 10px 14px;
+    margin: 12px 0;
+    border-radius: 4px;
+    font-size: 0.92em;
+  }
+  .stage-flow {
+    background: #fff;
+    border: 1px solid #cfd8e3;
+    padding: 16px;
+    border-radius: 8px;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 0.9em;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  nav {
+    background: #fff;
+    border: 1px solid #cfd8e3;
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+  }
+  nav a { color: #0066cc; text-decoration: none; margin-right: 14px; }
+  nav a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<h1>Smart Rural Bus Tracking System — End-to-End Information Flow</h1>
+<p><em>Bus → Network → Server → Passenger, with SMS as the fallback channel.</em></p>
+
+<nav>
+  <strong>Sections:</strong>
+  <a href="#problem">Problem</a>
+  <a href="#overview">Flow Overview</a>
+  <a href="#bus-unit">Bus Unit</a>
+  <a href="#packet">Data Packet</a>
+  <a href="#transport">Transport</a>
+  <a href="#server">Server</a>
+  <a href="#access">Passenger Access</a>
+  <a href="#sms">SMS Fallback</a>
+  <a href="#offline">Offline Logic</a>
+  <a href="#reliability">Reliability</a>
+  <a href="#sources">Sources</a>
+</nav>
+
+<!-- =================== PROBLEM =================== -->
+<h2 id="problem">1. The Problem We're Solving <span class="cite"><a href="#src-1">[1]</a> <a href="#src-6">[6]</a></span></h2>
+<p>Rural passengers don't know the real-time location, arrival time, route, or delay status of buses. The core issues:</p>
+<ul>
+  <li>Poor mobile internet at rural stops and along routes.</li>
+  <li>Many passengers use feature phones, not smartphones.</li>
+  <li>Buses go off-grid for stretches — GPS data can't be uploaded live.</li>
+  <li>System must be ultra-low cost (~₹4,000/bus) to scale across ~22,800 government buses.</li>
+  <li>Illiteracy and elderly users — need voice/SMS/display board options.</li>
+</ul>
+
+<div class="info">
+  <strong>Core goal:</strong> Bus tracking + low-connectivity fallback + ETA prediction, accessible via PWA, SMS, IVR, and bus-stop display boards.
+</div>
+
+<!-- =================== OVERVIEW =================== -->
+<h2 id="overview">2. End-to-End Flow at a Glance <span class="cite"><a href="#src-4">[4]</a></span></h2>
+<div class="stage-flow">
+[ Bus Unit ]                  [ Network ]              [ Cloud Server ]              [ Passenger ]
+ GPS + IR sensors                                         Ingest API                   PWA (smartphone)
+ MSPM0G3507 MCU       ──HTTP/JSON over 4G──>             ETA Engine          ──>      SMS (feature phone)
+ A7670 LTE module     ──SMS fallback──────>              Prediction Engine            IVR (voice call)
+ SD/flash buffer                                          Database                    Bus-stop Display
+ Buck converter                                           Dashboard (authority)        Authority Dashboard
+</div>
+<p>Nine logical stages from sensor to passenger:</p>
+
+<table>
+  <tr><th>Stage</th><th>Component</th><th>Role</th><th>Output</th></tr>
+  <tr><td>1</td><td>GPS Module (NEO-6M)</td><td>Read bus location, speed, time</td><td>Latitude, Longitude, Speed, UTC time</td></tr>
+  <tr><td>2</td><td>IR Sensor Pair</td><td>Count passenger entry/exit</td><td>Occupancy count</td></tr>
+  <tr><td>3</td><td>MSPM0G3507 MCU</td><td>Read GPS+IR, build packet, self-diagnose</td><td>Bus Data Packet (JSON)</td></tr>
+  <tr><td>4</td><td>Flash / SD Buffer</td><td>Store packets during outages</td><td>Buffered records</td></tr>
+  <tr><td>5</td><td>A7670 LTE / SIM7600</td><td>Transmit packet to server (HTTP or SMS)</td><td>Live updates</td></tr>
+  <tr><td>6</td><td>Cloud Server</td><td>Store, calculate ETA, run analytics</td><td>ETA, occupancy, status</td></tr>
+  <tr><td>7</td><td>Authority Dashboard</td><td>Live fleet monitoring</td><td>Fleet view, alerts</td></tr>
+  <tr><td>8</td><td>Bus-stop Display Board</td><td>Show passenger info</td><td>ETA, next bus</td></tr>
+  <tr><td>9</td><td>IVR + SMS + PWA</td><td>Passenger query channels</td><td>Voice / text / web ETA</td></tr>
+</table>
+
+<!-- =================== BUS UNIT =================== -->
+<h2 id="bus-unit">3. The Bus Unit (Edge Device) <span class="cite"><a href="#src-2">[2]</a> <a href="#src-3">[3]</a> <a href="#src-5">[5]</a> <a href="#src-7">[7]</a></span></h2>
+<p>A small palm-sized box installed in each bus. Total cost ≈ ₹4,000 per unit; ~₹9–11 Crore for full Tamil Nadu fleet (22,800 buses across 38 districts) <span class="cite"><a href="#src-2">[2]</a></span>.</p>
+
+<div class="note">
+  <strong>Note on MCU choice:</strong> The PDF lists <em>ESP32</em> in the initial hardware section <span class="cite"><a href="#src-1">[1]</a></span> and <em>MSPM0G3507</em> in the detailed feasibility and prototype-flow sections <span class="cite"><a href="#src-2">[2]</a> <a href="#src-4">[4]</a></span>. This writeup uses MSPM0G3507 as it is the final selected MCU. Similarly, the comms module is listed as both <em>SIM7600</em> <span class="cite"><a href="#src-2">[2]</a></span> and <em>A7670</em> <span class="cite"><a href="#src-5">[5]</a></span> — A7670 is the cheaper LTE option chosen in the cost/size table.
+</div>
+
+<table>
+  <tr><th>Part</th><th>Component</th><th>Purpose</th></tr>
+  <tr><td>Controller</td><td>TI MSPM0G3507 (128 KB flash, multi-UART, ADC)</td><td>Reads sensors, builds packet, manages comms</td></tr>
+  <tr><td>Location</td><td>NEO-6M GPS module</td><td>Latitude, longitude, speed, UTC time</td></tr>
+  <tr><td>Communication</td><td>A7670 4G LTE module (HTTP + SMS)</td><td>Sends data to server; falls back to SMS</td></tr>
+  <tr><td>Occupancy</td><td>Dual IR sensor pair at door</td><td>Entry/exit counting (state machine)</td></tr>
+  <tr><td>Storage</td><td>Internal flash / microSD</td><td>Buffer packets during network outage</td></tr>
+  <tr><td>Power</td><td>Bus 12V/24V → LM2596 buck → 5V/3.3V</td><td>Regulated supply from vehicle battery</td></tr>
+  <tr><td>Status</td><td>LEDs / buzzer</td><td>GPS lock, network, error indicators</td></tr>
+</table>
+
+<h3>MCU responsibilities</h3>
+<ul>
+  <li>Read GPS coordinates over UART, parse NMEA.</li>
+  <li>Track IR-sensor state machine to update occupancy.</li>
+  <li>Read battery voltage via voltage divider + ADC.</li>
+  <li>Build a structured JSON packet.</li>
+  <li>Check network availability; send if up, buffer if down.</li>
+  <li>Resync stored packets when network returns.</li>
+  <li>Detect tamper, GPS failure; emit heartbeat.</li>
+</ul>
+
+<!-- =================== DATA PACKET =================== -->
+<h2 id="packet">4. Bus Data Packet <span class="cite"><a href="#src-4">[4]</a> <a href="#src-7">[7]</a></span></h2>
+<p>Single canonical record. Same shape on every channel (HTTP, SMS-decoded, buffer replay).</p>
+<pre><code>{
+  "bus_id":     "BUS_01",
+  "route_id":   "ROUTE_05",
+  "latitude":   17.9785,
+  "longitude":  79.5941,
+  "speed":      35,
+  "timestamp":  "2026-06-12T10:14:23Z",
+  "battery":    "82%",
+  "occupancy":  43,
+  "health":     "OK"
+}</code></pre>
+
+<table>
+  <tr><th>Field</th><th>Source</th><th>How</th></tr>
+  <tr><td>bus_id</td><td>MCU</td><td>Hardcoded in firmware (e.g. <code>BUS_01</code>)</td></tr>
+  <tr><td>route_id</td><td>MCU</td><td>Hardcoded / configurable</td></tr>
+  <tr><td>latitude / longitude</td><td>GPS</td><td>From NMEA <code>$GPRMC</code> / <code>$GPGGA</code></td></tr>
+  <tr><td>speed</td><td>GPS</td><td>GPS direct, or MCU computes from Δposition/Δtime</td></tr>
+  <tr><td>timestamp</td><td>GPS / Server</td><td>GPS UTC; server stamps on receipt if missing</td></tr>
+  <tr><td>battery</td><td>MCU</td><td>Voltage divider → ADC → C code</td></tr>
+  <tr><td>occupancy</td><td>MCU</td><td>IR sensor pair state machine (entry +1 / exit −1)</td></tr>
+  <tr><td>health</td><td>MCU</td><td>GPS lock, tamper, last sync status</td></tr>
+</table>
+
+<!-- =================== TRANSPORT =================== -->
+<h2 id="transport">5. Transport — How the Packet Reaches the Server <span class="cite"><a href="#src-3">[3]</a> <a href="#src-6">[6]</a></span></h2>
+
+<h3>Primary path: HTTP POST over 4G/GPRS</h3>
+<pre><code>MCU ──UART──> A7670 ──LTE──> Internet ──> Cloud API
+                              POST /api/ingest
+                              Content-Type: application/json
+                              Body: { bus_id, lat, lng, ... }</code></pre>
+<p>Update interval: ~30 seconds (≈ 760 updates/sec across 22,800 buses — light load for cloud).</p>
+
+<h3>Fallback path: SMS (when data fails)</h3>
+<pre><code>MCU ──UART──> A7670 ──SMS via GSM tower──> SMS Gateway ──webhook──> Cloud API</code></pre>
+<p>Same logical packet, encoded compactly to fit 160 chars.</p>
+
+<h3>Last-resort: local buffer</h3>
+<p>If both fail, packets are written to flash/SD with a sequence number and replayed when network returns.</p>
+
+<!-- =================== SERVER =================== -->
+<h2 id="server">6. Cloud Server <span class="cite"><a href="#src-2">[2]</a> <a href="#src-3">[3]</a> <a href="#src-6">[6]</a></span></h2>
+<p>Single centralized cloud — not per-district. Cheaper, simpler to scale.</p>
+
+<h3>Ingest pipeline</h3>
+<ol>
+  <li><strong>HTTP endpoint</strong> <code>POST /api/ingest</code> — accepts JSON from the bus.</li>
+  <li><strong>SMS webhook</strong> <code>POST /api/sms-ingest</code> — gateway forwards decoded SMS.</li>
+  <li>Both call a single <strong>normalizer</strong> that produces the canonical record with <code>source: "http" | "sms" | "replay"</code>.</li>
+  <li>Write to time-series DB, keyed by <code>(bus_id, timestamp)</code>.</li>
+  <li>Update in-memory <em>latest position</em> cache for fast PWA reads.</li>
+</ol>
+
+<h3>ETA prediction</h3>
+<ul>
+  <li><strong>Phase 1:</strong> distance to next stop ÷ average route speed.</li>
+  <li><strong>Phase 2:</strong> incorporate time-of-day patterns, historical travel times, market-day / school-hour congestion.</li>
+</ul>
+
+<h3>Fallback prediction (when live GPS missing)</h3>
+<pre><code>Algorithm:
+1. Server stores fixed route + average travel times between stops.
+2. On each update, refresh last_known_position and last_update_time.
+3. If (now − last_update_time) &gt; threshold:
+   - move bus forward along the route by avg_speed × elapsed
+   - mark as "Estimated Location"
+4. If silent too long → show "Last Known Location" instead.
+5. When network returns → reconcile predicted vs actual,
+   correct trajectory, update prediction-accuracy metric.</code></pre>
+
+<!-- =================== ACCESS =================== -->
+<h2 id="access">7. Passenger Access Channels <span class="cite"><a href="#src-2">[2]</a> <a href="#src-3">[3]</a> <a href="#src-4">[4]</a> <a href="#src-6">[6]</a></span></h2>
+
+<table>
+  <tr><th>Channel</th><th>Audience</th><th>How It Works</th></tr>
+  <tr><td>PWA (web app)</td><td>Smartphone users</td><td>Source + destination → list of buses, ETA, current location, delay status. No app install.</td></tr>
+  <tr><td>SMS query</td><td>Feature-phone users</td><td><code>BUS 45A</code> → returns current location, next stop, ETA. <code>ROUTE KATTUR TRICHY</code> → lists buses + ETAs.</td></tr>
+  <tr><td>IVR call</td><td>Illiterate / elderly users</td><td>Voice menu reads out bus info in local language.</td></tr>
+  <tr><td>Display board</td><td>Bus-stop walk-ups</td><td>MCU + GSM + LCD at the stop pulls live data and shows arriving buses.</td></tr>
+  <tr><td>Dashboard</td><td>Transport authority</td><td>Live fleet map, route adherence, delay analysis, tamper alerts.</td></tr>
+</table>
+
+<h3>Example SMS interaction</h3>
+<pre><code>User sends:    BUS 45A
+Reply:         Bus 45A
+               Current Location: Samayapuram
+               Next Stop: No.1 Tollgate
+               ETA: 12 minutes
+
+User sends:    ROUTE KATTUR TRICHY
+Reply:         Available Buses:
+               45A - ETA 12 min
+               12B - ETA 25 min
+               34C - ETA 41 min</code></pre>
+
+<!-- =================== SMS FALLBACK =================== -->
+<h2 id="sms">8. SMS as Fallback Transport (Bus → Server) <span class="cite"><a href="#src-6">[6]</a></span></h2>
+<p>This is the heart of the low-connectivity strategy. When the LTE data channel is down but the tower is still reachable, SMS keeps data flowing.</p>
+
+<h3>Why SMS works as fallback</h3>
+<ul>
+  <li>Rides the GSM control channel — works wherever the SIM can register, even where data fails.</li>
+  <li>No APN, no DNS, no TLS handshake — fewer ways to break.</li>
+  <li>Tiny but sufficient: 160 chars holds a compact bus packet.</li>
+</ul>
+
+<h3>Decision logic on the MCU</h3>
+<pre><code>attempt_send(packet):
+    if GPRS_attach() fails after 3 retries        → SMS fallback
+    if HTTP POST returns non-2xx (3 retries)      → SMS fallback
+    if no ACK within 20 seconds                   → SMS fallback
+    after 3 consecutive HTTP failures             → skip HTTP for 1 hour
+    else                                          → success on HTTP</code></pre>
+
+<h3>Compact payload for SMS</h3>
+<table>
+  <tr><th>Format</th><th>Example</th><th>Length</th></tr>
+  <tr><td>Full JSON</td><td><code>{"bus_id":"BUS_01","lat":17.9785,"lng":79.5941,...}</code></td><td>~120 chars</td></tr>
+  <tr><td>Compact pipe</td><td><code>v1|BUS_01|17.9785|79.5941|35|82|43|1718193263</code></td><td>~45 chars</td></tr>
+</table>
+
+<h3>Server-side SMS handling</h3>
+<ol>
+  <li>SMS gateway (MSG91 / Twilio / Exotel) receives the SMS on a long code.</li>
+  <li>Posts a webhook to <code>/api/sms-ingest</code> with sender + body.</li>
+  <li>Normalizer parses <code>v1|...</code> back into the canonical JSON.</li>
+  <li>Record enters the same pipeline as HTTP packets — tagged <code>source: "sms"</code>.</li>
+</ol>
+
+<!-- =================== OFFLINE =================== -->
+<h2 id="offline">9. Offline-First Logic on the Bus <span class="cite"><a href="#src-2">[2]</a> <a href="#src-4">[4]</a></span></h2>
+<pre><code>Network Available  → Send packet over HTTP
+       ↓
+Network Lost       → Try SMS fallback
+       ↓
+SMS Lost too       → Write to flash / SD with sequence number
+       ↓
+Network Returns    → Replay buffered packets in order
+                     Server dedupes by (bus_id, seq)</code></pre>
+<p>Tracking continues uninterrupted; no data is lost even in long dead zones.</p>
+
+<!-- =================== RELIABILITY =================== -->
+<h2 id="reliability">10. Reliability Patterns <span class="cite"><a href="#src-3">[3]</a> <a href="#src-6">[6]</a></span></h2>
+<ul>
+  <li><strong>Sequence numbers</strong> — monotonic per bus; server detects gaps and dedupes.</li>
+  <li><strong>Idempotency</strong> — server keys ingest on <code>(bus_id, seq)</code>; replay is safe.</li>
+  <li><strong>Batching in SMS mode</strong> — accumulate to 1 SMS every few minutes, not per reading.</li>
+  <li><strong>Daily SMS cap</strong> — firmware enforces max SMS/day to bound cost.</li>
+  <li><strong>Heartbeat</strong> — one packet every 24 h even when nothing changes, so dead devices are visible.</li>
+  <li><strong>Tamper detection</strong> — flagged in <code>health</code> field; raises dashboard alert.</li>
+  <li><strong>Prediction reconciliation</strong> — when GPS returns, compare predicted vs actual; feed accuracy metric.</li>
+</ul>
+
+<!-- =================== SUMMARY =================== -->
+<h2>11. Summary</h2>
+<div class="callout">
+  Buses collect <strong>GPS + occupancy + health</strong> → MCU builds a JSON packet → A7670 sends over <strong>4G (primary)</strong> or <strong>SMS (fallback)</strong> or buffers to <strong>flash</strong> if both fail → Cloud server <strong>normalizes</strong> all sources into one pipeline, runs <strong>ETA + fallback prediction</strong> → Passengers query via <strong>PWA, SMS, IVR, or display boards</strong> → Authority watches the fleet on a <strong>dashboard</strong>.
+  <br><br>
+  The SMS path is what keeps the system honest in rural India: when data dies, control-channel messaging still gets bus locations to the server, and rural feature-phone users still get ETAs back.
+</div>
+
+<h2 id="sources">Sources</h2>
+<div class="sources">
+  <p>All references are sections of <code>Problem_Statement.pdf</code> (project working document, IITB WISH 2026).</p>
+  <ol>
+    <li id="src-1"><strong>[1] Problems & Features list</strong> — pp. 2, 4. Lists the 10 problems (connectivity, illiteracy, women/child safety, rural-route deviation, occupancy, navigation, breakdown alternatives, bus-to-server connectivity gap, historical prediction data, passenger demand) and the initial hardware proposal (ESP32, GPS, GSM/4G, microSD, backup battery).</li>
+    <li id="src-2"><strong>[2] Feasibility Analysis (Nithila)</strong> — pp. 5–10. Bus-side hardware (MSPM0G3507, SIM7600, tamper + battery monitor), cost feasibility (₹4,000/bus → ₹9–11 Cr fleet), server feasibility (22,800 buses, 38 districts, 760 updates/sec), centralized cloud architecture, PWA/SMS/WhatsApp channels, operating costs, power consumption (~1.2 W avg, 8–10 W peak).</li>
+    <li id="src-3"><strong>[3] Passenger Information channels & ETA Engine</strong> — pp. 4–5. PWA inputs/outputs, SMS query formats (<code>BUS 45A</code>, <code>ROUTE KATTUR TRICHY</code>) with exact response shapes, ETA prediction phases, dashboard features, offline-first SD-card sync.</li>
+    <li id="src-4"><strong>[4] Prototype Flow (Harshini)</strong> — pp. 11–13. 9-stage table (GPS → IR → MCU → Memory → LoRa/GSM/WiFi → Server → Dashboard → Display → IVR), Bus Data Packet fields, TI MCU selection rationale (MSPM0G3507, 128 KB flash), data packet JSON example, offline storage logic, IR sensor state machine for occupancy.</li>
+    <li id="src-5"><strong>[5] Cost & Size Table (Harshini)</strong> — p. 14. Component-level cost/size (NEO-6M ₹300–600, MSPM0G3507 ₹2000–2500, A7670 ₹1000–1500, LM2596 ₹50–150). Total ₹4–5k, palm-size.</li>
+    <li id="src-6"><strong>[6] Priorities & Block-wise Solution (Priyanka)</strong> — pp. 16–18. Priority ranking (1: ETA accuracy → 2: connectivity → 3: cost → 4: accessibility → 5: prediction → 6: route deviation), Bus Unit / Server Unit / Bus-Stop Unit blocks, tamper detection, SMS as primary fallback when GSM/internet fails.</li>
+    <li id="src-7"><strong>[7] Bus Unit detail & Fallback Prediction Algorithm (Priyanka)</strong> — pp. 18–20. Per-field origin table (Bus ID, Lat, Lng, Speed, Timestamp, Route ID, Battery — which device supplies each), fallback prediction algorithm (compare current_time vs last_update_time, project along fixed route at avg speed, reconcile when network returns).</li>
+  </ol>
+  <p><em>Page numbers are approximate (the PDF interleaves author title pages — Nithila, Harshini, Priyanka — with content). Citations point to the contributor whose section the claim comes from.</em></p>
+</div>
+
+</body>
+</html>

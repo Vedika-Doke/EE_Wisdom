@@ -1,0 +1,40 @@
+---
+title: "Prediction Workflow (when bus goes silent) — with SMS fallback"
+---
+flowchart TD
+    A["30-sec scheduler<br/>(per bus)"]:::start
+    B["Δt₄g = time since<br/>last 4G packet"]:::proc
+    D1{"Δt₄g < 4 min?"}:::dec
+    LIVE["Still LIVE<br/>(Tier 1 — 4G healthy)"]:::ok
+
+    SMS_CHK{"Any SMS packet<br/>in last 4 min?"}:::dec
+    SMS_OK["SMS FALLBACK<br/>(Tier 2 — 4G down,<br/>SMS position fresh)"]:::sms
+
+    D2{"Δt_any < 15 min?"}:::dec
+    DR["GUESS POSITION<br/>blend last + typical speed<br/>(dead reckoning)"]:::learn
+    EST["Mark ESTIMATED<br/>(confidence ↓ as e^−Δt/κ)"]:::est
+    LK["LAST_KNOWN<br/>(>15 min — stop guessing)"]:::alert
+
+    BURST["Any tier returns →<br/>FRAM burst-replay<br/>supersedes estimate"]:::burst
+
+    DB["Save to DB"]:::sink
+
+    A --> B --> D1
+    D1 -- "yes" --> LIVE --> DB
+    D1 -- "no" --> SMS_CHK
+    SMS_CHK -- "yes" --> SMS_OK --> DB
+    SMS_CHK -- "no" --> D2
+    D2 -- "yes" --> DR --> EST --> DB
+    D2 -- "no" --> LK --> DB
+    EST -. "recovery" .-> BURST -. "overwrites" .-> DB
+
+    classDef start fill:#F5C26B,stroke:#A8741C,color:#000,font-weight:bold
+    classDef proc fill:#DAE8FC,stroke:#6C8EBF,color:#000
+    classDef dec fill:#E1D5E7,stroke:#9673A6,color:#000,font-weight:bold
+    classDef ok fill:#D5E8D4,stroke:#82B366,color:#000
+    classDef sms fill:#FFE0B5,stroke:#D17A1E,color:#000,font-weight:bold
+    classDef est fill:#FFF2CC,stroke:#D6B656,color:#000
+    classDef learn fill:#FFF2CC,stroke:#D6B656,color:#000
+    classDef alert fill:#F8CECC,stroke:#B85450,color:#000
+    classDef burst fill:#CDE7F7,stroke:#3E7CB1,color:#000,font-style:italic
+    classDef sink fill:#E8E8E8,stroke:#666,color:#000

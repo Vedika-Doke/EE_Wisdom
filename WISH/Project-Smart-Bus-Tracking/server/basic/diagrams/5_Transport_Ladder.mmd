@@ -1,0 +1,43 @@
+---
+title: "RuralSync — 3-Tier Transport Ladder"
+---
+flowchart TD
+    GPS["📍 GPS Module<br/>NEO-6M · 1 Hz fix"]:::sensor
+    MCU["🧠 MSPM0G3507<br/>(builds 22 B binary packet)"]:::mcu
+    GPS --> MCU
+
+    MCU --> T1
+
+    subgraph LADDER["3-Tier Transport Ladder"]
+      direction TB
+      T1{{"Tier 1<br/>4G LTE HTTP POST<br/>~25 s cadence"}}:::t1
+      T2{{"Tier 2<br/>2G SMS gateway<br/>~60 s cadence"}}:::t2
+      T3{{"Tier 3<br/>Flash buffer (32 KB)<br/>burst on recovery"}}:::t3
+      T1 -. "4G unreachable" .-> T2
+      T2 -. "GSM also dead" .-> T3
+      T3 == "any tier returns" ==> T1
+    end
+
+    SRV["🖥️ Cloud Server<br/>(snap · EWMA · ETA · dead-reckoning)"]:::server
+
+    T1 -- "LIVE" --> SRV
+    T2 -- "SMS" --> SRV
+    T3 -- "burst replay" --> SRV
+
+    SRV --> OUT
+
+    subgraph OUT["Passenger Access"]
+      direction LR
+      PWA["📱 PWA<br/>(smartphone)"]:::out
+      SMSU["💬 SMS query<br/>(feature phone)"]:::out
+      IVR["📞 IVR call"]:::out
+      DISP["🔆 Stop display"]:::out
+    end
+
+    classDef sensor fill:#FFE0B5,stroke:#D17A1E,color:#000,font-weight:bold
+    classDef mcu fill:#F4C7C7,stroke:#B14242,color:#000,font-weight:bold
+    classDef t1 fill:#CDE7F7,stroke:#3E7CB1,color:#000,font-weight:bold
+    classDef t2 fill:#FFE0B5,stroke:#D17A1E,color:#000,font-weight:bold
+    classDef t3 fill:#F4C7C7,stroke:#B14242,color:#000,font-weight:bold
+    classDef server fill:#D5E8D4,stroke:#82B366,color:#000,font-weight:bold
+    classDef out fill:#E1D5E7,stroke:#9673A6,color:#000

@@ -1,0 +1,49 @@
+---
+title: "ETA Workflow — with 3-tier transport ladder"
+---
+flowchart LR
+    BUS["Bus device<br/>(GPS, speed, time)"]:::start
+
+    subgraph TRANSPORT["3-tier transport ladder (on bus)"]
+      direction TB
+      T1["Tier 1: 4G HTTP POST<br/>JSON · ~95 B · 20 s cadence"]:::t1
+      T2["Tier 2: 2G SMS gateway<br/>binary 22 B × 5/SMS · 60 s"]:::t2
+      T3["Tier 3: MSPM0 32 KB flash<br/>circular log · burst on recovery"]:::t3
+      T1 -. "4G down" .-> T2
+      T2 -. "GSM down" .-> T3
+      T3 -. "any tier returns" .-> T1
+    end
+
+    SRV["Server receives packet<br/>(via=4g | via=sms | via=burst)"]:::recv
+
+    BUS --> TRANSPORT --> SRV
+
+    B["Sanity-check<br/>+ dedup on (bus_id, seq)"]:::proc
+    C["Snap to assigned route<br/>polyline (segment k, s_k, δ)"]:::proc
+    D{"On route?<br/>δ ≤ W"}:::dec
+    G{"Crossed a stop?"}:::dec
+    H["LEARN:<br/>EWMA update of τ<br/>for this segment"]:::learn
+    I["CALCULATE ETA<br/>3-piece sum for<br/>each upcoming stop"]:::proc
+    E["OFF ROUTE!<br/>(3 in a row →<br/>divert pipeline)"]:::alert
+    J["Save to DB<br/>(position, status, ETAs)"]:::ok
+    K["Display / SMS / IVR / PWA"]:::sink
+
+    SRV --> B --> C --> D
+    D -- "yes" --> G
+    G -- "yes" --> H --> I
+    G -- "no" --> I
+    I --> J
+    D -- "no" --> E --> J
+    J --> K
+
+    classDef start fill:#F5C26B,stroke:#A8741C,color:#000,font-weight:bold
+    classDef proc fill:#DAE8FC,stroke:#6C8EBF,color:#000
+    classDef dec fill:#E1D5E7,stroke:#9673A6,color:#000,font-weight:bold
+    classDef ok fill:#D5E8D4,stroke:#82B366,color:#000
+    classDef alert fill:#F8CECC,stroke:#B85450,color:#000
+    classDef learn fill:#FFF2CC,stroke:#D6B656,color:#000
+    classDef sink fill:#E8E8E8,stroke:#666,color:#000,font-style:italic
+    classDef recv fill:#B5D8B5,stroke:#5A8A5A,color:#000,font-weight:bold
+    classDef t1 fill:#CDE7F7,stroke:#3E7CB1,color:#000
+    classDef t2 fill:#FFE0B5,stroke:#D17A1E,color:#000
+    classDef t3 fill:#F4C7C7,stroke:#B14242,color:#000

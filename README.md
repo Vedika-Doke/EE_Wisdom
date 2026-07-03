@@ -12,7 +12,9 @@ Each project lives in its own folder on `main`. Interactive study guides are ser
 
 | Folder / Branch | Contents |
 |---|---|
+| [`WISH/`](WISH/) | TI WiSH Hardware Summer School (2026) — digital Verilog labs, analog prework/quizzes, and a smart bus-tracking group project (server-side ETA engine) |
 | [`EE309-Microprocessors-Project/`](EE309-Microprocessors-Project/) | AT89C5131A + MCP4921 DAC + MCP3008 ADC — sine wave generation, NCO, Goertzel tone detection |
+| [`EE337-MicroLab-Project/`](EE337-MicroLab-Project/) | 8051 MicroLab project — I2C LCD interfacing and R2C driver |
 | [`Electrical-trainee-racing-team/`](Electrical-trainee-racing-team/) | ECU firmware, AMS/BMS research, HV-LV isolation, and comms protocol work for a student electric racing team |
 | [`JDE-Tenure/`](JDE-Tenure/) | Two complete KiCad PCB designs — STM32 dashboard board and a sensor testing board |
 | [`ToyCPU-1281/`](ToyCPU-1281/) | VHDL-based 8-bit toy CPU (i281) with custom ISA and Bubble Sort implementation |
@@ -128,6 +130,16 @@ Course project: design and implementation of an 8-bit toy CPU (i281).
 - Custom instruction set architecture (ISA)
 - Bubble Sort implemented directly on memory data
 - Functional simulation and verification
+
+---
+
+## WISH
+
+TI **WiSH Hardware Summer School (2026)** at IIT Bombay — kept as an academic-help resource. See [`WISH/`](WISH/) for the full breakdown.
+
+- **Week 1 — Digital Design:** two Verilog labs (shift-add and DFT-instrumented sequential multipliers) with testbenches, test plans, and simulation waveforms; prework guides and daily surveys
+- **Week 2 — Analog:** prework, ASLKv2010 starter-kit reference, and topic quizzes (Fourier/Laplace, inductors, RC circuits)
+- **Project — Smart Bus Tracking:** a rural bus tracking + ETA system with a runnable Python prediction engine (EWMA segment learning, dead reckoning, geofencing), full server-side math writeups, and design diagrams
 
 ---
 

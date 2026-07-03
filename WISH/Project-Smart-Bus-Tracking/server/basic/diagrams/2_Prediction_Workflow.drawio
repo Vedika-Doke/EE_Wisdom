@@ -1,0 +1,58 @@
+<mxfile host="app.diagrams.net" modified="2026-06-07T00:00:00.000Z" agent="Mozilla/5.0" version="24.6.4" type="device">
+  <diagram name="Prediction Workflow" id="pred">
+    <mxGraphModel dx="1422" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="title" value="Prediction Workflow (Network-Loss / Dead Reckoning) — Person 2" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#1F2E5C;" vertex="1" parent="1">
+          <mxGeometry x="80" y="20" width="700" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="tick" value="Scheduler tick (every 30 s)&#10;for each active bus" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5C26B;strokeColor=#A8741C;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="80" width="220" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="dt" value="Δt = now − last_packet_ts" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="320" y="170" width="220" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="d1" value="Δt ≤ 1.5·T_pkt ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="240" width="180" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="live" value="status = LIVE&#10;(nothing to do)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="600" y="255" width="200" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="d2" value="Δt ≤ T_max ? (15 min)" style="rhombus;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="370" width="180" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="lastknown" value="status = LAST_KNOWN&#10;freeze position&#10;ETAs = unknown&#10;conf = 0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="600" y="385" width="200" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="dr" value="DEAD RECKONING&#10;&#10;γ = exp(−Δt / κ)        (κ ≈ 5 min)&#10;v_est = γ·v_last + (1−γ)·(L_k / τ_k(b))&#10;d_hat = v_est · Δt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="280" y="500" width="320" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="walk" value="Walk polyline forward by d_hat&#10;from (k, s_k) crossing segment boundaries&#10;-&gt; (estimated lat, lon)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="280" y="640" width="320" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="estatus" value="status = ESTIMATED&#10;conf = exp(−Δt / T_max)&#10;recompute ETAs from estimated position" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="280" y="735" width="320" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="db" value="Persist to DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8E8E8;strokeColor=#666666;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="840" width="240" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="rec" value="ON NEXT REAL PACKET (reconciliation)&#10;err = haversine(actual, predicted)&#10;-&gt; prediction_log {bus, Δt, err, seg k}&#10;position := actual ; status := LIVE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5C26B;strokeColor=#A8741C;fontSize=11;align=left;spacingLeft=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="920" width="440" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="tick" target="dt"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="dt" target="d1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" value="YES" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontStyle=1;fontColor=#82B366;" edge="1" parent="1" source="d1" target="live"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" value="NO" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontStyle=1;fontColor=#B85450;" edge="1" parent="1" source="d1" target="d2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" value="NO" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontStyle=1;fontColor=#B85450;" edge="1" parent="1" source="d2" target="lastknown"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" value="YES" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontStyle=1;fontColor=#82B366;" edge="1" parent="1" source="d2" target="dr"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="dr" target="walk"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="walk" target="estatus"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="estatus" target="db"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="lastknown" target="db"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="live" target="db"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;" edge="1" parent="1" source="db" target="rec"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

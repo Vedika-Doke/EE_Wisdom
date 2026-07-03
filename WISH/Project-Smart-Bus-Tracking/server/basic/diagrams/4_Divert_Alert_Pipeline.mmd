@@ -1,0 +1,28 @@
+---
+title: "Divert-Alert Pipeline"
+---
+flowchart LR
+    T["Bus 17 off route<br/>(3 packets in a row)"]:::trigger
+    ALR["Log alert<br/>(Alerts table)"]:::db
+    BAN["Authority<br/>dashboard banner"]:::ban
+    DISP["Look up passengers<br/>who asked about Bus 17<br/>in last 90 min"]:::dispatcher
+    REN["Compose message<br/>in their language"]:::tpl
+    SMS["SMS"]:::sms
+    IVR["IVR call"]:::ivr
+    DBOARD["Stop display"]:::disp
+
+    T --> ALR
+    T --> BAN
+    T --> DISP --> REN
+    REN --> SMS
+    REN --> IVR
+    REN --> DBOARD
+
+    classDef trigger fill:#F8CECC,stroke:#B85450,color:#000,font-weight:bold
+    classDef db fill:#DAE8FC,stroke:#6C8EBF,color:#000
+    classDef ban fill:#E1D5E7,stroke:#9673A6,color:#000
+    classDef dispatcher fill:#FFE6CC,stroke:#D79B00,color:#000,font-weight:bold
+    classDef tpl fill:#FFF2CC,stroke:#D6B656,color:#000
+    classDef sms fill:#DAE8FC,stroke:#6C8EBF,color:#000
+    classDef ivr fill:#D5E8D4,stroke:#82B366,color:#000
+    classDef disp fill:#F5C26B,stroke:#A8741C,color:#000

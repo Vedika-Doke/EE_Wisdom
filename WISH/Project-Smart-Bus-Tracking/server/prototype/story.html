@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>WISH — How it works</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --panel-2: #1f2630;
+    --text: #e6edf3; --muted: #8b949e;
+    --teal: #4ec9b0; --blue: #58a6ff; --gold: #d8a657;
+    --pink: #d3869b; --purple: #b794f6; --green: #56d364;
+    --warn: #e3b341; --bad: #f85149;
+    --border: #30363d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+
+  /* Top header */
+  header { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: rgba(13,17,23,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 100; }
+  header h1 { font-size: 14px; font-weight: 600; margin: 0; letter-spacing: 0.3px; }
+  header h1 small { color: var(--muted); font-weight: 400; margin-left: 10px; }
+  header .links a { color: var(--muted); font-size: 12px; margin-left: 14px; text-decoration: none; }
+  header .links a:hover { color: var(--teal); }
+
+  /* Scene canvas */
+  #stage { position: absolute; top: 56px; left: 0; right: 0; bottom: 110px; overflow: hidden; }
+  .scene { position: absolute; inset: 0; opacity: 0; transform: translateY(20px); transition: opacity 0.6s, transform 0.6s; pointer-events: none; display: flex; flex-direction: column; }
+  .scene.active { opacity: 1; transform: none; pointer-events: auto; }
+
+  .scene-header { padding: 28px 60px 16px; flex-shrink: 0; }
+  .scene-tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; }
+  .scene h2 { font-size: 36px; font-weight: 600; margin: 0 0 10px 0; letter-spacing: -0.5px; }
+  .scene p.caption { font-size: 16px; color: var(--muted); margin: 0; max-width: 720px; line-height: 1.55; }
+  .scene .art { flex: 1; position: relative; padding: 0 60px 30px; min-height: 0; }
+
+  /* Bottom navigation */
+  nav { position: fixed; bottom: 0; left: 0; right: 0; height: 110px; background: rgba(13,17,23,0.85); backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 30px; padding: 0 60px; }
+  .dots { display: flex; gap: 10px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); cursor: pointer; transition: all 0.3s; border: 2px solid transparent; }
+  .dot.active { background: var(--teal); transform: scale(1.3); }
+  .dot:hover { border-color: var(--teal); }
+  .nav-buttons { display: flex; gap: 10px; }
+  .nav-btn { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); padding: 8px 18px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: 500; }
+  .nav-btn:hover { border-color: var(--teal); }
+  .nav-btn.primary { background: var(--teal); color: #000; border-color: var(--teal); font-weight: 600; }
+  .scene-counter { color: var(--muted); font-size: 11px; font-family: 'SF Mono', Menlo, monospace; min-width: 50px; }
+
+  /* ===== Scene 1: The bus + GPS module ===== */
+  .s1-svg { width: 100%; height: 100%; }
+  @keyframes road-scroll { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -160; } }
+  .s1-road-dashes { stroke-dasharray: 30 30; animation: road-scroll 1.6s linear infinite; }
+  @keyframes wheel-spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+  .scene.active .s1-wheel { animation: wheel-spin 1.4s linear infinite; transform-origin: center; transform-box: fill-box; }
+  @keyframes callout-pop { 0% { opacity: 0; transform: scale(0.4); } 100% { opacity: 1; transform: scale(1); } }
+  .scene.active .s1-callout { animation: callout-pop 0.9s 0.4s both ease-out; transform-origin: center; transform-box: fill-box; }
+  @keyframes pulse-soft { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
+  .scene.active .s1-led { animation: pulse-soft 1.2s infinite; }
+
+  /* ===== Scene 2: Bus → tower → server ===== */
+  @keyframes wave-out { 0% { r: 18; opacity: 0.8; } 100% { r: 60; opacity: 0; } }
+  .scene.active .s2-wave { animation: wave-out 1.6s infinite; transform-origin: center; }
+  .scene.active .s2-wave-2 { animation-delay: 0.5s; }
+  .scene.active .s2-wave-3 { animation-delay: 1.0s; }
+  @keyframes packet-travel { 0% { offset-distance: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
+  .scene.active .s2-packet { animation: packet-travel 2.2s 0.4s infinite linear; }
+  @keyframes server-blink { 0%,90%,100% { opacity: 1; } 95% { opacity: 0.3; } }
+  .scene.active .s2-server-light { animation: server-blink 2s infinite; }
+
+  /* ===== Scene 3: Engine math ===== */
+  @keyframes draw-line { from { stroke-dashoffset: 1000; } to { stroke-dashoffset: 0; } }
+  .scene.active .s3-route { stroke-dasharray: 1000; animation: draw-line 1.4s 0.2s both ease-out; }
+  @keyframes drop-perp { 0% { stroke-dashoffset: 200; opacity: 0; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+  .scene.active .s3-perp { stroke-dasharray: 200; animation: drop-perp 0.8s 1.5s both ease-out; }
+  @keyframes appear-bounce { 0% { transform: scale(0); opacity: 0; } 70% { transform: scale(1.4); } 100% { transform: scale(1); opacity: 1; } }
+  .scene.active .s3-bus { animation: appear-bounce 0.6s 1.0s both ease-out; transform-origin: center; transform-box: fill-box; }
+  .scene.active .s3-snap { animation: appear-bounce 0.6s 2.2s both ease-out; transform-origin: center; transform-box: fill-box; }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  .scene.active .s3-formula-line { animation: fade-in 0.5s both; }
+  .scene.active .s3-formula-line:nth-child(1) { animation-delay: 2.5s; }
+  .scene.active .s3-formula-line:nth-child(2) { animation-delay: 2.9s; }
+  .scene.active .s3-formula-line:nth-child(3) { animation-delay: 3.3s; }
+  .scene.active .s3-formula-line:nth-child(4) { animation-delay: 3.7s; }
+
+  /* ===== Scene 4: Dashboard ===== */
+  @keyframes row-in { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: none; } }
+  .scene.active .s4-row { animation: row-in 0.5s both; }
+  .scene.active .s4-row:nth-child(1) { animation-delay: 0.3s; }
+  .scene.active .s4-row:nth-child(2) { animation-delay: 0.6s; }
+  .scene.active .s4-row:nth-child(3) { animation-delay: 0.9s; }
+  @keyframes pulse-bad { 0%,100% { box-shadow: 0 0 0 0 rgba(248,81,73,0.7); } 50% { box-shadow: 0 0 0 14px rgba(248,81,73,0); } }
+  .scene.active .s4-alert-pill { animation: pulse-bad 1.4s 1.2s infinite; }
+
+  /* ===== Scene 5: Passenger phone ===== */
+  @keyframes ring-shake { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-2deg); } 75% { transform: rotate(2deg); } }
+  .scene.active .s5-phone { animation: ring-shake 1.4s 0.6s 2 ease-in-out; transform-origin: center; transform-box: fill-box; }
+  @keyframes voice-wave { 0% { stroke-dashoffset: 100; opacity: 0; } 50% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0.6; } }
+  .scene.active .s5-wave { stroke-dasharray: 100; animation: voice-wave 1.6s 2.4s both; }
+  @keyframes typewriter { from { width: 0; } to { width: 100%; } }
+  .scene.active .s5-text { overflow: hidden; white-space: nowrap; animation: typewriter 2.5s 3.4s both steps(40, end); }
+
+  /* ===== Scene 6: Divert broadcast ===== */
+  @keyframes radiate { 0% { r: 20; opacity: 1; } 100% { r: 200; opacity: 0; } }
+  .scene.active .s6-radiate { animation: radiate 1.6s 0.6s infinite; transform-origin: center; }
+  .scene.active .s6-radiate-2 { animation-delay: 1.1s; }
+  @keyframes phone-arrive { 0% { transform: translateY(24px); opacity: 0; } 70% { transform: translateY(-3px); opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
+  .scene.active .s6-phone-recv { animation: phone-arrive 0.9s 1.4s both ease-out; transform-origin: center; transform-box: fill-box; }
+  .scene.active .s6-phone-recv-2 { animation-delay: 1.8s; }
+  .scene.active .s6-phone-recv-3 { animation-delay: 2.2s; }
+
+  /* Generic */
+  .label-pill { background: var(--panel-2); color: var(--text); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-family: 'SF Mono', Menlo, monospace; border: 1px solid var(--border); }
+  .marathi { font-family: "Noto Sans Devanagari", -apple-system, sans-serif; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>WISH</h1>
+  <div class="links">
+    <a href="end_to_end.html">→ Live system flow</a>
+    <a href="simulator.html">→ Engine deep-dive</a>
+  </div>
+</header>
+
+<div id="stage">
+
+  <!-- ============ SCENE 1: THE BUS ============ -->
+  <div class="scene" data-scene="1">
+    <div class="scene-header">
+      <span class="scene-tag" style="background: rgba(88,166,255,0.15); color: var(--blue);">1 · The bus</span>
+      <h2>A small gadget rides along on every bus.</h2>
+      <p class="caption">It has a GPS chip (so it knows where it is), a SIM card (so it can send a quick message), and it runs off the bus's own battery. Costs about ₹1,500 to build.</p>
+    </div>
+    <div class="art">
+      <svg class="s1-svg" viewBox="0 0 1200 540" preserveAspectRatio="xMidYMid meet">
+        <!-- sky gradient -->
+        <defs>
+          <linearGradient id="sky1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#1a2742" />
+            <stop offset="1" stop-color="#2d3f5f" />
+          </linearGradient>
+          <linearGradient id="ground1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#3a4a3a" />
+            <stop offset="1" stop-color="#1f2a1f" />
+          </linearGradient>
+        </defs>
+        <rect x="0" y="0" width="1200" height="320" fill="url(#sky1)" />
+        <rect x="0" y="320" width="1200" height="220" fill="url(#ground1)" />
+        <!-- hills -->
+        <path d="M 0 320 Q 200 260 400 300 T 800 280 T 1200 310 L 1200 340 L 0 340 Z" fill="#243524" opacity="0.7" />
+        <!-- road -->
+        <rect x="0" y="380" width="1200" height="80" fill="#2a2a30" />
+        <line class="s1-road-dashes" x1="0" y1="420" x2="1200" y2="420" stroke="#e3b341" stroke-width="4" />
+
+        <!-- BUS (left side) -->
+        <g transform="translate(180, 280)">
+          <!-- body (MSRTC red/maroon style) -->
+          <rect x="0" y="20" width="280" height="100" rx="14" fill="#a83232" stroke="#1a1a1a" stroke-width="3" />
+          <!-- top stripe -->
+          <rect x="0" y="20" width="280" height="20" rx="8" fill="#7a1f1f" />
+          <!-- windows -->
+          <rect x="14" y="46" width="38" height="40" rx="4" fill="#8fd5ff" opacity="0.85" />
+          <rect x="60" y="46" width="38" height="40" rx="4" fill="#8fd5ff" opacity="0.85" />
+          <rect x="106" y="46" width="38" height="40" rx="4" fill="#8fd5ff" opacity="0.85" />
+          <rect x="152" y="46" width="38" height="40" rx="4" fill="#8fd5ff" opacity="0.85" />
+          <rect x="198" y="46" width="38" height="40" rx="4" fill="#8fd5ff" opacity="0.85" />
+          <rect x="244" y="46" width="28" height="40" rx="4" fill="#bce6ff" opacity="0.9" />
+          <!-- door -->
+          <rect x="200" y="86" width="36" height="34" fill="#2a2a2a" stroke="#1a1a1a" />
+          <!-- plate -->
+          <rect x="110" y="100" width="60" height="14" rx="2" fill="#fff" />
+          <text x="140" y="111" text-anchor="middle" font-family="monospace" font-size="9" font-weight="700" fill="#000">MH-17</text>
+          <!-- wheels -->
+          <circle class="s1-wheel" cx="55" cy="138" r="20" fill="#1a1a1a" stroke="#666" stroke-width="2" />
+          <circle cx="55" cy="138" r="8" fill="#444" />
+          <line x1="55" y1="120" x2="55" y2="156" stroke="#888" stroke-width="2" />
+          <line x1="37" y1="138" x2="73" y2="138" stroke="#888" stroke-width="2" />
+          <circle class="s1-wheel" cx="225" cy="138" r="20" fill="#1a1a1a" stroke="#666" stroke-width="2" />
+          <circle cx="225" cy="138" r="8" fill="#444" />
+          <line x1="225" y1="120" x2="225" y2="156" stroke="#888" stroke-width="2" />
+          <line x1="207" y1="138" x2="243" y2="138" stroke="#888" stroke-width="2" />
+          <!-- antenna stub on roof (where GPS module sits) -->
+          <circle cx="160" cy="15" r="5" fill="#4ec9b0" />
+          <line x1="160" y1="15" x2="160" y2="0" stroke="#4ec9b0" stroke-width="2" />
+        </g>
+
+        <!-- CALLOUT — magnified PCB on the right -->
+        <g class="s1-callout">
+          <!-- guide circle on bus -->
+          <circle cx="340" cy="295" r="22" fill="none" stroke="#4ec9b0" stroke-width="2" stroke-dasharray="3 3" />
+          <!-- connector lines -->
+          <line x1="362" y1="295" x2="640" y2="200" stroke="#4ec9b0" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.7" />
+          <line x1="362" y1="295" x2="640" y2="400" stroke="#4ec9b0" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.7" />
+
+          <!-- big PCB panel -->
+          <g transform="translate(640, 200)">
+            <rect x="0" y="0" width="440" height="200" rx="10" fill="#0a3a1f" stroke="#4ec9b0" stroke-width="3" />
+            <!-- silkscreen text -->
+            <text x="14" y="22" font-family="monospace" font-size="11" fill="#4ec9b0">WISH-GPS v1.0 · TI MSP430 + TPS54302 · ₹1,650 BOM</text>
+
+            <!-- GPS module (left) -->
+            <rect x="28" y="44" width="100" height="80" rx="3" fill="#1a1a1a" stroke="#fff" stroke-width="1" />
+            <text x="78" y="80" text-anchor="middle" font-family="monospace" font-size="9" fill="#fff">NEO-6M</text>
+            <text x="78" y="94" text-anchor="middle" font-family="monospace" font-size="9" fill="#fff">GPS</text>
+            <!-- antenna patch -->
+            <rect x="38" y="50" width="20" height="20" fill="#d8a657" stroke="#5a3a1f" />
+            <text x="48" y="63" text-anchor="middle" font-family="monospace" font-size="6" font-weight="700" fill="#000">ANT</text>
+
+            <!-- MCU (middle) -->
+            <rect x="160" y="60" width="60" height="60" rx="2" fill="#cc0000" />
+            <text x="190" y="80" text-anchor="middle" font-family="monospace" font-size="8" fill="#fff" font-weight="700">TI</text>
+            <text x="190" y="94" text-anchor="middle" font-family="monospace" font-size="9" fill="#fff">MSP430</text>
+            <text x="190" y="106" text-anchor="middle" font-family="monospace" font-size="7" fill="#fff">FR5969</text>
+            <!-- pins -->
+            <g fill="#888">
+            <rect x="158" y="62" width="4" height="2" /><rect x="158" y="68" width="4" height="2" /><rect x="158" y="74" width="4" height="2" /><rect x="158" y="80" width="4" height="2" /><rect x="158" y="86" width="4" height="2" /><rect x="158" y="92" width="4" height="2" /><rect x="158" y="98" width="4" height="2" /><rect x="158" y="104" width="4" height="2" /><rect x="158" y="110" width="4" height="2" /><rect x="158" y="116" width="4" height="2" />
+            <rect x="220" y="62" width="4" height="2" /><rect x="220" y="68" width="4" height="2" /><rect x="220" y="74" width="4" height="2" /><rect x="220" y="80" width="4" height="2" /><rect x="220" y="86" width="4" height="2" /><rect x="220" y="92" width="4" height="2" /><rect x="220" y="98" width="4" height="2" /><rect x="220" y="104" width="4" height="2" /><rect x="220" y="110" width="4" height="2" /><rect x="220" y="116" width="4" height="2" />
+            </g>
+
+            <!-- GSM modem (right) -->
+            <rect x="250" y="44" width="90" height="80" rx="3" fill="#1a1a1a" stroke="#fff" />
+            <text x="295" y="78" text-anchor="middle" font-family="monospace" font-size="9" fill="#fff">SIM800L</text>
+            <text x="295" y="92" text-anchor="middle" font-family="monospace" font-size="8" fill="#888">GSM/GPRS</text>
+            <!-- SIM slot -->
+            <rect x="262" y="105" width="66" height="14" fill="#d8a657" stroke="#5a3a1f" />
+            <text x="295" y="115" text-anchor="middle" font-family="monospace" font-size="7" font-weight="700" fill="#000">SIM</text>
+
+            <!-- TI power-management chip (TPS54302) -->
+            <rect x="140" y="155" width="60" height="28" rx="2" fill="#cc0000" />
+            <text x="170" y="168" text-anchor="middle" font-family="monospace" font-size="7" fill="#fff" font-weight="700">TI TPS54302</text>
+            <text x="170" y="178" text-anchor="middle" font-family="monospace" font-size="6" fill="#fff">12V → 5V buck</text>
+
+            <!-- power input -->
+            <rect x="360" y="160" width="60" height="20" fill="#5a1a1a" />
+            <text x="390" y="174" text-anchor="middle" font-family="monospace" font-size="8" fill="#fff">12V IN</text>
+
+            <!-- LED -->
+            <circle class="s1-led" cx="20" cy="180" r="5" fill="#56d364" />
+            <text x="30" y="184" font-family="monospace" font-size="9" fill="#56d364">PWR</text>
+
+            <!-- traces -->
+            <line x1="128" y1="84" x2="158" y2="84" stroke="#4ec9b0" stroke-width="1" opacity="0.6" />
+            <line x1="222" y1="84" x2="250" y2="84" stroke="#4ec9b0" stroke-width="1" opacity="0.6" />
+            <line x1="360" y1="160" x2="200" y2="160" stroke="#a83232" stroke-width="1" opacity="0.6" />
+            <line x1="200" y1="160" x2="200" y2="120" stroke="#a83232" stroke-width="1" opacity="0.6" />
+
+            <!-- callout labels -->
+            <text x="78" y="142" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#4ec9b0">Knows where the bus is</text>
+            <text x="190" y="142" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#4ec9b0">The little brain (TI)</text>
+            <text x="295" y="142" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#4ec9b0">Sends it over phone signal</text>
+          </g>
+        </g>
+
+        <!-- Foot label -->
+        <text x="600" y="500" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" fill="#8b949e">No smartphone, no internet — just a regular 2G signal is enough.</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ============ SCENE 2: TALKING TO THE SERVER ============ -->
+  <div class="scene" data-scene="2">
+    <div class="scene-header">
+      <span class="scene-tag" style="background: rgba(86,211,100,0.15); color: var(--green);">2 · The bus phones home</span>
+      <h2>Every 25 seconds, it sends a tiny message.</h2>
+      <p class="caption">Just a quick "I'm at this spot, going this fast." It goes over the same mobile network your phone uses. The whole day's data costs less than ₹2.</p>
+    </div>
+    <div class="art">
+      <svg viewBox="0 0 1200 540" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%;">
+        <defs>
+          <linearGradient id="sky2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#1a2742" /><stop offset="1" stop-color="#2d3f5f" />
+          </linearGradient>
+          <path id="signalPath" d="M 200 280 Q 480 80 600 200 Q 720 320 1000 230" fill="none" />
+        </defs>
+        <rect x="0" y="0" width="1200" height="540" fill="url(#sky2)" />
+        <rect x="0" y="380" width="1200" height="160" fill="#1f2a1f" />
+
+        <!-- bus (smaller) -->
+        <g transform="translate(80, 230) scale(0.6)">
+          <rect x="0" y="20" width="280" height="100" rx="14" fill="#a83232" stroke="#1a1a1a" stroke-width="3" />
+          <rect x="14" y="46" width="222" height="40" rx="4" fill="#8fd5ff" opacity="0.85" />
+          <circle cx="55" cy="138" r="20" fill="#1a1a1a" stroke="#666" stroke-width="2" />
+          <circle cx="225" cy="138" r="20" fill="#1a1a1a" stroke="#666" stroke-width="2" />
+          <text x="140" y="155" text-anchor="middle" font-family="monospace" font-size="16" font-weight="700" fill="#fff">MH-17</text>
+        </g>
+        <!-- signal waves from bus rooftop -->
+        <g transform="translate(196, 240)">
+          <circle class="s2-wave" cx="0" cy="0" r="18" fill="none" stroke="#56d364" stroke-width="3" />
+          <circle class="s2-wave s2-wave-2" cx="0" cy="0" r="18" fill="none" stroke="#56d364" stroke-width="3" />
+          <circle class="s2-wave s2-wave-3" cx="0" cy="0" r="18" fill="none" stroke="#56d364" stroke-width="3" />
+        </g>
+
+        <!-- cell tower in middle -->
+        <g transform="translate(560, 130)">
+          <line x1="40" y1="0" x2="20" y2="180" stroke="#888" stroke-width="3" />
+          <line x1="40" y1="0" x2="60" y2="180" stroke="#888" stroke-width="3" />
+          <line x1="20" y1="50" x2="60" y2="50" stroke="#888" stroke-width="2" />
+          <line x1="22" y1="100" x2="58" y2="100" stroke="#888" stroke-width="2" />
+          <line x1="26" y1="150" x2="54" y2="150" stroke="#888" stroke-width="2" />
+          <rect x="32" y="-12" width="16" height="14" fill="#a83232" />
+          <text x="40" y="200" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" fill="#8b949e">Mobile tower</text>
+        </g>
+
+        <!-- server (right) -->
+        <g transform="translate(940, 170)">
+          <rect x="0" y="0" width="180" height="160" rx="10" fill="#2a3142" stroke="#4ec9b0" stroke-width="2" />
+          <!-- rack slots -->
+          <rect x="14" y="14" width="152" height="22" rx="3" fill="#1a1f2a" />
+          <circle class="s2-server-light" cx="22" cy="25" r="3" fill="#56d364" />
+          <text x="40" y="29" font-family="monospace" font-size="9" fill="#888">api · port 443</text>
+          <rect x="14" y="42" width="152" height="22" rx="3" fill="#1a1f2a" />
+          <circle class="s2-server-light" cx="22" cy="53" r="3" fill="#56d364" />
+          <text x="40" y="57" font-family="monospace" font-size="9" fill="#888">ingest · queue</text>
+          <rect x="14" y="70" width="152" height="22" rx="3" fill="#1a1f2a" />
+          <circle class="s2-server-light" cx="22" cy="81" r="3" fill="#4ec9b0" />
+          <text x="40" y="85" font-family="monospace" font-size="9" fill="#888">ETA engine</text>
+          <rect x="14" y="98" width="152" height="22" rx="3" fill="#1a1f2a" />
+          <circle class="s2-server-light" cx="22" cy="109" r="3" fill="#d8a657" />
+          <text x="40" y="113" font-family="monospace" font-size="9" fill="#888">database</text>
+          <rect x="14" y="126" width="152" height="22" rx="3" fill="#1a1f2a" />
+          <circle class="s2-server-light" cx="22" cy="137" r="3" fill="#b794f6" />
+          <text x="40" y="141" font-family="monospace" font-size="9" fill="#888">SMS/IVR dispatch</text>
+          <text x="90" y="180" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" fill="#4ec9b0">Server (somewhere in a data centre)</text>
+        </g>
+
+        <!-- signal path -->
+        <use href="#signalPath" stroke="#4ec9b0" stroke-width="2" stroke-dasharray="6 6" opacity="0.5" fill="none" />
+        <!-- packet moving along path -->
+        <circle class="s2-packet" r="7" fill="#56d364" style="offset-path: path('M 200 280 Q 480 80 600 200 Q 720 320 1000 230');" />
+
+        <!-- packet contents popup -->
+        <g transform="translate(420, 360)">
+          <rect x="0" y="0" width="340" height="118" rx="8" fill="#161b22" stroke="#56d364" stroke-width="1.5" />
+          <text x="14" y="22" font-family="monospace" font-size="10" fill="#56d364" font-weight="700">What's in the message:</text>
+          <text x="14" y="44" font-family="monospace" font-size="11" fill="#e6edf3">bus_id  = "MH-17"</text>
+          <text x="14" y="60" font-family="monospace" font-size="11" fill="#e6edf3">lat     = 19.1234</text>
+          <text x="14" y="76" font-family="monospace" font-size="11" fill="#e6edf3">lon     = 73.9456</text>
+          <text x="14" y="92" font-family="monospace" font-size="11" fill="#e6edf3">speed   = 7.8 m/s</text>
+          <text x="14" y="108" font-family="monospace" font-size="11" fill="#e6edf3">time    = 14:23:11</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ============ SCENE 3: THE BRAIN ============ -->
+  <div class="scene" data-scene="3">
+    <div class="scene-header">
+      <span class="scene-tag" style="background: rgba(78,201,176,0.15); color: var(--teal);">3 · The server figures it out</span>
+      <h2>Where on the route is the bus, and when will it arrive?</h2>
+      <p class="caption">The server keeps the shape of every route in memory. When a message lands, it finds the nearest spot on the route, then adds up how long the rest of the trip usually takes. That's the ETA.</p>
+    </div>
+    <div class="art">
+      <svg viewBox="0 0 1200 540" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%;">
+        <rect x="0" y="0" width="1200" height="540" fill="#0d1117" />
+        <!-- left side: visual mini-map -->
+        <g transform="translate(60, 60)">
+          <rect x="0" y="0" width="560" height="420" rx="12" fill="#161b22" stroke="#30363d" />
+          <text x="20" y="30" font-family="-apple-system, sans-serif" font-size="13" fill="#8b949e">What the server sees:</text>
+
+          <!-- route polyline (curved) -->
+          <path class="s3-route" d="M 80 100 Q 200 80 280 180 Q 360 280 480 320" stroke="#4ec9b0" stroke-width="5" fill="none" stroke-linecap="round" />
+          <!-- stops -->
+          <circle cx="80" cy="100" r="9" fill="#4ec9b0" stroke="#fff" stroke-width="2" />
+          <text x="80" y="88" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" fill="#fff">Junnar</text>
+          <circle cx="280" cy="180" r="9" fill="#4ec9b0" stroke="#fff" stroke-width="2" />
+          <text x="280" y="168" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" fill="#fff">Narayangaon</text>
+          <circle cx="480" cy="320" r="9" fill="#4ec9b0" stroke="#fff" stroke-width="2" />
+          <text x="480" y="345" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" fill="#fff">Manchar</text>
+
+          <!-- bus (off the line slightly) -->
+          <g class="s3-bus">
+            <circle cx="250" cy="120" r="11" fill="#58a6ff" stroke="#fff" stroke-width="2" />
+            <text x="265" y="116" font-family="-apple-system, sans-serif" font-size="10" fill="#58a6ff">MH-17 sent: (250, 120)</text>
+          </g>
+
+          <!-- perpendicular drop -->
+          <line class="s3-perp" x1="250" y1="120" x2="218" y2="160" stroke="#fff" stroke-width="2" stroke-dasharray="4 4" />
+          <!-- snapped point -->
+          <g class="s3-snap">
+            <circle cx="218" cy="160" r="7" fill="#fff" stroke="#4ec9b0" stroke-width="2" />
+            <text x="218" y="200" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#fff">on the route</text>
+          </g>
+
+          <text x="280" y="395" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" fill="#8b949e">step 1 — find the closest point on the road</text>
+        </g>
+
+        <!-- right side: ETA breakdown -->
+        <g transform="translate(660, 60)">
+          <rect x="0" y="0" width="480" height="420" rx="12" fill="#161b22" stroke="#30363d" />
+          <text x="20" y="30" font-family="-apple-system, sans-serif" font-size="13" fill="#8b949e">step 2 — add up the time still to go:</text>
+
+          <g class="s3-formula-line" transform="translate(20, 70)">
+            <circle cx="10" cy="0" r="6" fill="#e3b341" />
+            <text x="28" y="4" font-family="-apple-system, sans-serif" font-size="14" fill="#e6edf3">Finish the bit of road the bus is on</text>
+            <text x="28" y="24" font-family="monospace" font-size="13" fill="#e3b341">≈ 4 min</text>
+          </g>
+          <g class="s3-formula-line" transform="translate(20, 140)">
+            <circle cx="10" cy="0" r="6" fill="#ff9466" />
+            <text x="28" y="4" font-family="-apple-system, sans-serif" font-size="14" fill="#e6edf3">Pause at Narayangaon stop</text>
+            <text x="28" y="24" font-family="monospace" font-size="13" fill="#ff9466">+ 40 sec</text>
+          </g>
+          <g class="s3-formula-line" transform="translate(20, 210)">
+            <circle cx="10" cy="0" r="6" fill="#b794f6" />
+            <text x="28" y="4" font-family="-apple-system, sans-serif" font-size="14" fill="#e6edf3">Drive Narayangaon → Manchar</text>
+            <text x="28" y="24" font-family="monospace" font-size="13" fill="#b794f6">+ 9 min</text>
+          </g>
+          <g class="s3-formula-line" transform="translate(20, 290)">
+            <line x1="0" y1="-12" x2="440" y2="-12" stroke="#30363d" />
+            <text x="0" y="14" font-family="-apple-system, sans-serif" font-size="18" fill="#fff" font-weight="600">Bus will arrive in about</text>
+            <text x="280" y="14" font-family="-apple-system, sans-serif" font-size="32" fill="#4ec9b0" font-weight="700">13 min</text>
+          </g>
+          <text x="240" y="395" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" fill="#8b949e">these times come from past trips the system has watched</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ============ SCENE 4: DASHBOARD ============ -->
+  <div class="scene" data-scene="4">
+    <div class="scene-header">
+      <span class="scene-tag" style="background: rgba(211,134,155,0.15); color: var(--pink);">4 · The depot can see everything</span>
+      <h2>One screen for all the buses.</h2>
+      <p class="caption">The MSRTC staff at the depot see every bus on a map, with how long until each arrives. If anything goes wrong — bus stuck, off route, signal lost — it shows up here right away.</p>
+    </div>
+    <div class="art" style="display:flex; justify-content:center; align-items:center;">
+      <!-- monitor frame -->
+      <div style="background:#1a1a1a; border-radius:12px; padding:14px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); width: 820px;">
+        <!-- top bezel with camera -->
+        <div style="display:flex; justify-content:center; padding-bottom:8px;">
+          <div style="width:8px; height:8px; border-radius:50%; background:#444;"></div>
+        </div>
+        <div style="background:#0d1117; border-radius:6px; padding:20px; min-height:380px;">
+          <!-- header row -->
+          <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:14px; border-bottom:1px solid #30363d;">
+            <div>
+              <div style="font-size:11px; color:#8b949e;">MSRTC PUNE DIVISION · LIVE OPS</div>
+              <div style="font-size:18px; font-weight:600;">Today's fleet</div>
+            </div>
+            <div style="font-size:11px; color:#8b949e; font-family:monospace;">14:29 IST · 12 buses online</div>
+          </div>
+          <!-- fleet rows -->
+          <div style="margin-top:14px;">
+            <div class="s4-row" style="display:grid; grid-template-columns: 80px 1fr 200px 100px; gap:14px; padding:10px 0; border-bottom:1px solid #21262d; align-items:center; font-size:13px;">
+              <div style="font-family:monospace; font-weight:600; color:#58a6ff;">MH-17</div>
+              <div>Route R5 · Junnar → Manchar<br><span style="font-size:11px; color:#8b949e;">arriving Manchar in <b style="color:#e6edf3">13 min</b></span></div>
+              <div style="height:6px; background:#21262d; border-radius:3px; overflow:hidden;"><div style="width:35%; height:100%; background:#58a6ff;"></div></div>
+              <div style="text-align:right;"><span style="background:rgba(88,166,255,0.15); color:#58a6ff; padding:3px 10px; border-radius:999px; font-size:10px; font-weight:700; border:1px solid rgba(88,166,255,0.4);">LIVE</span></div>
+            </div>
+            <div class="s4-row" style="display:grid; grid-template-columns: 80px 1fr 200px 100px; gap:14px; padding:10px 0; border-bottom:1px solid #21262d; align-items:center; font-size:13px;">
+              <div style="font-family:monospace; font-weight:600; color:#ffa657;">MH-04</div>
+              <div>Route R5 · Junnar → Manchar<br><span style="font-size:11px; color:#8b949e;">arriving Manchar in <b style="color:#e6edf3">6 min</b></span></div>
+              <div style="height:6px; background:#21262d; border-radius:3px; overflow:hidden;"><div style="width:70%; height:100%; background:#ffa657;"></div></div>
+              <div style="text-align:right;"><span style="background:rgba(88,166,255,0.15); color:#58a6ff; padding:3px 10px; border-radius:999px; font-size:10px; font-weight:700; border:1px solid rgba(88,166,255,0.4);">LIVE</span></div>
+            </div>
+            <div class="s4-row" style="display:grid; grid-template-columns: 80px 1fr 200px 100px; gap:14px; padding:10px 0; border-bottom:1px solid #21262d; align-items:center; font-size:13px;">
+              <div style="font-family:monospace; font-weight:600; color:#d3869b;">MH-09</div>
+              <div>Route R5 · Junnar → Manchar<br><span style="font-size:11px; color:#f85149;">⚠ went off route at 14:27 — alert sent to passengers</span></div>
+              <div style="height:6px; background:rgba(248,81,73,0.15); border-radius:3px; overflow:hidden;"><div style="width:50%; height:100%; background:#f85149;"></div></div>
+              <div style="text-align:right;"><span class="s4-alert-pill" style="background:rgba(248,81,73,0.15); color:#f85149; padding:3px 10px; border-radius:999px; font-size:10px; font-weight:700; border:1px solid rgba(248,81,73,0.4); display:inline-block;">OFF ROUTE</span></div>
+            </div>
+          </div>
+          <div style="margin-top:20px; font-size:11px; color:#8b949e;">Tap any bus → see the full trip + last 50 GPS pings.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SCENE 5: PASSENGER ============ -->
+  <div class="scene" data-scene="5">
+    <div class="scene-header">
+      <span class="scene-tag" style="background: rgba(183,148,246,0.15); color: var(--purple);">5 · The passenger</span>
+      <h2>Anyone can ask "where's my bus?" from any phone.</h2>
+      <p class="caption">No smartphone needed, no app to download. The passenger calls a free number. A voice answers in their own language and tells them how many minutes until the bus arrives.</p>
+    </div>
+    <div class="art" style="display:flex; justify-content:center; align-items:center; gap:60px;">
+      <!-- village + person -->
+      <svg viewBox="0 0 420 360" style="width:420px; height:360px;">
+        <!-- sky -->
+        <rect x="0" y="0" width="420" height="220" fill="#2d3f5f" />
+        <!-- ground -->
+        <rect x="0" y="220" width="420" height="140" fill="#3a4a3a" />
+        <!-- sun -->
+        <circle cx="340" cy="60" r="22" fill="#e3b341" opacity="0.8" />
+        <!-- hut -->
+        <polygon points="50,180 100,140 150,180" fill="#7a4a2a" />
+        <rect x="60" y="180" width="80" height="60" fill="#a87a4a" />
+        <rect x="90" y="200" width="22" height="40" fill="#5a3a1f" />
+        <!-- bus stop sign -->
+        <line x1="240" y1="170" x2="240" y2="280" stroke="#888" stroke-width="3" />
+        <rect x="215" y="160" width="60" height="40" fill="#4ec9b0" stroke="#fff" stroke-width="2" />
+        <text x="245" y="184" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#000" font-weight="700">BUS</text>
+        <text x="245" y="196" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="8" fill="#000">STOP</text>
+        <!-- person — clean figure, phone held to ear -->
+        <g transform="translate(290, 198)">
+          <!-- head -->
+          <circle cx="0" cy="0" r="14" fill="#e8c190" stroke="#7a4a2a" stroke-width="0.8" />
+          <!-- eyes -->
+          <circle cx="-4" cy="-2" r="1.2" fill="#2a1a0a" />
+          <circle cx="4" cy="-2" r="1.2" fill="#2a1a0a" />
+          <!-- hair -->
+          <path d="M -13 -4 Q -10 -16 0 -14 Q 10 -16 13 -4 L 13 -8 Q 0 -22 -13 -8 Z" fill="#2a1a0a" />
+          <!-- kurta / body -->
+          <path d="M -18 16 L 18 16 L 22 72 L -22 72 Z" fill="#4ec9b0" stroke="#2a6a5a" stroke-width="0.8" />
+          <!-- right arm (down at side) -->
+          <path d="M 18 22 Q 28 44 24 66" stroke="#e8c190" stroke-width="9" fill="none" stroke-linecap="round" />
+          <!-- left arm raised — bent up to hold phone at ear -->
+          <path d="M -18 22 Q -32 8 -28 -8" stroke="#e8c190" stroke-width="9" fill="none" stroke-linecap="round" />
+          <!-- phone at ear (positioning outside, animation inside) -->
+          <g transform="translate(-28, -12)">
+            <g class="s5-phone">
+              <rect x="-8" y="-12" width="16" height="26" rx="3" fill="#1a1a1a" stroke="#888" stroke-width="1" />
+              <rect x="-6" y="-9" width="12" height="18" fill="#0a3a1f" />
+              <circle cx="0" cy="11" r="1.5" fill="#666" />
+            </g>
+          </g>
+          <!-- voice waves coming from phone speaker -->
+          <path class="s5-wave" d="M -42 -16 Q -50 -16 -46 -22" stroke="#b794f6" stroke-width="2" fill="none" stroke-linecap="round" />
+          <path class="s5-wave" d="M -46 -8 Q -58 -10 -52 -18" stroke="#b794f6" stroke-width="2" fill="none" stroke-linecap="round" />
+          <!-- legs (pants) -->
+          <rect x="-15" y="72" width="13" height="46" rx="2" fill="#2a3142" />
+          <rect x="2" y="72" width="13" height="46" rx="2" fill="#2a3142" />
+          <!-- shoes -->
+          <ellipse cx="-9" cy="120" rx="9" ry="3" fill="#1a1a1a" />
+          <ellipse cx="9" cy="120" rx="9" ry="3" fill="#1a1a1a" />
+        </g>
+        <text x="210" y="340" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" fill="#8b949e">A passenger at a rural stop, basic phone in hand</text>
+      </svg>
+
+      <!-- phone screen + dialogue -->
+      <div style="background:#1a1a1a; border:8px solid #2a2a2a; border-radius:24px; padding:14px; width:260px; min-height: 360px;">
+        <div style="display:flex; justify-content:space-between; font-size:9px; color:#999; padding:0 4px 8px;">
+          <span>WISH</span><span>📶 2G</span>
+        </div>
+        <div style="background:#0a0a0a; border-radius:10px; padding:14px; min-height:280px;">
+          <div style="background:#1c2733; padding:10px; border-radius:10px; margin-bottom:10px;">
+            <div style="font-size:10px; color:#b794f6; font-weight:700; margin-bottom:4px;">📞 Calling 1800-WISH-ETA</div>
+            <div style="font-size:11px; color:#e6edf3; line-height:1.5;">
+              <span class="marathi">"नमस्कार. मराठीसाठी १ दाबा."</span><br>
+              <span style="color:#8b949e; font-size:10px;">("Hello. Press 1 for Marathi.")</span>
+            </div>
+          </div>
+          <div style="background:#1c2733; padding:10px; border-radius:10px; margin-bottom:10px;">
+            <div style="font-size:10px; color:#b794f6; font-weight:700; margin-bottom:4px;">User presses 1</div>
+            <div style="font-size:11px; color:#e6edf3; line-height:1.5;">
+              <span class="marathi">"बस क्रमांक सांगा."</span><br>
+              <span style="color:#8b949e; font-size:10px;">("Say the bus number.")</span>
+            </div>
+          </div>
+          <div style="background:#1c2733; padding:10px; border-radius:10px; margin-bottom:10px;">
+            <div style="font-size:10px; color:#b794f6; font-weight:700; margin-bottom:4px;">User says "MH-17"</div>
+            <div style="font-size:11px; color:#e6edf3; line-height:1.5;">
+              <span class="marathi">"बस MH-१७ अंदाजे १३ मिनिटांत मनचरला पोहोचेल."</span><br>
+              <span style="color:#8b949e; font-size:10px;">("Bus MH-17 will reach Manchar in about 13 minutes.")</span>
+            </div>
+          </div>
+          <div style="text-align:center; color:#8b949e; font-size:10px; margin-top:14px;">Call ended · ₹0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SCENE 6: DIVERT ============ -->
+  <div class="scene" data-scene="6">
+    <div class="scene-header">
+      <span class="scene-tag" style="background: rgba(248,81,73,0.15); color: var(--bad);">6 · When something goes wrong</span>
+      <h2>If a bus diverts, everyone hears about it in seconds.</h2>
+      <p class="caption">No more standing in the rain for an hour because the bus took a different road. Everyone who recently asked about that bus gets a text in their own language, automatically.</p>
+    </div>
+    <div class="art" style="display:flex; justify-content:center; align-items:center;">
+      <svg viewBox="0 0 1100 560" style="width:100%; height:100%; max-width:1100px;">
+        <!-- server in centre -->
+        <g transform="translate(490, 80)">
+          <rect x="0" y="0" width="120" height="140" rx="10" fill="#2a3142" stroke="#f85149" stroke-width="2.5" />
+          <rect x="10" y="14" width="100" height="18" rx="3" fill="#1a1f2a" />
+          <rect x="10" y="36" width="100" height="18" rx="3" fill="#1a1f2a" />
+          <rect x="10" y="58" width="100" height="18" rx="3" fill="#1a1f2a" />
+          <circle cx="18" cy="23" r="3" fill="#f85149" />
+          <circle cx="18" cy="45" r="3" fill="#f85149" />
+          <circle cx="18" cy="67" r="3" fill="#f85149" />
+          <text x="60" y="100" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" fill="#f85149" font-weight="700">ALERT</text>
+          <text x="60" y="116" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="9" fill="#f85149">MH-17 diverted</text>
+          <!-- radiating circles -->
+          <circle class="s6-radiate" cx="60" cy="70" r="20" fill="none" stroke="#f85149" stroke-width="2" />
+          <circle class="s6-radiate s6-radiate-2" cx="60" cy="70" r="20" fill="none" stroke="#f85149" stroke-width="2" />
+        </g>
+
+        <!-- lines fanning to 3 phones -->
+        <line x1="490" y1="150" x2="200" y2="350" stroke="#f85149" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6" />
+        <line x1="610" y1="150" x2="900" y2="350" stroke="#f85149" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6" />
+        <line x1="550" y1="220" x2="550" y2="350" stroke="#f85149" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6" />
+
+        <!-- phone 1 (left) -->
+        <g transform="translate(80, 320)"><g class="s6-phone-recv">
+          <rect x="0" y="0" width="120" height="160" rx="14" fill="#1a1a1a" stroke="#666" stroke-width="2" />
+          <rect x="10" y="20" width="100" height="115" fill="#0a0a0a" />
+          <rect x="14" y="26" width="92" height="80" fill="#3a1a1a" stroke="#f85149" />
+          <text x="60" y="44" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="8" fill="#f85149" font-weight="700">WISH ALERT</text>
+          <text x="60" y="62" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="7" fill="#fff" class="marathi">बस MH-17</text>
+          <text x="60" y="74" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="7" fill="#fff" class="marathi">मार्ग बदलला</text>
+          <text x="60" y="90" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="7" fill="#fff" class="marathi">वाट पाहू नका</text>
+          <circle cx="60" cy="148" r="4" fill="#666" />
+          <text x="60" y="175" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#8b949e">Rural Marathi user</text>
+        </g></g>
+
+        <!-- phone 2 (middle) -->
+        <g transform="translate(490, 350)"><g class="s6-phone-recv s6-phone-recv-2">
+          <rect x="0" y="0" width="120" height="160" rx="14" fill="#1a1a1a" stroke="#666" stroke-width="2" />
+          <rect x="10" y="20" width="100" height="115" fill="#0a0a0a" />
+          <rect x="14" y="26" width="92" height="80" fill="#3a1a1a" stroke="#f85149" />
+          <text x="60" y="44" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="8" fill="#f85149" font-weight="700">WISH ALERT</text>
+          <text x="60" y="60" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="7" fill="#fff">Bus MH-17</text>
+          <text x="60" y="72" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="7" fill="#fff">has diverted.</text>
+          <text x="60" y="90" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="7" fill="#fff">Don't wait.</text>
+          <circle cx="60" cy="148" r="4" fill="#666" />
+          <text x="60" y="175" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#8b949e">English user</text>
+        </g></g>
+
+        <!-- phone 3 (right) -->
+        <g transform="translate(900, 320)"><g class="s6-phone-recv s6-phone-recv-3">
+          <rect x="0" y="0" width="120" height="160" rx="14" fill="#1a1a1a" stroke="#666" stroke-width="2" />
+          <rect x="10" y="20" width="100" height="115" fill="#0a0a0a" />
+          <rect x="14" y="26" width="92" height="80" fill="#3a1a1a" stroke="#f85149" />
+          <text x="60" y="44" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="8" fill="#f85149" font-weight="700">सूचना</text>
+          <text x="60" y="62" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="7" fill="#fff" class="marathi">बस MH-17</text>
+          <text x="60" y="74" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="7" fill="#fff" class="marathi">वळली आहे</text>
+          <text x="60" y="90" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="7" fill="#fff" class="marathi">पुढची माहिती SMS</text>
+          <circle cx="60" cy="148" r="4" fill="#666" />
+          <text x="60" y="175" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#8b949e">Older basic phone</text>
+        </g></g>
+
+        <!-- caption strip -->
+        <text x="550" y="40" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" fill="#8b949e">From bus going off-route → text arriving on your phone: <tspan fill="#f85149" font-weight="700">under 30 seconds.</tspan></text>
+      </svg>
+    </div>
+  </div>
+
+</div>
+
+<nav>
+  <button class="nav-btn" id="prevBtn">← Prev</button>
+  <div class="dots" id="dots"></div>
+  <span class="scene-counter" id="sceneCounter">1 / 6</span>
+  <button class="nav-btn primary" id="nextBtn">Next →</button>
+  <button class="nav-btn" id="autoBtn">▶ Auto-play</button>
+</nav>
+
+<script>
+  const scenes = document.querySelectorAll('.scene');
+  const total = scenes.length;
+  let current = 0;
+  let autoPlaying = false;
+  let autoTimer = null;
+
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => go(i));
+    dotsEl.appendChild(d);
+  }
+  const dots = dotsEl.querySelectorAll('.dot');
+
+  function go(i) {
+    if (i < 0 || i >= total) return;
+    scenes[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = i;
+    scenes[current].classList.add('active');
+    dots[current].classList.add('active');
+    document.getElementById('sceneCounter').textContent = (current + 1) + ' / ' + total;
+    // Re-trigger CSS animations by forcing reflow
+    scenes[current].style.animation = 'none';
+    void scenes[current].offsetWidth;
+    scenes[current].style.animation = '';
+  }
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    if (current < total - 1) go(current + 1);
+    else { stopAuto(); }
+  });
+  document.getElementById('prevBtn').addEventListener('click', () => go(current - 1));
+
+  function stopAuto() {
+    autoPlaying = false;
+    if (autoTimer) clearTimeout(autoTimer);
+    document.getElementById('autoBtn').textContent = '▶ Auto-play';
+  }
+  function autoStep() {
+    if (!autoPlaying) return;
+    if (current < total - 1) {
+      go(current + 1);
+      autoTimer = setTimeout(autoStep, 7000);
+    } else {
+      stopAuto();
+    }
+  }
+  document.getElementById('autoBtn').addEventListener('click', () => {
+    if (autoPlaying) { stopAuto(); }
+    else {
+      autoPlaying = true;
+      document.getElementById('autoBtn').textContent = '⏸ Pause auto';
+      autoTimer = setTimeout(autoStep, 7000);
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') document.getElementById('nextBtn').click();
+    if (e.key === 'ArrowLeft') document.getElementById('prevBtn').click();
+  });
+
+  // activate first scene
+  scenes[0].classList.add('active');
+</script>
+
+</body>
+</html>

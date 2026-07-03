@@ -1,0 +1,33 @@
+---
+title: "Geofencing — how the server decides if the bus is on the right route"
+---
+flowchart TB
+    subgraph IDEA["THE IDEA"]
+        direction TB
+        VIS["We draw an invisible 'corridor' around the planned route<br/>(say 50 m wide on either side of the road).<br/><br/>If the bus stays inside the corridor → on route.<br/>If it goes outside for several updates in a row → diverted."]:::idea
+    end
+
+    subgraph MATH["THE MATH (used to check this)"]
+        direction TB
+        H["Distance between two GPS points<br/>(Haversine formula)<br/><br/>Tells us 'how far is the bus from this point on the route?'<br/>Accurate to a few metres — well under GPS error."]:::eq
+        XT["Perpendicular distance from bus to a road segment<br/>(Cross-track distance)<br/><br/>Tells us 'how far off the road line is the bus?'<br/>This is the number we compare to the corridor width."]:::eq
+        FAST["Fast version (good enough at our scale)<br/><br/>Convert lat/lon to flat x/y near the route,<br/>then standard high-school geometry to find the<br/>shortest distance from bus to road line.<br/><br/>~10× cheaper to compute, sub-metre error."]:::eq2
+    end
+
+    subgraph RULES["THE RULES (what the server actually does)"]
+        direction TB
+        R1["ON-ROUTE<br/>Bus is within the corridor (≤ 50 m from the road line)"]:::ok
+        R2["ARRIVED at a stop<br/>Bus is within 30 m of the stop AND barely moving"]:::ok
+        R3["LEFT the stop<br/>Bus is more than 50 m from the stop AND moving<br/>(extra 20 m so it doesn't flicker)"]:::ok
+        R4["DIVERTED (off route)<br/>Bus is outside the corridor for 3 packets in a row<br/>(one bad GPS reading isn't enough — we wait for 3)"]:::alert
+        R5["When diverted:<br/>• log an alert in the database<br/>• ping Person 3's dispatcher to notify passengers<br/>• flash a banner on the authority dashboard"]:::action
+    end
+
+    IDEA --> MATH --> RULES
+
+    classDef idea fill:#FFF2CC,stroke:#D6B656,color:#000
+    classDef eq fill:#DAE8FC,stroke:#6C8EBF,color:#000
+    classDef eq2 fill:#E1D5E7,stroke:#9673A6,color:#000
+    classDef ok fill:#D5E8D4,stroke:#82B366,color:#000
+    classDef alert fill:#F8CECC,stroke:#B85450,color:#000,font-weight:bold
+    classDef action fill:#FFE6CC,stroke:#D79B00,color:#000,font-weight:bold

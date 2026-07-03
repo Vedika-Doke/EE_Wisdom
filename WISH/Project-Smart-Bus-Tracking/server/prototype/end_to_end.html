@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>WISH — End-to-End System Flow</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<style>
+  :root {
+    --bg: #0b0f17; --panel: #11161f; --panel-2: #161c27; --panel-3: #1c2433;
+    --text: #e8eef6; --muted: #7c8794; --dim: #5a6573;
+    --p1: #5aa9ff;  /* Bus module */
+    --p2: #4ade80;  /* Server ingest */
+    --p3: #2dd4bf;  /* ETA engine */
+    --p4: #f59e0b;  /* DB */
+    --p5: #ec4899;  /* Dashboard */
+    --p6: #a78bfa;  /* SMS/IVR */
+    --warn: #f59e0b; --bad: #ef4444; --ok: #22c55e;
+    --border: #232b39; --border-soft: #1a2230;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; font-feature-settings: 'cv11', 'ss01'; }
+  #app { display: grid; grid-template-rows: 52px 1fr auto; height: 100vh; }
+
+  /* ---------- HEADER ---------- */
+  header {
+    background: linear-gradient(180deg, #11161f 0%, #0d121a 100%);
+    border-bottom: 1px solid var(--border); padding: 0 22px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .logo {
+    width: 26px; height: 26px; border-radius: 7px;
+    background: linear-gradient(135deg, var(--p3), var(--p1));
+    display: grid; place-items: center; color: #04141a; font-weight: 800; font-size: 13px;
+    box-shadow: 0 0 14px rgba(45,212,191,0.35);
+  }
+  header h1 { font-size: 13px; margin: 0; font-weight: 600; letter-spacing: 0.2px; }
+  header .sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  header .controls { display: flex; gap: 6px; }
+  header button {
+    background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+    padding: 6px 11px; font-size: 11px; font-weight: 500; border-radius: 6px; cursor: pointer;
+    transition: all 0.15s; letter-spacing: 0.1px;
+  }
+  header button:hover { border-color: var(--p3); color: var(--p3); }
+  header button.danger:hover { border-color: var(--bad); color: var(--bad); }
+  header button.primary { background: var(--p3); color: #04141a; border-color: var(--p3); font-weight: 600; }
+  header button.primary:hover { filter: brightness(1.1); color: #04141a; }
+
+  #main { display: grid; grid-template-columns: 1.5fr 1fr; height: 100%; overflow: hidden; }
+  #map { height: 100%; }
+  #right { background: var(--panel); border-left: 1px solid var(--border); overflow-y: auto; padding: 14px 16px; }
+
+  /* ---------- PIPELINE STRIP ---------- */
+  #pipeline {
+    background: linear-gradient(180deg, #0d121a 0%, #11161f 100%);
+    border-top: 1px solid var(--border); padding: 16px 22px 18px;
+  }
+  .pipeline-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--dim); margin-bottom: 10px; font-weight: 600; }
+  .stages { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; align-items: stretch; position: relative; }
+  .stage {
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px 11px; position: relative; transition: all 0.25s ease;
+    min-height: 108px; overflow: hidden;
+  }
+  .stage:not(:last-child) { margin-right: 18px; }
+  .stage::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: var(--border); transition: background 0.25s;
+  }
+  .stage[data-color="p1"]::before { background: var(--p1); opacity: 0.4; }
+  .stage[data-color="p2"]::before { background: var(--p2); opacity: 0.4; }
+  .stage[data-color="p3"]::before { background: var(--p3); opacity: 0.4; }
+  .stage[data-color="p4"]::before { background: var(--p4); opacity: 0.4; }
+  .stage[data-color="p5"]::before { background: var(--p5); opacity: 0.4; }
+  .stage[data-color="p6"]::before { background: var(--p6); opacity: 0.4; }
+  .stage.active::before { opacity: 1; }
+  .stage .head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .stage .icon {
+    width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center;
+    background: var(--panel-3); border: 1px solid var(--border);
+  }
+  .stage .icon svg { width: 14px; height: 14px; stroke-width: 1.8; }
+  .stage .num {
+    margin-left: auto; font-size: 9px; color: var(--dim); font-weight: 600;
+    background: var(--panel-3); padding: 2px 6px; border-radius: 4px; letter-spacing: 0.3px;
+  }
+  .stage h3 { font-size: 11px; margin: 0; font-weight: 600; letter-spacing: 0.1px; }
+  .stage .desc { font-size: 10px; color: var(--muted); margin: 0 0 7px 0; line-height: 1.4; }
+  .stage .data {
+    font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+    font-size: 10px; color: var(--text); line-height: 1.5;
+    background: rgba(0,0,0,0.25); border-radius: 5px; padding: 6px 8px;
+    border: 1px solid var(--border-soft);
+  }
+  .stage .data b { color: var(--text); font-weight: 600; }
+  .stage[data-color="p1"] .icon svg { color: var(--p1); }
+  .stage[data-color="p2"] .icon svg { color: var(--p2); }
+  .stage[data-color="p3"] .icon svg { color: var(--p3); }
+  .stage[data-color="p4"] .icon svg { color: var(--p4); }
+  .stage[data-color="p5"] .icon svg { color: var(--p5); }
+  .stage[data-color="p6"] .icon svg { color: var(--p6); }
+  .stage[data-color="p1"] h3 { color: var(--p1); }
+  .stage[data-color="p2"] h3 { color: var(--p2); }
+  .stage[data-color="p3"] h3 { color: var(--p3); }
+  .stage[data-color="p4"] h3 { color: var(--p4); }
+  .stage[data-color="p5"] h3 { color: var(--p5); }
+  .stage[data-color="p6"] h3 { color: var(--p6); }
+
+  .stage.active { transform: translateY(-2px); background: var(--panel-3); }
+  .stage[data-color="p1"].active { border-color: var(--p1); box-shadow: 0 4px 20px rgba(90,169,255,0.25); }
+  .stage[data-color="p2"].active { border-color: var(--p2); box-shadow: 0 4px 20px rgba(74,222,128,0.25); }
+  .stage[data-color="p3"].active { border-color: var(--p3); box-shadow: 0 4px 20px rgba(45,212,191,0.25); }
+  .stage[data-color="p4"].active { border-color: var(--p4); box-shadow: 0 4px 20px rgba(245,158,11,0.25); }
+  .stage[data-color="p5"].active { border-color: var(--p5); box-shadow: 0 4px 20px rgba(236,72,153,0.25); }
+  .stage[data-color="p6"].active { border-color: var(--p6); box-shadow: 0 4px 20px rgba(167,139,250,0.25); }
+  .stage.active .icon { border-color: currentColor; background: rgba(255,255,255,0.04); }
+
+  /* connector between cards */
+  .stage .connector {
+    position: absolute; right: -18px; top: 50%; width: 18px; height: 2px;
+    background: var(--border); transform: translateY(-50%); z-index: 1;
+    overflow: visible;
+  }
+  .stage:last-child .connector { display: none; }
+  .stage .connector::after {
+    content: ''; position: absolute; right: -3px; top: 50%; width: 7px; height: 7px;
+    border-top: 2px solid var(--border); border-right: 2px solid var(--border);
+    transform: translateY(-50%) rotate(45deg);
+  }
+  .stage .connector .dot {
+    position: absolute; top: 50%; left: 0; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--p3); transform: translateY(-50%); opacity: 0;
+    box-shadow: 0 0 8px var(--p3);
+  }
+  .stage .connector.flowing .dot { animation: travel 0.7s ease-in-out; }
+  .stage .connector.flowing { background: linear-gradient(to right, var(--p3), var(--border)); }
+  @keyframes travel { 0% { left: 0; opacity: 1; } 100% { left: 100%; opacity: 0.2; } }
+
+  /* ---------- RIGHT PANEL CARDS ---------- */
+  .card { background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 13px 14px; margin-bottom: 12px; }
+  .card h2 {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted);
+    margin: 0 0 11px 0; font-weight: 600; display: flex; justify-content: space-between;
+    align-items: center; padding-bottom: 9px; border-bottom: 1px solid var(--border-soft);
+  }
+  .card h2 .badge { font-size: 9px; padding: 2px 8px; border-radius: 4px; font-weight: 600; letter-spacing: 0.3px; text-transform: none; }
+  .card-title-wrap { display: flex; align-items: center; gap: 8px; }
+  .card-title-wrap svg { width: 13px; height: 13px; stroke-width: 1.8; }
+
+  /* Fleet dashboard */
+  .fleet-row { display: grid; grid-template-columns: 64px 1fr auto; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border-soft); font-size: 12px; align-items: center; }
+  .fleet-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .fleet-row:first-child { padding-top: 0; }
+  .fleet-row .bus-id { font-family: 'SF Mono', monospace; font-weight: 700; font-size: 11px; }
+  .fleet-row .info { color: var(--muted); font-size: 10px; line-height: 1.5; margin-top: 1px; }
+  .fleet-row .info b { color: var(--text); font-weight: 600; }
+  .status-pill { font-size: 9px; padding: 3px 8px; border-radius: 4px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; }
+  .status-LIVE { background: rgba(74,222,128,0.12); color: var(--ok); border: 1px solid rgba(74,222,128,0.3); }
+  .status-ESTIMATED { background: rgba(245,158,11,0.12); color: var(--warn); border: 1px solid rgba(245,158,11,0.3); }
+  .status-OFF_ROUTE { background: rgba(239,68,68,0.14); color: var(--bad); border: 1px solid rgba(239,68,68,0.4); animation: pulse 1.2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(239,68,68,0.5); } 50% { opacity: 0.85; box-shadow: 0 0 0 4px rgba(239,68,68,0); } }
+
+  /* Phone mockup */
+  .phone-wrap { display: flex; justify-content: center; padding: 6px 0 4px; }
+  .phone {
+    background: #050709; border: 6px solid #1a1f28; border-radius: 26px; padding: 0;
+    width: 220px; min-height: 320px; position: relative;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4), inset 0 0 0 1px #2a3140;
+  }
+  .phone .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 70px; height: 14px; background: #050709; border-radius: 0 0 10px 10px; z-index: 2; }
+  .phone .statusbar { display: flex; justify-content: space-between; align-items: center; padding: 8px 18px 6px; font-size: 9px; color: #d8dde6; font-weight: 600; letter-spacing: 0.2px; }
+  .phone .statusbar .right-icons { display: flex; gap: 4px; align-items: center; }
+  .phone .statusbar svg { width: 11px; height: 11px; }
+  .phone .screen { background: #0a0e15; border-radius: 0 0 18px 18px; margin: 0 4px 4px; padding: 10px; min-height: 260px; font-size: 11px; }
+  .phone .screen-title { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; padding: 0 4px 8px; border-bottom: 1px solid var(--border-soft); margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .phone .sms {
+    background: #141a24; padding: 8px 10px; border-radius: 10px; margin-bottom: 6px;
+    font-size: 10px; line-height: 1.45; border: 1px solid var(--border-soft);
+  }
+  .phone .sms .from { color: var(--p6); font-weight: 600; font-size: 9px; margin-bottom: 3px; display: flex; justify-content: space-between; }
+  .phone .sms .from .ts { color: var(--dim); font-weight: 500; }
+  .phone .sms.urgent { background: rgba(239,68,68,0.10); border: 1px solid rgba(239,68,68,0.35); border-left: 3px solid var(--bad); }
+  .phone .sms.urgent .from { color: var(--bad); }
+
+  .ivr-btn {
+    width: 100%; background: var(--p6); color: #1a0f3d; border: 0; padding: 11px;
+    font-size: 12px; font-weight: 700; border-radius: 7px; cursor: pointer; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.15s; letter-spacing: 0.2px;
+  }
+  .ivr-btn svg { width: 14px; height: 14px; }
+  .ivr-btn:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(167,139,250,0.3); }
+  .ivr-screen { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.3); padding: 11px 12px; border-radius: 7px; font-size: 11px; line-height: 1.55; min-height: 40px; display: none; }
+  .ivr-screen.active { display: block; }
+  .ivr-screen .speaking { color: var(--p6); font-style: italic; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 4px; margin-bottom: 11px; background: var(--panel-3); padding: 3px; border-radius: 7px; }
+  .tabs button { flex: 1; background: transparent; border: 0; color: var(--muted); padding: 6px; font-size: 10px; border-radius: 5px; cursor: pointer; font-weight: 600; letter-spacing: 0.3px; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .tabs button svg { width: 11px; height: 11px; }
+  .tabs button:hover { color: var(--text); }
+  .tabs button.active { background: var(--panel-2); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+
+  .help-text { font-size: 10px; color: var(--muted); margin-bottom: 8px; line-height: 1.5; }
+  .help-text b { color: var(--text); font-weight: 600; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand">
+      <div class="logo">W</div>
+      <div>
+        <h1>WISH — End-to-end system flow</h1>
+        <div class="sub">Bus → Server → ETA Engine → Database → Authority dashboard + Passenger IVR/SMS</div>
+      </div>
+    </div>
+    <div class="controls">
+      <button id="restartBtn">Restart loop</button>
+      <button id="speedBtn">1× speed</button>
+      <button id="blackoutBtn">Lost 2G signal</button>
+      <button id="divertBtn" class="danger">Trigger divert</button>
+      <button class="primary" onclick="window.open('simulator.html','_self')">Engine deep-dive →</button>
+    </div>
+  </header>
+
+  <div id="main">
+    <div id="map"></div>
+    <div id="right">
+
+      <div class="card">
+        <h2>
+          <span class="card-title-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+            Authority dashboard — fleet view
+          </span>
+          <span class="badge" style="background:rgba(236,72,153,0.14); color:var(--p5); border:1px solid rgba(236,72,153,0.3)">Stage 5a</span>
+        </h2>
+        <div id="fleetList"></div>
+      </div>
+
+      <div class="card">
+        <h2>
+          <span class="card-title-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="2" width="14" height="20" rx="3"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+            Passenger channel
+          </span>
+          <span class="badge" style="background:rgba(167,139,250,0.14); color:var(--p6); border:1px solid rgba(167,139,250,0.3)">Stage 5b</span>
+        </h2>
+        <div class="tabs">
+          <button data-tab="ivr" class="active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg>
+            IVR Call
+          </button>
+          <button data-tab="sms">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            SMS Inbox
+          </button>
+        </div>
+
+        <div id="tab-ivr">
+          <div class="help-text">
+            Simulates a passenger calling the IVR number for an ETA on Bus MH-17. The browser will <b>speak the ETA aloud</b>.
+          </div>
+          <button class="ivr-btn" id="callIvr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg>
+            Call 1800-WISH-ETA
+          </button>
+          <div class="ivr-screen" id="ivrScreen"></div>
+        </div>
+
+        <div id="tab-sms" style="display:none;">
+          <div class="help-text">
+            When a bus diverts, every recent IVR caller gets an SMS in their language. Click <b>Trigger divert</b> above.
+          </div>
+          <div class="phone-wrap">
+            <div class="phone">
+              <div class="notch"></div>
+              <div class="statusbar">
+                <span>9:41</span>
+                <span class="right-icons">
+                  <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 11h2v3H1zm4-2h2v5H5zm4-3h2v8H9zm4-4h2v12h-2z"/></svg>
+                  <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 6h12v6H2zm12.5 1v4h1V7z"/></svg>
+                </span>
+              </div>
+              <div class="screen" id="smsScreen">
+                <div class="screen-title"><span>WISH</span><span>Inbox</span></div>
+                <div style="color:var(--dim); font-size:10px; text-align:center; padding-top:80px;">No messages yet</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="pipeline">
+    <div class="pipeline-title">Data pipeline · packet flow visualizer</div>
+    <div class="stages">
+      <div class="stage" data-color="p1" id="stage1">
+        <div class="head">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div>
+          <h3>Bus device</h3>
+          <span class="num">01</span>
+        </div>
+        <div class="desc">GPS module emits a packet every ~25 s.</div>
+        <div class="data" id="data1">idle</div>
+        <div class="connector" id="arrow1"><div class="dot"></div></div>
+      </div>
+      <div class="stage" data-color="p2" id="stage2">
+        <div class="head">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+          <h3>Server ingest</h3>
+          <span class="num">02</span>
+        </div>
+        <div class="desc">Parse, validate, dedupe.</div>
+        <div class="data" id="data2">idle</div>
+        <div class="connector" id="arrow2"><div class="dot"></div></div>
+      </div>
+      <div class="stage" data-color="p3" id="stage3">
+        <div class="head">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2a3 3 0 0 0-3 3v1a3 3 0 0 0-3 3v3a3 3 0 0 0-3 3 3 3 0 0 0 3 3v1a3 3 0 0 0 3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0 3-3v-1a3 3 0 0 0 3-3 3 3 0 0 0-3-3V9a3 3 0 0 0-3-3V5a3 3 0 0 0-3-3z"/></svg></div>
+          <h3>ETA engine</h3>
+          <span class="num">03</span>
+        </div>
+        <div class="desc">Snap · geofence · compute ETA.</div>
+        <div class="data" id="data3">idle</div>
+        <div class="connector" id="arrow3"><div class="dot"></div></div>
+      </div>
+      <div class="stage" data-color="p4" id="stage4">
+        <div class="head">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v6c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 11v6c0 1.66 4 3 9 3s9-1.34 9-3v-6"/></svg></div>
+          <h3>Database</h3>
+          <span class="num">04</span>
+        </div>
+        <div class="desc">Bus state + ETA + audit log.</div>
+        <div class="data" id="data4">idle</div>
+        <div class="connector" id="arrow4"><div class="dot"></div></div>
+      </div>
+      <div class="stage" data-color="p5" id="stage5">
+        <div class="head">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+          <h3>Gov dashboard</h3>
+          <span class="num">05a</span>
+        </div>
+        <div class="desc">MSRTC depot ops — live fleet + alerts.</div>
+        <div class="data" id="data5">idle</div>
+        <div class="connector" id="arrow5"><div class="dot"></div></div>
+      </div>
+      <div class="stage" data-color="p6" id="stage6">
+        <div class="head">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg></div>
+          <h3>SMS / IVR</h3>
+          <span class="num">05b</span>
+        </div>
+        <div class="desc">Passenger queries + divert broadcast.</div>
+        <div class="data" id="data6">idle</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+// ============================================================
+// ENGINE (reused from simulator.html)
+// ============================================================
+const R_EARTH = 6_371_000;
+const rad = d => d * Math.PI / 180;
+const clip = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+function haversine(a, b) {
+  const p1 = rad(a.lat), p2 = rad(b.lat);
+  const dp = rad(b.lat - a.lat), dl = rad(b.lon - a.lon);
+  const x = Math.sin(dp/2)**2 + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+  return 2 * R_EARTH * Math.asin(Math.sqrt(x));
+}
+function toXY(pt, ref) { return { x: R_EARTH * rad(pt.lon - ref.lon) * Math.cos(rad(ref.lat)), y: R_EARTH * rad(pt.lat - ref.lat) }; }
+function projectToSegment(bus, p, q) {
+  const B = toXY(bus, p), Q = toXY(q, p);
+  const segLenSq = Q.x*Q.x + Q.y*Q.y;
+  if (segLenSq === 0) return { t: 0, delta: Math.hypot(B.x, B.y), snapLat: p.lat, snapLon: p.lon };
+  let t = clip((B.x*Q.x + B.y*Q.y) / segLenSq, 0, 1);
+  return { t, delta: Math.hypot(B.x - t*Q.x, B.y - t*Q.y), snapLat: p.lat + t*(q.lat-p.lat), snapLon: p.lon + t*(q.lon-p.lon) };
+}
+
+// ============================================================
+// ROUTE
+// ============================================================
+const ROUTE = {
+  id: "R5", name: "Junnar – Manchar", color: "#4ec9b0", geofenceWidth: 50,
+  stops: [
+    { name: "Junnar",       lat: 19.2074, lon: 73.8773 },
+    { name: "Narayangaon",  lat: 19.0741, lon: 73.9512 },
+    { name: "Manchar",      lat: 19.0007, lon: 73.9362 },
+  ],
+  stats: [{ tau: 900, dwell: 40 }, { tau: 540, dwell: 0 }],
+};
+
+async function fetchSegmentGeometry(p, q) {
+  const url = `https://router.project-osrm.org/route/v1/driving/${p.lon},${p.lat};${q.lon},${q.lat}?overview=full&geometries=geojson`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    return data.routes[0].geometry.coordinates.map(([lon, lat]) => ({ lat, lon }));
+  } catch (e) {
+    return [{ lat: p.lat, lon: p.lon }, { lat: q.lat, lon: q.lon }];
+  }
+}
+async function buildRoute(r) {
+  const dense = []; const stopIdx = [0];
+  for (let i = 0; i < r.stops.length - 1; i++) {
+    const pts = await fetchSegmentGeometry(r.stops[i], r.stops[i+1]);
+    pts[0] = { lat: r.stops[i].lat, lon: r.stops[i].lon };
+    pts[pts.length-1] = { lat: r.stops[i+1].lat, lon: r.stops[i+1].lon };
+    if (i === 0) dense.push(...pts); else dense.push(...pts.slice(1));
+    stopIdx.push(dense.length - 1);
+  }
+  r.dense = dense; r.stopIdx = stopIdx;
+  r.miniL = []; for (let i = 0; i < dense.length - 1; i++) r.miniL.push(haversine(dense[i], dense[i+1]));
+  r.L = []; for (let i = 0; i < r.stops.length - 1; i++) { let s = 0; for (let j = stopIdx[i]; j < stopIdx[i+1]; j++) s += r.miniL[j]; r.L.push(s); }
+}
+function pointAtFrac(r, frac) {
+  const totalL = r.L.reduce((a,b)=>a+b, 0);
+  let target = frac * totalL;
+  for (let i = 0; i < r.dense.length - 1; i++) {
+    if (target <= r.miniL[i]) {
+      const t = target / r.miniL[i];
+      return { lat: r.dense[i].lat + t*(r.dense[i+1].lat - r.dense[i].lat), lon: r.dense[i].lon + t*(r.dense[i+1].lon - r.dense[i].lon) };
+    }
+    target -= r.miniL[i];
+  }
+  return r.dense[r.dense.length-1];
+}
+function snapToRoute(route, bus) {
+  let best = null;
+  for (let i = 0; i < route.dense.length - 1; i++) {
+    const r = projectToSegment(bus, route.dense[i], route.dense[i+1]);
+    if (best === null || r.delta < best.delta) {
+      let segIdx = 0;
+      for (let j = 0; j < route.stopIdx.length - 1; j++) {
+        if (i >= route.stopIdx[j] && i < route.stopIdx[j+1]) { segIdx = j; break; }
+      }
+      let sK = 0;
+      for (let j = route.stopIdx[segIdx]; j < i; j++) sK += route.miniL[j];
+      sK += r.t * route.miniL[i];
+      best = { segIndex: segIdx, miniIdx: i, sK, delta: r.delta, snapLat: r.snapLat, snapLon: r.snapLon, onRoute: r.delta <= route.geofenceWidth };
+    }
+  }
+  return best;
+}
+function computeETA(route, snap, targetIdx = route.stops.length - 1) {
+  const k = snap.segIndex;
+  if (targetIdx <= k) return 0;
+  const fracLeft = (route.L[k] - snap.sK) / route.L[k];
+  let eta = fracLeft * route.stats[k].tau;
+  for (let i = k+1; i < targetIdx; i++) eta += route.stats[i].tau;
+  for (let j = k+1; j < targetIdx; j++) eta += route.stats[j-1].dwell;
+  return eta;
+}
+
+// ============================================================
+// FLEET — 3 buses on R5 at different positions
+// ============================================================
+const FLEET = [
+  { id: "MH-17", color: "#58a6ff", frac: 0.10, status: "LIVE",  eta: 0, lat: 0, lon: 0 },
+  { id: "MH-04", color: "#ffa657", frac: 0.45, status: "LIVE",  eta: 0, lat: 0, lon: 0 },
+  { id: "MH-09", color: "#a5d6ff", frac: 0.78, status: "LIVE",  eta: 0, lat: 0, lon: 0 },
+];
+
+// ============================================================
+// MAP
+// ============================================================
+const map = L.map('map', { zoomControl: true, attributionControl: false }).setView([19.10, 73.92], 11);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+let routeLine = null;
+let corridor = null;
+const busMarkers = {};
+let perpLine = null, snapDot = null;
+
+function renderMap() {
+  const latlngs = ROUTE.dense.map(p => [p.lat, p.lon]);
+  corridor = L.polyline(latlngs, { color: ROUTE.color, weight: 28, opacity: 0.15, lineCap: 'round' }).addTo(map);
+  routeLine = L.polyline(latlngs, { color: ROUTE.color, weight: 4, opacity: 0.95 }).addTo(map);
+  ROUTE.stops.forEach((s, i) => {
+    L.circleMarker([s.lat, s.lon], { radius: 6, color: '#fff', fillColor: ROUTE.color, fillOpacity: 1, weight: 2 })
+      .addTo(map).bindTooltip(`P${i} · ${s.name}`, { permanent: true, direction: 'right', offset: [8,0], className: 'route-label' });
+  });
+  FLEET.forEach(b => {
+    const m = L.marker([0,0], { icon: makeBusIcon(b.color, b.id) }).addTo(map);
+    busMarkers[b.id] = m;
+  });
+  perpLine = L.polyline([], { color: '#fff', weight: 2, dashArray: '4 3', opacity: 0.9 }).addTo(map);
+  snapDot = L.circleMarker([0,0], { radius: 5, color: '#fff', fillColor: '#fff', fillOpacity: 1, weight: 0, opacity: 0 }).addTo(map);
+  map.fitBounds(L.latLngBounds(latlngs), { padding: [40, 40], maxZoom: 12 });
+}
+function makeBusIcon(color, label) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="background:${color}; color:#000; padding:3px 6px; border-radius:6px; font-size:10px; font-weight:700; border:2px solid #fff; box-shadow:0 0 10px ${color}; white-space:nowrap;">🚌 ${label}</div>`,
+    iconSize: [1,1], iconAnchor: [0,0],
+  });
+}
+
+// ============================================================
+// PIPELINE ANIMATION
+// ============================================================
+const $ = id => document.getElementById(id);
+function activateStage(n, dataHtml) {
+  const stage = $(`stage${n}`);
+  stage.classList.add('active');
+  if (dataHtml !== undefined) $(`data${n}`).innerHTML = dataHtml;
+  setTimeout(() => stage.classList.remove('active'), 600);
+  if (n < 6) {
+    setTimeout(() => {
+      const arrow = $(`arrow${n}`);
+      if (arrow) { arrow.classList.add('flowing'); setTimeout(() => arrow.classList.remove('flowing'), 700); }
+    }, 200);
+  }
+}
+
+// Run a packet through all 6 stages with timed activations
+async function flowPacket(bus) {
+  const lat = bus.lat, lon = bus.lon;
+  const snap = snapToRoute(ROUTE, { lat, lon });
+  const eta = computeETA(ROUTE, snap);
+  bus.eta = eta;
+  bus.status = snap.onRoute ? "LIVE" : (offRouteAlerts[bus.id] ? "OFF_ROUTE" : "LIVE");
+
+  // 1. Bus device emits packet
+  activateStage(1, `bus=<b>${bus.id}</b><br>lat=${lat.toFixed(5)}<br>lon=${lon.toFixed(5)}<br>v=${(7+Math.random()*2).toFixed(1)} m/s`);
+  await sleep(220);
+
+  // 2. Server ingest validates
+  activateStage(2, `parse OK<br>route_id=R5<br>plausible ✓<br>queued for engine`);
+  await sleep(220);
+
+  // 3. ETA engine snaps + computes
+  activateStage(3, `seg=${snap.segIndex} (${ROUTE.stops[snap.segIndex].name} → ${ROUTE.stops[snap.segIndex+1].name})<br>δ=${snap.delta.toFixed(1)} m  ${snap.onRoute?'✓':'⚠ off'}<br>ETA → <b>${(eta/60).toFixed(1)} min</b>`);
+  if (bus.id === "MH-17") {
+    perpLine.setLatLngs([[lat,lon], [snap.snapLat, snap.snapLon]]);
+    snapDot.setLatLng([snap.snapLat, snap.snapLon]).setStyle({ opacity: 1, fillOpacity: 1 });
+  }
+  await sleep(220);
+
+  // 4. DB persists
+  activateStage(4, `INSERT bus_state<br>id=${bus.id} eta=${eta.toFixed(0)}s<br>status=${bus.status}<br>ts=${new Date().toLocaleTimeString()}`);
+  await sleep(220);
+
+  // 5a. Dashboard refreshes
+  renderFleet();
+  activateStage(5, `tile refreshed<br>${bus.id} · ${bus.status}<br>ETA ${(eta/60).toFixed(1)} min`);
+  await sleep(220);
+
+  // 5b. SMS/IVR only fires on demand (handled separately)
+  activateStage(6, sms_log.length > 0 ? `queue ${sms_log.length} msgs<br>IVR ready` : `idle · listening`);
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ============================================================
+// FLEET RENDER
+// ============================================================
+function renderFleet() {
+  $('fleetList').innerHTML = FLEET.map(b => `
+    <div class="fleet-row">
+      <span class="bus-id" style="color:${b.color}">${b.id}</span>
+      <span>
+        <div>${ROUTE.id} · ${ROUTE.name}</div>
+        <div class="info">ETA to Manchar: <b>${(b.eta/60).toFixed(1)} min</b> · ${(b.frac*100).toFixed(0)}% along route</div>
+      </span>
+      <span class="status-pill status-${b.status}">${b.status}</span>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// IVR — uses browser SpeechSynthesis
+// ============================================================
+function speak(text, lang='en-IN') {
+  if (!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang;
+  u.rate = 0.95;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+
+$('callIvr').addEventListener('click', async () => {
+  const ivr = $('ivrScreen');
+  ivr.classList.add('active');
+  ivr.innerHTML = '📞 <i>Connecting…</i>';
+  await sleep(700);
+  ivr.innerHTML = '<span class="speaking">"नमस्कार. WISH बस सेवेत आपले स्वागत आहे. मराठीसाठी १ दाबा, English साठी 2."</span>';
+  speak('Hello. Welcome to WISH bus service. Press 1 for Marathi, 2 for English.');
+  await sleep(3200);
+
+  ivr.innerHTML += '<br><br>👤 <i>Passenger presses 2 (English)</i>';
+  await sleep(700);
+
+  ivr.innerHTML += '<br><br><span class="speaking">"Please say your bus number."</span>';
+  speak('Please say your bus number.');
+  await sleep(1700);
+
+  ivr.innerHTML += '<br><br>👤 <i>Passenger: "MH-17"</i>';
+  await sleep(900);
+
+  // Query the engine
+  const bus = FLEET.find(b => b.id === "MH-17");
+  const minutes = (bus.eta / 60).toFixed(0);
+  const status = bus.status;
+  const line = (status === "OFF_ROUTE")
+    ? `Bus MH-17 has diverted from its route. We are unable to confirm its arrival time. Please wait for a follow-up SMS.`
+    : `Bus MH-17 will reach Manchar in approximately ${minutes} minutes.`;
+
+  ivr.innerHTML += `<br><br>🧠 <i>IVR queries DB → ETA engine output</i>`;
+  await sleep(700);
+  ivr.innerHTML += `<br><br><span class="speaking">"${line}"</span>`;
+  speak(line);
+
+  // Log this caller so they get SMS on divert
+  recentCallers.add("MH-17");
+
+  // Also push an ETA SMS to the inbox so the passenger has a written copy.
+  await sleep(800);
+  if (status === "OFF_ROUTE") {
+    pushSMS(`<b>⚠ Bus MH-17</b> has diverted from R5. Please wait for a follow-up SMS.`);
+  } else {
+    pushSMS(`<b>Bus MH-17 · R5 Junnar–Manchar</b><br>Arriving at <b>Manchar in ~${minutes} min</b>.<br>Reply STOP to unsubscribe.`);
+  }
+  activateStage(6, `IVR → ETA spoken<br>SMS dispatched<br>caller logged for divert alerts`);
+});
+
+// Tabs
+document.querySelectorAll('.tabs button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    $('tab-ivr').style.display = b.dataset.tab === 'ivr' ? '' : 'none';
+    $('tab-sms').style.display = b.dataset.tab === 'sms' ? '' : 'none';
+  });
+});
+
+// ============================================================
+// SMS / DIVERT
+// ============================================================
+const sms_log = [];
+const recentCallers = new Set();  // bus IDs the user has called about
+const offRouteAlerts = {};         // bus_id -> true if alert fired
+
+function pushSMS(message, urgent=false) {
+  sms_log.unshift({ message, urgent, ts: new Date().toLocaleTimeString() });
+  const screen = $('smsScreen');
+  const title = `<div class="screen-title"><span>WISH</span><span>Inbox · ${sms_log.length}</span></div>`;
+  const list = sms_log.map(s => `
+    <div class="sms ${s.urgent?'urgent':''}">
+      <div class="from"><span>WISH</span><span class="ts">${s.ts}</span></div>
+      ${s.message}
+    </div>
+  `).join('');
+  screen.innerHTML = title + list;
+  // auto-switch to SMS tab on urgent
+  if (urgent) {
+    document.querySelectorAll('.tabs button').forEach(x => x.classList.remove('active'));
+    document.querySelector('.tabs button[data-tab="sms"]').classList.add('active');
+    $('tab-ivr').style.display = 'none'; $('tab-sms').style.display = '';
+  }
+}
+
+function triggerDivert() {
+  const bus = FLEET.find(b => b.id === "MH-17");
+  offRouteAlerts[bus.id] = true;
+  bus.status = "OFF_ROUTE";
+  // Compute a perpendicular drift vector at the bus's current position on the route.
+  const here = pointAtFrac(ROUTE, bus.frac);
+  const ahead = pointAtFrac(ROUTE, Math.min(bus.frac + 0.01, 0.999));
+  const dLat = ahead.lat - here.lat;
+  const dLon = ahead.lon - here.lon;
+  // Perpendicular (rotate 90°). Pick the side away from the route.
+  const perpLat = -dLon;
+  const perpLon =  dLat;
+  const mag = Math.hypot(perpLat, perpLon) || 1;
+  // Step size ~ ~80m per tick (in lat/lon degrees, rough)
+  const step = 0.00075;
+  bus.divert = { stepLat: (perpLat / mag) * step, stepLon: (perpLon / mag) * step, ticks: 0 };
+  bus.frac = -1;  // stop following the route
+  // SMS broadcast in Marathi + English to recent callers
+  if (recentCallers.has("MH-17")) {
+    pushSMS(`<b>⚠ बस MH-17 मार्गावरून वळली आहे.</b> कृपया वाट पाहू नका. पुढील माहिती लवकरच.<br><i>Bus MH-17 has diverted. Do not wait. More info shortly.</i>`, true);
+  } else {
+    pushSMS(`<b>⚠ Bus MH-17 has diverted</b> from Route R5 (Junnar–Manchar). Notify recent IVR callers.`, true);
+  }
+  activateStage(6, `🚨 OFF_ROUTE alert<br>broadcast to ${recentCallers.size} recent callers<br>SMS dispatched`);
+  renderFleet();
+}
+
+$('divertBtn').addEventListener('click', triggerDivert);
+
+// ============================================================
+// LOST SIGNAL / flash-buffer demo
+// ============================================================
+const bufferedDots = [];
+async function triggerBlackout() {
+  const bus = FLEET.find(b => b.id === "MH-17");
+  if (bus.divert) return;  // already off-route
+  // Mark as silent — server enters ESTIMATED
+  bus.silent = true;
+  bus.status = "ESTIMATED";
+  busMarkers[bus.id].setIcon(makeBusIcon('#e3b341', bus.id));
+  activateStage(1, `<b style="color:var(--p4)">⚠ 2G LOST</b><br>A7670 cannot reach tower<br>GPS still recording → on-chip flash`);
+  activateStage(3, `no fresh packet<br>γ = e^(−Δt/300)<br>dead-reckoning ETA`);
+  renderFleet();
+  pushSMS(`<b>Bus MH-17</b> · brief signal gap, position estimated.`, false);
+  log_blackout(`signal lost · firmware buffering GPS fixes to on-chip flash`);
+
+  // Simulate 6 buffered packets while silent — they appear later as a burst.
+  const buffered = [];
+  for (let i = 1; i <= 6; i++) {
+    const f = Math.min(0.99, bus.frac + 0.012*i);
+    const pt = pointAtFrac(ROUTE, f);
+    buffered.push({ lat: pt.lat, lon: pt.lon, t: Date.now() + i*20000, frac: f });
+  }
+  await sleepMs(3000);  // hold the silent state visibly for 3 seconds
+
+  // Signal recovers — burst the buffer
+  activateStage(1, `<b style="color:var(--ok)">✓ 2G RECOVERED</b><br>burst-uploading ${buffered.length} flash-buffered packets<br>chronological order`);
+  activateStage(2, `parse OK × ${buffered.length}<br>dedup + stale-check<br>queue for engine`);
+  log_blackout(`signal back · replaying ${buffered.length} cached packets`);
+
+  // Clear any prior breadcrumbs
+  bufferedDots.forEach(m => map.removeLayer(m));
+  bufferedDots.length = 0;
+
+  // Render each buffered packet as a numbered gold dot along the route
+  for (let i = 0; i < buffered.length; i++) {
+    const p = buffered[i];
+    const dot = L.marker([p.lat, p.lon], { icon: L.divIcon({
+      className: '',
+      html: `<div style="background:#ffb84d; color:#0e1116; width:22px; height:22px; border-radius:50%; border:3px solid #fff; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; box-shadow:0 0 10px #ffb84d, 0 2px 4px rgba(0,0,0,0.5);">${i+1}</div>`,
+      iconSize: [22, 22], iconAnchor: [11, 11],
+    }) }).addTo(map);
+    dot.bindTooltip(`flash-buffered #${i+1}`, { direction: 'top', offset: [0,-12] });
+    bufferedDots.push(dot);
+    bus.frac = p.frac;
+    busMarkers[bus.id].setLatLng([p.lat, p.lon]);
+    await sleepMs(380);
+  }
+
+  // Live state restored
+  bus.silent = false;
+  bus.status = "LIVE";
+  busMarkers[bus.id].setIcon(makeBusIcon(bus.color, bus.id));
+  activateStage(3, `latest buffered pkt supersedes<br>dead-reckon discarded<br>EWMA learned silent-window τ`);
+  activateStage(5, `dashboard reconciled<br>MH-17 · LIVE again`);
+  renderFleet();
+  pushSMS(`<b>Bus MH-17</b> · signal restored, live tracking resumed.`, false);
+  log_blackout(`live state restored from latest buffered packet · EWMA gained ${buffered.length} samples`);
+}
+function log_blackout(msg) { console.log('[BLACKOUT]', msg); }
+const sleepMs = ms => new Promise(r => setTimeout(r, ms));
+$('blackoutBtn').addEventListener('click', triggerBlackout);
+
+// ============================================================
+// AUTO-PLAY LOOP
+// ============================================================
+let tickRate = 1.0;
+let loopTimer = null;
+async function loop() {
+  for (const bus of FLEET) {
+    if (bus.silent) {
+      // Server-side silence — MH-17 is buffering to on-chip flash, dashboard shows ESTIMATED.
+      // Don't advance bus.frac here; triggerBlackout owns the motion.
+      continue;
+    }
+    if (bus.divert) {
+      // Drift perpendicular away from the route, with small jitter.
+      bus.lat += bus.divert.stepLat + (Math.random()-0.5) * 0.00010;
+      bus.lon += bus.divert.stepLon + (Math.random()-0.5) * 0.00010;
+      bus.divert.ticks += 1;
+      busMarkers[bus.id].setLatLng([bus.lat, bus.lon]);
+      await flowPacket(bus);
+      continue;
+    }
+    if (bus.frac < 0) continue;
+    const pt = pointAtFrac(ROUTE, bus.frac);
+    // small GPS jitter
+    bus.lat = pt.lat + (Math.random()-0.5) * 0.00012;
+    bus.lon = pt.lon + (Math.random()-0.5) * 0.00012;
+    busMarkers[bus.id].setLatLng([bus.lat, bus.lon]);
+    await flowPacket(bus);
+    bus.frac += 0.06;  // advance — faster motion for slide-deck visibility
+    if (bus.frac > 1) bus.frac = 0;
+  }
+  loopTimer = setTimeout(loop, 700 / tickRate);
+}
+
+$('restartBtn').addEventListener('click', () => {
+  if (loopTimer) clearTimeout(loopTimer);
+  FLEET[0].frac = 0.10; FLEET[1].frac = 0.45; FLEET[2].frac = 0.78;
+  FLEET.forEach(b => { b.status = "LIVE"; b.eta = 0; delete b.divert; delete b.silent; });
+  bufferedDots.forEach(m => map.removeLayer(m)); bufferedDots.length = 0;
+  sms_log.length = 0; recentCallers.clear();
+  Object.keys(offRouteAlerts).forEach(k => delete offRouteAlerts[k]);
+  $('smsScreen').innerHTML = '<div class="screen-title"><span>WISH</span><span>Inbox</span></div><div style="color:var(--dim); font-size:10px; text-align:center; padding-top:80px;">No messages yet</div>';
+  $('ivrScreen').classList.remove('active');
+  renderFleet();
+  loop();
+});
+$('speedBtn').addEventListener('click', () => {
+  tickRate = tickRate === 1.0 ? 2.0 : (tickRate === 2.0 ? 4.0 : 1.0);
+  $('speedBtn').textContent = tickRate + '× speed';
+});
+
+// ============================================================
+// BOOTSTRAP
+// ============================================================
+async function boot() {
+  await buildRoute(ROUTE);
+  renderMap();
+  renderFleet();
+  loop();
+}
+boot();
+</script>
+</body>
+</html>

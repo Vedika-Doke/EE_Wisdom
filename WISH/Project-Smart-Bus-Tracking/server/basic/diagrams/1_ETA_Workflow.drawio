@@ -1,0 +1,57 @@
+<mxfile host="app.diagrams.net" modified="2026-06-07T00:00:00.000Z" agent="Mozilla/5.0" version="24.6.4" type="device">
+  <diagram name="ETA Workflow" id="eta">
+    <mxGraphModel dx="1422" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="ETA Workflow — Person 2" style="text;html=1;align=center;verticalAlign=middle;fontSize=20;fontStyle=1;fontColor=#1F2E5C;" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="450" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="start" value="GPS packet arrives&#10;{bus_id, route_id, lat, lon, v, ts}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5C26B;strokeColor=#A8741C;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="80" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="validate" value="Validate packet&#10;(hdop, jump-distance check)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="320" y="180" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="snap" value="Snap to route polyline&#10;-&gt; (segment k, offset s_k, perp δ)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="320" y="280" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="onroute" value="δ ≤ W ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="380" width="160" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="offroute" value="streak++&#10;if streak ≥ 3:&#10;status = OFF_ROUTE&#10;-&gt; fire Divert-Alert (§10)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="600" y="395" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="resetstreak" value="streak = 0&#10;status = LIVE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="320" y="510" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="arrival" value="Crossed stop P_{k+1} ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="600" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="learn" value="ONLINE LEARNING&#10;T_obs = ts − seg_start_ts&#10;τ_k(b) ← α·T_obs + (1−α)·τ_k(b)&#10;Update d_j(b) if dwelled" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="600" y="600" width="240" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="computeETA" value="COMPUTE ETA per downstream stop P_m&#10;&#10;ETA(P_m) = (L_k − s_k)/L_k · τ_k(b)&#10;          + Σ τ_i(b)  for i = k+1..m−1&#10;          + Σ d_j(b)  for j = k+1..m−1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=11;fontStyle=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="280" y="720" width="320" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="persist" value="Persist to DB&#10;{position, status=LIVE, conf=1.0, eta[]}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="870" width="320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="consumers" value="Dashboard · Display board · SMS · IVR  (Person 3)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8E8E8;strokeColor=#666666;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="280" y="960" width="320" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="start" target="validate"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="validate" target="snap"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="snap" target="onroute"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" value="NO" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontStyle=1;fontColor=#B85450;" edge="1" parent="1" source="onroute" target="offroute"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" value="YES" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontStyle=1;fontColor=#82B366;" edge="1" parent="1" source="onroute" target="resetstreak"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="resetstreak" target="arrival"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" value="YES" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontStyle=1;fontColor=#82B366;" edge="1" parent="1" source="arrival" target="learn"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e8" value="NO" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontStyle=1;" edge="1" parent="1" source="arrival" target="computeETA"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="learn" target="computeETA"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="computeETA" target="persist"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="persist" target="consumers"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
