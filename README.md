@@ -135,7 +135,7 @@ Course project: design and implementation of an 8-bit toy CPU (i281).
 
 ## WISH
 
-TI **WiSH Hardware Summer School (2026)** at IIT Bombay — kept as an academic-help resource. See [`WISH/`](WISH/) for the full breakdown.
+TI **WiSH Hardware Mentee (2026)** — kept as an academic-help resource. See [`WISH/`](WISH/) for the full breakdown.
 
 - **Week 1 — Digital Design:** two Verilog labs (shift-add and DFT-instrumented sequential multipliers) with testbenches, test plans, and simulation waveforms; prework guides and daily surveys
 - **Week 2 — Analog:** prework, ASLKv2010 starter-kit reference, and topic quizzes (Fourier/Laplace, inductors, RC circuits)
