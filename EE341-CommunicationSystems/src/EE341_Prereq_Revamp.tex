@@ -1,0 +1,1011 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{titlesec}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning}
+
+\definecolor{keyblue}{RGB}{22,78,128}
+\definecolor{warmred}{RGB}{160,40,40}
+\definecolor{boxbg}{RGB}{242,246,250}
+\definecolor{trapbg}{RGB}{253,244,244}
+\definecolor{exbg}{RGB}{244,250,244}
+
+\titleformat{\section}{\Large\bfseries\color{keyblue}}{\thesection}{0.7em}{}
+\titleformat{\subsection}{\large\bfseries\color{keyblue!85!black}}{\thesubsection}{0.6em}{}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{keyblue}EE341 Prereq Revamp — Signals, Systems \& Fourier}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\newmdenv[backgroundcolor=boxbg,linecolor=keyblue,linewidth=1pt,
+  leftmargin=0pt,rightmargin=0pt,innerleftmargin=8pt,innerrightmargin=8pt,
+  innertopmargin=6pt,innerbottommargin=6pt,skipabove=8pt,skipbelow=8pt]{keybox}
+\newmdenv[backgroundcolor=trapbg,linecolor=warmred,linewidth=1pt,
+  leftmargin=0pt,rightmargin=0pt,innerleftmargin=8pt,innerrightmargin=8pt,
+  innertopmargin=6pt,innerbottommargin=6pt,skipabove=8pt,skipbelow=8pt]{trapbox}
+\newmdenv[backgroundcolor=exbg,linecolor=green!35!black,linewidth=1pt,
+  leftmargin=0pt,rightmargin=0pt,innerleftmargin=8pt,innerrightmargin=8pt,
+  innertopmargin=6pt,innerbottommargin=6pt,skipabove=8pt,skipbelow=8pt]{exbox}
+
+\newcommand{\FT}{\;\stackrel{\mathcal{F}}{\longleftrightarrow}\;}
+\newcommand{\sinc}{\operatorname{sinc}}
+\newcommand{\rect}{\operatorname{rect}}
+\newcommand{\tri}{\operatorname{tri}}
+\newcommand{\sgn}{\operatorname{sgn}}
+\newcommand{\dd}{\,\mathrm{d}}
+\newcommand{\ii}{\mathrm{j}}
+
+\newenvironment{worked}[1]{\par\vspace{4pt}\noindent\textbf{\color{warmred}Worked problem #1.}\ \ignorespaces}{\par\vspace{4pt}}
+\newcommand{\soln}{\par\vspace{2pt}\noindent\textit{Solution.}\ \ignorespaces}
+
+\title{\vspace{-1.5cm}\textbf{\color{keyblue}Signals, Systems \& the Fourier Transform}\\[4pt]
+\large A prerequisite revamp for EE341 (Communication Systems--I), IIT Bombay}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\vspace{-1.2cm}
+
+\begin{keybox}
+\textbf{How to use this.} You said your fundamentals are shaky, so this builds each idea up rather than
+just listing formulas. But your first quiz is \textbf{17 August}, so it is ordered by \emph{what EE341 actually
+uses}, not by what a full signals course would cover.
+
+\medskip
+\noindent\textbf{If you have three days:}
+\begin{itemize}[nosep,leftmargin=*]
+\item \textbf{Day 1} --- Part A (\S1--\S3) and Part B (\S4--\S6). This is the load-bearing material. Do every worked problem \emph{yourself} first.
+\item \textbf{Day 2} --- Part C (\S7--\S9). Sampling is standard; \S9 (bandpass / lowpass-equivalent) is where your lecture notes already are, so it matters most.
+\item \textbf{Day 3} --- Part D (\S10) skim only, then the problem set in \S11 under time pressure.
+\end{itemize}
+
+\medskip
+\noindent\textbf{Notation warning.} EE341 (and Madhow's book) uses \textbf{ordinary frequency $f$ in Hz}, not
+$\omega$ in rad/s. Your notes write $X(f)$, $\cos(2\pi f_c t)$, never $\omega$. Everything here follows that
+convention. It removes all the annoying $1/2\pi$ factors --- the transform becomes perfectly symmetric.
+\end{keybox}
+
+\tableofcontents
+\newpage
+
+%==============================================================
+\section*{\color{keyblue}PART A --- Signals and Systems}
+\addcontentsline{toc}{section}{PART A --- Signals and Systems}
+%==============================================================
+
+\section{What a signal is, and the four classifications that matter}
+
+A \textbf{signal} is a function carrying information. In this course it is almost always $x(t)$, a real-valued
+function of continuous time. Four classifications come up constantly in communications, and each one is really
+a question about \emph{which mathematical tool applies}.
+
+\subsection{Energy vs.\ power signals}
+
+Define
+\[
+E_x = \int_{-\infty}^{\infty}|x(t)|^2\dd t,
+\qquad
+P_x = \lim_{T\to\infty}\frac{1}{T}\int_{-T/2}^{T/2}|x(t)|^2\dd t .
+\]
+
+\begin{itemize}[leftmargin=*]
+\item If $0<E_x<\infty$, $x$ is an \textbf{energy signal}. Then $P_x=0$ automatically. Pulses, decaying
+exponentials, anything that dies out.
+\item If $E_x=\infty$ but $0<P_x<\infty$, $x$ is a \textbf{power signal}. Sinusoids, periodic signals, random
+noise, and \emph{every real communication waveform} (a transmitter runs forever).
+\end{itemize}
+
+\begin{keybox}
+\textbf{Why you should care.} This determines which spectral object exists.
+An energy signal has a Fourier transform $X(f)$ and an \emph{energy} spectral density $|X(f)|^2$.
+A power signal generally does \emph{not} have a well-behaved $X(f)$ --- it has a \emph{power} spectral
+density instead. This is exactly why Part D (random processes) exists: modulated signals and noise are power
+signals, so ``take the Fourier transform of the noise'' is meaningless, and you must talk about PSD.
+\end{keybox}
+
+\begin{worked}{1.1}
+Your notes (page 4) compute the power of the DSB-SC signal $x_c(t)=A\,x(t)\cos(2\pi f_c t)$. Reproduce it.
+\end{worked}
+\soln
+\[
+P_{x_c}=\lim_{T\to\infty}\frac1T\int_{-T/2}^{T/2}A^2x^2(t)\cos^2(2\pi f_c t)\dd t
+=\lim_{T\to\infty}\frac1T\int_{-T/2}^{T/2}A^2x^2(t)\,\frac{1+\cos(4\pi f_c t)}{2}\dd t .
+\]
+Split it. The first piece gives $\tfrac{A^2}{2}P_x$. The second piece,
+$\tfrac{A^2}{2}\langle x^2(t)\cos(4\pi f_ct)\rangle$, vanishes: $x^2(t)$ is lowpass with bandwidth $\le 2W$,
+while $\cos(4\pi f_c t)$ oscillates at $2f_c\gg 2W$, so the product averages to zero. Hence
+\[
+\boxed{P_{x_c}=\frac{A^2}{2}P_x}.
+\]
+For DSB-AM, $x_c'(t)=A(1+\mu x(t))\cos(2\pi f_ct)$, the same argument on $(1+\mu x)^2 = 1+2\mu x+\mu^2x^2$
+with $\langle x\rangle=0$ gives
+\[
+P_{x_c'}=\frac{A^2}{2}\big(1+\mu^2 P_x\big)=\underbrace{\frac{A^2}{2}}_{\text{carrier, useless}}+\underbrace{\frac{A^2\mu^2}{2}P_x}_{\text{message}} .
+\]
+The \textbf{power efficiency} $\eta=\mu^2P_x/(1+\mu^2P_x)$ is why DSB-AM is wasteful --- a favourite quiz question.
+
+\subsection{Periodic vs.\ aperiodic}
+$x(t)$ is periodic if $x(t+T_0)=x(t)$ for some $T_0>0$; the smallest such $T_0$ is the fundamental period,
+$f_0=1/T_0$. Periodic $\Rightarrow$ Fourier \emph{series} (discrete spectrum, spectral lines). Aperiodic
+$\Rightarrow$ Fourier \emph{transform} (continuous spectrum). \S4 shows these are the same theorem.
+
+\subsection{Real vs.\ complex}
+Physical signals are real. This is not a triviality --- it forces \textbf{Hermitian symmetry} on the spectrum
+($\S5.4$), which is the single most-used structural fact in this course. Complex signals appear as
+\emph{bookkeeping devices}: the analytic signal $x_+(t)$ and the complex envelope $x_\ell(t)$ in \S9 are complex
+by construction, and that is the whole point.
+
+\subsection{Causal vs.\ non-causal; lowpass vs.\ bandpass}
+Causal: $x(t)=0$ for $t<0$. Matters for realizability of filters.
+
+Lowpass vs.\ bandpass is the classification your course opens with. From your notes, page 1:
+\begin{keybox}
+$x(t)$ is a \textbf{lowpass signal of bandwidth $W$} if $X(f)=0$ for all $|f|>W$.\\
+$x(t)$ is a \textbf{bandpass signal} with centre $f_c$ and bandwidth $2W$ if $X(f)=0$ except for
+$f_c-W\le|f|\le f_c+W$.
+\end{keybox}
+\textbf{Careful with the word ``bandwidth''.} For a real lowpass signal occupying $[-W,W]$, the bandwidth is
+$W$ (the one-sided extent), not $2W$. For the bandpass signal occupying $[f_c-W,f_c+W]$ and its mirror, the
+bandwidth is $2W$. Your notes cross out a ``$2$'' on page 1 for exactly this reason. Sloppiness here loses
+marks; state which convention you are using.
+
+\section{Elementary signals you must know cold}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Name} & \textbf{Definition} & \textbf{Note} \\
+\midrule
+Unit rectangle & $\rect(t)=1$ for $|t|<\tfrac12$, else $0$ & width 1, centred at 0 \\
+Unit triangle & $\tri(t)=1-|t|$ for $|t|<1$, else $0$ & $=\rect*\rect$ \\
+Sinc & $\sinc(t)=\dfrac{\sin(\pi t)}{\pi t}$, $\sinc(0)=1$ & zeros at all nonzero integers \\
+Unit step & $u(t)=1$ for $t>0$, $0$ for $t<0$, $\tfrac12$ at $0$ & \\
+Signum & $\sgn(t)=2u(t)-1$ & \\
+Impulse & $\delta(t)$, see below & not a function \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{trapbox}
+\textbf{Trap.} There are two sinc conventions. Communications uses the \textbf{normalised} one,
+$\sinc(t)=\sin(\pi t)/(\pi t)$, so that $\rect(t)\FT\sinc(f)$ cleanly. Some maths and DSP texts use
+$\sin(t)/t$. Always check. Every formula in this document uses the normalised one.
+\end{trapbox}
+
+\subsection{The delta function, properly}
+$\delta(t)$ is not a function; it is defined \emph{entirely} by how it behaves inside an integral:
+\[
+\int_{-\infty}^{\infty}\varphi(t)\,\delta(t-t_0)\dd t=\varphi(t_0)\qquad\text{(sifting property)}
+\]
+for every continuous $\varphi$. Everything else follows from this. Two consequences you will use daily:
+\begin{align}
+x(t)*\delta(t-t_0)&=x(t-t_0) &&\text{(convolving with a shifted impulse = shifting)}\\
+x(t)\,\delta(t-t_0)&=x(t_0)\,\delta(t-t_0) &&\text{(multiplying by an impulse = sampling)}
+\end{align}
+Also the scaling rule $\delta(at)=\frac{1}{|a|}\delta(t)$, which trips people up constantly.
+
+\begin{trapbox}
+\textbf{Trap.} $\delta(t)$ has \emph{unit area}, not unit height. So in a spectrum plot an impulse is drawn as
+an arrow whose labelled height is its \emph{weight} (area). When your notes draw the carrier line in the
+DSB-AM spectrum as a tall arrow at $f_c$, that arrow has weight $A/2$, i.e.\ the term
+$\frac{A}{2}\delta(f-f_c)$ --- it is not ``infinitely large signal''.
+\end{trapbox}
+
+\section{LTI systems and convolution}
+
+A system $\mathcal{H}$ maps input $x(t)$ to output $y(t)$. It is
+\begin{itemize}[nosep,leftmargin=*]
+\item \textbf{Linear} if $\mathcal{H}\{a x_1+b x_2\}=a\mathcal{H}\{x_1\}+b\mathcal{H}\{x_2\}$;
+\item \textbf{Time-invariant} if $\mathcal{H}\{x(t-t_0)\}=y(t-t_0)$.
+\end{itemize}
+Both together: \textbf{LTI}.
+
+\subsection{Why LTI is the whole game}
+Here is the argument you should be able to reproduce, because it explains why Fourier analysis exists at all.
+
+Write any input using the sifting property as a continuum of shifted impulses:
+\[
+x(t)=\int_{-\infty}^{\infty}x(\tau)\,\delta(t-\tau)\dd\tau .
+\]
+Let $h(t)=\mathcal{H}\{\delta(t)\}$ be the \textbf{impulse response}. By time-invariance,
+$\mathcal{H}\{\delta(t-\tau)\}=h(t-\tau)$. By linearity (extended to integrals), push $\mathcal H$ through:
+\[
+\boxed{\;y(t)=\int_{-\infty}^{\infty}x(\tau)\,h(t-\tau)\dd\tau \;=\; (x*h)(t)\;}
+\]
+So \textbf{an LTI system is completely characterised by one function, $h(t)$}. That is an enormous reduction,
+and it is why we can talk about ``the channel'' or ``the filter'' as a single object.
+
+\subsection{Properties of convolution}
+\begin{align*}
+&\text{Commutative: } x*h=h*x
+&&\text{Associative: } (x*h_1)*h_2=x*(h_1*h_2)\\
+&\text{Distributive: } x*(h_1+h_2)=x*h_1+x*h_2
+&&\text{Shift: } x(t)*h(t-t_0)=y(t-t_0)
+\end{align*}
+Associativity is why cascaded filters multiply their frequency responses; distributivity is why parallel
+branches add.
+
+\textbf{Widths add.} If $x$ is supported on $[a_1,b_1]$ and $h$ on $[a_2,b_2]$, then $x*h$ is supported on
+$[a_1+a_2,\,b_1+b_2]$. Use this as an instant sanity check on any convolution you compute.
+
+\begin{worked}{3.1}
+Compute $\rect(t)*\rect(t)$.
+\end{worked}
+\soln
+Both have width 1, so the answer has width 2, supported on $[-1,1]$ --- already a check.
+\[
+(\rect*\rect)(t)=\int_{-\infty}^{\infty}\rect(\tau)\rect(t-\tau)\dd\tau
+=\int_{-1/2}^{1/2}\rect(t-\tau)\dd\tau .
+\]
+The integrand is 1 when $|t-\tau|<\tfrac12$, i.e.\ $\tau\in(t-\tfrac12,\,t+\tfrac12)$. So the integral is the
+length of the overlap between $(-\tfrac12,\tfrac12)$ and $(t-\tfrac12,t+\tfrac12)$, which is $1-|t|$ for
+$|t|\le1$ and 0 otherwise. Therefore
+\[
+\rect(t)*\rect(t)=\tri(t).
+\]
+This one result will save you repeatedly: it is why $\sinc^2$ pairs with the triangle, and it is the reason a
+raised-cosine-type pulse shows up later in the ISI chapter.
+
+\subsection{Causality and stability from $h(t)$}
+\begin{itemize}[nosep,leftmargin=*]
+\item \textbf{Causal} $\iff h(t)=0$ for $t<0$.
+\item \textbf{BIBO stable} $\iff \int|h(t)|\dd t<\infty$.
+\end{itemize}
+The ideal lowpass filter has $h(t)=2W\sinc(2Wt)$, which is neither causal nor absolutely integrable. That is
+why ``ideal filter'' is a mathematical fiction we use for analysis and approximate in practice --- worth one
+sentence in any exam answer that invokes one.
+
+\subsection{Eigenfunctions: the bridge to Fourier}
+Feed a complex exponential $x(t)=e^{\ii 2\pi f_0 t}$ into an LTI system:
+\[
+y(t)=\int h(\tau)e^{\ii2\pi f_0 (t-\tau)}\dd\tau
+= e^{\ii2\pi f_0 t}\underbrace{\int h(\tau)e^{-\ii2\pi f_0\tau}\dd\tau}_{\textstyle H(f_0)} = H(f_0)\,e^{\ii2\pi f_0t}.
+\]
+\begin{keybox}
+\textbf{The complex exponential comes out unchanged except for a complex scale factor.} It is an
+\emph{eigenfunction} of every LTI system, with eigenvalue $H(f_0)$ --- and that eigenvalue is precisely the
+Fourier transform of $h$.
+
+This is \emph{the} reason we decompose signals into complex exponentials rather than, say, polynomials:
+because it turns the hard operation (convolution) into the easy one (multiplication). Everything in Part B is
+machinery for doing that decomposition.
+\end{keybox}
+
+\begin{trapbox}
+\textbf{Trap.} $\cos(2\pi f_0t)$ is \emph{not} an eigenfunction --- an LTI system can change its phase, so the
+output is $|H(f_0)|\cos(2\pi f_0 t+\angle H(f_0))$, not a scalar multiple of the input. Only the complex
+exponential is a true eigenfunction. (For a real system the cosine result follows by writing it as a sum of
+two exponentials and using $H(-f)=H^*(f)$.)
+\end{trapbox}
+%==============================================================
+\section*{\color{keyblue}PART B --- The Fourier Transform}
+\addcontentsline{toc}{section}{PART B --- The Fourier Transform}
+%==============================================================
+
+\section{From Fourier series to Fourier transform}
+
+\subsection{The series}
+Any reasonable periodic signal with period $T_0$ ($f_0=1/T_0$) can be written as
+\[
+x(t)=\sum_{n=-\infty}^{\infty}c_n e^{\ii2\pi n f_0 t},
+\qquad
+c_n=\frac{1}{T_0}\int_{T_0}x(t)e^{-\ii2\pi n f_0 t}\dd t .
+\]
+The $c_n$ are complex numbers: $|c_n|$ is the amplitude of the $n$-th harmonic, $\angle c_n$ its phase. The
+spectrum is a set of \textbf{discrete lines} at $f=nf_0$.
+
+Why does the formula for $c_n$ work? Because the exponentials are orthogonal over a period:
+$\frac{1}{T_0}\int_{T_0}e^{\ii2\pi(n-m)f_0t}\dd t=\delta_{nm}$. Multiplying the series by $e^{-\ii2\pi mf_0t}$
+and averaging kills every term except $n=m$. That is the entire trick, and the same trick reappears in matched
+filtering and in orthogonal signalling later in the course.
+
+\begin{worked}{4.1}
+Find the Fourier series of the square wave $c(t)$ your notes use for the ring modulator / switching
+demodulator: $c(t)=+1$ for the first half of each period, $-1$ for the second, period $T_c=1/f_c$.
+\end{worked}
+\soln
+$c(t)$ is odd (with the origin chosen at a rising edge midpoint) and has zero mean, so only odd harmonics
+survive:
+\[
+c(t)=\frac{4}{\pi}\left[\cos(2\pi f_ct)-\frac13\cos(6\pi f_ct)+\frac15\cos(10\pi f_ct)-\cdots\right].
+\]
+That matches your notes exactly ($\frac4\pi\cos\omega_ct-\frac{4}{3\pi}\cos3\omega_ct+\frac{4}{5\pi}\cos5\omega_ct$).
+The \emph{unipolar} switching function (0/1 instead of $\mp1$) that appears on the demodulation page is just
+$\frac{1+c(t)}{2}$:
+\[
+s(t)=\frac12+\frac{2}{\pi}\cos(2\pi f_ct)-\frac{2}{3\pi}\cos(6\pi f_ct)+\cdots
+\]
+--- again exactly your notes. \textbf{Why this matters:} a switching modulator multiplies $x(t)$ by $s(t)$, so
+the output contains $x(t)$ replicated around DC, $f_c$, $3f_c$, $5f_c,\dots$ A bandpass filter at $f_c$ with
+bandwidth $2W$ picks off the term $\frac{2}{\pi}x(t)\cos(2\pi f_ct)$, which is DSB-SC. Cheap hardware, exact
+result.
+
+\subsection{Letting the period go to infinity}
+Take an aperiodic $x(t)$, and build a periodic version $\tilde x_{T_0}$ by repeating it every $T_0$. Then
+\[
+c_n=\frac{1}{T_0}\int_{-T_0/2}^{T_0/2}x(t)e^{-\ii2\pi nf_0t}\dd t=\frac{1}{T_0}X(nf_0),
+\qquad X(f):=\int_{-\infty}^{\infty}x(t)e^{-\ii2\pi ft}\dd t .
+\]
+The lines sit at spacing $f_0=1/T_0$ and have height $X(nf_0)/T_0$. As $T_0\to\infty$ the lines merge into a
+continuum, the sum becomes an integral, and we get the transform pair.
+
+\begin{keybox}
+\textbf{The Fourier transform pair (Hz convention).}
+\[
+X(f)=\int_{-\infty}^{\infty}x(t)\,e^{-\ii2\pi f t}\dd t,
+\qquad
+x(t)=\int_{-\infty}^{\infty}X(f)\,e^{+\ii2\pi f t}\dd f .
+\]
+Note the beautiful symmetry: no $1/2\pi$ anywhere, and forward/inverse differ only in the sign of the exponent.
+This is the payoff for using $f$ instead of $\omega$.
+\end{keybox}
+
+\begin{trapbox}
+\textbf{Converting from an $\omega$-based textbook.} If a book gives $X(\omega)$, then $X(f)=X(\omega)\big|_{\omega=2\pi f}$
+--- the \emph{function values} are the same, only the argument is relabelled. But a formula like
+$x(t)=\frac{1}{2\pi}\int X(\omega)e^{\ii\omega t}\dd\omega$ carries a $1/2\pi$ that disappears in the $f$
+convention. Never mix the two mid-problem.
+\end{trapbox}
+
+\subsection{What $X(f)$ actually means}
+$X(f)$ is complex. Write $X(f)=|X(f)|e^{\ii\theta(f)}$.
+\begin{itemize}[nosep,leftmargin=*]
+\item $|X(f)|$ --- \textbf{magnitude spectrum}: how much of frequency $f$ is present.
+\item $\theta(f)$ --- \textbf{phase spectrum}: \emph{where} those components sit in time. Phase carries most
+of the perceptual information in a signal; discarding it destroys the waveform even though $|X|$ is intact.
+\item Units: if $x$ is in volts, $X(f)$ is in volts/Hz. It is a \emph{density}, which is why impulses appear
+whenever a signal has finite power concentrated at a single frequency.
+\end{itemize}
+
+\section{Properties of the Fourier transform}
+
+These are not trivia to memorise --- in this course you will almost never compute an FT integral. You will
+recognise a signal as a combination of known pairs and apply properties. Learn them as \emph{moves}.
+
+\subsection{Linearity}
+$a x_1(t)+b x_2(t)\FT aX_1(f)+bX_2(f)$. Obvious, but it is what lets you decompose DSB-AM into
+carrier + sidebands and treat each separately.
+
+\subsection{Time shift and frequency shift (the two you will use most)}
+\begin{align}
+x(t-t_0)&\FT X(f)\,e^{-\ii2\pi ft_0} &&\text{delay $\Rightarrow$ linear phase, magnitude unchanged}\\
+x(t)\,e^{\ii2\pi f_ct}&\FT X(f-f_c) &&\text{multiply by exponential $\Rightarrow$ shift spectrum}
+\end{align}
+\textbf{Proof of the second} (do this once by hand, it takes two lines):
+$\int x(t)e^{\ii2\pi f_ct}e^{-\ii2\pi ft}\dd t=\int x(t)e^{-\ii2\pi(f-f_c)t}\dd t=X(f-f_c)$.
+
+\begin{keybox}
+\textbf{The modulation property --- the single most important formula in this course.}
+\[
+x(t)\cos(2\pi f_ct)\;=\;\frac{x(t)e^{\ii2\pi f_ct}+x(t)e^{-\ii2\pi f_ct}}{2}
+\FT
+\frac{1}{2}X(f-f_c)+\frac{1}{2}X(f+f_c).
+\]
+Multiplying by a carrier \textbf{takes the spectrum, halves it, and puts a copy at $+f_c$ and a copy at
+$-f_c$}. That is literally the definition of modulation as your notes state it: ``process of shifting
+frequency''. Everything in the AM chapter is this one line applied repeatedly.
+\end{keybox}
+
+Your notes write $X_c(f)=\frac{A}{2}X(f-f_c)+\frac{A}{2}X(f+f_c)$ for $x_c(t)=Ax(t)\cos(2\pi f_ct)$, and then
+say ``$=\frac{A}{2}X(f-f_c)$ for $f>0$, and $X_c(f)$ has Hermitian symmetry''. That shorthand is legitimate
+\emph{only} because $X(f-f_c)$ and $X(f+f_c)$ do not overlap, which needs $f_c>W$. State that condition.
+
+\subsection{Scaling}
+\[
+x(at)\FT\frac{1}{|a|}X\!\left(\frac fa\right).
+\]
+\textbf{Compress in time $\Rightarrow$ stretch in frequency.} This is the time--bandwidth trade-off: a short
+pulse necessarily occupies a wide band. It is the reason high data rates need wide bandwidth, which is the
+theme of the second half of EE341.
+
+\subsection{Duality}
+If $x(t)\FT X(f)$, then $X(t)\FT x(-f)$. This gives you a free pair for every pair you know:
+from $\rect(t)\FT\sinc(f)$ you immediately get $\sinc(t)\FT\rect(f)$ (using evenness). Use it; it halves
+what you need to memorise.
+
+\subsection{Conjugate symmetry --- Hermitian symmetry}
+\begin{keybox}
+If $x(t)$ is \textbf{real}, then
+\[
+\boxed{X(-f)=X^*(f)}
+\]
+equivalently $|X(f)|$ is \textbf{even} and $\angle X(f)$ is \textbf{odd}.
+\end{keybox}
+\textbf{Proof.} $X(-f)=\int x(t)e^{\ii2\pi ft}\dd t = \left[\int x^*(t)e^{-\ii2\pi ft}\dd t\right]^*=X^*(f)$
+since $x=x^*$.
+
+\textbf{Why this dominates the course.} It says the negative-frequency half of the spectrum of a real signal
+carries \emph{no new information}. Hence:
+\begin{itemize}[nosep,leftmargin=*]
+\item You may specify a real bandpass signal by its positive-frequency content alone --- this is what your
+notes mean by ``$X_c(f)=A X(f-f_c)$ for $f>0$, and $X_c(f)$ has Hermitian symmetry''.
+\item It motivates the \textbf{analytic signal} $x_+(t)$ (\S9), which simply \emph{deletes} the redundant half.
+\item It is why DSB transmission is spectrally wasteful (upper and lower sidebands are mirror images), which
+motivates SSB and VSB.
+\end{itemize}
+Two corollaries worth having reflexively: $x$ real and even $\Rightarrow$ $X$ real and even;
+$x$ real and odd $\Rightarrow$ $X$ purely imaginary and odd.
+
+\subsection{Convolution and multiplication}
+\begin{keybox}
+\[
+x(t)*h(t)\FT X(f)H(f)
+\qquad\qquad
+x(t)\,h(t)\FT X(f)*H(f)
+\]
+\end{keybox}
+The first is the reason Fourier analysis is used at all (\S3.5). The second is its dual and is how you handle
+any product of signals --- e.g.\ the square-law modulator, where you square $x(t)+\cos2\pi f_ct$ and want to
+know where the resulting spectral pieces land.
+
+\textbf{Proof of the first} (know it):
+\[
+\int\!\!\left[\int x(\tau)h(t-\tau)\dd\tau\right]e^{-\ii2\pi ft}\dd t
+=\int x(\tau)\!\left[\int h(t-\tau)e^{-\ii2\pi ft}\dd t\right]\!\dd\tau
+=\int x(\tau)H(f)e^{-\ii2\pi f\tau}\dd\tau=X(f)H(f),
+\]
+where the inner bracket used the time-shift property.
+
+\subsection{Differentiation and integration}
+\[
+\frac{\dd x}{\dd t}\FT \ii2\pi f\,X(f),
+\qquad
+\int_{-\infty}^{t}x(\tau)\dd\tau\FT\frac{X(f)}{\ii2\pi f}+\frac{X(0)}{2}\delta(f).
+\]
+The $\delta(f)$ term (DC offset) is forgotten by almost everyone. It is needed exactly when $X(0)\ne0$.
+
+\subsection{Parseval / Rayleigh}
+\[
+\int_{-\infty}^{\infty}|x(t)|^2\dd t=\int_{-\infty}^{\infty}|X(f)|^2\dd f
+\qquad\text{(energy signals)}
+\]
+More generally $\int x(t)y^*(t)\dd t=\int X(f)Y^*(f)\dd f$. The quantity $|X(f)|^2$ is the
+\textbf{energy spectral density} in J/Hz. For \emph{power} signals the analogue is the power spectral density
+of \S10 --- do not apply this Parseval to a modulated carrier.
+
+\subsection{Moment / area rules (fast sanity checks)}
+\[
+X(0)=\int x(t)\dd t,
+\qquad
+x(0)=\int X(f)\dd f .
+\]
+Use these constantly. If you compute a transform and $X(0)$ does not equal the area under $x(t)$, you have
+made an algebra error. Thirty seconds, catches most mistakes.
+
+\section{Standard transform pairs}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.7}
+\begin{tabular}{@{}p{6.6cm}p{6.6cm}@{}}
+\toprule
+\textbf{$x(t)$} & \textbf{$X(f)$}\\
+\midrule
+$\delta(t)$ & $1$\\
+$1$ & $\delta(f)$\\
+$\delta(t-t_0)$ & $e^{-\ii2\pi ft_0}$\\
+$e^{\ii2\pi f_ct}$ & $\delta(f-f_c)$\\
+$\cos(2\pi f_ct)$ & $\tfrac12\delta(f-f_c)+\tfrac12\delta(f+f_c)$\\
+$\sin(2\pi f_ct)$ & $\tfrac{1}{2\ii}\delta(f-f_c)-\tfrac{1}{2\ii}\delta(f+f_c)$\\
+$\rect(t/T)$ & $T\sinc(fT)$\\
+$2W\sinc(2Wt)$ & $\rect\!\big(f/(2W)\big)$\\
+$\tri(t/T)$ & $T\sinc^2(fT)$\\
+$e^{-at}u(t)$, $a>0$ & $\dfrac{1}{a+\ii2\pi f}$\\
+$e^{-a|t|}$, $a>0$ & $\dfrac{2a}{a^2+(2\pi f)^2}$\\
+$e^{-\pi t^2}$ & $e^{-\pi f^2}$ \quad (its own transform)\\
+$u(t)$ & $\dfrac{1}{2}\delta(f)+\dfrac{1}{\ii2\pi f}$\\
+$\sgn(t)$ & $\dfrac{1}{\ii\pi f}$\\
+$\dfrac{1}{\pi t}$ & $-\ii\,\sgn(f)$ \quad \textbf{(Hilbert transform kernel)}\\
+$\displaystyle\sum_{n}\delta(t-nT_s)$ & $\dfrac{1}{T_s}\displaystyle\sum_{k}\delta\!\left(f-\tfrac{k}{T_s}\right)$ \quad \textbf{(impulse train)}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{keybox}
+\textbf{The three lines to memorise above all others}, because EE341 uses them on nearly every page:
+\begin{enumerate}[nosep,leftmargin=*]
+\item $\cos(2\pi f_ct)\FT\tfrac12[\delta(f-f_c)+\delta(f+f_c)]$ --- modulation.
+\item $\dfrac{1}{\pi t}\FT-\ii\sgn(f)$ --- Hilbert transform, hence analytic signal and SSB.
+\item $\sum_n\delta(t-nT_s)\FT \dfrac{1}{T_s}\sum_k\delta(f-k/T_s)$ --- sampling theorem.
+\end{enumerate}
+\end{keybox}
+
+\begin{worked}{6.1}
+Derive $u(t)\FT\frac12\delta(f)+\frac{1}{\ii2\pi f}$, and use it to get your notes' expression
+$U(f)=\frac12(1+\sgn(f))$ in the frequency variable.
+\end{worked}
+\soln
+Write $u(t)=\frac12+\frac12\sgn(t)$. The constant $\frac12$ transforms to $\frac12\delta(f)$.
+For $\sgn(t)$: it is not integrable, so take the limit of $e^{-a|t|}\sgn(t)$ as $a\to0^+$:
+\[
+\int_0^\infty e^{-at}e^{-\ii2\pi ft}\dd t-\int_{-\infty}^0 e^{at}e^{-\ii2\pi ft}\dd t
+=\frac{1}{a+\ii2\pi f}-\frac{1}{a-\ii2\pi f}\xrightarrow{a\to0^+}\frac{-\ii4\pi f}{(2\pi f)^2}=\frac{1}{\ii\pi f}.
+\]
+Hence $u(t)\FT\frac12\delta(f)+\frac{1}{\ii2\pi f}$.
+
+Now the notes' $U(f)$ is a \emph{different object}: it is the unit step \emph{as a function of frequency},
+used as a mask to kill negative frequencies. There, $U(f)=\frac12(1+\sgn(f))$ is simply the algebraic identity
+$u=\frac12+\frac12\sgn$ written with argument $f$: $U(f)=0$ for $f<0$, $\frac12$ at $f=0$, $1$ for $f>0$ ---
+precisely the box on your SNR page. Keep the two straight: one is a transform, the other is a masking
+function.
+
+\begin{worked}{6.2}
+A pulse $p(t)=\rect(t/T)$ is transmitted. Find its bandwidth by the first-null definition, and comment on the
+time--bandwidth product.
+\end{worked}
+\soln
+$P(f)=T\sinc(fT)$, first null at $f=1/T$. So $B_{\text{null}}=1/T$ and $B\cdot T=1$. Halving the pulse
+duration doubles the bandwidth --- the scaling property in action. This constant is the seed of the Nyquist
+criterion in the ISI chapter: you cannot signal faster than roughly $2B$ symbols/second in bandwidth $B$.
+%==============================================================
+\section*{\color{keyblue}PART C --- Filtering, Sampling, and Bandpass Signals}
+\addcontentsline{toc}{section}{PART C --- Filtering, Sampling, Bandpass Signals}
+%==============================================================
+
+\section{Filtering in the frequency domain}
+
+For an LTI system, $Y(f)=H(f)X(f)$ where $H(f)$ is the \textbf{frequency response} (the FT of $h(t)$).
+Magnitude $|H(f)|$ scales each frequency; phase $\angle H(f)$ delays it.
+
+\subsection{Distortionless transmission}
+A channel is distortionless if $y(t)=K\,x(t-t_d)$, i.e.
+\[
+H(f)=K e^{-\ii2\pi f t_d}
+\quad\Longleftrightarrow\quad
+|H(f)|=K \text{ (flat)}, \qquad \angle H(f)=-2\pi f t_d \text{ (linear in $f$)}.
+\]
+\begin{keybox}
+\textbf{Flat magnitude and \emph{linear} phase} over the signal's band. Nonflat magnitude gives amplitude
+distortion; nonlinear phase gives \textbf{delay distortion} --- different frequency components arrive at
+different times, smearing pulses. This is the same phenomenon that becomes intersymbol interference later.
+The \emph{group delay} $\tau_g(f)=-\frac{1}{2\pi}\frac{\dd\angle H(f)}{\dd f}$ is constant exactly when phase
+is linear.
+\end{keybox}
+
+\subsection{Ideal filters}
+\begin{itemize}[leftmargin=*]
+\item \textbf{Ideal LPF}, cutoff $W$: $H(f)=\rect\!\big(\tfrac{f}{2W}\big)$, so $h(t)=2W\sinc(2Wt)$.
+\item \textbf{Ideal BPF}, centre $f_c$, bandwidth $2W$: $H(f)=\rect\!\big(\tfrac{f-f_c}{2W}\big)+\rect\!\big(\tfrac{f+f_c}{2W}\big)$,
+so $h(t)=4W\sinc(2Wt)\cos(2\pi f_ct)$ --- a lowpass sinc \emph{modulated} onto the carrier. Note how the
+modulation property gives you the bandpass impulse response for free.
+\end{itemize}
+Both are non-causal (the sinc extends to $t<0$) and unstable in the BIBO sense. Real filters (Butterworth,
+Chebyshev) approximate them with finite roll-off, and a real receiver's ``high-$Q$ tunable bandpass filter''
+--- the thing your superheterodyne page says is hard to build --- is exactly this approximation problem.
+
+\begin{worked}{7.1}
+In the coherent demodulator on your notes page 7: $x_c'(t)=Ax(t)\cos(2\pi f_ct)$ is multiplied by
+$\cos(2\pi f_ct+\phi)$ and lowpass filtered. Find the output.
+\end{worked}
+\soln
+\[
+y(t)=Ax(t)\cos(2\pi f_ct)\cos(2\pi f_ct+\phi)=\frac{Ax(t)}{2}\big[\cos\phi+\cos(4\pi f_ct+\phi)\big].
+\]
+The LPF (cutoff $W<2f_c-W$) removes the $2f_c$ term, leaving
+\[
+\boxed{y_{\text{out}}(t)=\frac{A\cos\phi}{2}\,x(t)}.
+\]
+\begin{keybox}
+\textbf{The punchline of coherent detection.} The recovered signal is scaled by $\cos\phi$. If the local
+oscillator is $90^\circ$ out of phase ($\phi=\pi/2$) the output is \emph{zero} --- total loss of signal. This
+is the \textbf{quadrature null effect}, and it is why DSB-SC needs carrier recovery (a PLL), and why DSB-AM
+with envelope detection --- which needs no phase reference at all --- survived commercially despite being
+power-inefficient.
+\end{keybox}
+If instead there is a frequency error $\Delta f$ (LO at $f_c+\Delta f$), you get
+$\frac{A}{2}x(t)\cos(2\pi\Delta f\,t)$: a slow beating in and out. Your notes' page 11 does exactly this
+calculation in complex-envelope form.
+
+\section{Sampling}
+
+\subsection{Impulse sampling}
+Sample $x(t)$ every $T_s$ seconds. Model it as multiplication by an impulse train:
+\[
+x_s(t)=x(t)\sum_{n}\delta(t-nT_s)=\sum_n x(nT_s)\delta(t-nT_s).
+\]
+Multiplication in time $\Rightarrow$ convolution in frequency, and the impulse train transforms to another
+impulse train with spacing $f_s=1/T_s$:
+\[
+X_s(f)=X(f)*\frac{1}{T_s}\sum_k\delta\!\left(f-kf_s\right)
+=\boxed{f_s\sum_{k=-\infty}^{\infty}X(f-kf_s)}
+\]
+
+\begin{keybox}
+\textbf{Sampling replicates the spectrum} at every multiple of $f_s$, scaled by $f_s$. That single sentence is
+the sampling theorem; everything else is bookkeeping about whether the replicas collide.
+\end{keybox}
+
+\subsection{The Nyquist criterion and aliasing}
+If $x$ is lowpass with bandwidth $W$ (so $X(f)=0$ for $|f|>W$), the replicas occupy
+$[kf_s-W,\,kf_s+W]$. They do not overlap iff
+\[
+f_s>2W \qquad\text{(Nyquist rate $=2W$)}.
+\]
+Then $x(t)$ is recovered exactly by an ideal LPF of gain $T_s$ and cutoff between $W$ and $f_s-W$:
+\[
+x(t)=\sum_{n}x(nT_s)\,\sinc\!\left(\frac{t-nT_s}{T_s}\right)\qquad\text{(at $f_s=2W$).}
+\]
+If $f_s<2W$, replicas overlap and high frequencies fold down into the baseband as lower frequencies. This is
+\textbf{aliasing}, and it is \emph{irreversible} --- no filter afterwards can undo it. Hence every practical
+sampler is preceded by an \textbf{anti-aliasing filter}.
+
+\begin{trapbox}
+\textbf{The equality case.} At exactly $f_s=2W$ the replicas touch at $f=W$. This is fine for a strictly
+bandlimited signal with no impulse at $\pm W$, but fails for e.g.\ $x(t)=\sin(2\pi Wt)$ sampled at $2W$: every
+sample lands on a zero crossing and you recover nothing. Exam questions love this. Say ``$f_s>2W$, with
+equality permissible only if $X(f)$ has no impulse at $\pm W$''.
+\end{trapbox}
+
+\subsection{Practical sampling}
+\begin{itemize}[leftmargin=*]
+\item \textbf{Natural sampling}: multiply by a pulse train of finite-width rectangles. Spectrum is
+$\sum_k c_k X(f-kf_s)$ with $c_k$ the pulse train's Fourier coefficients --- replicas are weighted by a sinc
+envelope but each is undistorted, so recovery is still exact.
+\item \textbf{Flat-top sampling (PAM, sample-and-hold)}: each sample is held for width $\tau$. Now
+$X_s(f)=\tau\sinc(f\tau)\cdot f_s\sum_kX(f-kf_s)$ --- the baseband copy is \emph{multiplied} by
+$\sinc(f\tau)$, which droops across the band. This is \textbf{aperture distortion}, fixed by an equaliser of
+response $1/\sinc(f\tau)$. This appears in EE341's PAM/PCM section.
+\end{itemize}
+
+\begin{worked}{8.1}
+$x(t)=\cos(2\pi\cdot 300t)$ is sampled at $f_s=500$ Hz. What is heard after ideal lowpass reconstruction at
+$250$ Hz?
+\end{worked}
+\soln
+$W=300>f_s/2=250$, so aliasing. Replicas of the lines at $\pm300$ appear at $\pm300+k\cdot500$. Taking
+$k=-1$: $300-500=-200$; taking $k=+1$: $-300+500=200$. So a pair of lines lands at $\pm200$ Hz inside the
+reconstruction band. Output: a $200$ Hz tone. The alias frequency is $|f-kf_s|$ folded into $[0,f_s/2]$.
+
+\section{Bandpass signals and the lowpass equivalent}
+
+This is where your lecture notes currently are, and it is the conceptual heart of the first half of EE341.
+Everything below is a direct consequence of Hermitian symmetry (\S5.4).
+
+\subsection{The motivation}
+A real bandpass signal at $f_c=900$ MHz with bandwidth $200$ kHz is a nightmare to simulate or analyse
+directly --- you would need to sample at $\ge1.8$ GHz to represent a signal that carries only $200$ kHz of
+information. The redundancy is twofold: (i) negative frequencies duplicate positive ones (Hermitian symmetry),
+and (ii) the carrier itself carries no information. Strip both away and you get a \emph{lowpass} complex
+signal of bandwidth $W$ that contains everything. That object is the complex envelope.
+
+\subsection{Step 1: the analytic signal}
+Delete negative frequencies:
+\[
+X_+(f)=X_{bp}(f)\,U(f),\qquad U(f)=\tfrac12\big(1+\sgn(f)\big).
+\]
+So $X_+(f)=\tfrac12 X_{bp}(f)+\tfrac12X_{bp}(f)\sgn(f)$. In the time domain, using
+$\sgn(f)\FT^{-1}$-pairing with $\frac{1}{\ii\pi t}$, i.e.\ $\frac{1}{\pi t}\FT-\ii\sgn(f)$:
+\[
+x_+(t)=\frac12 x_{bp}(t)+\frac{\ii}{2}\,\hat x_{bp}(t),
+\qquad
+\hat x_{bp}(t):=x_{bp}(t)*\frac{1}{\pi t}
+\]
+where $\hat x$ is the \textbf{Hilbert transform} of $x$. (Your notes write
+$x_+ = x_{bp}*\big(\tfrac12\delta(t)+\tfrac{1}{\ii2\pi t}\big)$ --- same thing; the
+$\tfrac{1}{\ii 2\pi t}$ combines with the factor to give $\tfrac{\ii}{2}\hat x_{bp}$. Watch the $\ii$'s.)
+
+\begin{keybox}
+\textbf{The Hilbert transform is a $-90^\circ$ phase shifter.} Its frequency response is
+$H(f)=-\ii\sgn(f)$: magnitude 1 everywhere, phase $-90^\circ$ for $f>0$ and $+90^\circ$ for $f<0$.
+It does nothing to amplitudes; it only rotates phase. Key facts:
+\[
+\widehat{\cos(2\pi f_ct)}=\sin(2\pi f_ct),\qquad \widehat{\sin(2\pi f_ct)}=-\cos(2\pi f_ct),\qquad \hat{\hat x}=-x.
+\]
+\end{keybox}
+
+\subsection{Step 2: shift down to baseband}
+\[
+x_\ell(t)=2x_+(t)e^{-\ii2\pi f_ct}
+\qquad\text{(some texts, and your notes, omit the 2; be consistent)}
+\]
+Expanding with $x_+=\frac12(x_{bp}+\ii\hat x_{bp})$ and $e^{-\ii2\pi f_ct}=\cos-\ii\sin$:
+\[
+x_\ell(t)=x_I(t)+\ii\,x_Q(t)
+\]
+with
+\begin{align}
+x_I(t)&=x_{bp}(t)\cos(2\pi f_ct)+\hat x_{bp}(t)\sin(2\pi f_ct) &&\textbf{in-phase}\\
+x_Q(t)&=\hat x_{bp}(t)\cos(2\pi f_ct)-x_{bp}(t)\sin(2\pi f_ct) &&\textbf{quadrature}
+\end{align}
+Both $x_I$ and $x_Q$ are \textbf{real lowpass signals of bandwidth $W$}. This is the block diagram on your
+notes page 12.
+
+\subsection{Step 3: reconstruct}
+\begin{keybox}
+\[
+\boxed{\;x_{bp}(t)=\operatorname{Re}\big\{x_\ell(t)\,e^{\ii2\pi f_ct}\big\}
+= x_I(t)\cos(2\pi f_ct)-x_Q(t)\sin(2\pi f_ct)\;}
+\]
+\end{keybox}
+That minus sign is not optional --- it comes from $\operatorname{Re}\{(x_I+\ii x_Q)(\cos+\ii\sin)\}$. Losing
+it is the most common error in this topic.
+
+\subsection{Envelope and phase}
+Write $x_\ell(t)=A(t)e^{\ii\phi(t)}$ with
+\[
+A(t)=\sqrt{x_I^2(t)+x_Q^2(t)}\ \ (\ge0),
+\qquad
+\phi(t)=\tan^{-1}\!\frac{x_Q(t)}{x_I(t)} .
+\]
+Then $x_{bp}(t)=A(t)\cos\big(2\pi f_ct+\phi(t)\big)$. $A(t)$ is the \textbf{envelope} --- and it is exactly
+what an envelope detector (diode + RC) outputs.
+
+\begin{keybox}
+\textbf{Now the AM results become one-liners.}
+\begin{itemize}[nosep,leftmargin=*]
+\item \textbf{DSB-SC:} $x_c(t)=Ax(t)\cos2\pi f_ct=\operatorname{Re}\{Ax(t)e^{\ii2\pi f_ct}\}$, so
+$x_\ell=Ax(t)$, which is real. Envelope $=A|x(t)|$. Since $x(t)$ goes negative, the envelope is the
+\emph{rectified} message --- so an envelope detector \textbf{fails}, and the sign flips show up as the
+$180^\circ$ phase reversals drawn on your notes page 3.
+\item \textbf{DSB-AM:} $x_c'(t)=A(1+\mu x(t))\cos2\pi f_ct$, so $x_\ell=A(1+\mu x(t))$. If $\mu|x(t)|<1$ for
+all $t$ (i.e.\ modulation index under 100\%), then $x_\ell>0$ always, the envelope is
+$A(1+\mu x(t))$, and an envelope detector recovers $x(t)$ up to a DC offset. \textbf{Over-modulation}
+($\mu|x|>1$) makes $x_\ell$ change sign and the envelope detector produces the rectified, distorted mess.
+\item \textbf{Angle modulation:} $A(t)=$ const, all the information is in $\phi(t)$.
+\end{itemize}
+\end{keybox}
+
+\subsection{Noise in the same language}
+Your notes page 11 does this: pass bandpass noise $n(t)$ through the receiver's BPF and write
+$n(t)=n_I(t)\cos2\pi f_ct-n_Q(t)\sin2\pi f_ct$. Then received signal + noise has envelope
+\[
+A(t)=\sqrt{\big(x_I(t)+n_I(t)\big)^2+\big(x_Q(t)+n_Q(t)\big)^2},
+\]
+which is the starting point for every SNR calculation in analog communication. For white Gaussian noise
+filtered to bandwidth $2W$, $n_I$ and $n_Q$ turn out to be independent, zero-mean, each with the \emph{same}
+variance as $n$ --- proved with the tools of \S10.
+
+\begin{worked}{9.1}
+Find the lowpass equivalent of $x_{bp}(t)=\cos\big(2\pi(f_c+\Delta f)t\big)$ with respect to carrier $f_c$.
+\end{worked}
+\soln
+$x_{bp}=\operatorname{Re}\{e^{\ii2\pi(f_c+\Delta f)t}\}=\operatorname{Re}\{e^{\ii2\pi\Delta f t}e^{\ii2\pi f_ct}\}$,
+so $x_\ell(t)=e^{\ii2\pi\Delta ft}$, giving $x_I=\cos(2\pi\Delta ft)$, $x_Q=\sin(2\pi\Delta ft)$, envelope
+$A(t)=1$. \textbf{A frequency offset becomes a slow rotation of the complex envelope} --- which is precisely
+the picture on your notes page 11 where $x_\ell(t)=Ax(t)+Ae^{\ii2\pi\Delta ft}$ and hence
+$x_I=Ax(t)+A\cos(2\pi\Delta ft)$, $x_Q=A\sin(2\pi\Delta ft)$. Everything about carrier offset, phase noise,
+and synchronisation is easier to see in this representation.
+
+\begin{worked}{9.2}
+Show the bandpass filter $h_{bp}(t)=2\operatorname{Re}\{h_\ell(t)e^{\ii2\pi f_ct}\}$ acting on
+$x_{bp}$ produces output whose complex envelope is $y_\ell=x_\ell * h_\ell$.
+\end{worked}
+\soln
+Sketch: in the frequency domain, $Y_{bp}(f)=H_{bp}(f)X_{bp}(f)$. Restrict to $f>0$, where
+$X_{bp}(f)=\tfrac12X_\ell(f-f_c)$ and $H_{bp}(f)=H_\ell(f-f_c)$. Multiply, shift back by $f_c$, and read off
+$Y_\ell(f)=X_\ell(f)H_\ell(f)$; invert. \textbf{Why this matters:} it means you can simulate an entire
+bandpass communication link --- modulator, channel filter, receiver filter, noise --- entirely at baseband
+with complex signals, at a sampling rate set by $W$ and not by $f_c$. That is how every real simulator (and
+every software-defined radio) works.
+%==============================================================
+\section*{\color{keyblue}PART D --- Random Processes Primer}
+\addcontentsline{toc}{section}{PART D --- Random Processes Primer}
+%==============================================================
+
+\section{Just enough randomness to survive the noise chapter}
+
+Skim this before the quiz; return to it properly before the mid-semester. The syllabus lists it as a prereq
+because noise is not a signal you can write down --- you can only describe its statistics.
+
+\subsection{Random variables, in one box}
+\begin{keybox}
+Mean $\mu_X=E[X]$; variance $\sigma_X^2=E[(X-\mu_X)^2]=E[X^2]-\mu_X^2$.\\
+Gaussian: $p_X(x)=\dfrac{1}{\sqrt{2\pi\sigma^2}}e^{-(x-\mu)^2/2\sigma^2}$.\\
+The Q-function: $Q(x)=P(X>x)$ for standard Gaussian $=\displaystyle\int_x^\infty\frac{1}{\sqrt{2\pi}}e^{-t^2/2}\dd t$.
+\end{keybox}
+$Q(\cdot)$ is the function every digital-communication error probability is expressed in. Get comfortable with
+$Q(x)=1-Q(-x)$ and its rapid decay. You will meet $P_e=Q\!\left(\sqrt{2E_b/N_0}\right)$ for BPSK.
+
+\subsection{Random processes}
+A random process $X(t)$ is a family of random variables, one per time instant. Two statistics matter:
+\[
+\mu_X(t)=E[X(t)],\qquad R_X(t_1,t_2)=E[X(t_1)X(t_2)]\quad\text{(autocorrelation)}.
+\]
+
+\textbf{Wide-sense stationary (WSS)} means: $\mu_X(t)=\mu_X$ is constant, and $R_X(t_1,t_2)$ depends only on
+the lag $\tau=t_1-t_2$, so we write $R_X(\tau)$. Almost every noise model in this course is WSS.
+
+Properties of $R_X(\tau)$ for a WSS process:
+\begin{itemize}[nosep,leftmargin=*]
+\item $R_X(0)=E[X^2(t)]=$ average power.
+\item $R_X(-\tau)=R_X(\tau)$ (even).
+\item $|R_X(\tau)|\le R_X(0)$.
+\end{itemize}
+
+\subsection{Power spectral density and the Wiener--Khinchin theorem}
+\begin{keybox}
+\[
+\boxed{S_X(f)=\int_{-\infty}^{\infty}R_X(\tau)e^{-\ii2\pi f\tau}\dd\tau}
+\qquad\text{and}\qquad
+P_X=R_X(0)=\int_{-\infty}^{\infty}S_X(f)\dd f .
+\]
+\textbf{The PSD is the Fourier transform of the autocorrelation.} This is what replaces $|X(f)|^2$ when the
+signal is a power signal with no ordinary Fourier transform.
+\end{keybox}
+$S_X(f)$ is real, even, and non-negative. It has units W/Hz.
+
+\subsection{The one result you will use constantly}
+\begin{keybox}
+\textbf{WSS process through an LTI filter.} If $Y=X*h$, then
+\[
+S_Y(f)=|H(f)|^2 S_X(f),\qquad \mu_Y=\mu_X H(0).
+\]
+\end{keybox}
+Note $|H(f)|^2$, \emph{not} $H(f)$: phase information is destroyed, because the PSD does not know about phase.
+
+\subsection{White noise}
+\textbf{AWGN} (additive white Gaussian noise) has
+\[
+S_N(f)=\frac{N_0}{2}\ \text{(W/Hz, two-sided, for all $f$)},\qquad R_N(\tau)=\frac{N_0}{2}\delta(\tau).
+\]
+Two consequences: (i) samples at distinct times are uncorrelated (and, being Gaussian, independent);
+(ii) it has infinite power, so it is a fiction --- but a harmless one, because every receiver filters it.
+After an ideal BPF of bandwidth $2W$ (both sidebands, at $\pm f_c$), the noise power is
+\[
+P_N=\int|H(f)|^2\frac{N_0}{2}\dd f=\frac{N_0}{2}\cdot 2\cdot(2W)=2N_0W .
+\]
+Combine this with the signal power from Worked Problem 1.1 and you have the SNR expressions your notes are
+building towards.
+
+\begin{worked}{10.1}
+Show that for bandpass noise $n(t)=n_I(t)\cos2\pi f_ct-n_Q(t)\sin2\pi f_ct$ with $S_N(f)$ flat of height
+$N_0/2$ over $|f\mp f_c|<W$, the components satisfy $\sigma_{n_I}^2=\sigma_{n_Q}^2=\sigma_n^2$.
+\end{worked}
+\soln
+Sketch of the standard argument: $n_I$ and $n_Q$ are obtained from $n$ by the operations in \S9.3, which are
+lowpass filters of one-sided width $W$ applied to frequency-shifted copies. Their PSDs come out as
+$S_{n_I}(f)=S_{n_Q}(f)=S_N(f-f_c)+S_N(f+f_c)$ for $|f|<W$, i.e.\ flat of height $N_0$ over $[-W,W]$. So
+\[
+\sigma_{n_I}^2=\sigma_{n_Q}^2=N_0\cdot 2W = 2N_0W=\sigma_n^2 .
+\]
+Equal variance to the bandpass noise itself --- this is the fact that makes envelope-detector and
+coherent-detector SNR comparisons work out.
+
+%==============================================================
+\section{Problem set (do this last, timed)}
+%==============================================================
+
+Give yourself \textbf{60 minutes}. Solutions follow --- do not look until you have finished.
+
+\begin{enumerate}[leftmargin=*,itemsep=6pt]
+\item Sketch $|X(f)|$ for $x(t)=\rect(t/T)\cos(2\pi f_ct)$ with $f_c\gg1/T$. What is the bandwidth?
+\item A real signal $x(t)$ has $X(f)$ with $X(f)=0$ for $|f|>5$ kHz. It is multiplied by $\cos(2\pi\cdot100{,}000\,t)$.
+Over what frequency range does the result live? What is the minimum sampling rate needed to represent the
+\emph{result} without loss if you sample it directly as a bandpass signal? (Hint: think about the lowpass
+equivalent.)
+\item Prove that if $x(t)$ is real and even, $X(f)$ is real and even.
+\item Compute $\big(e^{-at}u(t)\big)*\big(e^{-bt}u(t)\big)$ for $a\neq b$, two ways: directly, and via
+Fourier transforms with partial fractions.
+\item A DSB-AM signal has $A=1$, $\mu=0.5$, and message $x(t)=\cos(2\pi\cdot1000t)$. Compute the total power,
+the sideband power, and the power efficiency.
+\item Find the Hilbert transform of $x(t)=\cos(2\pi f_0t)+\sin(2\pi f_0 t)$, and hence write its analytic signal.
+\item An LTI system has $h(t)=\delta(t)-\delta(t-T)$. Find $H(f)$, sketch $|H(f)|$, and state at which
+frequencies the system nulls the input. (This is a two-ray multipath channel --- it shows up in the ISI
+chapter.)
+\item $x(t)$ is bandlimited to $W=4$ kHz and sampled at $f_s=7$ kHz. If $x$ contains a tone at $3.5$ kHz, at
+what frequency does its alias appear after reconstruction with an ideal $3.5$ kHz LPF?
+\end{enumerate}
+
+\subsection*{Solutions}
+
+\textbf{1.} By the modulation property, $X(f)=\frac{T}{2}\sinc\big((f-f_c)T\big)+\frac{T}{2}\sinc\big((f+f_c)T\big)$:
+two sinc lobes centred at $\pm f_c$. First nulls at $f_c\pm 1/T$, so the null-to-null bandwidth is $2/T$.
+(The baseband pulse had bandwidth $1/T$; modulation doubles it. Every DSB scheme doubles bandwidth.)
+
+\medskip
+\textbf{2.} The product occupies $95$--$105$ kHz and $-105$ to $-95$ kHz: a bandpass signal with $f_c=100$ kHz,
+$W=5$ kHz, total bandwidth $10$ kHz. Naive lowpass reasoning would demand $f_s>2\times105=210$ kHz. But the
+lowpass equivalent $x_\ell$ is complex with bandwidth $5$ kHz, so $10$ kHz complex samples/second suffice ---
+i.e.\ $10$ kHz on each of the I and Q branches, $20$ k real samples/second. This is \emph{bandpass sampling},
+and it is the practical reason \S9 exists.
+
+\medskip
+\textbf{3.} $X(f)=\int x(t)e^{-\ii2\pi ft}\dd t=\int x(t)\cos(2\pi ft)\dd t-\ii\int x(t)\sin(2\pi ft)\dd t$.
+The second integrand is (even)$\times$(odd) $=$ odd, so it integrates to zero over $\mathbb{R}$. Hence $X(f)$
+is real. And $X(-f)=\int x(t)\cos(2\pi ft)\dd t=X(f)$ since cosine is even, so $X$ is even. $\square$
+
+\medskip
+\textbf{4.} Direct: for $t>0$,
+$\int_0^t e^{-a\tau}e^{-b(t-\tau)}\dd\tau=e^{-bt}\int_0^te^{(b-a)\tau}\dd\tau=\dfrac{e^{-at}-e^{-bt}}{b-a}$,
+and $0$ for $t<0$.\\
+Via FT: the product is $\dfrac{1}{(a+\ii2\pi f)(b+\ii2\pi f)}=\dfrac{1}{b-a}\left[\dfrac{1}{a+\ii2\pi f}-\dfrac{1}{b+\ii2\pi f}\right]$,
+which inverts term by term to the same answer. The second route is the one to use under time pressure.
+
+\medskip
+\textbf{5.} $P_x=\frac12$ for a unit-amplitude cosine. Total power
+$P=\frac{A^2}{2}(1+\mu^2P_x)=\frac12\left(1+0.25\cdot0.5\right)=\frac12(1.125)=0.5625$ W.
+Carrier power $=\frac{A^2}{2}=0.5$ W; sideband (message) power $=\frac{A^2\mu^2}{2}P_x=0.0625$ W.
+Efficiency $\eta=0.0625/0.5625=1/9\approx11.1\%$. Even at $\mu=1$ with a sinusoidal message the ceiling is
+$33.3\%$ --- two-thirds of your transmitter power goes into a carrier that carries no information. That is the
+argument for DSB-SC.
+
+\medskip
+\textbf{6.} $\hat x(t)=\sin(2\pi f_0t)-\cos(2\pi f_0t)$ (using $\hat{\cos}=\sin$, $\hat{\sin}=-\cos$).
+Then $x_+(t)=x+\ii\hat x=(1-\ii)\cos(2\pi f_0t)+(1+\ii)\sin(2\pi f_0t)$. Alternatively note
+$x(t)=\sqrt2\cos(2\pi f_0t-\pi/4)$, so $x_+(t)=\sqrt2\,e^{\ii(2\pi f_0t-\pi/4)}$ --- much cleaner, and it
+confirms the analytic signal of a sinusoid is just the corresponding rotating phasor.
+(Convention note: with the $x_+=\tfrac12(x+\ii\hat x)$ definition used in \S9, halve these.)
+
+\medskip
+\textbf{7.} $H(f)=1-e^{-\ii2\pi fT}$. Factor: $=e^{-\ii\pi fT}\big(e^{\ii\pi fT}-e^{-\ii\pi fT}\big)=2\ii\sin(\pi fT)e^{-\ii\pi fT}$,
+so $|H(f)|=2|\sin(\pi fT)|$. Nulls where $\sin(\pi fT)=0$, i.e.\ $f=k/T$ for integer $k$ (including DC).
+A comb of nulls spaced $1/T$ apart --- these are the ``frequency-selective fades'' of a two-path channel.
+
+\medskip
+\textbf{8.} $f_s=7$ kHz means replicas at $\pm3.5+7k$. The tone at $3.5$ kHz sits exactly at $f_s/2$: the
+replica from $k=-1$ lands at $3.5-7=-3.5$ kHz, coinciding with the original negative-frequency line. This is
+the boundary case of the trap in \S8.2 --- the tone is not aliased to a different frequency, but its amplitude
+and phase are not recoverable in general (samples may all land on zero crossings). Note also that
+$f_s=7<2W=8$ kHz, so the signal is undersampled overall and other components between $3.5$ and $4$ kHz
+\emph{are} genuinely aliased into the band.
+
+%==============================================================
+\section{One-page recall sheet}
+%==============================================================
+
+\begin{keybox}
+\textbf{Transforms}\quad $X(f)=\int x e^{-\ii2\pi ft}\dd t$; \ $x(t)=\int Xe^{\ii2\pi ft}\dd f$
+
+\textbf{Convolution} $x*h\FT XH$ \quad\textbf{Product} $xh\FT X*H$
+
+\textbf{Shift} $x(t-t_0)\FT Xe^{-\ii2\pi ft_0}$ \quad $xe^{\ii2\pi f_ct}\FT X(f-f_c)$
+
+\textbf{Modulation} $x\cos2\pi f_ct\FT \tfrac12X(f-f_c)+\tfrac12X(f+f_c)$
+
+\textbf{Scaling} $x(at)\FT\frac{1}{|a|}X(f/a)$ \quad\textbf{Duality} $X(t)\FT x(-f)$
+
+\textbf{Real $x$} $\Rightarrow X(-f)=X^*(f)$
+
+\textbf{Parseval} $\int|x|^2\dd t=\int|X|^2\dd f$ \quad $X(0)=\int x\dd t$, \ $x(0)=\int X\dd f$
+
+\medskip
+\textbf{Pairs} $\rect(t/T)\FT T\sinc(fT)$; \ $\tri(t/T)\FT T\sinc^2(fT)$; \
+$\cos2\pi f_ct\FT\tfrac12[\delta(f-f_c)+\delta(f+f_c)]$; \
+$\frac{1}{\pi t}\FT-\ii\sgn f$; \ $\sum_n\delta(t-nT_s)\FT f_s\sum_k\delta(f-kf_s)$
+
+\medskip
+\textbf{Sampling} $X_s(f)=f_s\sum_kX(f-kf_s)$; \ need $f_s>2W$
+
+\textbf{Bandpass} $x_{bp}=\operatorname{Re}\{x_\ell e^{\ii2\pi f_ct}\}=x_I\cos2\pi f_ct-x_Q\sin2\pi f_ct$;
+\ $A=\sqrt{x_I^2+x_Q^2}$
+
+\textbf{Coherent detection} output $\propto\cos\phi$ --- zero at $\phi=90^\circ$
+
+\textbf{DSB-SC} $x_\ell=Ax(t)$ (real, sign-changing $\Rightarrow$ envelope detection fails)
+
+\textbf{DSB-AM} $x_\ell=A(1+\mu x)$; envelope detection works iff $\mu|x|<1$; $\eta=\frac{\mu^2P_x}{1+\mu^2P_x}$
+
+\textbf{Noise} $S_Y=|H|^2S_X$; \ white: $S_N=N_0/2$, $R_N=\frac{N_0}{2}\delta(\tau)$
+\end{keybox}
+
+\vspace{1em}
+\begin{trapbox}
+\textbf{The five mistakes that cost the most marks}
+\begin{enumerate}[nosep,leftmargin=*]
+\item Mixing $f$ and $\omega$ conventions mid-problem (stray $2\pi$'s).
+\item Forgetting the minus sign in $x_{bp}=x_I\cos-x_Q\sin$.
+\item Calling the bandwidth of a real lowpass signal $2W$ when the course means $W$ (or vice versa) --- state your convention.
+\item Applying the modulation property without checking $f_c>W$, so the shifted copies actually don't overlap.
+\item Using $|X(f)|^2$ (energy spectral density) for a modulated carrier or noise, which is a \emph{power} signal and needs PSD.
+\end{enumerate}
+\end{trapbox}
+
+\vfill
+\noindent\small\textit{Built against the EE341 (Autumn 2026) course introduction and the handwritten lecture
+notes in your course folder, so the notation matches what Prof.\ Appaiah uses. Reference texts if you want
+more depth: Madhow, \emph{Introduction to Communication Systems}, Ch.~2 (this is the best match for the
+lowpass-equivalent material in \S9); Lathi, Ch.~3--4 for signals and Fourier; Haykin \& Moher Ch.~2 for the
+bandpass/Hilbert treatment.}
+
+\end{document}

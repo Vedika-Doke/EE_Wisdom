@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How the Ring Modulator Works — EE341</title>
+<style>
+:root{
+  color-scheme: light;
+  --surface-0:#f4f4f2;
+  --surface-1:#fcfcfb;
+  --surface-2:#eeeeeb;
+  --text-primary:#0b0b0b;
+  --text-secondary:#52514e;
+  --text-muted:#77766f;
+  --rule:#dcdcd6;
+  --msg:#2a78d6;
+  --car:#eb6834;
+  --out:#1baf7a;
+  --off:#c9c8c2;
+  --accentbg:#eaf1fb;
+  --warnbg:#fdf3ee;
+  --okbg:#e9f6f1;
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --surface-0:#121211;
+  --surface-1:#1a1a19;
+  --surface-2:#232322;
+  --text-primary:#ffffff;
+  --text-secondary:#c3c2b7;
+  --text-muted:#95948b;
+  --rule:#33332f;
+  --msg:#3987e5;
+  --car:#d95926;
+  --out:#199e70;
+  --off:#4a4a46;
+  --accentbg:#16233a;
+  --warnbg:#2c1d16;
+  --okbg:#14291f;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--surface-0); color:var(--text-primary);
+  font:16px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 20px 80px}
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:8px}
+h1{font-size:29px;line-height:1.2;margin:0 0 6px;letter-spacing:-.02em}
+.sub{color:var(--text-secondary);font-size:15px;margin:0}
+h2{font-size:21px;margin:38px 0 10px;letter-spacing:-.01em}
+h3{font-size:16px;margin:22px 0 6px}
+p{margin:10px 0}
+.card{background:var(--surface-1);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;margin:16px 0}
+.note{background:var(--accentbg);border:1px solid var(--rule);border-left:3px solid var(--msg);border-radius:10px;padding:12px 16px;margin:14px 0}
+.trap{background:var(--warnbg);border:1px solid var(--rule);border-left:3px solid var(--car);border-radius:10px;padding:12px 16px;margin:14px 0}
+.key{background:var(--okbg);border:1px solid var(--rule);border-left:3px solid var(--out);border-radius:10px;padding:12px 16px;margin:14px 0}
+.eq{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:15px;text-align:center;margin:14px 0;color:var(--text-primary);overflow-x:auto}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+button{font:inherit;cursor:pointer;border-radius:9px;border:1px solid var(--rule);background:var(--surface-2);color:var(--text-primary);padding:7px 14px}
+button:hover{background:var(--rule)}
+button.on{background:var(--msg);border-color:var(--msg);color:#fff}
+.themebtn{font-size:13px;padding:6px 11px;white-space:nowrap}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0}
+.ctl label{font-size:14px;color:var(--text-secondary)}
+input[type=range]{accent-color:var(--msg);width:190px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--text-secondary);margin:8px 0 4px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{color:var(--text-secondary);font-weight:600;font-size:13px}
+.big{font-size:20px;font-weight:600;letter-spacing:-.01em}
+.stategrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+@media(max-width:720px){.stategrid{grid-template-columns:1fr}}
+.state{border:1px solid var(--rule);border-radius:10px;padding:12px 14px;background:var(--surface-2)}
+.state.active{border-color:var(--car);background:var(--warnbg)}
+.state h4{margin:0 0 4px;font-size:14px}
+.state p{margin:2px 0;font-size:13.5px;color:var(--text-secondary)}
+canvas{display:block;width:100%;height:auto}
+svg{display:block;width:100%;height:auto}
+ol,ul{padding-left:22px}
+li{margin:5px 0}
+.tag{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);border:1px solid var(--rule);border-radius:5px;padding:1px 6px;margin-right:6px}
+.tt{position:fixed;pointer-events:none;background:var(--surface-1);border:1px solid var(--rule);border-radius:8px;padding:6px 10px;font-size:12.5px;box-shadow:0 4px 14px rgba(0,0,0,.14);opacity:0;transition:opacity .1s;z-index:50;white-space:nowrap}
+footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--rule);font-size:13px;color:var(--text-muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <h1>The Ring Modulator, one step at a time</h1>
+    <p class="sub">Why four diodes and two transformers produce DSB-SC — EE341, Communication Systems&nbsp;I</p>
+  </div>
+  <button class="themebtn" id="theme">Dark</button>
+</header>
+
+<div class="key">
+<p style="margin:0"><span class="big">The whole circuit is one thing: a switch that flips the message's polarity <em>f<sub>c</sub></em> times per second.</span></p>
+<p style="margin:6px 0 0;color:var(--text-secondary)">The diodes are not amplifying, mixing, or shaping anything. They are acting as <strong>switches</strong>, and the carrier is the thing throwing the switch. Once you see that, every formula on your notes page follows in two lines.</p>
+</div>
+
+<h2>1. Start from the answer, then work backwards</h2>
+<p>Here is what the circuit does, written out. Everything below is just an explanation of where this comes from:</p>
+<div class="eq">v<sub>out</sub>(t) &nbsp;=&nbsp; x(t) · c(t) &nbsp;&nbsp;&nbsp;where c(t) = ±1 square wave at frequency f<sub>c</sub></div>
+<p>So during one half of every carrier cycle the output <em>is</em> the message, and during the other half it is the message <strong>upside down</strong>. Nothing else happens. The circuit is a polarity flipper.</p>
+
+<h2>2. Watch it flip</h2>
+<p>The animation below shows the same instant in three places at once: which diodes are conducting, how the message reaches the output transformer, and what the output waveform is doing. Let it run, or scrub the slider.</p>
+
+<div class="card">
+  <div class="ctl">
+    <button id="play" class="on">Pause</button>
+    <label for="scrub">Time</label>
+    <input type="range" id="scrub" min="0" max="1000" value="0">
+    <label for="speed">Speed</label>
+    <input type="range" id="speed" min="10" max="200" value="70" style="width:110px">
+    <label style="margin-left:auto;font-size:13px"><input type="checkbox" id="showsq" checked> show carrier switching</label>
+  </div>
+
+  <svg id="ckt" viewBox="0 0 900 420" role="img" aria-label="Ring modulator circuit with conducting diode pair highlighted"></svg>
+
+  <p style="font-size:13.5px;color:var(--text-secondary);margin:6px 0 2px"><strong>Strip the diodes away</strong> and this is all that is left — a double-pole switch that the carrier throws back and forth:</p>
+  <svg id="sw" viewBox="0 0 900 190" role="img" aria-label="Equivalent double-pole switch: straight-through or crossed"></svg>
+
+  <div class="stategrid">
+    <div class="state" id="statePos">
+      <h4 style="color:var(--car)">Carrier positive half-cycle</h4>
+      <p>One <strong>opposite pair</strong> of diodes is forward-biased and conducts; the other pair is reverse-biased and open.</p>
+      <p>The message reaches the output transformer <strong>the right way up</strong>.</p>
+      <p style="color:var(--out);font-weight:600">v<sub>out</sub> = + x(t)</p>
+    </div>
+    <div class="state" id="stateNeg">
+      <h4 style="color:var(--car)">Carrier negative half-cycle</h4>
+      <p>The carrier reverses, so the <em>other</em> opposite pair conducts and the first pair goes open.</p>
+      <p>That pair connects the message transformer to the output transformer with the two wires <strong>swapped</strong>.</p>
+      <p style="color:var(--out);font-weight:600">v<sub>out</sub> = − x(t)</p>
+    </div>
+  </div>
+
+  <div class="legend" style="margin-top:14px">
+    <span><i class="sw" style="background:var(--msg)"></i> message x(t)</span>
+    <span><i class="sw" style="background:var(--car)"></i> carrier / conducting path</span>
+    <span><i class="sw" style="background:var(--out)"></i> output</span>
+    <span><i class="sw" style="background:var(--off)"></i> diode off (open circuit)</span>
+  </div>
+</div>
+
+<div class="trap">
+<p style="margin:0"><strong>Diode labels are not standard.</strong> Your notes say "D1, D2 on" for the positive half; other books say "D1, D3". What matters is that the conducting pair is always an <strong>opposite pair</strong> across the ring — two diodes that between them form a straight-through path, or the swapped path. Don't memorise numbers; memorise <em>opposite pair conducts, the other pair is open</em>.</p>
+</div>
+
+<h2>3. The three waveforms</h2>
+<p>Same time axis for all three. The output is literally the top trace multiplied by the middle trace.</p>
+
+<div class="card">
+  <div class="legend">
+    <span><i class="sw" style="background:var(--msg)"></i> x(t) &nbsp;message</span>
+    <span><i class="sw" style="background:var(--car)"></i> c(t) &nbsp;carrier switching function (±1)</span>
+    <span><i class="sw" style="background:var(--out)"></i> v<sub>out</sub>(t) = x(t)·c(t)</span>
+  </div>
+  <canvas id="waves" width="1720" height="760"></canvas>
+  <p style="font-size:13.5px;color:var(--text-secondary);margin-top:10px">Notice the dashed blue outline on the bottom trace: the output keeps touching <strong>+x(t)</strong> and <strong>−x(t)</strong> and never goes outside them. The message is the <em>envelope</em> — but a signed one, which is exactly why a simple envelope detector cannot demodulate this.</p>
+</div>
+
+<h2>4. Why the diodes switch on the carrier and not on the message</h2>
+<p>This is the line you underlined in your notes, and it is the one assumption the whole analysis rests on.</p>
+<p>A diode conducts when it is forward-biased. In this circuit two voltages are competing to bias it: the carrier, amplitude <em>A<sub>c</sub></em>, and the message, amplitude |x(t)|. We <strong>deliberately</strong> make the carrier much bigger:</p>
+<div class="eq">A<sub>c</sub> &nbsp;≫&nbsp; |x(t)|</div>
+<div class="note">
+<p style="margin:0"><strong>What this buys us.</strong> If the carrier dominates, the on/off pattern of the diodes depends only on the sign of the carrier — it is a clean, message-independent square wave at f<sub>c</sub>. That is what lets us write <code>v_out = x(t)·c(t)</code> with c(t) a fixed ±1 square wave.</p>
+<p style="margin:8px 0 0"><strong>What happens if you break it.</strong> If |x(t)| ever approached A<sub>c</sub>, the message could flip a diode on its own. The switching would become message-dependent, c(t) would no longer be a fixed square wave, and the output would pick up nonlinear distortion products. The multiplication would stop being a clean multiplication.</p>
+</div>
+<p>So the ring modulator is a <strong>nonlinear circuit deliberately operated so that it behaves linearly with respect to the message</strong>. It is linear in x(t) and grossly nonlinear in the carrier — and that asymmetry is the design.</p>
+
+<h2>5. From a square wave to a sine: the Fourier step</h2>
+<p>We have <code>v_out = x(t)·c(t)</code>, but DSB-SC is supposed to be <code>x(t)·cos(2πf_c t)</code> — a <em>sinusoid</em>, not a square wave. The Fourier series is what closes the gap.</p>
+
+<div class="eq">c(t) = (4/π)&thinsp;cos(2πf<sub>c</sub>t) − (4/3π)&thinsp;cos(6πf<sub>c</sub>t) + (4/5π)&thinsp;cos(10πf<sub>c</sub>t) − …</div>
+
+<p>Drag the slider to add harmonics and watch the sum become the square wave. The point is the reverse direction: the square wave <em>already contains</em> a pure cosine at f<sub>c</sub>, plus unwanted stuff at 3f<sub>c</sub>, 5f<sub>c</sub>, …</p>
+
+<div class="card">
+  <div class="ctl">
+    <label for="nh">Harmonics included: <strong id="nhval">1</strong></label>
+    <input type="range" id="nh" min="1" max="15" value="1">
+  </div>
+  <canvas id="fourier" width="1720" height="440"></canvas>
+  <p style="font-size:13.5px;color:var(--text-secondary);margin-top:8px">With one term you have a plain cosine at f<sub>c</sub>. Every extra odd harmonic sharpens the corners. The ripple near the jumps never disappears — that is the Gibbs phenomenon, and it is harmless here.</p>
+</div>
+
+<div class="key">
+<p style="margin:0"><strong>Two properties of c(t) do all the work:</strong></p>
+<ol style="margin:8px 0 0">
+<li><strong>No DC term.</strong> c(t) spends equal time at +1 and −1, so its average is zero. This is why the carrier is <em>suppressed</em>.</li>
+<li><strong>Only odd harmonics</strong>, at 3f<sub>c</sub>, 5f<sub>c</sub>, 7f<sub>c</sub>, … — far away from f<sub>c</sub>, so a filter can throw them out.</li>
+</ol>
+</div>
+
+<h2>6. What comes out, in the frequency domain</h2>
+<p>Multiply x(t) by each harmonic in turn and apply the modulation property — each cosine puts a scaled copy of the message spectrum around its own frequency:</p>
+<div class="eq">v<sub>out</sub>(t) = (4/π)&thinsp;x(t)cos(2πf<sub>c</sub>t) − (4/3π)&thinsp;x(t)cos(6πf<sub>c</sub>t) + …</div>
+<p>So the spectrum is copies of the message centred at f<sub>c</sub>, 3f<sub>c</sub>, 5f<sub>c</sub>, … with shrinking amplitudes. The bandpass filter keeps the first one and discards the rest.</p>
+
+<div class="card">
+  <div class="ctl">
+    <button id="bpfbtn">Turn bandpass filter on</button>
+    <span style="font-size:13.5px;color:var(--text-secondary)" id="bpfnote">Showing the raw ring output — copies at every odd harmonic.</span>
+  </div>
+  <canvas id="spec" width="1720" height="480"></canvas>
+  <p style="font-size:13.5px;color:var(--text-secondary);margin-top:8px">Only positive frequencies drawn. Each triangle is a copy of the message spectrum, width 2W. Hover a copy for its amplitude.</p>
+</div>
+
+<div class="note">
+<p style="margin:0"><strong>The filter has to fit between the copies.</strong> The wanted band runs from f<sub>c</sub>−W to f<sub>c</sub>+W; the nearest unwanted band starts at 3f<sub>c</sub>−W. Requiring no overlap:</p>
+<div class="eq" style="margin:8px 0">f<sub>c</sub> + W &lt; 3f<sub>c</sub> − W &nbsp;&nbsp;⟹&nbsp;&nbsp; f<sub>c</sub> &gt; W</div>
+<p style="margin:0">Always true in practice (carriers are megahertz, messages kilohertz), but it is a one-mark statement if a question asks for the condition.</p>
+</div>
+
+<h2>7. The final result — and the factor everyone drops</h2>
+<div class="key">
+<div class="eq" style="margin:4px 0"><strong>v<sub>BPF</sub>(t) = (4/π) · x(t) · cos(2πf<sub>c</sub>t)</strong></div>
+<p style="margin:6px 0 0;text-align:center;color:var(--text-secondary)">This is DSB-SC. The gain is 4/π ≈ 1.27, not 1.</p>
+</div>
+<p>That 4/π is the amplitude of the fundamental in the Fourier series. It gets dropped constantly, and it matters the moment a question asks for transmitted <strong>power</strong> — power goes as amplitude squared, so dropping it costs you a factor of (4/π)² ≈ 1.62.</p>
+
+<h2>8. Why it's suppressed-carrier — the one-line reason</h2>
+<p>Compare two switching schemes that look nearly identical:</p>
+
+<table>
+<thead><tr><th style="width:24%">Circuit</th><th style="width:24%">What gets switched</th><th style="width:26%">Switching function</th><th>Output after BPF at f<sub>c</sub></th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>Ring modulator</strong></td>
+  <td>the <strong>message alone</strong>, x(t)</td>
+  <td>bipolar c(t) = ±1<br>(4/π)cos(2πf<sub>c</sub>t) − (4/3π)cos(6πf<sub>c</sub>t) + …<br><strong style="color:var(--out)">no DC term</strong></td>
+  <td>(4/π)&thinsp;x(t)cos(2πf<sub>c</sub>t)<br><strong>DSB-SC</strong> — no carrier line</td>
+</tr>
+<tr>
+  <td><strong>Single-diode switching modulator</strong></td>
+  <td><strong>message + carrier</strong>, x(t) + A&thinsp;cos(2πf<sub>c</sub>t)</td>
+  <td>unipolar s(t) = 0 or 1<br>½ + (2/π)cos(2πf<sub>c</sub>t) − (2/3π)cos(6πf<sub>c</sub>t) + …<br><strong style="color:var(--car)">DC term of ½</strong></td>
+  <td>(A/2)cos(2πf<sub>c</sub>t) + (2/π)x(t)cos(2πf<sub>c</sub>t)<br><strong>DSB-AM</strong> — carrier present</td>
+</tr>
+</tbody>
+</table>
+
+<p>Work the second row through and you'll see where the carrier line comes from. The diode passes <code>[x(t) + A cos(2πf_c t)] · s(t)</code>, and <code>s(t)</code> contains a constant ½. That ½ multiplies the <em>carrier term</em> and hands you <code>(A/2)cos(2πf_c t)</code> straight at the output — an undiminished spectral line at f<sub>c</sub>. Meanwhile the ½ multiplying x(t) gives a baseband term the filter throws away.</p>
+<p>The ring modulator never gets the chance to do this, for two reasons: only x(t) enters the ring, and its switching function has no DC component. Note that <code>s(t) = (1 + c(t))/2</code> — the two switching functions differ by exactly a DC offset, and that offset is the whole difference between suppressed-carrier and full-carrier AM.</p>
+
+<div class="key">
+<p style="margin:0"><strong>The word for this is "balance".</strong> The ring modulator is <strong>double-balanced</strong>: neither the carrier nor the message appears at the output on its own — only their product does. The single-diode circuit is <strong>single-balanced</strong>.</p>
+<p style="margin:8px 0 0">The center-tapped transformers are what enforce it. The carrier is injected at the <em>center tap</em> of T2's primary, so it drives both halves of that winding equally and in opposition — the two halves induce equal and opposite voltages in the secondary, and the carrier cancels. The message, arriving across the ends of the winding, does not cancel. That geometric symmetry is why the carrier is suppressed in hardware, not just on paper.</p>
+</div>
+
+<h2>9. Checklist for the quiz</h2>
+<ul>
+<li><strong>Function:</strong> product modulator, output = x(t)·c(t), yields DSB-SC after bandpass filtering.</li>
+<li><strong>Mechanism:</strong> the carrier square wave switches an opposite pair of diodes on each half-cycle; one pair passes the message straight through, the other passes it with the leads swapped, i.e. inverted.</li>
+<li><strong>Required condition:</strong> A<sub>c</sub> ≫ |x(t)| so the switching is set by the carrier alone.</li>
+<li><strong>Filter condition:</strong> f<sub>c</sub> &gt; W so the copy at f<sub>c</sub> doesn't collide with the one at 3f<sub>c</sub>.</li>
+<li><strong>Output:</strong> (4/π)&thinsp;x(t)cos(2πf<sub>c</sub>t) — keep the 4/π.</li>
+<li><strong>Why SC:</strong> c(t) has zero DC component. Double-balanced.</li>
+<li><strong>Demodulation:</strong> coherent detection only — multiply by cos(2πf<sub>c</sub>t + φ) and lowpass; output scales as cos φ, so it vanishes at φ = 90°. Envelope detection fails because x(t) changes sign.</li>
+<li><strong>Advantages:</strong> no external power needed (passive), good carrier suppression from the symmetry, works over a wide frequency range.</li>
+</ul>
+
+<footer>
+Built for EE341 (Autumn 2026), IIT Bombay — to accompany the ring-modulator page of your lecture notes dated 4/8/26. Cross-check with Lathi §4.3 or Haykin &amp; Moher §3.2.
+</footer>
+
+</div>
+<div class="tt" id="tt"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- theme ---------- */
+var themeBtn=document.getElementById('theme');
+themeBtn.onclick=function(){
+  var d=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme', d?'light':'dark');
+  themeBtn.textContent = d?'Dark':'Light';
+  drawAll();
+};
+function C(n){return getComputedStyle(document.body).getPropertyValue('--'+n).trim();}
+
+/* ---------- shared signal model ---------- */
+var FC=6;                     // carrier cycles across the window
+var W=1;                      // message cycles across the window
+function msg(t){ return 0.78*Math.sin(2*Math.PI*W*t) + 0.22*Math.sin(2*Math.PI*2.0*t+0.9); }
+function carr(t){ return Math.sin(2*Math.PI*FC*t)>=0 ? 1 : -1; }
+
+var tNow=0, playing=true, speed=0.7;
+
+/* ================= CIRCUIT SVG ================= */
+var svg=document.getElementById('ckt');
+var SVGNS='http://www.w3.org/2000/svg';
+function el(n,a){var e=document.createElementNS(SVGNS,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+
+// ring as a square: P1 top-left, P2 top-right, P3 bottom-right, P4 bottom-left
+var TOP=104, BOT=252;
+var P={ P1:{x:362,y:TOP}, P2:{x:566,y:TOP}, P3:{x:566,y:BOT}, P4:{x:362,y:BOT} };
+// diodes run around the loop in one rotational direction (that is what "ring" means)
+// pair A = {d1,d3} -> straight through ; pair B = {d2,d4} -> swapped
+var DIODES=[
+  {id:'d1',a:'P1',b:'P2',pair:'A',lab:{dx:0,dy:-16}},
+  {id:'d2',a:'P2',b:'P3',pair:'B',lab:{dx:30,dy:5}},
+  {id:'d3',a:'P3',b:'P4',pair:'A',lab:{dx:0,dy:26}},
+  {id:'d4',a:'P4',b:'P1',pair:'B',lab:{dx:-30,dy:5}}
+];
+
+function coil(x,y,n){
+  var d='M '+x+' '+y, r=11;
+  for(var i=0;i<n;i++){ d+=' a '+r+' '+r+' 0 1 1 0 '+(2*r); }
+  return el('path',{d:d,fill:'none','stroke-width':2.6,stroke:'var(--text-secondary)','stroke-linecap':'round'});
+}
+function txt(g,x,y,s,fill,size,anchor,weight){
+  var t=el('text',{x:x,y:y,fill:fill,'font-size':size||12,'text-anchor':anchor||'start','font-weight':weight||400});
+  t.textContent=s; g.appendChild(t); return t;
+}
+
+function buildCircuit(){
+  svg.innerHTML='';
+  var g=el('g',{});
+  var MID=(TOP+BOT)/2;                 // 178 : centre-tap height
+  var T1x=118, T2x=706;                // secondary / primary coil x
+
+  /* ---------- input source ---------- */
+  txt(g,20,MID-8,'x(t)','var(--msg)',15,'start',600);
+  txt(g,20,MID+12,'message','var(--text-muted)',12);
+  g.appendChild(el('path',{d:'M 26 '+(MID-30)+' L 26 '+TOP+' L 84 '+TOP,fill:'none',stroke:'var(--msg)','stroke-width':2.4}));
+  g.appendChild(el('path',{d:'M 26 '+(MID+26)+' L 26 '+BOT+' L 84 '+BOT,fill:'none',stroke:'var(--msg)','stroke-width':2.4}));
+
+  /* ---------- T1 ---------- */
+  g.appendChild(coil(84,TOP,7));
+  g.appendChild(coil(T1x,TOP,7));
+  g.appendChild(el('path',{d:'M 100 '+(TOP-8)+' L 100 '+(BOT+8),fill:'none',stroke:'var(--rule)','stroke-width':2}));
+  g.appendChild(el('path',{d:'M 106 '+(TOP-8)+' L 106 '+(BOT+8),fill:'none',stroke:'var(--rule)','stroke-width':2}));
+  txt(g,84,TOP-18,'T1','var(--text-muted)',12,'start',600);
+
+  /* T1 secondary ends -> P1 (direct) and P3 (under the ring) */
+  g.appendChild(el('path',{d:'M '+T1x+' '+TOP+' L '+P.P1.x+' '+TOP,fill:'none',stroke:'var(--msg)','stroke-width':2.4}));
+  g.appendChild(el('path',{d:'M '+T1x+' '+BOT+' L '+T1x+' 306 L '+P.P3.x+' 306 L '+P.P3.x+' '+BOT,
+    fill:'none',stroke:'var(--msg)','stroke-width':2.4}));
+
+  /* ---------- T2 ---------- */
+  g.appendChild(coil(T2x,TOP,7));
+  g.appendChild(coil(T2x+38,TOP,7));
+  g.appendChild(el('path',{d:'M '+(T2x+16)+' '+(TOP-8)+' L '+(T2x+16)+' '+(BOT+8),fill:'none',stroke:'var(--rule)','stroke-width':2}));
+  g.appendChild(el('path',{d:'M '+(T2x+22)+' '+(TOP-8)+' L '+(T2x+22)+' '+(BOT+8),fill:'none',stroke:'var(--rule)','stroke-width':2}));
+  txt(g,T2x,TOP-18,'T2','var(--text-muted)',12,'start',600);
+
+  /* T2 primary ends <- P2 (direct) and P4 (under, crossing the T1 run) */
+  g.appendChild(el('path',{d:'M '+P.P2.x+' '+TOP+' L '+T2x+' '+TOP,fill:'none',stroke:'var(--out)','stroke-width':2.6}));
+  g.appendChild(el('path',{d:'M '+P.P4.x+' '+BOT+' L '+P.P4.x+' 348 L '+T2x+' 348 L '+T2x+' '+BOT,
+    fill:'none',stroke:'var(--out)','stroke-width':2.6}));
+
+  /* ---------- carrier: between the two centre taps, routed over the top ---------- */
+  var CY0=44;
+  g.appendChild(el('path',{d:'M '+T1x+' '+MID+' L 60 '+MID+' L 60 '+CY0+' L 398 '+CY0,fill:'none',stroke:'var(--car)','stroke-width':2.2}));
+  g.appendChild(el('path',{d:'M 462 '+CY0+' L 782 '+CY0+' L 782 '+MID+' L '+T2x+' '+MID,fill:'none',stroke:'var(--car)','stroke-width':2.2}));
+  g.appendChild(el('circle',{cx:T1x,cy:MID,r:3.6,fill:'var(--car)'}));
+  g.appendChild(el('circle',{cx:T2x,cy:MID,r:3.6,fill:'var(--car)'}));
+  g.appendChild(el('circle',{cx:430,cy:CY0,r:28,fill:'var(--surface-1)',stroke:'var(--car)','stroke-width':2.4}));
+  g.appendChild(el('path',{d:'M 414 '+(CY0+7)+' L 421 '+(CY0+7)+' L 421 '+(CY0-7)+' L 430 '+(CY0-7)+' L 430 '+(CY0+7)+' L 439 '+(CY0+7)+' L 439 '+(CY0-7)+' L 446 '+(CY0-7),
+    fill:'none',stroke:'var(--car)','stroke-width':2.2,'stroke-linejoin':'round'}));
+  var clab=txt(g,470,CY0-6,'carrier: square wave at f','var(--car)',12.5,'start',600);
+  var sub=el('tspan',{dy:3,'font-size':9.5}); sub.textContent='c'; clab.appendChild(sub);
+  var pol=txt(g,470,CY0+14,'','var(--car)',12.5,'start',700); pol.setAttribute('id','polTxt');
+  txt(g,60,MID+36,'centre','var(--text-muted)',10.5,'middle');
+  txt(g,60,MID+48,'taps','var(--text-muted)',10.5,'middle');
+
+  /* ---------- ring diodes ---------- */
+  DIODES.forEach(function(d){
+    var A=P[d.a],B=P[d.b];
+    var gg=el('g',{id:'g'+d.id});
+    gg.appendChild(el('line',{x1:A.x,y1:A.y,x2:B.x,y2:B.y,'stroke-width':3.4,stroke:'var(--off)','stroke-linecap':'round',id:'w'+d.id}));
+    var mx=(A.x+B.x)/2,my=(A.y+B.y)/2;
+    var ang=Math.atan2(B.y-A.y,B.x-A.x)*180/Math.PI;
+    var tri=el('g',{transform:'translate('+mx+','+my+') rotate('+ang+')',id:'s'+d.id});
+    tri.appendChild(el('polygon',{points:'-10,-9 -10,9 8,0',fill:'var(--off)'}));
+    tri.appendChild(el('line',{x1:8,y1:-10,x2:8,y2:10,stroke:'var(--off)','stroke-width':3.4,'stroke-linecap':'round'}));
+    gg.appendChild(tri);
+    var t=txt(gg,mx+d.lab.dx,my+d.lab.dy,d.id.toUpperCase(),'var(--text-muted)',12.5,'middle',600);
+    t.setAttribute('id','l'+d.id);
+    g.appendChild(gg);
+  });
+  ['P1','P2','P3','P4'].forEach(function(k){
+    g.appendChild(el('circle',{cx:P[k].x,cy:P[k].y,r:4.4,fill:'var(--text-secondary)'}));
+  });
+
+  /* wire-crossing hop (no connection) where the two under-routes cross */
+  g.appendChild(el('path',{d:'M '+(P.P4.x-9)+' 306 A 9 9 0 0 1 '+(P.P4.x+9)+' 306',fill:'none',stroke:'var(--msg)','stroke-width':2.4}));
+  g.appendChild(el('circle',{cx:P.P4.x,cy:306,r:6,fill:'var(--surface-1)',stroke:'none'}));
+  g.appendChild(el('path',{d:'M '+(P.P4.x-9)+' 306 A 9 9 0 0 1 '+(P.P4.x+9)+' 306',fill:'none',stroke:'var(--msg)','stroke-width':2.4}));
+
+  /* ---------- output ---------- */
+  g.appendChild(el('path',{d:'M '+(T2x+38)+' '+TOP+' L 838 '+TOP+' L 838 '+(MID-22),fill:'none',stroke:'var(--out)','stroke-width':2.6}));
+  g.appendChild(el('path',{d:'M '+(T2x+38)+' '+BOT+' L 838 '+BOT+' L 838 '+(MID+18),fill:'none',stroke:'var(--out)','stroke-width':2.6}));
+  txt(g,848,MID-4,'v','var(--out)',15,'start',700);
+  txt(g,857,MID+1,'out','var(--out)',10.5,'start',700);
+  txt(g,848,MID+16,'DSB-SC','var(--text-muted)',11.5);
+
+  /* live polarity badge */
+  var badge=el('g',{id:'badge'});
+  badge.appendChild(el('rect',{x:770,y:290,width:112,height:36,rx:9,fill:'var(--surface-2)',stroke:'var(--rule)'}));
+  var bt=el('text',{x:826,y:314,'text-anchor':'middle','font-size':15,'font-weight':700,fill:'var(--out)',id:'badgeTxt'});
+  bt.textContent='+ x(t)'; badge.appendChild(bt);
+  var st=el('text',{x:826,y:344,'text-anchor':'middle','font-size':11.5,fill:'var(--text-muted)',id:'pathTxt'});
+  st.textContent='straight through'; badge.appendChild(st);
+  g.appendChild(badge);
+
+  svg.appendChild(g);
+}
+
+function updateCircuit(){
+  var s = carr(tNow) >= 0;              // true = carrier positive half
+  var onPair = s ? 'A' : 'B';
+  DIODES.forEach(function(d){
+    var on = d.pair===onPair;
+    var col = on ? C('car') : C('off');
+    var w=document.getElementById('w'+d.id);
+    var sh=document.getElementById('s'+d.id);
+    var lb=document.getElementById('l'+d.id);
+    if(!w)return;
+    w.setAttribute('stroke',col);
+    w.setAttribute('stroke-width', on?5.2:3.0);
+    sh.querySelector('polygon').setAttribute('fill',col);
+    sh.querySelector('line').setAttribute('stroke',col);
+    lb.setAttribute('fill', on?C('car'):C('text-muted'));
+    lb.setAttribute('font-weight', on?700:600);
+    w.setAttribute('opacity', on?1:0.35);
+    sh.setAttribute('opacity', on?1:0.35);
+  });
+  var pt=document.getElementById('polTxt');
+  if(pt) pt.textContent = s ? 'carrier +  →  D1, D3 conduct' : 'carrier −  →  D2, D4 conduct';
+  var bt=document.getElementById('badgeTxt');
+  if(bt){ bt.textContent = (s?'+ x(t)':'− x(t)'); bt.setAttribute('fill', C('out')); }
+  var px=document.getElementById('pathTxt');
+  if(px) px.textContent = s?'straight through':'leads swapped';
+  document.getElementById('statePos').className='state'+(s?' active':'');
+  document.getElementById('stateNeg').className='state'+(s?'':' active');
+  drawSwitch(s);
+}
+
+/* ---------- equivalent DPDT switch ---------- */
+var swSvg=document.getElementById('sw');
+function drawSwitch(pos){
+  swSvg.innerHTML='';
+  var g=el('g',{});
+  var yA=54, yB=132, xL=250, xR=650;
+  txt(g,150,yA+5,'x(t)','var(--msg)',15,'middle',700);
+  txt(g,150,yB+5,'−x(t)','var(--msg)',15,'middle',700);
+  g.appendChild(el('line',{x1:186,y1:yA,x2:xL,y2:yA,stroke:'var(--msg)','stroke-width':3}));
+  g.appendChild(el('line',{x1:186,y1:yB,x2:xL,y2:yB,stroke:'var(--msg)','stroke-width':3}));
+  [[xL,yA],[xL,yB],[xR,yA],[xR,yB]].forEach(function(p){
+    g.appendChild(el('circle',{cx:p[0],cy:p[1],r:6,fill:'var(--text-secondary)'}));
+  });
+  var d1,d2;
+  if(pos){ d1='M '+xL+' '+yA+' L '+xR+' '+yA; d2='M '+xL+' '+yB+' L '+xR+' '+yB; }
+  else   { d1='M '+xL+' '+yA+' L '+xR+' '+yB; d2='M '+xL+' '+yB+' L '+xR+' '+yA; }
+  g.appendChild(el('path',{d:d1,fill:'none',stroke:'var(--car)','stroke-width':5,'stroke-linecap':'round'}));
+  g.appendChild(el('path',{d:d2,fill:'none',stroke:'var(--car)','stroke-width':5,'stroke-linecap':'round'}));
+  g.appendChild(el('line',{x1:xR,y1:yA,x2:xR+60,y2:yA,stroke:'var(--out)','stroke-width':3}));
+  g.appendChild(el('line',{x1:xR,y1:yB,x2:xR+60,y2:yB,stroke:'var(--out)','stroke-width':3}));
+  txt(g,xR+72,yA+5,'to T2','var(--out)',14,'start',600);
+  txt(g,xR+72,yB+5,'to T2','var(--out)',14,'start',600);
+  txt(g,450,178,pos?'carrier +  ·  straight  ·  v_out = + x(t)':'carrier −  ·  crossed  ·  v_out = − x(t)',
+      'var(--car)',14,'middle',700);
+  swSvg.appendChild(g);
+}
+
+/* ================= WAVEFORM CANVAS ================= */
+var wc=document.getElementById('waves');
+function drawWaves(){
+  var ctx=wc.getContext('2d');
+  var Wd=wc.width, Ht=wc.height, dpr=2;
+  ctx.clearRect(0,0,Wd,Ht);
+  ctx.fillStyle=C('surface-1'); ctx.fillRect(0,0,Wd,Ht);
+  var pad={l:215,r:40,t:26,b:38};
+  var rows=3, rh=(Ht-pad.t-pad.b)/rows;
+  var showsq=document.getElementById('showsq').checked;
+  var X=function(t){return pad.l + t*(Wd-pad.l-pad.r);};
+
+  var rowsDef=[
+    {lab:'x(t)', col:C('msg'), f:function(t){return msg(t);}},
+    {lab:'c(t)', col:C('car'), f:function(t){return carr(t);}},
+    {lab:'x(t)·c(t)', col:C('out'), f:function(t){return msg(t)*carr(t);}}
+  ];
+
+  rowsDef.forEach(function(r,i){
+    var y0=pad.t+i*rh+rh/2, amp=rh*0.36;
+    // zero line
+    ctx.strokeStyle=C('rule'); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(pad.l,y0); ctx.lineTo(Wd-pad.r,y0); ctx.stroke();
+    // label
+    ctx.fillStyle=C('text-secondary'); ctx.font='600 26px ui-sans-serif,system-ui';
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.fillStyle=r.col; ctx.fillText(r.lab, pad.l-16, y0);
+
+    // envelope guides on output row
+    if(i===2){
+      ctx.setLineDash([9,9]); ctx.lineWidth=2.4; ctx.strokeStyle=C('msg'); ctx.globalAlpha=0.62;
+      [1,-1].forEach(function(sg){
+        ctx.beginPath();
+        for(var k=0;k<=900;k++){ var t=k/900; var v=sg*msg(t);
+          var px=X(t), py=y0-v*amp; k?ctx.lineTo(px,py):ctx.moveTo(px,py); }
+        ctx.stroke();
+      });
+      ctx.globalAlpha=1; ctx.setLineDash([]);
+    }
+    // trace
+    ctx.strokeStyle=r.col; ctx.lineWidth=(i===1?3.6:4);
+    ctx.lineJoin='round'; ctx.lineCap='round';
+    ctx.beginPath();
+    var prev=null;
+    for(var k=0;k<=1400;k++){
+      var t=k/1400, v=r.f(t), px=X(t), py=y0-v*amp;
+      if(i===1 && prev!==null && Math.sign(v)!==Math.sign(prev)){ ctx.lineTo(px, y0+prev*amp*0); }
+      k?ctx.lineTo(px,py):ctx.moveTo(px,py);
+      prev=v;
+    }
+    ctx.stroke();
+
+    // shading for carrier half-cycles
+    if(showsq && i===1){
+      ctx.globalAlpha=0.10; ctx.fillStyle=C('car');
+      for(var h=0;h<FC*2;h++){ if(h%2===0){ var t1=h/(2*FC), t2=(h+1)/(2*FC);
+        ctx.fillRect(X(t1),pad.t,X(t2)-X(t1),Ht-pad.t-pad.b);} }
+      ctx.globalAlpha=1;
+    }
+  });
+
+  // time cursor
+  var cx=X(tNow%1);
+  ctx.strokeStyle=C('text-primary'); ctx.globalAlpha=0.30; ctx.lineWidth=2.6;
+  ctx.beginPath(); ctx.moveTo(cx,pad.t); ctx.lineTo(cx,Ht-pad.b); ctx.stroke(); ctx.globalAlpha=1;
+  // markers
+  rowsDef.forEach(function(r,i){
+    var y0=pad.t+i*rh+rh/2, amp=rh*0.36;
+    var py=y0-r.f(tNow%1)*amp;
+    ctx.beginPath(); ctx.arc(cx,py,9,0,7); ctx.fillStyle=r.col; ctx.fill();
+    ctx.lineWidth=4; ctx.strokeStyle=C('surface-1'); ctx.stroke();
+  });
+
+  ctx.fillStyle=C('text-muted'); ctx.font='22px ui-sans-serif,system-ui'; ctx.textAlign='center';
+  ctx.fillText('time →', Wd/2, Ht-8);
+}
+
+/* ================= FOURIER CANVAS ================= */
+var fcv=document.getElementById('fourier');
+function drawFourier(){
+  var n=+document.getElementById('nh').value;
+  document.getElementById('nhval').textContent=n;
+  var ctx=fcv.getContext('2d'), Wd=fcv.width, Ht=fcv.height;
+  ctx.clearRect(0,0,Wd,Ht); ctx.fillStyle=C('surface-1'); ctx.fillRect(0,0,Wd,Ht);
+  var pad={l:76,r:330,t:30,b:44};
+  var y0=(Ht-pad.b+pad.t)/2, amp=(Ht-pad.t-pad.b)*0.30;
+  var X=function(t){return pad.l+t*(Wd-pad.l-pad.r);};
+
+  ctx.strokeStyle=C('rule'); ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(pad.l,y0); ctx.lineTo(Wd-pad.r,y0); ctx.stroke();
+
+  // ideal square
+  ctx.strokeStyle=C('text-muted'); ctx.setLineDash([8,8]); ctx.lineWidth=2.6; ctx.globalAlpha=.7;
+  ctx.beginPath();
+  for(var k=0;k<=1600;k++){var t=k/1600; var v=Math.cos(2*Math.PI*2*t)>=0?1:-1;
+    var px=X(t),py=y0-v*amp; k?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+  ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha=1;
+
+  // partial sum
+  ctx.strokeStyle=C('car'); ctx.lineWidth=4.2; ctx.lineJoin='round';
+  ctx.beginPath();
+  for(var k2=0;k2<=1600;k2++){
+    var t2=k2/1600, s=0;
+    for(var i=0;i<n;i++){ var m=2*i+1; s += (4/(Math.PI*m))*Math.cos(2*Math.PI*2*m*t2)*(i%2?-1:1); }
+    var px2=X(t2), py2=y0-s*amp;
+    k2?ctx.lineTo(px2,py2):ctx.moveTo(px2,py2);
+  }
+  ctx.stroke();
+
+  ctx.font='600 22px ui-sans-serif,system-ui'; ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillStyle=C('car'); ctx.fillText('sum of '+n+' harmonic'+(n>1?'s':''), Wd-pad.r+16, y0-34);
+  ctx.fillStyle=C('text-muted'); ctx.fillText('ideal c(t)', Wd-pad.r+16, y0+34);
+  ctx.textAlign='right'; ctx.font='20px ui-sans-serif,system-ui';
+  ctx.fillStyle=C('text-secondary'); ctx.fillText('+1',pad.l-14,y0-amp); ctx.fillText('−1',pad.l-14,y0+amp);
+}
+
+/* ================= SPECTRUM CANVAS ================= */
+var scv=document.getElementById('spec');
+var bpfOn=false;
+var specHits=[];
+function drawSpec(){
+  var ctx=scv.getContext('2d'), Wd=scv.width, Ht=scv.height;
+  ctx.clearRect(0,0,Wd,Ht); ctx.fillStyle=C('surface-1'); ctx.fillRect(0,0,Wd,Ht);
+  var pad={l:80,r:40,t:40,b:70};
+  var base=Ht-pad.b;
+  var fmax=8.2;
+  var X=function(f){return pad.l+(f/fmax)*(Wd-pad.l-pad.r);};
+  var H=(Ht-pad.t-pad.b);
+  var bw=0.62; // half-width W in these units
+  specHits=[];
+
+  // axis
+  ctx.strokeStyle=C('rule'); ctx.lineWidth=2.4;
+  ctx.beginPath(); ctx.moveTo(pad.l,base); ctx.lineTo(Wd-pad.r,base); ctx.stroke();
+
+  // BPF window
+  if(bpfOn){
+    ctx.fillStyle=C('msg'); ctx.globalAlpha=.10;
+    ctx.fillRect(X(1-bw*1.35),pad.t-6,X(1+bw*1.35)-X(1-bw*1.35),H+6);
+    ctx.globalAlpha=1;
+    ctx.strokeStyle=C('msg'); ctx.lineWidth=3; ctx.setLineDash([10,7]);
+    ctx.strokeRect(X(1-bw*1.35),pad.t-6,X(1+bw*1.35)-X(1-bw*1.35),H+6);
+    ctx.setLineDash([]);
+    ctx.fillStyle=C('msg'); ctx.font='600 22px ui-sans-serif,system-ui'; ctx.textAlign='center';
+    ctx.fillText('bandpass filter', X(1), pad.t-14);
+  }
+
+  var harms=[1,3,5,7];
+  harms.forEach(function(m){
+    var amp=(1/m);
+    var kept = !bpfOn || m===1;
+    var h=amp*H*0.86;
+    var col=kept?C('out'):C('off');
+    ctx.globalAlpha = kept?1:0.30;
+    // triangle spectrum copy
+    ctx.beginPath();
+    ctx.moveTo(X(m-bw),base); ctx.lineTo(X(m),base-h); ctx.lineTo(X(m+bw),base);
+    ctx.closePath();
+    ctx.fillStyle=col; ctx.fill();
+    ctx.strokeStyle=C('surface-1'); ctx.lineWidth=3; ctx.stroke();
+    ctx.globalAlpha=1;
+    // tick + label
+    ctx.fillStyle=kept?C('text-primary'):C('text-muted');
+    var main=(m===1?'f':m+'f');
+    ctx.font='600 22px ui-sans-serif,system-ui'; ctx.textAlign='left';
+    var wm=ctx.measureText(main).width;
+    ctx.font='600 15px ui-sans-serif,system-ui';
+    var wc=ctx.measureText('c').width;
+    var x0=X(m)-(wm+wc)/2;
+    ctx.font='600 22px ui-sans-serif,system-ui'; ctx.fillText(main, x0, base+32);
+    ctx.font='600 15px ui-sans-serif,system-ui'; ctx.fillText('c', x0+wm+1, base+38);
+    if(kept){
+      ctx.fillStyle=C('text-secondary'); ctx.font='19px ui-sans-serif,system-ui';
+      ctx.fillText((m===1?'4/π':'4/'+(m)+'π'), X(m), base-h-14);
+    }
+    specHits.push({x:X(m),y:base-h,m:m,amp:amp,kept:kept});
+  });
+
+  ctx.fillStyle=C('text-muted'); ctx.font='22px ui-sans-serif,system-ui'; ctx.textAlign='center';
+  ctx.fillText('frequency →', (pad.l+Wd-pad.r)/2, Ht-14);
+
+
+  if(bpfOn){
+    ctx.fillStyle=C('out'); ctx.font='600 22px ui-sans-serif,system-ui'; ctx.textAlign='left';
+    ctx.fillText('DSB-SC output', X(1+bw*1.35)+24, base-H*0.42);
+  }
+}
+
+/* tooltip on spectrum */
+var tt=document.getElementById('tt');
+scv.addEventListener('mousemove',function(e){
+  var r=scv.getBoundingClientRect(), sx=scv.width/r.width;
+  var mx=(e.clientX-r.left)*sx, my=(e.clientY-r.top)*sx;
+  var hit=null;
+  specHits.forEach(function(h){ if(Math.abs(mx-h.x)<70 && my>h.y-40) hit=h; });
+  if(hit){
+    tt.style.opacity=1; tt.style.left=(e.clientX+14)+'px'; tt.style.top=(e.clientY-38)+'px';
+    tt.innerHTML='<strong>'+(hit.m===1?'f':hit.m+'f')+'ᶜ copy</strong> &mdash; amplitude 4/'+(hit.m===1?'':hit.m)+'π'+(hit.kept?'':' &middot; removed by filter');
+  } else tt.style.opacity=0;
+});
+scv.addEventListener('mouseleave',function(){tt.style.opacity=0;});
+
+document.getElementById('bpfbtn').onclick=function(){
+  bpfOn=!bpfOn;
+  this.textContent = bpfOn?'Turn bandpass filter off':'Turn bandpass filter on';
+  this.className = bpfOn?'on':'';
+  document.getElementById('bpfnote').textContent = bpfOn
+    ? 'Only the copy at fᶜ survives — that is DSB-SC, with amplitude 4/π.'
+    : 'Showing the raw ring output — copies at every odd harmonic.';
+  drawSpec();
+};
+
+/* ---------- controls ---------- */
+var playBtn=document.getElementById('play'), scrub=document.getElementById('scrub');
+playBtn.onclick=function(){ playing=!playing; this.textContent=playing?'Pause':'Play'; this.className=playing?'on':''; };
+scrub.oninput=function(){ playing=false; playBtn.textContent='Play'; playBtn.className='';
+  tNow=+this.value/1000; updateCircuit(); drawWaves(); };
+document.getElementById('speed').oninput=function(){ speed=+this.value/100; };
+document.getElementById('nh').oninput=drawFourier;
+document.getElementById('showsq').onchange=drawWaves;
+
+function drawAll(){ buildCircuit(); updateCircuit(); drawWaves(); drawFourier(); drawSpec(); }
+
+var last=0;
+function loop(ts){
+  if(playing){ var dt=(ts-last)/1000; last=ts;
+    if(dt<0.2){ tNow=(tNow+dt*speed*0.28)%1; scrub.value=Math.round(tNow*1000); updateCircuit(); drawWaves(); }
+  } else last=ts;
+  requestAnimationFrame(loop);
+}
+
+drawAll();
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

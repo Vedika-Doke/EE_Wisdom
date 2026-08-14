@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Over-modulation and the Envelope's Blind Spot — EE341</title>
+<style>
+:root{
+  color-scheme: light;
+  --surface-0:#f4f4f2; --surface-1:#fcfcfb; --surface-2:#eeeeeb;
+  --text-primary:#0b0b0b; --text-secondary:#52514e; --text-muted:#77766f;
+  --rule:#dcdcd6;
+  --msg:#2a78d6; --car:#eb6834; --out:#1baf7a; --bad:#e34948; --off:#c9c8c2;
+  --accentbg:#eaf1fb; --warnbg:#fdf3ee; --okbg:#e9f6f1; --badbg:#fdeeee;
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --surface-0:#121211; --surface-1:#1a1a19; --surface-2:#232322;
+  --text-primary:#ffffff; --text-secondary:#c3c2b7; --text-muted:#95948b;
+  --rule:#33332f;
+  --msg:#3987e5; --car:#d95926; --out:#199e70; --bad:#e66767; --off:#4a4a46;
+  --accentbg:#16233a; --warnbg:#2c1d16; --okbg:#14291f; --badbg:#2e1717;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--surface-0);color:var(--text-primary);
+  font:16px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 20px 80px}
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:8px}
+h1{font-size:29px;line-height:1.2;margin:0 0 6px;letter-spacing:-.02em}
+.sub{color:var(--text-secondary);font-size:15px;margin:0}
+h2{font-size:21px;margin:38px 0 10px;letter-spacing:-.01em}
+p{margin:10px 0}
+.card{background:var(--surface-1);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;margin:16px 0}
+.note{background:var(--accentbg);border:1px solid var(--rule);border-left:3px solid var(--msg);border-radius:10px;padding:12px 16px;margin:14px 0}
+.trap{background:var(--warnbg);border:1px solid var(--rule);border-left:3px solid var(--car);border-radius:10px;padding:12px 16px;margin:14px 0}
+.key{background:var(--okbg);border:1px solid var(--rule);border-left:3px solid var(--out);border-radius:10px;padding:12px 16px;margin:14px 0}
+.eq{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:15px;text-align:center;margin:14px 0;overflow-x:auto}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+button{font:inherit;cursor:pointer;border-radius:9px;border:1px solid var(--rule);background:var(--surface-2);color:var(--text-primary);padding:7px 13px}
+button:hover{background:var(--rule)}
+button.on{background:var(--msg);border-color:var(--msg);color:#fff}
+.themebtn{font-size:13px;padding:6px 11px;white-space:nowrap}
+.ctl{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:12px 0}
+.ctl label{font-size:14px;color:var(--text-secondary)}
+input[type=range]{accent-color:var(--msg);width:240px}
+.legend{display:flex;flex-wrap:wrap;gap:15px;font-size:13px;color:var(--text-secondary);margin:8px 0 4px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+.dash{width:15px;height:0;border-top:2.5px dashed;display:inline-block}
+canvas{display:block;width:100%;height:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{color:var(--text-secondary);font-weight:600;font-size:13px}
+ul,ol{padding-left:22px} li{margin:5px 0}
+.status{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0 2px}
+.pill{border-radius:999px;padding:5px 14px;font-size:13.5px;font-weight:700;border:1px solid}
+.pill.ok{background:var(--okbg);border-color:var(--out);color:var(--out)}
+.pill.bad{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+.readout{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--text-secondary)}
+.msgbtns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--rule);font-size:13px;color:var(--text-muted)}
+.big{font-size:20px;font-weight:600;letter-spacing:-.01em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <h1>Over-modulation &amp; the envelope's blind spot</h1>
+    <p class="sub">Why the envelope detector throws away the sign — EE341, Lecture 2 material</p>
+  </div>
+  <button class="themebtn" id="theme">Dark</button>
+</header>
+
+<div class="key">
+<p style="margin:0"><span class="big">An envelope detector measures a <em>magnitude</em>. Magnitudes have no sign.</span></p>
+<p style="margin:6px 0 0;color:var(--text-secondary)">Every idea on this page — over-modulation, the &pi; phase shift in your notes, "different x(t)'s give the same envelope", why DSB-SC needs coherent detection — is that one sentence, seen from a different angle.</p>
+</div>
+
+<h2>1. Drag &mu; and watch it break</h2>
+<p>The transmitted signal is <code>x_c(t) = A(1 + μ·x(t))·cos(2πf_c t)</code>. The quantity <code>A(1+μx)</code> is the <strong>signed envelope</strong> — what we <em>want</em> the receiver to see. The detector actually outputs <code>A|1+μx|</code>. Below &mu;&nbsp;=&nbsp;1 those are the same thing. Above it, they are not.</p>
+
+<div class="card">
+  <div class="ctl">
+    <label for="mu">Modulation index &mu; = <strong id="muval" style="font-size:16px;color:var(--text-primary)">0.70</strong></label>
+    <input type="range" id="mu" min="0" max="200" value="70">
+    <button id="anim">Sweep</button>
+  </div>
+  <div class="status">
+    <span class="pill ok" id="pill">within limits</span>
+    <span class="readout" id="readout"></span>
+  </div>
+
+  <canvas id="main" width="1760" height="1180"></canvas>
+
+  <div class="legend" style="margin-top:12px">
+    <span><i class="sw" style="background:var(--msg)"></i> message x(t)</span>
+    <span><i class="sw" style="background:var(--car)"></i> transmitted x<sub>c</sub>(t)</span>
+    <span><i class="dash" style="border-color:var(--msg)"></i> signed envelope A(1+&mu;x) — what we want</span>
+    <span><i class="sw" style="background:var(--out)"></i> detector output A|1+&mu;x|</span>
+    <span><i class="sw" style="background:var(--bad)"></i> where they disagree — information destroyed</span>
+  </div>
+</div>
+
+<div class="trap" id="explainbox">
+<p style="margin:0" id="explaintext"></p>
+</div>
+
+<h2>2. What is actually happening at the fold</h2>
+<p>Look at the middle panel as you push &mu; past 1. Three things happen at the same instant, and they are the same event described three ways:</p>
+
+<table>
+<thead><tr><th style="width:30%">Description</th><th>What you see</th></tr></thead>
+<tbody>
+<tr><td><strong>Algebra</strong></td><td><code>1 + μx(t)</code> passes through zero and goes negative.</td></tr>
+<tr><td><strong>Waveform</strong></td><td>The carrier shrinks to zero amplitude, then grows back — but <strong>inverted</strong>. This is your notes' "&pi; phase shift as x(t) &lt; 0".</td></tr>
+<tr><td><strong>Detector</strong></td><td>The absolute value folds the negative part back up. The output <em>bounces</em> off zero instead of passing through it.</td></tr>
+</tbody>
+</table>
+
+<div class="note">
+<p style="margin:0"><strong>Why the sign is unrecoverable.</strong> A carrier of amplitude &minus;0.5 and a carrier of amplitude +0.5 shifted by 180&deg; are <em>the same waveform</em>. Not similar — identical, sample for sample. The minus sign has been converted into phase. An envelope detector is a diode and an RC: it responds to how big the wiggles are and has no phase reference whatsoever, so that information is gone before the signal ever reaches the output.</p>
+<p style="margin:8px 0 0">A <em>coherent</em> detector does have a phase reference, which is exactly why it can demodulate DSB-SC where an envelope detector cannot.</p>
+</div>
+
+<h2>3. "Different x(t)'s can still give us the same envelope"</h2>
+<p>This line in your notes is the same fact stated backwards. If the detector only sees <code>|·|</code>, then <strong>any two messages with the same magnitude produce the same output</strong>, and the receiver has no way to tell them apart.</p>
+<p>Here are three genuinely different messages. Look at the top panel — they are clearly not the same signal. Then look at the envelope in the bottom panel.</p>
+
+<div class="card">
+  <div class="msgbtns" id="ambbtns"></div>
+  <canvas id="amb" width="1760" height="760"></canvas>
+  <div class="legend" style="margin-top:10px">
+    <span><i class="sw" style="background:var(--msg)"></i> the three candidate messages</span>
+    <span><i class="sw" style="background:var(--out)"></i> resulting DSB-SC envelope A|x(t)| — identical for all three</span>
+  </div>
+  <p style="font-size:13.5px;color:var(--text-secondary);margin-top:10px">Switch between them: the top trace changes, the bottom trace does not move at all.</p>
+</div>
+
+<div class="key">
+<p style="margin:0"><strong>So envelope detection is only valid when the mapping is one-to-one.</strong> Adding the carrier — the "+1" in <code>1 + μx</code> — lifts the whole message onto a positive pedestal so that <code>|1+μx| = 1+μx</code> and no folding can occur. That is what the carrier is <em>for</em>. It buys uniqueness, and you pay for it with the transmit power computed in your efficiency formula.</p>
+</div>
+
+<h2>4. DSB-SC is permanent over-modulation</h2>
+<p>Remove the carrier: <code>x_c(t) = A·x(t)·cos(2πf_c t)</code>. The signed envelope is <code>A·x(t)</code>, which goes negative every time the message does. There is no pedestal to prevent it.</p>
+<p>So DSB-SC is the &mu;&nbsp;&rarr;&nbsp;&infin; limit of what you are looking at above — folding at <em>every</em> zero crossing of the message. Set the slider to its maximum and you will see the DSB-AM waveform approach exactly the picture on page 3 of your notes, with a phase reversal at each crossing.</p>
+<div class="eq">envelope detection fails for DSB-SC &nbsp;&nbsp;&hArr;&nbsp;&nbsp; DSB-SC is always over-modulated</div>
+<p>These are not two facts to memorise. They are one fact.</p>
+
+<h2>5. The RC envelope detector, and its own two failure modes</h2>
+<p>Your notes say: <em>"can get envelope by connecting local maximas, or pass thru diode + RC to get peaks."</em> The diode charges the capacitor at each carrier peak; between peaks the capacitor discharges through R. The time constant has to sit in a window:</p>
+<div class="eq">1/f<sub>c</sub> &nbsp;&lt;&lt;&nbsp; RC &nbsp;&lt;&lt;&nbsp; 1/W</div>
+<p>Drag the time constant and watch both walls:</p>
+
+<div class="card">
+  <div class="ctl">
+    <label for="rc">RC time constant = <strong id="rcval" style="color:var(--text-primary)"></strong></label>
+    <input type="range" id="rc" min="0" max="100" value="62">
+  </div>
+  <div class="status"><span class="pill ok" id="rcpill"></span><span class="readout" id="rcnote"></span></div>
+  <canvas id="rcplot" width="1760" height="560"></canvas>
+  <div class="legend" style="margin-top:10px">
+    <span><i class="sw" style="background:var(--car)"></i> rectified carrier (diode output)</span>
+    <span><i class="sw" style="background:var(--out)"></i> capacitor voltage — the recovered envelope</span>
+    <span><i class="dash" style="border-color:var(--msg)"></i> ideal envelope</span>
+  </div>
+</div>
+
+<div class="trap">
+<p style="margin:0"><strong>Too small (RC &lt; 1/f<sub>c</sub>):</strong> the capacitor discharges fully between carrier peaks. The output is just the rectified carrier — massive ripple at f<sub>c</sub>, no smoothing at all.</p>
+<p style="margin:8px 0 0"><strong>Too large (RC &gt; 1/W):</strong> the capacitor cannot discharge fast enough to follow the envelope down. The output holds too high and cuts corners on the falling edges — <strong>diagonal clipping</strong> (also called failure-to-follow distortion). This is the more commonly examined of the two.</p>
+</div>
+
+<h2>6. Checklist</h2>
+<ul>
+<li><strong>Condition:</strong> <code>μ|x(t)| ≤ 1</code> for all t, i.e. <code>1 + μx ≥ 0</code>. With x normalised to max|x| = 1, this is <code>μ ≤ 1</code>.</li>
+<li><strong>Only the negative peak binds.</strong> Nothing breaks when <code>1+μx</code> gets large; it breaks when it tries to go below zero. For an asymmetric message the constraint is <code>μ ≤ 1/|min x|</code>.</li>
+<li><strong>Failure mechanism:</strong> the detector outputs a magnitude, so a sign change becomes a 180° phase reversal that the detector cannot see. The folding is irreversible.</li>
+<li><strong>Also:</strong> over-modulation is a nonlinear operation, so it generates harmonics that widen the transmitted bandwidth past 2W and spill into adjacent channels. It is a regulatory problem, not only an audio-quality one.</li>
+<li><strong>Assumption throughout:</strong> x(t) has no DC component — otherwise the DC would be indistinguishable from the carrier.</li>
+<li><strong>RC detector:</strong> <code>1/f_c &lt;&lt; RC &lt;&lt; 1/W</code>. Too small → ripple. Too large → diagonal clipping.</li>
+<li><strong>Trade-off to state:</strong> efficiency η = μ²P<sub>x</sub>/(1+μ²P<sub>x</sub>) rises with μ, but μ = 1 is a hard wall. Broadcasters run 0.8–0.9 for headroom.</li>
+</ul>
+
+<footer>
+Built for EE341 (Autumn 2026), IIT Bombay — to accompany the Lecture 2 page on envelopes and phase reversal.
+</footer>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+var themeBtn=document.getElementById('theme');
+themeBtn.onclick=function(){
+  var d=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',d?'light':'dark');
+  themeBtn.textContent=d?'Dark':'Light';
+  drawAll();
+};
+function C(n){return getComputedStyle(document.body).getPropertyValue('--'+n).trim();}
+
+var FC=26;                                   // carrier cycles across window
+function msg(t){ return Math.cos(2*Math.PI*t - Math.PI); }   // one cycle, starts at -1
+function carrier(t){ return Math.cos(2*Math.PI*FC*t); }
+
+/* =============== PANEL 1 : mu sweep =============== */
+var mu=0.7;
+var mainC=document.getElementById('main');
+
+function drawMain(){
+  var ctx=mainC.getContext('2d'), Wd=mainC.width, Ht=mainC.height;
+  ctx.clearRect(0,0,Wd,Ht); ctx.fillStyle=C('surface-1'); ctx.fillRect(0,0,Wd,Ht);
+  var pad={l:290,r:50,t:34,b:40};
+  var rows=3, rh=(Ht-pad.t-pad.b)/rows;
+  var X=function(t){return pad.l+t*(Wd-pad.l-pad.r);};
+  var N=2400;
+
+  function rowbase(i){return pad.t+i*rh+rh/2;}
+  function label(i,txt,col,sub){
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.fillStyle=col; ctx.font='600 27px ui-sans-serif,system-ui';
+    ctx.fillText(txt, pad.l-22, rowbase(i)-(sub?14:0));
+    if(sub){ ctx.fillStyle=C('text-muted'); ctx.font='21px ui-sans-serif,system-ui';
+      ctx.fillText(sub, pad.l-22, rowbase(i)+18); }
+  }
+  function axis(i){
+    ctx.strokeStyle=C('rule'); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(pad.l,rowbase(i)); ctx.lineTo(Wd-pad.r,rowbase(i)); ctx.stroke();
+  }
+
+  /* ---- row 0 : message ---- */
+  var a0=rh*0.32;
+  axis(0); label(0,'x(t)',C('msg'),'the message');
+  ctx.strokeStyle=C('msg'); ctx.lineWidth=4.5; ctx.lineJoin='round'; ctx.beginPath();
+  for(var k=0;k<=N;k++){var t=k/N; var px=X(t),py=rowbase(0)-msg(t)*a0; k?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+  ctx.stroke();
+  ctx.fillStyle=C('text-muted'); ctx.font='20px ui-sans-serif,system-ui'; ctx.textAlign='left';
+  ctx.fillText('+1',pad.l+10,rowbase(0)-a0-16); ctx.fillText('−1',pad.l+10,rowbase(0)+a0+18);
+
+  /* ---- row 1 : transmitted signal ---- */
+  var a1=rh*0.40, scale=a1/Math.max(1e-6,(1+mu));
+  axis(1); label(1,'transmitted',C('car'),'x_c(t)');
+  // shade folded regions
+  var folded=[];
+  var inF=false, st=0;
+  for(var k2=0;k2<=N;k2++){ var t2=k2/N, e=1+mu*msg(t2);
+    if(e<0 && !inF){ inF=true; st=t2; } else if(e>=0 && inF){ inF=false; folded.push([st,t2]); } }
+  if(inF) folded.push([st,1]);
+  folded.forEach(function(f){
+    ctx.fillStyle=C('bad'); ctx.globalAlpha=0.13;
+    ctx.fillRect(X(f[0]),pad.t+rh*0.06,X(f[1])-X(f[0]),rh*2-rh*0.12);
+    ctx.globalAlpha=1;
+  });
+  // carrier trace, coloured red where inverted
+  ctx.lineWidth=2.2;
+  var prevBad=null;
+  ctx.beginPath();
+  for(var k3=0;k3<=N;k3++){
+    var t3=k3/N, e3=1+mu*msg(t3), v=e3*carrier(t3);
+    var bad = e3<0;
+    if(bad!==prevBad){ if(prevBad!==null){ctx.stroke();}
+      ctx.beginPath(); ctx.strokeStyle= bad?C('bad'):C('car'); prevBad=bad;
+      ctx.moveTo(X(t3),rowbase(1)-v*scale);
+    } else ctx.lineTo(X(t3),rowbase(1)-v*scale);
+  }
+  ctx.stroke();
+  // detector envelope (solid green) = |1+mu x|
+  ctx.strokeStyle=C('out'); ctx.lineWidth=4.6;
+  [1,-1].forEach(function(sg){
+    ctx.beginPath();
+    for(var k5=0;k5<=N;k5++){var t5=k5/N,e5=sg*Math.abs(1+mu*msg(t5));
+      var px=X(t5),py=rowbase(1)-e5*scale; k5?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+    ctx.stroke();
+  });
+  // signed envelope (dashed blue, both signs) drawn ON TOP so the disagreement is visible
+  ctx.setLineDash([12,9]); ctx.lineWidth=3.6; ctx.strokeStyle=C('msg');
+  [1,-1].forEach(function(sg){
+    ctx.beginPath();
+    for(var k4=0;k4<=N;k4++){var t4=k4/N,e4=sg*(1+mu*msg(t4));
+      var px=X(t4),py=rowbase(1)-e4*scale; k4?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  /* ---- row 2 : recovered message ---- */
+  var a2=rh*0.32;
+  axis(2); label(2,'recovered',C('out'),'what you hear');
+  // true message faint
+  ctx.strokeStyle=C('msg'); ctx.lineWidth=3.4; ctx.globalAlpha=.45; ctx.setLineDash([11,9]);
+  ctx.beginPath();
+  for(var k6=0;k6<=N;k6++){var t6=k6/N; var px=X(t6),py=rowbase(2)-msg(t6)*a2; k6?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+  ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha=1;
+  // recovered = (|1+mu x| - mean)/mu
+  var rec=[], sum=0;
+  for(var k7=0;k7<=N;k7++){var t7=k7/N; var r=Math.abs(1+mu*msg(t7)); rec.push(r); sum+=r;}
+  var mean=sum/(N+1);
+  ctx.strokeStyle=C('out'); ctx.lineWidth=4.5; ctx.beginPath();
+  for(var k8=0;k8<=N;k8++){
+    var t8=k8/N, val=(rec[k8]-mean)/Math.max(mu,1e-6);
+    var px=X(t8),py=rowbase(2)-val*a2; k8?ctx.lineTo(px,py):ctx.moveTo(px,py);
+  }
+  ctx.stroke();
+  // error shading
+  folded.forEach(function(f){
+    ctx.fillStyle=C('bad'); ctx.globalAlpha=0.13;
+    ctx.fillRect(X(f[0]),rowbase(2)-rh*0.42,X(f[1])-X(f[0]),rh*0.84); ctx.globalAlpha=1;
+  });
+  // fold boundary markers + captions
+  ctx.setLineDash([7,7]); ctx.strokeStyle=C('bad'); ctx.lineWidth=2.4;
+  folded.forEach(function(f){
+    [f[0],f[1]].forEach(function(tb){
+      if(tb<=0.001||tb>=0.999) return;
+      ctx.beginPath(); ctx.moveTo(X(tb),pad.t+8); ctx.lineTo(X(tb),Ht-pad.b-8); ctx.stroke();
+    });
+  });
+  ctx.setLineDash([]);
+  if(folded.length){
+    ctx.fillStyle=C('bad'); ctx.font='600 21px ui-sans-serif,system-ui'; ctx.textAlign='center';
+    folded.forEach(function(f){
+      var cxm=(X(f[0])+X(f[1]))/2;
+      ctx.fillText('1+μx < 0', cxm, pad.t+24);
+      ctx.fillText('folded', cxm, rowbase(2)+rh*0.46);
+    });
+  }
+
+  ctx.fillStyle=C('text-muted'); ctx.font='21px ui-sans-serif,system-ui'; ctx.textAlign='center';
+  ctx.fillText('time →',(pad.l+Wd-pad.r)/2, Ht-10);
+}
+
+function updateStatus(){
+  var minv=1-mu;                       // min of 1+mu*x since min x = -1
+  var pill=document.getElementById('pill'), ro=document.getElementById('readout');
+  var et=document.getElementById('explaintext'), eb=document.getElementById('explainbox');
+  if(mu<=1.0001){
+    pill.className='pill ok'; pill.textContent='within limits';
+    ro.textContent='min(1 + μx) = '+minv.toFixed(2)+'  ≥ 0   →   |1+μx| = 1+μx, no folding';
+    eb.className='key';
+    if(mu<0.02){
+      et.innerHTML='<strong>μ = 0: no modulation at all.</strong> Pure carrier, constant envelope, zero information transmitted — and 100% of the power wasted. Efficiency η = 0.';
+    } else if(mu<0.6){
+      et.innerHTML='<strong>Under-modulated.</strong> Recovery is perfect (green sits exactly on the dashed blue), but the envelope barely varies, so the message occupies a small fraction of the transmitted power. η = μ²P<sub>x</sub>/(1+μ²P<sub>x</sub>) is small — for μ = '+mu.toFixed(2)+' with a sinusoidal message, about '+(100*(mu*mu*0.5)/(1+mu*mu*0.5)).toFixed(1)+'%.';
+    } else if(mu<0.98){
+      et.innerHTML='<strong>This is where you want to be.</strong> The envelope still never touches zero (minimum = '+minv.toFixed(2)+'), so recovery is exact, and you are using as much of the available modulation depth as is safe. Broadcasters sit right about here. η ≈ '+(100*(mu*mu*0.5)/(1+mu*mu*0.5)).toFixed(1)+'% for a sinusoidal message.';
+    } else {
+      et.innerHTML='<strong>μ = 1: the wall.</strong> The envelope just kisses zero at the message trough. Still recoverable in principle, but there is zero margin — any noise, any drift, any message peak larger than expected pushes you over. This is the maximum permitted depth, and η reaches its ceiling of 33.3% for a sinusoidal message.';
+    }
+  } else {
+    pill.className='pill bad'; pill.textContent='OVER-MODULATED';
+    ro.textContent='min(1 + μx) = '+minv.toFixed(2)+'  < 0   →   sign lost, envelope folds';
+    eb.className='trap';
+    et.innerHTML='<strong>Broken.</strong> The signed envelope (dashed) dips below zero, so the carrier flips phase by 180° — see the red segments in the middle panel. The detector reports the magnitude, so the recovered message (bottom, green) <em>bounces off</em> the trough instead of passing through it, and no longer matches the true message (dashed). The shaded regions are where the information has been destroyed: no amount of post-processing recovers it, because two different messages would have produced this identical output.';
+  }
+}
+
+var muSlider=document.getElementById('mu');
+muSlider.oninput=function(){ mu=+this.value/100; document.getElementById('muval').textContent=mu.toFixed(2);
+  updateStatus(); drawMain(); };
+
+var sweeping=false, sweepDir=1, rafId=null;
+document.getElementById('anim').onclick=function(){
+  sweeping=!sweeping; this.className=sweeping?'on':''; this.textContent=sweeping?'Stop':'Sweep';
+  if(sweeping) step(); else if(rafId) cancelAnimationFrame(rafId);
+};
+function step(){
+  if(!sweeping) return;
+  var v=+muSlider.value+sweepDir*1.1;
+  if(v>=200){v=200;sweepDir=-1;} if(v<=0){v=0;sweepDir=1;}
+  muSlider.value=v; mu=v/100;
+  document.getElementById('muval').textContent=mu.toFixed(2);
+  updateStatus(); drawMain();
+  rafId=requestAnimationFrame(step);
+}
+
+/* =============== PANEL 2 : ambiguity =============== */
+var AMB=[
+  {name:'x(t) = cos', f:function(t){return Math.cos(2*Math.PI*t-Math.PI);},
+   note:'A plain cosine. It goes negative for half of every cycle.'},
+  {name:'x(t) = |cos|', f:function(t){return Math.abs(Math.cos(2*Math.PI*t-Math.PI));},
+   note:'Fully rectified — never negative. A completely different waveform.'},
+  {name:'half-flipped', f:function(t){var c=Math.cos(2*Math.PI*t-Math.PI); return (t<0.5)?Math.abs(c):-Math.abs(c);},
+   note:'Sign flipped on a schedule of its own choosing.'}
+];
+var ambSel=0;
+var ambC=document.getElementById('amb');
+function buildAmbBtns(){
+  var box=document.getElementById('ambbtns'); box.innerHTML='';
+  AMB.forEach(function(m,i){
+    var b=document.createElement('button'); b.textContent=m.name;
+    b.className=(i===ambSel)?'on':'';
+    b.onclick=function(){ambSel=i;buildAmbBtns();drawAmb();};
+    box.appendChild(b);
+  });
+}
+function drawAmb(){
+  var ctx=ambC.getContext('2d'), Wd=ambC.width, Ht=ambC.height;
+  ctx.clearRect(0,0,Wd,Ht); ctx.fillStyle=C('surface-1'); ctx.fillRect(0,0,Wd,Ht);
+  var pad={l:230,r:50,t:34,b:44}, rh=(Ht-pad.t-pad.b)/2;
+  var X=function(t){return pad.l+t*(Wd-pad.l-pad.r);}, N=2400;
+  var f=AMB[ambSel].f;
+
+  function base(i){return pad.t+i*rh+rh/2;}
+  [0,1].forEach(function(i){
+    ctx.strokeStyle=C('rule'); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(pad.l,base(i)); ctx.lineTo(Wd-pad.r,base(i)); ctx.stroke();
+  });
+
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  ctx.font='600 26px ui-sans-serif,system-ui'; ctx.fillStyle=C('msg');
+  ctx.fillText('x(t)',pad.l-22,base(0)-12);
+  ctx.font='20px ui-sans-serif,system-ui'; ctx.fillStyle=C('text-muted');
+  ctx.fillText('changes',pad.l-22,base(0)+16);
+  ctx.font='600 26px ui-sans-serif,system-ui'; ctx.fillStyle=C('out');
+  ctx.fillText('envelope',pad.l-22,base(1)-12);
+  ctx.font='20px ui-sans-serif,system-ui'; ctx.fillStyle=C('text-muted');
+  ctx.fillText('never moves',pad.l-22,base(1)+16);
+
+  var a=rh*0.34;
+  // message
+  ctx.strokeStyle=C('msg'); ctx.lineWidth=4.5; ctx.lineJoin='round'; ctx.beginPath();
+  for(var k=0;k<=N;k++){var t=k/N,px=X(t),py=base(0)-f(t)*a; k?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+  ctx.stroke();
+
+  // DSB-SC waveform + envelope
+  ctx.strokeStyle=C('car'); ctx.lineWidth=1.9; ctx.globalAlpha=.75; ctx.beginPath();
+  for(var k2=0;k2<=N;k2++){var t2=k2/N,v=f(t2)*carrier(t2),px=X(t2),py=base(1)-v*a; k2?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+  ctx.stroke(); ctx.globalAlpha=1;
+  ctx.strokeStyle=C('out'); ctx.lineWidth=4.5;
+  [1,-1].forEach(function(sg){
+    ctx.beginPath();
+    for(var k3=0;k3<=N;k3++){var t3=k3/N,e=sg*Math.abs(f(t3)),px=X(t3),py=base(1)-e*a; k3?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+    ctx.stroke();
+  });
+
+  ctx.fillStyle=C('text-secondary'); ctx.font='21px ui-sans-serif,system-ui'; ctx.textAlign='left';
+  ctx.fillText(AMB[ambSel].note, pad.l, Ht-14);
+}
+
+/* =============== PANEL 3 : RC detector =============== */
+var rcC=document.getElementById('rcplot');
+function drawRC(){
+  var s=+document.getElementById('rc').value/100;
+  // RC in units of the window; carrier period = 1/FC, message period = 1
+  var rcTime=Math.pow(10, -2.6 + 2.4*s);     // 2.5e-3 .. 0.63
+  var ctx=rcC.getContext('2d'), Wd=rcC.width, Ht=rcC.height;
+  ctx.clearRect(0,0,Wd,Ht); ctx.fillStyle=C('surface-1'); ctx.fillRect(0,0,Wd,Ht);
+  var pad={l:80,r:50,t:34,b:44};
+  var y0=Ht-pad.b, amp=(Ht-pad.t-pad.b)*0.86;
+  var X=function(t){return pad.l+t*(Wd-pad.l-pad.r);};
+  var N=9000, dt=1/N, MU=0.85, FCR=60;
+
+  ctx.strokeStyle=C('rule'); ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(pad.l,y0); ctx.lineTo(Wd-pad.r,y0); ctx.stroke();
+
+  var env=function(t){return (1+MU*msg(t))/(1+MU);};
+  // rectified carrier
+  ctx.strokeStyle=C('car'); ctx.lineWidth=1.7; ctx.globalAlpha=.55; ctx.beginPath();
+  for(var k=0;k<=N;k++){var t=k/N,v=Math.abs(env(t)*carrier(t)),px=X(t),py=y0-v*amp; k?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+  ctx.stroke(); ctx.globalAlpha=1;
+  // ideal envelope
+  ctx.setLineDash([11,9]); ctx.strokeStyle=C('msg'); ctx.lineWidth=3.2; ctx.globalAlpha=.8; ctx.beginPath();
+  for(var k1=0;k1<=N;k1++){var t1=k1/N,px=X(t1),py=y0-env(t1)*amp; k1?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+  ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha=1;
+  // capacitor sim
+  var vc=0, decay=Math.exp(-dt/rcTime);
+  ctx.strokeStyle=C('out'); ctx.lineWidth=4; ctx.beginPath();
+  for(var k2=0;k2<=N;k2++){
+    var t2=k2/N, sig=Math.abs(env(t2)*Math.cos(2*Math.PI*FCR*t2));
+    vc=vc*decay; if(sig>vc) vc=sig;
+    var px=X(t2),py=y0-vc*amp; k2?ctx.lineTo(px,py):ctx.moveTo(px,py);
+  }
+  ctx.stroke();
+
+  // labels + verdict
+  var Tc=1/FCR, Tm=1.0;
+  document.getElementById('rcval').textContent = (rcTime/Tc).toFixed(2)+' × carrier periods';
+  var pill=document.getElementById('rcpill'), note=document.getElementById('rcnote');
+  if(rcTime < 2.5*Tc){
+    pill.className='pill bad'; pill.textContent='RC too small';
+    note.textContent='the capacitor dumps its charge between carrier peaks → heavy ripple at f_c';
+  } else if(rcTime > 0.18*Tm){
+    pill.className='pill bad'; pill.textContent='RC too large — diagonal clipping';
+    note.textContent='cannot discharge fast enough to follow the envelope down → straight-line cuts on falling edges';
+  } else {
+    pill.className='pill ok'; pill.textContent='good — 1/f_c ≪ RC ≪ 1/W';
+    note.textContent='fast enough to track the envelope, slow enough to smooth the carrier';
+  }
+  ctx.fillStyle=C('text-muted'); ctx.font='21px ui-sans-serif,system-ui'; ctx.textAlign='center';
+  ctx.fillText('time →',(pad.l+Wd-pad.r)/2, Ht-10);
+}
+document.getElementById('rc').oninput=drawRC;
+
+function drawAll(){ drawMain(); updateStatus(); drawAmb(); drawRC(); }
+buildAmbBtns();
+document.getElementById('muval').textContent=mu.toFixed(2);
+drawAll();
+})();
+</script>
+</body>
+</html>
