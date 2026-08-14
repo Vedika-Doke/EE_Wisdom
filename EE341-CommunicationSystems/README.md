@@ -23,6 +23,10 @@ Everything is written in the notation the course actually uses — **ordinary fr
 The HTML files are **single-file and self-contained** — no build step, no CDN, no internet
 needed. Download and open in any browser. Both have a light/dark toggle.
 
+**Or use them live in the browser (GitHub Pages):**
+- 🔗 [Ring modulator explainer](https://vedika-doke.github.io/EE_Wisdom/EE341-CommunicationSystems/ring_modulator_explained.html)
+- 🔗 [Over-modulation explainer](https://vedika-doke.github.io/EE_Wisdom/EE341-CommunicationSystems/overmodulation_explained.html)
+
 ---
 
 ## `EE341_Prereq_Revamp.pdf`
