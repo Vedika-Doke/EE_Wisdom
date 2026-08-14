@@ -1,6 +1,6 @@
 # EE341 — Communication Systems I
 
-**IIT Bombay | Autumn 2026 | Instructor: Prof. Kumar Appaiah**
+**IIT Bombay | Autumn 2026 | Instructor: Prof. Prasanna Suresh Chaporkar**
 
 Study material for EE341: a prerequisite refresher on signals, systems and the Fourier
 transform, plus interactive explainers for the topics that are hardest to get from a
