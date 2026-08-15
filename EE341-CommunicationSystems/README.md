@@ -18,6 +18,10 @@ Everything is written in the notation the course actually uses — **ordinary fr
 | [`EE341_Prereq_Revamp.pdf`](EE341_Prereq_Revamp.pdf) | 18-page prerequisite refresher (signals & systems, Fourier, sampling, bandpass/lowpass-equivalent, random processes primer) with worked problems and a timed problem set |
 | [`ring_modulator_explained.html`](ring_modulator_explained.html) | Interactive explainer — how the ring modulator produces DSB-SC |
 | [`overmodulation_explained.html`](overmodulation_explained.html) | Interactive explainer — over-modulation, the envelope ambiguity, and the RC envelope detector |
+| [`convolution_explained.html`](convolution_explained.html) | Interactive explainer — convolution as flip, slide, overlap |
+| [`convolution_limits_helper.html`](convolution_limits_helper.html) | Interactive helper — reading off the integration limits in a convolution |
+| [`rect_conv_figure.png`](rect_conv_figure.png) | Figure — convolution of two rects, region by region |
+| [`EE341_pushkar.pdf`](EE341_pushkar.pdf) | Scanned handwritten lecture notes (Pushkar) — modulation, analog communication |
 | [`src/`](src/) | LaTeX source for the PDF |
 
 The HTML files are **single-file and self-contained** — no build step, no CDN, no internet
@@ -26,6 +30,8 @@ needed. Download and open in any browser. Both have a light/dark toggle.
 **Or use them live in the browser (GitHub Pages):**
 - 🔗 [Ring modulator explainer](https://vedika-doke.github.io/EE_Wisdom/EE341-CommunicationSystems/ring_modulator_explained.html)
 - 🔗 [Over-modulation explainer](https://vedika-doke.github.io/EE_Wisdom/EE341-CommunicationSystems/overmodulation_explained.html)
+- 🔗 [Convolution explainer](https://vedika-doke.github.io/EE_Wisdom/EE341-CommunicationSystems/convolution_explained.html)
+- 🔗 [Convolution limits helper](https://vedika-doke.github.io/EE_Wisdom/EE341-CommunicationSystems/convolution_limits_helper.html)
 
 ---
 

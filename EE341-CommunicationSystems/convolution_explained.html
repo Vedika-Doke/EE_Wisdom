@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convolution: flip, slide, overlap — EE341</title>
+<style>
+:root{
+  color-scheme: light;
+  --surface-0:#f4f4f2; --surface-1:#fcfcfb; --surface-2:#eeeeeb;
+  --text-primary:#0b0b0b; --text-secondary:#52514e; --text-muted:#77766f;
+  --rule:#dcdcd6;
+  --xc:#2a78d6; --hc:#eb6834; --yc:#1baf7a; --acc:#4a3aa7;
+  --accentbg:#eaf1fb; --warnbg:#fdf3ee; --okbg:#e9f6f1;
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --surface-0:#121211; --surface-1:#1a1a19; --surface-2:#232322;
+  --text-primary:#ffffff; --text-secondary:#c3c2b7; --text-muted:#95948b;
+  --rule:#33332f;
+  --xc:#3987e5; --hc:#d95926; --yc:#199e70; --acc:#9085e9;
+  --accentbg:#16233a; --warnbg:#2c1d16; --okbg:#14291f;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--surface-0);color:var(--text-primary);
+ font:16px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 20px 80px}
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:8px}
+h1{font-size:29px;line-height:1.2;margin:0 0 6px;letter-spacing:-.02em}
+.sub{color:var(--text-secondary);font-size:15px;margin:0}
+h2{font-size:21px;margin:36px 0 10px;letter-spacing:-.01em}
+p{margin:10px 0}
+.card{background:var(--surface-1);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;margin:16px 0}
+.note{background:var(--accentbg);border:1px solid var(--rule);border-left:3px solid var(--xc);border-radius:10px;padding:12px 16px;margin:14px 0}
+.key{background:var(--okbg);border:1px solid var(--rule);border-left:3px solid var(--yc);border-radius:10px;padding:12px 16px;margin:14px 0}
+.trap{background:var(--warnbg);border:1px solid var(--rule);border-left:3px solid var(--hc);border-radius:10px;padding:12px 16px;margin:14px 0}
+.eq{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:15px;text-align:center;margin:14px 0;overflow-x:auto}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+button{font:inherit;cursor:pointer;border-radius:9px;border:1px solid var(--rule);background:var(--surface-2);color:var(--text-primary);padding:6px 12px;font-size:14px}
+button:hover{background:var(--rule)}
+button.on{background:var(--xc);border-color:var(--xc);color:#fff}
+.themebtn{font-size:13px;padding:6px 11px;white-space:nowrap}
+.ctl{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:10px 0}
+.ctl label{font-size:14px;color:var(--text-secondary)}
+input[type=range]{accent-color:var(--xc);width:280px}
+.picker{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:6px 0}
+.picker .tag{font-size:13px;color:var(--text-secondary);min-width:78px}
+.readout{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;color:var(--text-secondary);background:var(--surface-2);border-radius:8px;padding:8px 12px;margin:10px 0}
+.readout b{color:var(--text-primary)}
+canvas{display:block;width:100%;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:15px;font-size:13px;color:var(--text-secondary);margin:8px 0 2px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{color:var(--text-secondary);font-weight:600;font-size:13px}
+ul,ol{padding-left:22px} li{margin:5px 0}
+footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--rule);font-size:13px;color:var(--text-muted)}
+.big{font-size:20px;font-weight:600;letter-spacing:-.01em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <h1>Convolution: flip, slide, measure the overlap</h1>
+    <p class="sub">What <code>∫ x(τ) h(t−τ) dτ</code> is actually doing — EE341 §3.2</p>
+  </div>
+  <button class="themebtn" id="theme">Dark</button>
+</header>
+
+<div class="key">
+<p style="margin:0"><span class="big">Convolution is: flip one signal, slide it, and measure how much the two overlap at each position.</span></p>
+<p style="margin:6px 0 0;color:var(--text-secondary)">The integral computes one number per slide position. Collect those numbers as you slide, and you have y(t).</p>
+</div>
+
+<h2>1. Why there is a flip at all</h2>
+<p>The <code>−τ</code> in <code>h(t−τ)</code> does two things at once, and it helps to separate them:</p>
+<div class="card">
+  <canvas id="flip" width="1760" height="440"></canvas>
+  <p style="font-size:13.5px;color:var(--text-secondary);margin:10px 0 0">
+  <strong>Left:</strong> h(τ) as given. <strong>Middle:</strong> h(−τ) — mirrored about τ = 0. <strong>Right:</strong> h(t−τ) — the mirrored copy, slid right by t (the arrow marks t). Drag the slider in §2 and it is the right-hand shape that moves.<br>
+  A deliberately lopsided shape is used here: if h is symmetric — like <code>rect</code> — the mirroring is invisible, which is exactly why the flip is so easy to forget.</p>
+</div>
+<div class="note">
+<p style="margin:0"><strong>Where the flip comes from.</strong> Recall the meaning from §3.1: <code>h(t−τ)</code> is "how much is the poke from time τ still ringing at time t", and <code>t−τ</code> is <em>elapsed time</em>. As τ runs <em>forward</em> through the pokes, the elapsed time runs <em>backward</em>. That reversal is the flip. It is not a trick — it is what "how long ago" means.</p>
+</div>
+
+<h2>2. Slide it</h2>
+<p>Pick two signals, then drag t. The shaded region is the overlap; its area is the value of y at that instant, plotted as the dot in the lower panel.</p>
+
+<div class="card">
+  <div class="picker"><span class="tag">x(τ):</span><span id="xbtns"></span></div>
+  <div class="picker"><span class="tag">h(τ):</span><span id="hbtns"></span></div>
+  <div class="ctl">
+    <label for="tsl">t = <strong id="tval" style="color:var(--text-primary)">0.00</strong></label>
+    <input type="range" id="tsl" min="-250" max="250" value="0">
+    <button id="play">Play</button>
+    <label style="font-size:13px"><input type="checkbox" id="showprod"> show the product x(τ)·h(t−τ)</label>
+  </div>
+
+  <canvas id="conv" width="1760" height="1000"></canvas>
+
+  <div class="readout" id="readout"></div>
+
+  <div class="legend">
+    <span><i class="sw" style="background:var(--xc)"></i> x(τ) — fixed</span>
+    <span><i class="sw" style="background:var(--hc)"></i> h(t−τ) — flipped, sliding</span>
+    <span><i class="sw" style="background:var(--yc)"></i> overlap = y(t)</span>
+  </div>
+</div>
+
+<h2>3. Read your worked problem off the picture</h2>
+<p>Select <strong>rect</strong> for both, then step through these four positions:</p>
+
+<table>
+<thead><tr><th style="width:16%">t</th><th style="width:36%">What you see</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td><code>t = −1.5</code></td><td>no overlap, y = 0</td><td>the sliding window is entirely left of x</td></tr>
+<tr><td><code>t = −0.5</code></td><td>half overlap, y = 0.5</td><td>edges just half-covering; y = 1 + t</td></tr>
+<tr><td><code>t = 0</code></td><td>full overlap, y = 1</td><td>the two rects sit exactly on top of each other — <strong>the peak</strong></td></tr>
+<tr><td><code>t = +0.7</code></td><td>shrinking, y = 0.3</td><td>y = 1 − t as it slides out</td></tr>
+</tbody>
+</table>
+
+<p>Trace the dot across the whole slide and it draws a triangle. That <em>is</em> the result:</p>
+<div class="eq">rect(t) * rect(t) = tri(t)</div>
+
+<div class="key">
+<p style="margin:0"><strong>The two cases in your notes are the two sides of the triangle.</strong> Sliding in from the left (t &lt; 0), overlap grows: <code>1 + t</code>. Sliding out to the right (t &gt; 0), overlap shrinks: <code>1 − t</code>. The split is at t = 0 because that is where the window stops entering and starts leaving. Together: <code>1 − |t|</code>.</p>
+</div>
+
+<div class="trap">
+<p style="margin:0"><strong>The case-splitting rule, stated generally.</strong> You are intersecting two intervals, so the limits are</p>
+<div class="eq" style="margin:8px 0">lower = max(all lower limits) &nbsp;&nbsp;&nbsp; upper = min(all upper limits)</div>
+<p style="margin:0">A new case begins at each t where the winner of a max or a min <em>changes</em>. For two equal-width rects that happens once (at t = 0) → <strong>two cases</strong>. For unequal widths it happens twice → <strong>three cases</strong>, the middle one being a flat top where the narrow signal sits entirely inside the wide one. Try <strong>rect</strong> against <strong>wide rect</strong> above and watch the plateau appear.</p>
+</div>
+
+<h2>4. Things the picture makes obvious</h2>
+<ul>
+<li><strong>Widths add.</strong> Overlap starts the instant the leading edges touch and ends when the trailing edges part. Watch the support of y — it is always as wide as the two supports combined.</li>
+<li><strong>Commutativity.</strong> Swap x and h in the pickers. The output is identical. Sliding x past h or h past x measures the same overlap.</li>
+<li><strong>Convolution smooths.</strong> Two hard-edged rects give a continuous triangle. Convolving with anything of finite width is a weighted local average, which is why filters blur sharp edges — and why a bandlimited channel spreads a pulse into its neighbours (that is intersymbol interference, later in the course).</li>
+<li><strong>Convolving with δ does nothing.</strong> Pick <strong>impulse</strong> for h: the sliding "signal" is a single spike, so the overlap integral just samples x at that point and y is a copy of x. That is <code>x * δ = x</code>, seen rather than proved.</li>
+</ul>
+
+<footer>
+Built for EE341 (Autumn 2026), IIT Bombay — companion to §3.1–3.2 of the prereq revamp.
+</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var themeBtn=document.getElementById('theme');
+themeBtn.onclick=function(){
+  var d=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',d?'light':'dark');
+  themeBtn.textContent=d?'Dark':'Light'; drawAll();
+};
+function C(n){return getComputedStyle(document.body).getPropertyValue('--'+n).trim();}
+
+/* ---------- signal library ---------- */
+var SIG=[
+  {id:'rect',  name:'rect',       f:function(u){return Math.abs(u)<0.5?1:0;}},
+  {id:'wrect', name:'wide rect',  f:function(u){return Math.abs(u)<1.0?1:0;}},
+  {id:'crect', name:'causal rect',f:function(u){return (u>=0&&u<1)?1:0;}},
+  {id:'tri',   name:'triangle',   f:function(u){return Math.max(0,1-Math.abs(u));}},
+  {id:'exp',   name:'decay',      f:function(u){return u>=0?Math.exp(-2.5*u):0;}},
+  {id:'imp',   name:'impulse',    f:function(u){return Math.abs(u)<0.02?25:0;}},
+  {id:'two',   name:'two pulses', f:function(u){return (Math.abs(u+0.6)<0.22||Math.abs(u-0.6)<0.22)?1:0;}}
+];
+var xi=0, hi=0, tNow=0, playing=false, dir=1, raf=null;
+function X(u){return SIG[xi].f(u);}
+function H(u){return SIG[hi].f(u);}
+
+/* ---------- numeric convolution ---------- */
+var TMIN=-3.0, TMAX=3.0, N=1500, DT=(TMAX-TMIN)/N;
+function yAt(t){
+  var s=0;
+  for(var k=0;k<=N;k++){ var tau=TMIN+k*DT; s += X(tau)*H(t-tau)*DT; }
+  return s;
+}
+var yCache=null;
+function rebuild(){
+  yCache=[];
+  for(var k=0;k<=300;k++){ var t=TMIN+(TMAX-TMIN)*k/300; yCache.push(yAt(t)); }
+}
+function yLookup(t){
+  var p=(t-TMIN)/(TMAX-TMIN)*300;
+  var i=Math.max(0,Math.min(299,Math.floor(p))), fr=p-i;
+  return yCache[i]*(1-fr)+yCache[i+1]*fr;
+}
+
+/* ---------- pickers ---------- */
+function buildPickers(){
+  ['x','h'].forEach(function(which){
+    var box=document.getElementById(which+'btns'); box.innerHTML='';
+    SIG.forEach(function(s,i){
+      var b=document.createElement('button');
+      b.textContent=s.name;
+      b.className=((which==='x'?xi:hi)===i)?'on':'';
+      b.style.marginRight='6px';
+      b.onclick=function(){ if(which==='x') xi=i; else hi=i; rebuild(); buildPickers(); drawAll(); };
+      box.appendChild(b);
+    });
+  });
+}
+
+/* ---------- flip explainer ---------- */
+function drawFlip(){
+  var cv=document.getElementById('flip'), ctx=cv.getContext('2d');
+  var Wd=cv.width, Ht=cv.height;
+  ctx.clearRect(0,0,Wd,Ht); ctx.fillStyle=C('surface-1'); ctx.fillRect(0,0,Wd,Ht);
+  // deliberately asymmetric demo shape — a symmetric h would make the mirror invisible
+  var D=function(u){ return (u>=-0.1&&u<1.1) ? Math.exp(-1.8*u)*(u>=0?1:0.0)+((u>=-0.1&&u<0)?0:0) : 0; };
+  D=function(u){ return u>=0 ? (u<1.4? Math.exp(-1.7*u):0) : 0; };
+  var panels=[
+    {lab:'h(τ)',      g:function(u){return D(u);}},
+    {lab:'h(−τ)',     g:function(u){return D(-u);}},
+    {lab:'h(t−τ)',    g:function(u){return D(tNow-u);}}
+  ];
+  var pw=Wd/3, pad={t:56,b:52,l:44,r:44};
+  panels.forEach(function(p,i){
+    var x0=i*pw+pad.l, x1=(i+1)*pw-pad.r, base=Ht-pad.b;
+    var amp=(Ht-pad.t-pad.b)*0.82;
+    var TX=function(u){return x0+(u-TMIN)/(TMAX-TMIN)*(x1-x0);};
+    ctx.strokeStyle=C('rule'); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(x0,base); ctx.lineTo(x1,base); ctx.stroke();
+    // zero tick
+    ctx.beginPath(); ctx.moveTo(TX(0),base-6); ctx.lineTo(TX(0),base+8); ctx.stroke();
+    ctx.fillStyle=C('text-muted'); ctx.font='19px ui-sans-serif,system-ui'; ctx.textAlign='center';
+    ctx.fillText('0',TX(0),base+30);
+    if(i===2){ ctx.fillStyle=C('acc'); ctx.beginPath(); ctx.moveTo(TX(tNow),base+4);
+      ctx.lineTo(TX(tNow)-8,base+20); ctx.lineTo(TX(tNow)+8,base+20); ctx.closePath(); ctx.fill();
+      ctx.fillText('t',TX(tNow),base+40); }
+    ctx.strokeStyle=C('hc'); ctx.lineWidth=4; ctx.lineJoin='round'; ctx.beginPath();
+    for(var k=0;k<=700;k++){
+      var u=TMIN+(TMAX-TMIN)*k/700, v=Math.min(p.g(u),1.15);
+      var px=TX(u), py=base-v*amp; k?ctx.lineTo(px,py):ctx.moveTo(px,py);
+    }
+    ctx.stroke();
+    ctx.fillStyle=C('text-primary'); ctx.font='600 25px ui-sans-serif,system-ui'; ctx.textAlign='center';
+    ctx.fillText(p.lab,(x0+x1)/2,34);
+    if(i<2){ ctx.fillStyle=C('text-muted'); ctx.font='30px ui-sans-serif,system-ui';
+      ctx.fillText('→',(i+1)*pw,Ht/2); }
+  });
+}
+
+/* ---------- main convolution canvas ---------- */
+function drawConv(){
+  var cv=document.getElementById('conv'), ctx=cv.getContext('2d');
+  var Wd=cv.width, Ht=cv.height;
+  ctx.clearRect(0,0,Wd,Ht); ctx.fillStyle=C('surface-1'); ctx.fillRect(0,0,Wd,Ht);
+  var pad={l:96,r:56,t:44,b:52};
+  var topH=(Ht-pad.t-pad.b)*0.55, gap=52;
+  var botH=(Ht-pad.t-pad.b)-topH-gap;
+  var TX=function(u){return pad.l+(u-TMIN)/(TMAX-TMIN)*(Wd-pad.l-pad.r);};
+  var showProd=document.getElementById('showprod').checked;
+
+  /* ===== top: tau axis ===== */
+  var baseA=pad.t+topH, ampA=topH*0.80;
+  ctx.strokeStyle=C('rule'); ctx.lineWidth=2.4;
+  ctx.beginPath(); ctx.moveTo(pad.l,baseA); ctx.lineTo(Wd-pad.r,baseA); ctx.stroke();
+  // ticks
+  ctx.fillStyle=C('text-muted'); ctx.font='19px ui-sans-serif,system-ui'; ctx.textAlign='center';
+  for(var g=-3;g<=3;g++){
+    ctx.strokeStyle=C('rule'); ctx.beginPath(); ctx.moveTo(TX(g),baseA); ctx.lineTo(TX(g),baseA+7); ctx.stroke();
+    ctx.fillText(g,TX(g),baseA+30);
+  }
+  ctx.textAlign='left'; ctx.fillText('τ →',Wd-pad.r-46,baseA+30);
+
+  // overlap shading (product area)
+  ctx.fillStyle=C('yc'); ctx.globalAlpha=0.30;
+  ctx.beginPath(); ctx.moveTo(TX(TMIN),baseA);
+  for(var k=0;k<=900;k++){
+    var u=TMIN+(TMAX-TMIN)*k/900;
+    var v=Math.min(X(u),1.15)*Math.min(H(tNow-u),1.15);
+    ctx.lineTo(TX(u),baseA-Math.min(v,1.3)*ampA);
+  }
+  ctx.lineTo(TX(TMAX),baseA); ctx.closePath(); ctx.fill(); ctx.globalAlpha=1;
+
+  // product outline
+  if(showProd){
+    ctx.strokeStyle=C('yc'); ctx.lineWidth=3.6; ctx.beginPath();
+    for(var k1=0;k1<=900;k1++){
+      var u1=TMIN+(TMAX-TMIN)*k1/900;
+      var v1=Math.min(Math.min(X(u1),1.15)*Math.min(H(tNow-u1),1.15),1.3);
+      var px=TX(u1),py=baseA-v1*ampA; k1?ctx.lineTo(px,py):ctx.moveTo(px,py);
+    }
+    ctx.stroke();
+  }
+
+  // x(tau)
+  ctx.strokeStyle=C('xc'); ctx.lineWidth=4.6; ctx.lineJoin='round'; ctx.beginPath();
+  for(var k2=0;k2<=900;k2++){
+    var u2=TMIN+(TMAX-TMIN)*k2/900, v2=Math.min(X(u2),1.15);
+    var px2=TX(u2),py2=baseA-v2*ampA; k2?ctx.lineTo(px2,py2):ctx.moveTo(px2,py2);
+  }
+  ctx.stroke();
+  // h(t - tau)
+  ctx.strokeStyle=C('hc'); ctx.lineWidth=4.6; ctx.beginPath();
+  for(var k3=0;k3<=900;k3++){
+    var u3=TMIN+(TMAX-TMIN)*k3/900, v3=Math.min(H(tNow-u3),1.15);
+    var px3=TX(u3),py3=baseA-v3*ampA; k3?ctx.lineTo(px3,py3):ctx.moveTo(px3,py3);
+  }
+  ctx.stroke();
+
+  // t marker
+  ctx.strokeStyle=C('acc'); ctx.setLineDash([8,7]); ctx.lineWidth=2.6;
+  ctx.beginPath(); ctx.moveTo(TX(tNow),pad.t-8); ctx.lineTo(TX(tNow),baseA); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle=C('xc'); ctx.font='600 24px ui-sans-serif,system-ui'; ctx.textAlign='left';
+  ctx.fillText('x(τ)',pad.l+6,pad.t+4);
+  ctx.fillStyle=C('hc'); ctx.fillText('h(t−τ)',pad.l+90,pad.t+4);
+  ctx.fillStyle=C('yc'); ctx.fillText('overlap',pad.l+212,pad.t+4);
+
+  /* ===== bottom: y(t) ===== */
+  var baseB=pad.t+topH+gap+botH, ampB=botH*0.80;
+  var ymax=0; yCache.forEach(function(v){if(v>ymax)ymax=v;});
+  if(ymax<1e-9) ymax=1;
+  ctx.strokeStyle=C('rule'); ctx.lineWidth=2.4;
+  ctx.beginPath(); ctx.moveTo(pad.l,baseB); ctx.lineTo(Wd-pad.r,baseB); ctx.stroke();
+  ctx.fillStyle=C('text-muted'); ctx.font='19px ui-sans-serif,system-ui'; ctx.textAlign='center';
+  for(var g2=-3;g2<=3;g2++){
+    ctx.strokeStyle=C('rule'); ctx.beginPath(); ctx.moveTo(TX(g2),baseB); ctx.lineTo(TX(g2),baseB+7); ctx.stroke();
+    ctx.fillText(g2,TX(g2),baseB+30);
+  }
+  ctx.textAlign='left'; ctx.fillText('t →',Wd-pad.r-46,baseB+30);
+
+  // full y curve, faint; solid up to current t
+  ctx.strokeStyle=C('yc'); ctx.lineWidth=3.6; ctx.globalAlpha=.28; ctx.beginPath();
+  for(var k4=0;k4<=300;k4++){
+    var t4=TMIN+(TMAX-TMIN)*k4/300;
+    var px4=TX(t4),py4=baseB-(yCache[k4]/ymax)*ampB; k4?ctx.lineTo(px4,py4):ctx.moveTo(px4,py4);
+  }
+  ctx.stroke(); ctx.globalAlpha=1;
+  ctx.lineWidth=5; ctx.beginPath(); var started=false;
+  for(var k5=0;k5<=300;k5++){
+    var t5=TMIN+(TMAX-TMIN)*k5/300; if(t5>tNow) break;
+    var px5=TX(t5),py5=baseB-(yCache[k5]/ymax)*ampB;
+    started?ctx.lineTo(px5,py5):(ctx.moveTo(px5,py5),started=true);
+  }
+  if(started) ctx.stroke();
+
+  var yv=yLookup(tNow);
+  ctx.beginPath(); ctx.arc(TX(tNow),baseB-(yv/ymax)*ampB,12,0,7);
+  ctx.fillStyle=C('yc'); ctx.fill(); ctx.lineWidth=5; ctx.strokeStyle=C('surface-1'); ctx.stroke();
+  ctx.strokeStyle=C('acc'); ctx.setLineDash([8,7]); ctx.lineWidth=2.6;
+  ctx.beginPath(); ctx.moveTo(TX(tNow),baseB-(yv/ymax)*ampB); ctx.lineTo(TX(tNow),baseB); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle=C('yc'); ctx.font='600 24px ui-sans-serif,system-ui'; ctx.textAlign='left';
+  ctx.fillText('y(t) = (x * h)(t)',pad.l+6,pad.t+topH+gap+4);
+}
+
+function updateReadout(){
+  var yv=yLookup(tNow);
+  var el=document.getElementById('readout');
+  var extra='';
+  if(SIG[xi].id==='rect' && SIG[hi].id==='rect'){
+    var lo=Math.max(-0.5,tNow-0.5), hi2=Math.min(0.5,tNow+0.5);
+    if(hi2>lo){
+      extra = '   overlap τ ∈ ( <b>'+lo.toFixed(2)+'</b> , <b>'+hi2.toFixed(2)+'</b> )   length = <b>'+(hi2-lo).toFixed(3)+'</b>'
+            + '   →  '+(tNow>=0?'1 − t':'1 + t')+' = <b>'+(1-Math.abs(tNow)).toFixed(3)+'</b>';
+    } else extra='   no overlap  →  y = 0';
+  }
+  el.innerHTML='t = <b>'+tNow.toFixed(2)+'</b>    y(t) = <b>'+yv.toFixed(3)+'</b>'+extra;
+}
+
+/* ---------- controls ---------- */
+var sl=document.getElementById('tsl');
+sl.oninput=function(){ tNow=+this.value/100*1.2; document.getElementById('tval').textContent=tNow.toFixed(2);
+  playing=false; document.getElementById('play').textContent='Play'; document.getElementById('play').className='';
+  drawAll(); };
+document.getElementById('play').onclick=function(){
+  playing=!playing; this.textContent=playing?'Pause':'Play'; this.className=playing?'on':'';
+  if(playing) loop();
+};
+document.getElementById('showprod').onchange=drawConv;
+function loop(){
+  if(!playing) return;
+  tNow+=dir*0.012;
+  if(tNow>3){tNow=3;dir=-1;} if(tNow<-3){tNow=-3;dir=1;}
+  sl.value=Math.round(tNow/1.2*100);
+  document.getElementById('tval').textContent=tNow.toFixed(2);
+  drawAll();
+  raf=requestAnimationFrame(loop);
+}
+function drawAll(){ drawFlip(); drawConv(); updateReadout(); }
+
+buildPickers(); rebuild(); drawAll();
+})();
+</script>
+</body>
+</html>
