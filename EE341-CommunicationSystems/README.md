@@ -15,27 +15,31 @@ Everything is written in the notation the course actually uses — **ordinary fr
 
 | File | What it is |
 |---|---|
-| [`EE341_Prereq_Revamp.pdf`](EE341_Prereq_Revamp.pdf) | 18-page prerequisite refresher (signals & systems, Fourier, sampling, bandpass/lowpass-equivalent, random processes primer) with worked problems and a timed problem set |
-| [`ring_modulator_explained.html`](ring_modulator_explained.html) | Interactive explainer — how the ring modulator produces DSB-SC |
-| [`overmodulation_explained.html`](overmodulation_explained.html) | Interactive explainer — over-modulation, the envelope ambiguity, and the RC envelope detector |
-| [`convolution_explained.html`](convolution_explained.html) | Interactive explainer — convolution as flip, slide, overlap |
-| [`convolution_limits_helper.html`](convolution_limits_helper.html) | Interactive helper — reading off the integration limits in a convolution |
+| [`EE341_prereq.pdf`](EE341_prereq.pdf) | 18-page prerequisite refresher (signals & systems, Fourier, sampling, bandpass/lowpass-equivalent, random processes primer) with worked problems and a timed problem set |
+| [`EE341_quiz1.pdf`](EE341_quiz1.pdf) | Quiz 1 revision sheet + 14-problem set with full solutions — AM schemes, spectra, modulator/demodulator circuits, superheterodyne receiver, bandpass/complex-envelope/Hilbert |
+| [`fourier.pdf`](fourier.pdf) | Fourier problem set — 20 questions with full solutions (series, transforms, properties, convolution, Parseval, sampling) |
+| [`ring_modulator.html`](ring_modulator.html) | Interactive explainer — how the ring modulator produces DSB-SC |
+| [`overmodulation.html`](overmodulation.html) | Interactive explainer — over-modulation, the envelope ambiguity, and the RC envelope detector |
+| [`convolution.html`](convolution.html) | Interactive explainer — convolution as flip, slide, overlap |
+| [`conv_limits.html`](conv_limits.html) | Interactive helper — reading off the integration limits in a convolution |
+| [`offset.html`](offset.html) | Interactive explainer — frequency offset and the rotating complex envelope |
 | [`rect_conv_figure.png`](rect_conv_figure.png) | Figure — convolution of two rects, region by region |
 | [`EE341_pushkar.pdf`](EE341_pushkar.pdf) | Scanned handwritten lecture notes (Pushkar) — modulation, analog communication |
 | [`src/`](src/) | LaTeX source for the PDF |
 
 The HTML files are **single-file and self-contained** — no build step, no CDN, no internet
-needed. Download and open in any browser. Both have a light/dark toggle.
+needed. Download and open in any browser. All have a light/dark toggle.
 
 **Or use them live in the browser (GitHub Pages):**
-- 🔗 [Ring modulator explainer](https://vedika-doke.github.io/EE_Wisdom/EE341-CommunicationSystems/ring_modulator_explained.html)
-- 🔗 [Over-modulation explainer](https://vedika-doke.github.io/EE_Wisdom/EE341-CommunicationSystems/overmodulation_explained.html)
-- 🔗 [Convolution explainer](https://vedika-doke.github.io/EE_Wisdom/EE341-CommunicationSystems/convolution_explained.html)
-- 🔗 [Convolution limits helper](https://vedika-doke.github.io/EE_Wisdom/EE341-CommunicationSystems/convolution_limits_helper.html)
+- 🔗 [Ring modulator explainer](https://vedika-doke.github.io/EE_Wisdom/EE341-CommunicationSystems/ring_modulator.html)
+- 🔗 [Over-modulation explainer](https://vedika-doke.github.io/EE_Wisdom/EE341-CommunicationSystems/overmodulation.html)
+- 🔗 [Convolution explainer](https://vedika-doke.github.io/EE_Wisdom/EE341-CommunicationSystems/convolution.html)
+- 🔗 [Convolution limits helper](https://vedika-doke.github.io/EE_Wisdom/EE341-CommunicationSystems/conv_limits.html)
+- 🔗 [Frequency offset / rotating complex envelope](https://vedika-doke.github.io/EE_Wisdom/EE341-CommunicationSystems/offset.html)
 
 ---
 
-## `EE341_Prereq_Revamp.pdf`
+## `EE341_prereq.pdf`
 
 Ordered by what EE341 actually uses, not by what a full signals course would cover.
 
@@ -59,7 +63,7 @@ five mistakes that cost the most marks.
 
 ---
 
-## `ring_modulator_explained.html`
+## `ring_modulator.html`
 
 The core idea: **the diodes are switches, and the carrier throws them.** The circuit is a
 polarity flipper, nothing more.
@@ -75,7 +79,7 @@ Covers the `4/π` gain factor that gets dropped, and the `f_c > W` filter condit
 
 ---
 
-## `overmodulation_explained.html`
+## `overmodulation.html`
 
 The core idea: **an envelope detector measures a magnitude, and magnitudes have no sign.**
 
@@ -85,6 +89,26 @@ The core idea: **an envelope detector measures a magnitude, and magnitudes have 
 - DSB-SC framed as permanent over-modulation (which is why it needs coherent detection)
 - The diode + RC envelope detector, with a time-constant slider showing both failure modes:
   ripple when `RC` is too small, diagonal clipping when it's too large
+
+---
+
+## `EE341_quiz1.pdf`
+
+Condensed revision sheet + 14-problem set with full solutions, weighted towards spectra of
+modulated signals, modulator/demodulator circuits, and bandpass/complex-envelope/Hilbert —
+covers everything through the superheterodyne receiver.
+
+## `fourier.pdf`
+
+20 questions with full solutions on Fourier series, transforms, properties, convolution,
+Parseval and sampling, and their use on modulated signals — includes a one-page reference
+sheet of properties and standard pairs.
+
+## `offset.html`
+
+Interactive explainer for what a frequency offset between transmitter and receiver carriers
+does to the complex envelope — visualizes the residual phasor rotation and its effect on
+coherent detection.
 
 ---
 
