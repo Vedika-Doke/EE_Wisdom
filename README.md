@@ -13,6 +13,7 @@ Each project lives in its own folder on `main`. Interactive study guides are ser
 | Folder / Branch | Contents |
 |---|---|
 | [`WISH/`](WISH/) | TI WiSH Hardware Summer School (2026) — digital Verilog labs, analog prework/quizzes, and a smart bus-tracking group project (server-side ETA engine) |
+| [`EE301-EMWaves/`](EE301-EMWaves/) | EE301 (Electromagnetic Waves) — full transmission-lines explainer, ground-floor-up |
 | [`EE309-Microprocessors-Project/`](EE309-Microprocessors-Project/) | AT89C5131A + MCP4921 DAC + MCP3008 ADC — sine wave generation, NCO, Goertzel tone detection |
 | [`EE337-MicroLab-Project/`](EE337-MicroLab-Project/) | 8051 MicroLab project — I2C LCD interfacing and R2C driver |
 | [`Electrical-trainee-racing-team/`](Electrical-trainee-racing-team/) | ECU firmware, AMS/BMS research, HV-LV isolation, and comms protocol work for a student electric racing team |
