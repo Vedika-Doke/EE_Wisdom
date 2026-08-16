@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frequency offset & the rotating complex envelope — EE341</title>
+<style>
+:root{
+  color-scheme: light;
+  --surface-0:#f4f4f2; --surface-1:#fcfcfb; --surface-2:#eeeeeb;
+  --text-primary:#0b0b0b; --text-secondary:#52514e; --text-muted:#77766f;
+  --rule:#dcdcd6;
+  --iq:#2a78d6; --car:#eb6834; --env:#1baf7a; --acc:#4a3aa7; --bad:#e34948;
+  --accentbg:#eaf1fb; --warnbg:#fdf3ee; --okbg:#e9f6f1;
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --surface-0:#121211; --surface-1:#1a1a19; --surface-2:#232322;
+  --text-primary:#ffffff; --text-secondary:#c3c2b7; --text-muted:#95948b;
+  --rule:#33332f;
+  --iq:#3987e5; --car:#d95926; --env:#199e70; --acc:#9085e9; --bad:#e66767;
+  --accentbg:#16233a; --warnbg:#2c1d16; --okbg:#14291f;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--surface-0);color:var(--text-primary);
+ font:16px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1020px;margin:0 auto;padding:26px 20px 80px}
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:6px}
+h1{font-size:28px;line-height:1.2;margin:0 0 6px;letter-spacing:-.02em}
+.sub{color:var(--text-secondary);font-size:15px;margin:0}
+h2{font-size:20px;margin:34px 0 10px;letter-spacing:-.01em}
+p{margin:10px 0}
+.card{background:var(--surface-1);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;margin:16px 0}
+.key{background:var(--okbg);border:1px solid var(--rule);border-left:3px solid var(--env);border-radius:10px;padding:12px 16px;margin:14px 0}
+.note{background:var(--accentbg);border:1px solid var(--rule);border-left:3px solid var(--iq);border-radius:10px;padding:12px 16px;margin:14px 0}
+.trap{background:var(--warnbg);border:1px solid var(--rule);border-left:3px solid var(--car);border-radius:10px;padding:12px 16px;margin:14px 0}
+code,.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+code{font-size:.92em;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.eq{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;text-align:center;margin:12px 0;overflow-x:auto}
+button{font:inherit;cursor:pointer;border-radius:9px;border:1px solid var(--rule);background:var(--surface-2);color:var(--text-primary);padding:6px 12px;font-size:14px}
+button:hover{background:var(--rule)}
+button.on{background:var(--iq);border-color:var(--iq);color:#fff}
+.themebtn{font-size:13px;padding:6px 11px;white-space:nowrap}
+input[type=range]{accent-color:var(--iq);width:220px}
+.row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:9px 0}
+.row .lab{font-size:14px;color:var(--text-secondary)}
+canvas{display:block;width:100%;height:auto}
+.readout{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;color:var(--text-secondary);
+  background:var(--surface-2);border-radius:8px;padding:9px 13px;margin:10px 0}
+.readout b{color:var(--text-primary)}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{color:var(--text-secondary);font-weight:600;font-size:13px}
+ul,ol{padding-left:22px} li{margin:5px 0}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);font-size:13px;color:var(--text-muted)}
+.big{font-size:20px;font-weight:600;letter-spacing:-.01em}
+.pillrow{display:flex;flex-wrap:wrap;gap:7px;margin:6px 0 12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <h1>Frequency offset = a slowly rotating phasor</h1>
+    <p class="sub">Worked problem 9.1 and your notes page 11, seen in the complex plane — EE341</p>
+  </div>
+  <button class="themebtn" id="theme">Dark</button>
+</header>
+
+<div class="key">
+<p style="margin:0"><span class="big">The complex envelope is the signal seen from a reference frame spinning at f<sub>c</sub>.</span></p>
+<p style="margin:6px 0 0;color:var(--text-secondary)">Multiplying by e<sup>−j2πf<sub>c</sub>t</sup> literally means "spin the coordinate system at the carrier rate". Get the rate exactly right and the phasor freezes. Get it slightly wrong by Δf, and it creeps around at Δf — that residual creep <em>is</em> the frequency offset.</p>
+</div>
+
+<h2>1. Two frames, same signal</h2>
+<p>Left: the analytic signal in the <strong>lab frame</strong> — spinning at the full carrier rate, far too fast to read. Right: the same thing in the <strong>rotating frame</strong> — that is the complex envelope. Watch how the fast spin is subtracted away, leaving only what matters.</p>
+
+<div class="card">
+  <div class="pillrow" id="modes"></div>
+  <div class="row">
+    <span class="lab">frequency offset Δf = <strong id="dfval" class="mono" style="color:var(--text-primary)"></strong></span>
+    <input type="range" id="df" min="-200" max="200" value="60">
+    <span class="lab">phase offset φ₀ = <strong id="phval" class="mono" style="color:var(--text-primary)"></strong></span>
+    <input type="range" id="ph" min="0" max="360" value="0" style="width:150px">
+    <button id="play" class="on">Pause</button>
+  </div>
+
+  <canvas id="argand" width="1760" height="760"></canvas>
+  <div class="readout" id="ro1"></div>
+</div>
+
+<div class="note" id="modenote"></div>
+
+<h2>2. What that looks like on a time axis</h2>
+<p>The same instant is marked in every panel. x<sub>I</sub> and x<sub>Q</sub> are the phasor's shadow on the two axes; the envelope is its length.</p>
+
+<div class="card">
+  <canvas id="traces" width="1760" height="1080"></canvas>
+</div>
+
+<h2>3. Why the envelope beats</h2>
+<p>In the page-11 case the complex envelope is a <strong>sum of two vectors</strong>:</p>
+<div class="eq">x<sub>ℓ</sub>(t) = A·x(t) &nbsp;+&nbsp; A·e<sup>j2πΔf t</sup></div>
+<ul>
+<li><strong>A·x(t)</strong> — the message. Real, so it lies flat along the horizontal axis, sliding back and forth (and going negative).</li>
+<li><strong>A·e<sup>j2πΔf t</sup></strong> — the injected carrier with its offset. Constant length, rotating at Δf.</li>
+</ul>
+<p>The envelope the detector reports is the <strong>length of the sum</strong>. Because the second vector keeps changing direction, sometimes it lines up with the message and sometimes it opposes it:</p>
+<div class="eq">A(t) = A·√( x²(t) + 2·x(t)·cos(2πΔf t) + 1 )</div>
+
+<table>
+<thead><tr><th style="width:26%">Δf</th><th>what happens</th></tr></thead>
+<tbody>
+<tr><td><code>Δf = 0</code> (locked)</td><td>the rotating vector stands still at angle 0, so it simply adds 1 to the message: A(t) = A·|x(t) + 1|. Clean DSB-AM. This is why injecting a carrier lets a cheap envelope detector work.</td></tr>
+<tr><td><code>Δf ≠ 0</code></td><td>the vector wanders around, alternately reinforcing and cancelling the message. The envelope <strong>fades in and out at rate Δf</strong> — the beating you hear on a mistuned receiver.</td></tr>
+</tbody>
+</table>
+
+<div class="trap">
+<p style="margin:0"><strong>Watch for the phase flip.</strong> Set Δf small but nonzero and let it run. Twice per beat cycle the rotating vector passes through the negative real direction; if the message is small there, the sum sweeps close to the origin and the envelope collapses. That near-origin pass is where the demodulated output goes to mush — it is the same "envelope through zero" failure as over-modulation, arriving by a different route.</p>
+</div>
+
+<h2>4. What to take away</h2>
+<ul>
+<li><strong>Phase offset</strong> → phasor parked at a fixed angle. <strong>Frequency offset</strong> → phasor rotating at that rate. Set φ₀ with Δf = 0 and compare.</li>
+<li><strong>Complex envelopes add</strong> when bandpass signals add (Re{} is linear), which is the entire trick on page 11 — no trigonometric identities required.</li>
+<li><strong>A PLL's job</strong>, in one sentence: stop the rotation and drive the angle to zero.</li>
+<li>The envelope never cares about absolute phase — only length. That is exactly why an envelope detector is immune to φ₀ but ruined by Δf.</li>
+</ul>
+
+<footer>
+Built for EE341 (Autumn 2026), IIT Bombay — companion to Worked Problem 9.1 and lecture notes page 11.
+</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var themeBtn=document.getElementById('theme');
+themeBtn.onclick=function(){
+  var d=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',d?'light':'dark');
+  themeBtn.textContent=d?'Dark':'Light'; render();
+};
+function C(n){return getComputedStyle(document.body).getPropertyValue('--'+n).trim();}
+
+var FC=16;                 // carrier cycles per window (display only)
+var FM=1;                  // message cycles per window
+var MODES=[
+  {id:'tone', name:'Worked problem 9.1 — pure tone, offset carrier'},
+  {id:'p11',  name:'Notes page 11 — DSB-SC + offset carrier'}
+];
+var mode=0, tau=0, playing=true, raf=null;
+function df(){ return +document.getElementById('df').value/100; }   // cycles per window
+function ph0(){ return +document.getElementById('ph').value*Math.PI/180; }
+function msg(t){ return 0.8*Math.cos(2*Math.PI*FM*t); }
+
+// complex envelope at time t  -> {re, im}
+function xl(t){
+  var th=2*Math.PI*df()*t + ph0();
+  if(MODES[mode].id==='tone') return {re:Math.cos(th), im:Math.sin(th)};
+  return {re: msg(t)+Math.cos(th), im: Math.sin(th)};
+}
+function xlParts(t){ // for page-11 mode: the two component vectors
+  var th=2*Math.PI*df()*t + ph0();
+  return {a:{re:msg(t),im:0}, b:{re:Math.cos(th),im:Math.sin(th)}};
+}
+function absv(z){ return Math.sqrt(z.re*z.re+z.im*z.im); }
+function xbp(t){ var z=xl(t), c=2*Math.PI*FC*t; return z.re*Math.cos(c)-z.im*Math.sin(c); }
+
+/* ---------------- Argand ---------------- */
+function drawArgand(){
+  var cv=document.getElementById('argand'), ctx=cv.getContext('2d');
+  var W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H); ctx.fillStyle=C('surface-1'); ctx.fillRect(0,0,W,H);
+  var pans=[
+    {x0:0,   title:'lab frame',      sub:'analytic signal  x₊(t) ∝ x_ℓ(t)·e^(j2πf_c t)', rot:true},
+    {x0:W/2, title:'rotating frame', sub:'complex envelope  x_ℓ(t) = x_I + j·x_Q',        rot:false}
+  ];
+  var R=2.3;
+  pans.forEach(function(p){
+    var cx=p.x0+W/4, cy=H/2+26, S=(Math.min(W/2,H)-150)/2/R;
+    // grid
+    ctx.strokeStyle=C('rule'); ctx.lineWidth=1.6;
+    for(var g=-2;g<=2;g++){
+      if(g===0) continue;
+      ctx.beginPath(); ctx.arc(cx,cy,Math.abs(g)*S,0,7); ctx.stroke();
+    }
+    ctx.lineWidth=2.2;
+    ctx.beginPath(); ctx.moveTo(cx-R*S,cy); ctx.lineTo(cx+R*S,cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx,cy-R*S); ctx.lineTo(cx,cy+R*S); ctx.stroke();
+    ctx.fillStyle=C('text-muted'); ctx.font='20px ui-sans-serif,system-ui';
+    ctx.textAlign='left'; ctx.fillText('Re  (I)',cx+R*S-84,cy-14);
+    ctx.textAlign='center'; ctx.fillText('Im  (Q)',cx+40,cy-R*S+22);
+
+    // trail
+    var N=420, span=p.rot?0.10:1.0;
+    ctx.lineWidth=3; ctx.strokeStyle=C('acc'); ctx.globalAlpha=.30;
+    ctx.beginPath();
+    for(var k=0;k<=N;k++){
+      var t=tau-span+span*k/N, z=xl(t);
+      var re=z.re, im=z.im;
+      if(p.rot){ var c=2*Math.PI*FC*t, cr=Math.cos(c), si=Math.sin(c);
+        var nr=re*cr-im*si, ni=re*si+im*cr; re=nr; im=ni; }
+      var px=cx+re*S, py=cy-im*S; k?ctx.lineTo(px,py):ctx.moveTo(px,py);
+    }
+    ctx.stroke(); ctx.globalAlpha=1;
+
+    // vectors
+    var z=xl(tau), re=z.re, im=z.im;
+    if(p.rot){ var c2=2*Math.PI*FC*tau, cr2=Math.cos(c2), si2=Math.sin(c2);
+      var nr2=re*cr2-im*si2, ni2=re*si2+im*cr2; re=nr2; im=ni2; }
+    if(!p.rot && MODES[mode].id==='p11'){
+      var pp=xlParts(tau);
+      // message vector along Re axis
+      ctx.strokeStyle=C('iq'); ctx.lineWidth=5; ctx.globalAlpha=.75;
+      arrow(ctx,cx,cy,cx+pp.a.re*S,cy,10);
+      // rotating carrier, tip-to-tail
+      ctx.strokeStyle=C('car');
+      arrow(ctx,cx+pp.a.re*S,cy,cx+(pp.a.re+pp.b.re)*S,cy-pp.b.im*S,10);
+      ctx.globalAlpha=1;
+    }
+    ctx.strokeStyle=C('env'); ctx.lineWidth=6;
+    arrow(ctx,cx,cy,cx+re*S,cy-im*S,13);
+    ctx.beginPath(); ctx.arc(cx+re*S,cy-im*S,10,0,7); ctx.fillStyle=C('env'); ctx.fill();
+
+    ctx.fillStyle=C('text-primary'); ctx.font='600 25px ui-sans-serif,system-ui'; ctx.textAlign='center';
+    ctx.fillText(p.title,p.x0+W/4,44);
+    ctx.fillStyle=C('text-muted'); ctx.font='19px ui-mono,ui-sans-serif,system-ui';
+    ctx.fillText(p.sub,p.x0+W/4,72);
+    if(p.rot){ ctx.fillStyle=C('text-muted'); ctx.font='18px ui-sans-serif,system-ui';
+      ctx.fillText('spinning at f_c — unreadable, and mostly redundant',p.x0+W/4,H-18); }
+    else { ctx.fillStyle=C('env'); ctx.font='600 19px ui-sans-serif,system-ui';
+      ctx.fillText('the carrier spin has been subtracted away',p.x0+W/4,H-18); }
+  });
+  // divider
+  ctx.strokeStyle=C('rule'); ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(W/2,30); ctx.lineTo(W/2,H-40); ctx.stroke();
+}
+function arrow(ctx,x0,y0,x1,y1,head){
+  ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke();
+  var a=Math.atan2(y1-y0,x1-x0), L=Math.hypot(x1-x0,y1-y0);
+  if(L<head*1.2) return;
+  ctx.beginPath();
+  ctx.moveTo(x1,y1);
+  ctx.lineTo(x1-head*Math.cos(a-0.45),y1-head*Math.sin(a-0.45));
+  ctx.lineTo(x1-head*Math.cos(a+0.45),y1-head*Math.sin(a+0.45));
+  ctx.closePath(); ctx.fillStyle=ctx.strokeStyle; ctx.fill();
+}
+
+/* ---------------- time traces ---------------- */
+function drawTraces(){
+  var cv=document.getElementById('traces'), ctx=cv.getContext('2d');
+  var W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H); ctx.fillStyle=C('surface-1'); ctx.fillRect(0,0,W,H);
+  var pad={l:230,r:60,t:30,b:44}, rows=4, rh=(H-pad.t-pad.b)/rows, N=1600;
+  var X=function(t){return pad.l+t*(W-pad.l-pad.r);};
+  var defs=[
+    {lab:'x_I(t)', sub:'in-phase',  col:C('iq'),  f:function(t){return xl(t).re;}, amp:2.2},
+    {lab:'x_Q(t)', sub:'quadrature',col:C('car'), f:function(t){return xl(t).im;}, amp:2.2},
+    {lab:'|x_ℓ(t)|',sub:'envelope', col:C('env'), f:function(t){return absv(xl(t));}, amp:2.4, pos:true},
+    {lab:'x_bp(t)',sub:'transmitted',col:C('text-secondary'), f:xbp, amp:2.4, env:true}
+  ];
+  defs.forEach(function(d,i){
+    var y0=pad.t+i*rh+rh/2, A=rh*0.36/(d.amp/2.2);
+    ctx.strokeStyle=C('rule'); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(pad.l,y0); ctx.lineTo(W-pad.r,y0); ctx.stroke();
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.fillStyle=d.col; ctx.font='600 25px ui-sans-serif,system-ui';
+    ctx.fillText(d.lab,pad.l-22,y0-12);
+    ctx.fillStyle=C('text-muted'); ctx.font='19px ui-sans-serif,system-ui';
+    ctx.fillText(d.sub,pad.l-22,y0+16);
+    if(d.env){
+      ctx.setLineDash([10,8]); ctx.lineWidth=3; ctx.strokeStyle=C('env'); ctx.globalAlpha=.75;
+      [1,-1].forEach(function(sg){
+        ctx.beginPath();
+        for(var k=0;k<=N;k++){var t=k/N; var v=sg*absv(xl(t))/d.amp*2.2;
+          var px=X(t),py=y0-v*A; k?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+        ctx.stroke();
+      });
+      ctx.setLineDash([]); ctx.globalAlpha=1;
+    }
+    ctx.strokeStyle=d.col; ctx.lineWidth=d.env?2:4.2; ctx.lineJoin='round';
+    ctx.beginPath();
+    for(var k2=0;k2<=N;k2++){
+      var t2=k2/N, v2=d.f(t2)/d.amp*2.2;
+      var px2=X(t2),py2=y0-v2*A; k2?ctx.lineTo(px2,py2):ctx.moveTo(px2,py2);
+    }
+    ctx.stroke();
+    // cursor dot
+    var cxp=X(tau-Math.floor(tau)), vv=d.f(tau)/d.amp*2.2;
+    ctx.beginPath(); ctx.arc(cxp,y0-vv*A,9,0,7); ctx.fillStyle=d.col; ctx.fill();
+    ctx.lineWidth=4; ctx.strokeStyle=C('surface-1'); ctx.stroke();
+  });
+  // global cursor
+  var cx=X(tau-Math.floor(tau));
+  ctx.strokeStyle=C('acc'); ctx.globalAlpha=.45; ctx.lineWidth=2.6; ctx.setLineDash([7,7]);
+  ctx.beginPath(); ctx.moveTo(cx,pad.t); ctx.lineTo(cx,H-pad.b); ctx.stroke();
+  ctx.setLineDash([]); ctx.globalAlpha=1;
+  ctx.fillStyle=C('text-muted'); ctx.font='21px ui-sans-serif,system-ui'; ctx.textAlign='center';
+  ctx.fillText('time →',(pad.l+W-pad.r)/2,H-10);
+}
+
+/* ---------------- glue ---------------- */
+function render(){
+  document.getElementById('dfval').textContent=(df()>=0?'+':'−')+Math.abs(df()).toFixed(2);
+  document.getElementById('phval').textContent=document.getElementById('ph').value+'°';
+  drawArgand(); drawTraces();
+  var z=xl(tau);
+  document.getElementById('ro1').innerHTML=
+    'x_ℓ = <b>'+z.re.toFixed(2)+(z.im>=0?' + ':' − ')+Math.abs(z.im).toFixed(2)+'j</b>'+
+    '&nbsp;&nbsp;|x_ℓ| = <b>'+absv(z).toFixed(2)+'</b>'+
+    '&nbsp;&nbsp;∠x_ℓ = <b>'+(Math.atan2(z.im,z.re)*180/Math.PI).toFixed(0)+'°</b>'+
+    '&nbsp;&nbsp;&nbsp; rotation rate = <b>'+df().toFixed(2)+'</b> turns per window';
+  var mn=document.getElementById('modenote');
+  if(MODES[mode].id==='tone'){
+    mn.className='note';
+    mn.innerHTML='<p style="margin:0"><strong>Worked problem 9.1.</strong> Here x_ℓ(t) = e^(j2πΔf t + jφ₀), so the phasor has <em>constant length 1</em> and just rotates. The envelope is flat — a pure tone never changes amplitude — and <strong>all</strong> of the offset information lives in the angle. Set Δf = 0 and it freezes; φ₀ then just parks it at an angle.</p>';
+  } else {
+    mn.className='trap';
+    mn.innerHTML='<p style="margin:0"><strong>Notes page 11.</strong> Now x_ℓ(t) = A·x(t) + A·e^(j2πΔf t): a real vector along the horizontal axis (the message) <em>plus</em> a rotating unit vector (the offset carrier), added tip-to-tail. The green arrow is their sum. Its <strong>length</strong> is what the envelope detector reports — and because the orange vector keeps changing direction, that length beats at rate Δf.</p>';
+  }
+}
+var mb=document.getElementById('modes');
+MODES.forEach(function(m,i){
+  var b=document.createElement('button'); b.textContent=m.name;
+  b.className=(i===0)?'on':'';
+  b.onclick=function(){ mode=i;
+    [].forEach.call(mb.children,function(c){c.className='';}); b.className='on'; render(); };
+  mb.appendChild(b);
+});
+['df','ph'].forEach(function(id){ document.getElementById(id).oninput=render; });
+document.getElementById('play').onclick=function(){
+  playing=!playing; this.textContent=playing?'Pause':'Play'; this.className=playing?'on':'';
+  if(playing) loop();
+};
+function loop(){ if(!playing) return; tau+=0.0016; if(tau>50) tau-=50; render(); raf=requestAnimationFrame(loop); }
+render(); loop();
+})();
+</script>
+</body>
+</html>
